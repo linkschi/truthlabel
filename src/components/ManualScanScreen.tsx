@@ -1,0 +1,955 @@
+"use client";
+
+import dynamic from "next/dynamic";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useMemo, useState, useTransition } from "react";
+import AppMenu from "@/components/AppMenu";
+import {
+  getNextSelectedAllergiesOverride,
+  splitSavedAllergyProfile,
+} from "@/components/manualScanScreenState";
+import { SectionLabel } from "@/components/ResultUi";
+import { categoryProfiles } from "@/data/categoryProfiles";
+import { getDemoProductById } from "@/data/demoProducts";
+import { publicAppConfig } from "@/lib/appConfig";
+import { saveLatestBarcodeScan } from "@/lib/barcodeScanStorage";
+import { saveLatestManualScan } from "@/lib/manualScanStorage";
+import type { NormalizedProductForScan } from "@/lib/productDatabase/productDatabaseTypes";
+import {
+  applyBarcodeConfidenceNotes,
+  BarcodeValidationError,
+  runBarcodeScan,
+  type BarcodeScanLookupStatus,
+} from "@/lib/runBarcodeScan";
+import {
+  ManualScanValidationError,
+  type ManualScanInput,
+  runManualScan,
+} from "@/lib/runManualScan";
+import {
+  getSavedAllergyProfile,
+  useUserSettings,
+} from "@/lib/userSettings/userSettingsStorage";
+import type { OcrConfirmedDetails } from "./OcrIngredientScanner";
+
+const CameraBarcodeScanner = dynamic(
+  () => import("@/components/CameraBarcodeScanner"),
+  {
+    ssr: false,
+    loading: () => (
+      <ScannerOverlayLoading
+        title="Opening barcode scanner"
+        message="Preparing the camera barcode scanner on this device."
+      />
+    ),
+  },
+);
+
+const OcrIngredientScanner = dynamic(
+  () => import("@/components/OcrIngredientScanner"),
+  {
+    ssr: false,
+    loading: () => (
+      <ScannerOverlayLoading
+        title="Opening OCR scanner"
+        message="Preparing the ingredient-label scanner on this device."
+      />
+    ),
+  },
+);
+
+const manualAllergyOptions = [
+  "Milk",
+  "Egg",
+  "Peanut",
+  "Tree nuts",
+  "Wheat / gluten",
+  "Soy",
+  "Fish",
+  "Crustacean shellfish",
+  "Sesame",
+  "Mustard",
+  "Celery",
+  "Lupin",
+  "Molluscs",
+  "Sulphites",
+] as const;
+
+const manualCategoryOptions = categoryProfiles.map((profile) => profile.label);
+
+const manualExampleIds = [
+  "simple-rolled-oats",
+  "red-berry-soda",
+  "zero-sugar-citrus-drink",
+  "shelf-stable-sauce",
+  "chocolate-milk-drink",
+] as const;
+
+const manualQuickFillExamples = manualExampleIds.map((id) => {
+  const product = getDemoProductById(id);
+
+  return {
+    id,
+    label: product.productName,
+    productName: product.productName,
+    brandName: product.brandName,
+    productCategory: product.productCategory,
+    ingredientText:
+      id === "simple-rolled-oats" ? "Rolled oats" : product.ingredients.join(", "),
+    allergenStatement: product.allergenStatement,
+    packagingText: product.packagingText,
+    allergyProfile:
+      product.id === "chocolate-milk-drink" ? ["Milk"] : ([] as string[]),
+  };
+});
+
+const formFieldClass =
+  "mt-2 w-full rounded-[18px] border border-[#ddd6ca] bg-white/86 px-4 py-3 text-[14px] text-[#1f2d26] outline-none transition placeholder:text-[#8b8378] focus:border-[#bba88b] focus:bg-white";
+
+const textAreaClass = `${formFieldClass} min-h-[120px] resize-y`;
+
+const featureFlags = publicAppConfig.flags;
+const barcodeLookupEnabled = featureFlags.enableBarcodeLookup;
+const cameraBarcodeEnabled =
+  featureFlags.enableBarcodeLookup && featureFlags.enableCameraBarcodeScan;
+const ocrEnabled = featureFlags.enableOcrScan;
+const demoProductsEnabled = featureFlags.enableDemoProducts;
+
+function ScannerOverlayLoading({
+  title,
+  message,
+}: {
+  title: string;
+  message: string;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 bg-[rgba(18,24,21,0.74)] px-4 py-5 backdrop-blur-sm sm:px-5 sm:py-6">
+      <div className="mx-auto flex h-full w-full max-w-[440px] flex-col justify-center rounded-[30px] border border-white/14 bg-[#102019] p-5 text-white shadow-[0_28px_60px_rgba(0,0,0,0.38)]">
+        <div className="rounded-[24px] border border-white/14 bg-[rgba(255,255,255,0.06)] px-5 py-6 text-center">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/66">
+            inside it
+          </p>
+          <h2 className="mt-2 font-heading text-[1.3rem] font-semibold text-white">
+            {title}
+          </h2>
+          <p className="mt-2 text-[14px] leading-6 text-white/78">{message}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+type BarcodeFeedbackState = {
+  status: BarcodeScanLookupStatus | "validation";
+  message: string;
+  dataQualityWarnings: string[];
+  productData: NormalizedProductForScan | null;
+};
+
+function uniqueStrings(values: Array<string | null | undefined>) {
+  const seen = new Set<string>();
+  const result: string[] = [];
+
+  values.forEach((value) => {
+    const normalized = value?.trim();
+    if (!normalized || seen.has(normalized)) {
+      return;
+    }
+
+    seen.add(normalized);
+    result.push(normalized);
+  });
+
+  return result;
+}
+
+function parseTypedAllergies(value: string) {
+  return value
+    .split(/[,\n]/)
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+}
+
+function buildOcrConfidenceNotes(details?: OcrConfirmedDetails) {
+  return uniqueStrings([
+    "OCR text may contain mistakes. Check the ingredient list against the package label.",
+    details?.possibleAllergenStatement
+      ? "Allergen statements should be checked manually on the package."
+      : null,
+    ...(details?.confidenceWarnings ?? []),
+  ]);
+}
+
+function buildManualScanInput(args: {
+  productName: string;
+  brandName: string;
+  productCategory: string;
+  ingredientText: string;
+  allergenStatement: string;
+  packagingText: string;
+  selectedAllergies: string[];
+  customAllergiesText: string;
+}): ManualScanInput {
+  const combinedAllergies = [
+    ...args.selectedAllergies,
+    ...parseTypedAllergies(args.customAllergiesText),
+  ];
+
+  return {
+    productName: args.productName,
+    brandName: args.brandName,
+    productCategory: args.productCategory,
+    ingredientText: args.ingredientText,
+    allergenStatement: args.allergenStatement,
+    packagingText: args.packagingText,
+    userAllergyProfile: Array.from(new Set(combinedAllergies)),
+  };
+}
+
+export default function ManualScanScreen() {
+  const router = useRouter();
+  const userSettings = useUserSettings();
+  const [isPending, startTransition] = useTransition();
+  const [isCameraScannerOpen, setIsCameraScannerOpen] = useState(false);
+  const [isOcrScannerOpen, setIsOcrScannerOpen] = useState(false);
+  const [isLookingUpBarcode, setIsLookingUpBarcode] = useState(false);
+  const [barcodeInput, setBarcodeInput] = useState("");
+  const [barcodeFeedback, setBarcodeFeedback] =
+    useState<BarcodeFeedbackState | null>(null);
+  const [productName, setProductName] = useState("");
+  const [brandName, setBrandName] = useState("");
+  const [productCategoryOverride, setProductCategoryOverride] =
+    useState<string | null>(null);
+  const [ingredientText, setIngredientText] = useState("");
+  const [allergenStatement, setAllergenStatement] = useState("");
+  const [packagingText, setPackagingText] = useState("");
+  const [selectedAllergiesOverride, setSelectedAllergiesOverride] =
+    useState<string[] | null>(null);
+  const [customAllergiesTextOverride, setCustomAllergiesTextOverride] =
+    useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState("");
+  const savedAllergyDefaults = useMemo(
+    () => splitSavedAllergyProfile(getSavedAllergyProfile(userSettings)),
+    [userSettings],
+  );
+  const productCategory =
+    productCategoryOverride ??
+    userSettings.scanPreferences.defaultProductCategory ??
+    "General / Unknown";
+  const selectedAllergies =
+    selectedAllergiesOverride ?? savedAllergyDefaults.selectedAllergies;
+  const customAllergiesText =
+    customAllergiesTextOverride ?? savedAllergyDefaults.customAllergiesText;
+
+  const selectedAllergySummary = useMemo(
+    () =>
+      Array.from(
+        new Set([
+          ...selectedAllergies,
+          ...parseTypedAllergies(customAllergiesText),
+        ]),
+      ),
+    [customAllergiesText, selectedAllergies],
+  );
+
+  const barcodeDraftProduct =
+    barcodeFeedback?.status === "found_missing_ingredients"
+      ? barcodeFeedback.productData
+      : null;
+
+  function applyQuickFill(exampleId: (typeof manualExampleIds)[number]) {
+    const example = manualQuickFillExamples.find((entry) => entry.id === exampleId);
+
+    if (!example) {
+      return;
+    }
+
+    setProductName(example.productName);
+    setBrandName(example.brandName);
+    setProductCategoryOverride(example.productCategory);
+    setIngredientText(example.ingredientText);
+    setAllergenStatement(example.allergenStatement);
+    setPackagingText(example.packagingText);
+    setSelectedAllergiesOverride(example.allergyProfile);
+    setCustomAllergiesTextOverride("");
+    setErrorMessage("");
+    setBarcodeFeedback(null);
+    setBarcodeInput("");
+  }
+
+  async function lookupBarcodeValue(barcodeValue: string) {
+    if (!barcodeLookupEnabled) {
+      setBarcodeFeedback({
+        status: "error",
+        message:
+          "Barcode lookup is unavailable in this build. Paste the ingredient list manually instead.",
+        dataQualityWarnings: [],
+        productData: null,
+      });
+      return null;
+    }
+
+    setErrorMessage("");
+    setIsLookingUpBarcode(true);
+    setBarcodeFeedback(null);
+
+    try {
+      const result = await runBarcodeScan({
+        barcode: barcodeValue,
+        userAllergyProfile: selectedAllergySummary,
+      });
+
+      if (result.lookupStatus === "found" && result.productData && result.scanResult) {
+        saveLatestBarcodeScan({
+          input: {
+            barcode: result.productData.barcode,
+            userAllergyProfile: selectedAllergySummary,
+          },
+          lookupStatus: result.lookupStatus,
+          productData: result.productData,
+          result: result.scanResult,
+          message: result.message,
+          dataQualityWarnings: result.dataQualityWarnings,
+          savedAt: new Date().toISOString(),
+        });
+
+        startTransition(() => {
+          router.push("/product?barcode=latest");
+        });
+        return result;
+      }
+
+      setBarcodeFeedback({
+        status: result.lookupStatus,
+        message: result.message,
+        dataQualityWarnings: result.dataQualityWarnings,
+        productData: result.productData,
+      });
+
+      if (result.lookupStatus === "found_missing_ingredients" && result.productData) {
+        setProductName(result.productData.productName);
+        setBrandName(result.productData.brandName);
+        setProductCategoryOverride(result.productData.productCategory);
+        setIngredientText("");
+        setAllergenStatement(result.productData.allergenStatement);
+        setPackagingText(result.productData.packagingText);
+      }
+
+      return result;
+    } catch (error) {
+      if (error instanceof BarcodeValidationError) {
+        setBarcodeFeedback({
+          status: "validation",
+          message: error.message,
+          dataQualityWarnings: [],
+          productData: null,
+        });
+        return null;
+      }
+
+      setBarcodeFeedback({
+        status: "error",
+        message:
+          "Product lookup failed. Check your connection or paste the ingredient list manually.",
+        dataQualityWarnings: [],
+        productData: null,
+      });
+      return null;
+    } finally {
+      setIsLookingUpBarcode(false);
+    }
+  }
+
+  async function handleBarcodeLookup(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    await lookupBarcodeValue(barcodeInput);
+  }
+
+  async function handleCameraBarcodeDetected(barcode: string) {
+    setIsCameraScannerOpen(false);
+    setBarcodeInput(barcode);
+    await lookupBarcodeValue(barcode);
+  }
+
+  function runConfirmedIngredientScan(options?: {
+    ingredientTextOverride?: string;
+    allergenStatementOverride?: string;
+    scanSource?: "manual_paste" | "barcode" | "ocr";
+    additionalConfidenceNotes?: string[];
+  }) {
+    setErrorMessage("");
+
+    const input = buildManualScanInput({
+      productName,
+      brandName,
+      productCategory,
+      ingredientText: options?.ingredientTextOverride ?? ingredientText,
+      allergenStatement:
+        options?.allergenStatementOverride ?? allergenStatement,
+      packagingText,
+      selectedAllergies,
+      customAllergiesText,
+    });
+
+    const result = runManualScan({
+      ...input,
+      barcode: barcodeDraftProduct?.barcode,
+      packagingText: barcodeDraftProduct?.packagingText || input.packagingText,
+      allergenStatement:
+        options?.allergenStatementOverride ||
+        barcodeDraftProduct?.allergenStatement ||
+        input.allergenStatement,
+      externalSignals: barcodeDraftProduct?.externalSignals,
+      scanSource:
+        options?.scanSource ?? (barcodeDraftProduct ? "barcode" : "manual_paste"),
+      additionalConfidenceNotes: options?.additionalConfidenceNotes ?? [],
+    });
+
+    const finalResult = barcodeDraftProduct
+      ? applyBarcodeConfidenceNotes(result, barcodeDraftProduct)
+      : result;
+
+    if (
+      barcodeDraftProduct &&
+      (options?.scanSource ?? "barcode") === "barcode"
+    ) {
+      saveLatestBarcodeScan({
+        input: {
+          barcode: barcodeDraftProduct.barcode,
+          userAllergyProfile: input.userAllergyProfile,
+        },
+        lookupStatus: "found",
+        productData: barcodeDraftProduct,
+        result: finalResult,
+        message: "Product found. InsideIt scanned the available ingredient data.",
+        dataQualityWarnings: barcodeDraftProduct.dataQualityWarnings,
+        savedAt: new Date().toISOString(),
+      });
+
+      startTransition(() => {
+        router.push("/product?barcode=latest");
+      });
+      return;
+    }
+
+    saveLatestManualScan({
+      input: {
+        ...input,
+        barcode: barcodeDraftProduct?.barcode,
+        packagingText: barcodeDraftProduct?.packagingText || input.packagingText,
+        allergenStatement:
+          options?.allergenStatementOverride ||
+          barcodeDraftProduct?.allergenStatement ||
+          input.allergenStatement,
+        externalSignals: barcodeDraftProduct?.externalSignals,
+        scanSource:
+          options?.scanSource ?? (barcodeDraftProduct ? "barcode" : "manual_paste"),
+        additionalConfidenceNotes: options?.additionalConfidenceNotes ?? [],
+      },
+      result: finalResult,
+      savedAt: new Date().toISOString(),
+    });
+
+    startTransition(() => {
+      router.push("/product?manual=latest");
+    });
+  }
+
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    try {
+      runConfirmedIngredientScan();
+    } catch (error) {
+      if (error instanceof ManualScanValidationError) {
+        setErrorMessage(error.message);
+        return;
+      }
+
+      setErrorMessage("We could not read this label yet. Please review the pasted text and try again.");
+    }
+  }
+
+  async function handleOcrTextConfirmed(
+    extractedIngredientText: string,
+    details?: OcrConfirmedDetails,
+  ) {
+    setIngredientText(extractedIngredientText);
+    if (details?.possibleAllergenStatement) {
+      setAllergenStatement(details.possibleAllergenStatement);
+    }
+
+    try {
+      runConfirmedIngredientScan({
+        ingredientTextOverride: extractedIngredientText,
+        allergenStatementOverride: details?.possibleAllergenStatement,
+        scanSource: "ocr",
+        additionalConfidenceNotes: buildOcrConfidenceNotes(details),
+      });
+      setIsOcrScannerOpen(false);
+    } catch (error) {
+      if (error instanceof ManualScanValidationError) {
+        setErrorMessage(error.message);
+        return;
+      }
+
+      setErrorMessage("We could not read this label yet. Please review the pasted text and try again.");
+    }
+  }
+
+  return (
+    <main className="min-h-screen px-4 py-5 sm:px-5 sm:py-6">
+      {isCameraScannerOpen ? (
+        <CameraBarcodeScanner
+          onBarcodeDetected={handleCameraBarcodeDetected}
+          onClose={() => setIsCameraScannerOpen(false)}
+        />
+      ) : null}
+      {isOcrScannerOpen ? (
+        <OcrIngredientScanner
+          onTextConfirmed={handleOcrTextConfirmed}
+          onClose={() => setIsOcrScannerOpen(false)}
+        />
+      ) : null}
+
+      <div className="mx-auto max-w-[440px] space-y-4">
+        <header className="flex items-start justify-between gap-4 px-1 py-1">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#7c6d4f]">
+              inside it
+            </p>
+            <h1 className="mt-1 font-heading text-[1.7rem] font-semibold text-[#17251f]">
+              Scan
+            </h1>
+            <p className="mt-2 max-w-sm text-[14px] leading-5 text-[#58665e]">
+              {barcodeLookupEnabled
+                ? "Type a barcode or paste a real product label and run it through the current InsideIt engine."
+                : "Paste a real product label and run it through the current InsideIt engine."}
+            </p>
+            <p className="mt-1 text-[13px] font-medium text-[#7a705c]">
+              {barcodeLookupEnabled
+                ? "Barcode lookup is live. Ingredient list still gives the strongest result."
+                : "Ingredient list still gives the strongest result in this build."}
+            </p>
+          </div>
+          <AppMenu />
+        </header>
+
+        <section className="rounded-[24px] border border-white/72 bg-[var(--surface-strong)] px-4 py-4 shadow-[var(--shadow)]">
+          <SectionLabel>Trust note</SectionLabel>
+          <p className="mt-1.5 text-[13px] leading-5 text-[#55645c]">
+            InsideIt helps explain ingredient labels and safety signals. It is not medical advice. Always check the product label, especially for allergies.
+          </p>
+        </section>
+
+        {demoProductsEnabled ? (
+        <section className="rounded-[28px] border border-white/75 bg-[var(--surface-strong)] px-4 py-4 shadow-[var(--shadow)]">
+          <div className="flex items-center justify-between gap-3">
+            <SectionLabel>Quick fill</SectionLabel>
+            <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-[#66756d]">
+              Real label tests
+            </p>
+          </div>
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            {manualQuickFillExamples.map((example) => (
+              <button
+                key={example.id}
+                type="button"
+                onClick={() => applyQuickFill(example.id)}
+                className="rounded-full border border-[#ddd6ca] bg-white/78 px-3 py-1.5 text-[12px] font-medium text-[#33443c] transition hover:border-[#c4b493] hover:bg-[#fbf6ed]"
+              >
+                {example.label}
+              </button>
+            ))}
+          </div>
+        </section>
+        ) : null}
+
+        {barcodeLookupEnabled ? (
+        <section className="rounded-[28px] border border-white/75 bg-[var(--surface-strong)] px-4 py-4 shadow-[var(--shadow)]">
+          <div className="flex items-center justify-between gap-3">
+            <SectionLabel>Barcode lookup</SectionLabel>
+            <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-[#66756d]">
+              Open Food Facts
+            </p>
+          </div>
+          <p className="mt-1.5 text-[14px] leading-5 text-[#55645c]">
+            Type a barcode to fetch product data, then let InsideIt scan the available ingredient list.
+          </p>
+          <p className="mt-2 text-[12px] leading-5 text-[#6a776f]">
+            Product database data may be incomplete or user-submitted. Check the package label if something looks missing.
+          </p>
+
+          <div className="mt-4 flex flex-wrap gap-2.5">
+            {cameraBarcodeEnabled ? (
+              <button
+                type="button"
+                disabled={isLookingUpBarcode || isPending}
+                onClick={() => {
+                  setBarcodeFeedback(null);
+                  setIsCameraScannerOpen(true);
+                }}
+                className="rounded-full border border-[#ddd4c3] bg-white/82 px-4 py-2.5 text-[12px] font-semibold uppercase tracking-[0.14em] text-[#22342c] transition active:scale-[0.99] disabled:cursor-wait disabled:opacity-70"
+              >
+                {isLookingUpBarcode ? "Looking up..." : "Scan Barcode"}
+              </button>
+            ) : null}
+            <span className="inline-flex items-center rounded-full border border-[#e7decf] bg-[#faf7f0] px-3 py-2 text-[11px] font-medium text-[#6c6a5f]">
+              {cameraBarcodeEnabled
+                ? "Camera access is only used to read the barcode."
+                : "You can still type the barcode manually if camera scan is unavailable."}
+            </span>
+          </div>
+
+          {isLookingUpBarcode ? (
+            <p
+              role="status"
+              aria-live="polite"
+              className="mt-3 text-[12px] leading-5 text-[#6a776f]"
+            >
+              Looking up the product database and checking the available ingredient data.
+            </p>
+          ) : null}
+
+          <form onSubmit={handleBarcodeLookup} className="mt-4">
+            <div className="flex flex-col gap-2.5 sm:flex-row sm:items-end">
+              <label className="min-w-0 flex-1">
+                <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#445047]">
+                  Product barcode
+                </span>
+                <input
+                  value={barcodeInput}
+                  onChange={(event) => setBarcodeInput(event.target.value)}
+                  inputMode="numeric"
+                  autoComplete="off"
+                  className={formFieldClass}
+                  placeholder="0123456789012"
+                />
+              </label>
+              <button
+                type="submit"
+                disabled={isLookingUpBarcode || isPending}
+                className="rounded-full border border-transparent bg-[#182b22] px-4 py-2.5 text-[12px] font-semibold uppercase tracking-[0.14em] text-white shadow-[0_18px_36px_rgba(24,43,34,0.18)] transition active:scale-[0.99] disabled:cursor-wait disabled:opacity-70"
+              >
+                {isLookingUpBarcode ? "Looking up..." : "Lookup"}
+              </button>
+            </div>
+          </form>
+
+          {barcodeFeedback ? (
+            <div
+              role="status"
+              aria-live="polite"
+              className="mt-4 rounded-[20px] border border-[#e7decf] bg-white/78 px-4 py-3.5"
+            >
+              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#7c6d4f]">
+                {barcodeFeedback.status === "found_missing_ingredients"
+                  ? "Barcode product found"
+                  : barcodeFeedback.status === "not_found"
+                    ? "Product not found"
+                    : barcodeFeedback.status === "validation"
+                      ? "Check the barcode"
+                      : "Lookup status"}
+              </p>
+              <p className="mt-1.5 text-[13px] leading-5 text-[#49584f]">
+                {barcodeFeedback.message}
+              </p>
+
+              {barcodeFeedback.productData ? (
+                <div className="mt-3 grid gap-1 text-[12px] leading-5 text-[#5a6960]">
+                  <p>
+                    <span className="font-semibold text-[#33443c]">Product:</span>{" "}
+                    {barcodeFeedback.productData.productName}
+                  </p>
+                  <p>
+                    <span className="font-semibold text-[#33443c]">Brand:</span>{" "}
+                    {barcodeFeedback.productData.brandName}
+                  </p>
+                  <p>
+                    <span className="font-semibold text-[#33443c]">Barcode:</span>{" "}
+                    {barcodeFeedback.productData.barcode}
+                  </p>
+                </div>
+              ) : null}
+
+              {barcodeFeedback.dataQualityWarnings.length > 0 ? (
+                <ul className="mt-3 space-y-1.5 text-[12px] leading-5 text-[#5a6960]">
+                  {barcodeFeedback.dataQualityWarnings.map((warning) => (
+                    <li key={warning}>- {warning}</li>
+                  ))}
+                </ul>
+              ) : null}
+            </div>
+          ) : null}
+        </section>
+        ) : null}
+
+        <form
+          onSubmit={handleSubmit}
+          className="rounded-[28px] border border-white/75 bg-[var(--surface-strong)] px-4 py-4 shadow-[var(--shadow)]"
+        >
+          <div className="flex items-center justify-between gap-3">
+            <SectionLabel>Paste label</SectionLabel>
+            <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-[#66756d]">
+              {barcodeDraftProduct ? "Complete barcode scan" : "Manual input"}
+            </p>
+          </div>
+
+          <div className="mt-4 flex flex-wrap items-center gap-2.5">
+            {ocrEnabled ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setErrorMessage("");
+                  setIsOcrScannerOpen(true);
+                }}
+                className="rounded-full border border-[#ddd4c3] bg-white/82 px-4 py-2.5 text-[12px] font-semibold uppercase tracking-[0.14em] text-[#22342c] transition active:scale-[0.99]"
+              >
+                Scan Ingredient Label
+              </button>
+            ) : null}
+            <span className="inline-flex items-center rounded-full border border-[#e7decf] bg-[#faf7f0] px-3 py-2 text-[11px] font-medium text-[#6c6a5f]">
+              {ocrEnabled
+                ? "OCR is review-first. You can edit the text before scanning."
+                : "Paste the ingredient list manually when OCR is unavailable in this build."}
+            </span>
+          </div>
+
+          {barcodeDraftProduct ? (
+            <div className="mt-4 rounded-[18px] border border-[#e7decf] bg-white/78 px-4 py-3">
+              <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#7c6d4f]">
+                Complete this barcode scan
+              </p>
+              <p className="mt-1.5 text-[13px] leading-5 text-[#55645c]">
+                The product record was found, but the ingredient list was missing. Paste the label below to finish the scan while keeping the saved product details.
+              </p>
+              <p className="mt-2 text-[12px] leading-5 text-[#5a6960]">
+                Barcode: {barcodeDraftProduct.barcode}
+              </p>
+            </div>
+          ) : null}
+
+          {errorMessage ? (
+            <div
+              role="alert"
+              className="mt-4 rounded-[18px] border border-[#e7d7d4] bg-[#f7ecea] px-4 py-3"
+            >
+              <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#8f615e]">
+                Check the input
+              </p>
+              <p className="mt-1.5 text-[13px] leading-5 text-[#6b4d49]">
+                {errorMessage}
+              </p>
+            </div>
+          ) : null}
+
+          <div className="mt-4 grid gap-4">
+            {barcodeDraftProduct ? (
+              <label className="block">
+                <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#445047]">
+                  Barcode
+                </span>
+                <input
+                  value={barcodeDraftProduct.barcode}
+                  readOnly
+                  className={`${formFieldClass} cursor-default bg-[#f8f3ea] text-[#596860]`}
+                />
+              </label>
+            ) : null}
+
+            <label className="block">
+              <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#445047]">
+                Product name
+              </span>
+              <input
+                value={productName}
+                onChange={(event) => setProductName(event.target.value)}
+                className={formFieldClass}
+                placeholder="Unknown product"
+              />
+            </label>
+
+            <label className="block">
+              <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#445047]">
+                Brand name
+              </span>
+              <input
+                value={brandName}
+                onChange={(event) => setBrandName(event.target.value)}
+                className={formFieldClass}
+                placeholder="Unknown brand"
+              />
+            </label>
+
+            <label className="block">
+              <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#445047]">
+                Product category
+              </span>
+              <select
+                value={productCategory}
+                onChange={(event) => setProductCategoryOverride(event.target.value)}
+                className={formFieldClass}
+              >
+                {manualCategoryOptions.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="block">
+              <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#445047]">
+                Ingredient list
+              </span>
+              <textarea
+                value={ingredientText}
+                onChange={(event) => setIngredientText(event.target.value)}
+                className={textAreaClass}
+                placeholder="Ingredients: Carbonated water, sugar, citric acid, Red No. 3, sodium benzoate, natural flavour."
+              />
+              <p className="mt-1.5 text-[12px] leading-5 text-[#6a776f]">
+                Paste the visible ingredient text. InsideIt will parse commas, line breaks, semicolons, and common label prefixes.
+              </p>
+            </label>
+
+            <label className="block">
+              <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#445047]">
+                Allergen statement
+              </span>
+              <input
+                value={allergenStatement}
+                onChange={(event) => setAllergenStatement(event.target.value)}
+                className={formFieldClass}
+                placeholder="Contains milk and soy"
+              />
+            </label>
+
+            <label className="block">
+              <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#445047]">
+                Packaging text
+              </span>
+              <input
+                value={packagingText}
+                onChange={(event) => setPackagingText(event.target.value)}
+                className={formFieldClass}
+                placeholder="PET bottle, plastic pouch, foil wrapper"
+              />
+            </label>
+          </div>
+
+          <div className="mt-5 rounded-[22px] border border-[#e7decf] bg-white/76 px-4 py-4">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <SectionLabel>Allergy profile</SectionLabel>
+                <p className="mt-1.5 text-[13px] leading-5 text-[#55645c]">
+                  Optional. If one of these matches the product, Allergy Risk can turn red.
+                </p>
+              </div>
+              <span className="rounded-full border border-[#e1d8ca] bg-[#faf7f0] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#6d6a5d]">
+                Optional
+              </span>
+            </div>
+
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {manualAllergyOptions.map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  aria-pressed={selectedAllergies.includes(option)}
+                  onClick={() =>
+                    setSelectedAllergiesOverride((current) =>
+                      getNextSelectedAllergiesOverride(
+                        current,
+                        selectedAllergies,
+                        option,
+                      ),
+                    )
+                  }
+                  className={`rounded-full border px-3 py-1.5 text-[13px] font-medium transition ${
+                    selectedAllergies.includes(option)
+                      ? "border-[#1c3028] bg-[#1c3028] text-white shadow-[0_10px_24px_rgba(28,48,40,0.14)]"
+                      : "border-[#ddd6ca] bg-white/78 text-[#33443c] hover:border-[#c4b493] hover:bg-[#fbf6ed]"
+                  }`}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
+
+            <label className="mt-4 block">
+              <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#445047]">
+                Typed allergies
+              </span>
+              <input
+                value={customAllergiesText}
+                onChange={(event) =>
+                  setCustomAllergiesTextOverride(event.target.value)
+                }
+                className={formFieldClass}
+                placeholder="milk, sesame, sulphites"
+              />
+            </label>
+
+            <div className="mt-3 rounded-[18px] border border-[#e7decf] bg-[#faf7f0] px-3.5 py-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#7c6d4f]">
+                Selected profile
+              </p>
+              {selectedAllergySummary.length > 0 ? (
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {selectedAllergySummary.map((item) => (
+                    <span
+                      key={item}
+                      className="inline-flex rounded-full border border-[#e1d8ca] bg-white px-3 py-1 text-[12px] font-medium text-[#445249]"
+                    >
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-2 text-[13px] leading-5 text-[#49584f]">
+                  No allergy profile selected for this scan.
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="mt-5 rounded-[20px] border border-[#e7decf] bg-white/76 px-4 py-3.5">
+            <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#7a705c]">
+              Data honesty
+            </p>
+            <p className="mt-1.5 text-[13px] leading-5 text-[#55645c]">
+              Barcode records can be incomplete or user-submitted. Heavy metals, microplastics, and recall status also require external data. Missing data is not proof of absence.
+            </p>
+            <p className="mt-2 text-[12px] leading-5 text-[#6a776f]">
+              Recall and safety checks depend on available official data. Barcode lookup only sends the barcode or product details needed for product and safety matching.
+            </p>
+          </div>
+
+          <div className="mt-5 flex items-center justify-between gap-3">
+            <Link
+              href="/"
+              className="text-[13px] font-medium text-[#5f695f] underline-offset-4 hover:underline"
+            >
+              Back home
+            </Link>
+            <button
+              type="submit"
+              disabled={isPending}
+              className="rounded-full border border-transparent bg-[#182b22] px-5 py-2.5 text-[13px] font-semibold uppercase tracking-[0.14em] text-white shadow-[0_18px_36px_rgba(24,43,34,0.18)] transition active:scale-[0.99] disabled:cursor-wait disabled:opacity-70"
+            >
+              {isPending
+                ? barcodeDraftProduct
+                  ? "Completing scan..."
+                  : "Scanning label..."
+                : barcodeDraftProduct
+                  ? "Complete scan"
+                  : "Run manual scan"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </main>
+  );
+}
