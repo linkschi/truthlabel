@@ -226,6 +226,17 @@ function requireScanInput(value: ManualScanInput | null) {
   return value;
 }
 
+function findButtonByLabel(
+  container: ParentNode,
+  pattern: RegExp,
+) {
+  return (
+    Array.from(
+      container.querySelectorAll<HTMLButtonElement>("button"),
+    ).find((button) => pattern.test(button.textContent ?? "")) ?? null
+  );
+}
+
 test("OcrIngredientScanner renders the OCR instructions", async () => {
   const rendered = await renderScanner();
 
@@ -286,9 +297,10 @@ test("OcrIngredientScanner camera capture can trigger the OCR flow when camera s
   });
 
   try {
-    const useCameraButton = Array.from(
-      rendered.container.querySelectorAll("button"),
-    ).find((button) => /use camera/i.test(button.textContent ?? ""));
+    const useCameraButton = findButtonByLabel(
+      rendered.container,
+      /use camera/i,
+    );
     assert.ok(useCameraButton);
 
     await act(async () => {
@@ -301,9 +313,10 @@ test("OcrIngredientScanner camera capture can trigger the OCR flow when camera s
       assert.match(rendered.container.textContent ?? "", /Capture Label/i);
     });
 
-    const captureButton = Array.from(
-      rendered.container.querySelectorAll("button"),
-    ).find((button) => /capture label/i.test(button.textContent ?? ""));
+    const captureButton = findButtonByLabel(
+      rendered.container,
+      /capture label/i,
+    );
     assert.ok(captureButton);
 
     await act(async () => {
@@ -378,9 +391,10 @@ test("OcrIngredientScanner lets the user edit OCR text before confirming and can
       );
     });
 
-    const confirmButton = Array.from(
-      rendered.container.querySelectorAll("button"),
-    ).find((button) => /scan this label/i.test(button.textContent ?? ""));
+    const confirmButton = findButtonByLabel(
+      rendered.container,
+      /scan this label/i,
+    );
     assert.ok(confirmButton);
 
     await act(async () => {
