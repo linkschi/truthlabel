@@ -16,17 +16,8 @@ import { publicAppConfig } from "@/lib/appConfig";
 import { saveLatestBarcodeScan } from "@/lib/barcodeScanStorage";
 import { saveLatestManualScan } from "@/lib/manualScanStorage";
 import type { NormalizedProductForScan } from "@/lib/productDatabase/productDatabaseTypes";
-import {
-  applyBarcodeConfidenceNotes,
-  BarcodeValidationError,
-  runBarcodeScan,
-  type BarcodeScanLookupStatus,
-} from "@/lib/runBarcodeScan";
-import {
-  ManualScanValidationError,
-  type ManualScanInput,
-  runManualScan,
-} from "@/lib/runManualScan";
+import type { BarcodeScanLookupStatus } from "@/lib/runBarcodeScan";
+import type { ManualScanInput } from "@/lib/runManualScan";
 import {
   getSavedAllergyProfile,
   useUserSettings,
@@ -115,6 +106,32 @@ const cameraBarcodeEnabled =
   featureFlags.enableBarcodeLookup && featureFlags.enableCameraBarcodeScan;
 const ocrEnabled = featureFlags.enableOcrScan;
 const demoProductsEnabled = featureFlags.enableDemoProducts;
+
+type RunBarcodeScanModule = typeof import("@/lib/runBarcodeScan");
+type RunManualScanModule = typeof import("@/lib/runManualScan");
+
+let barcodeScanModulePromise: Promise<RunBarcodeScanModule> | null = null;
+let manualScanModulePromise: Promise<RunManualScanModule> | null = null;
+
+function loadBarcodeScanModule() {
+  if (!barcodeScanModulePromise) {
+    barcodeScanModulePromise = import("@/lib/runBarcodeScan");
+  }
+
+  return barcodeScanModulePromise;
+}
+
+function loadManualScanModule() {
+  if (!manualScanModulePromise) {
+    manualScanModulePromise = import("@/lib/runManualScan");
+  }
+
+  return manualScanModulePromise;
+}
+
+function hasErrorName(error: unknown, expectedName: string) {
+  return error instanceof Error && error.name === expectedName;
+}
 
 function ScannerOverlayLoading({
   title,
@@ -295,6 +312,7 @@ export default function ManualScanScreen() {
     setBarcodeFeedback(null);
 
     try {
+      const { runBarcodeScan } = await loadBarcodeScanModule();
       const result = await runBarcodeScan({
         barcode: barcodeValue,
         userAllergyProfile: selectedAllergySummary,
@@ -338,10 +356,11 @@ export default function ManualScanScreen() {
 
       return result;
     } catch (error) {
-      if (error instanceof BarcodeValidationError) {
+      if (hasErrorName(error, "BarcodeValidationError")) {
         setBarcodeFeedback({
           status: "validation",
-          message: error.message,
+          message:
+            error instanceof Error ? error.message : "Enter a valid product barcode.",
           dataQualityWarnings: [],
           productData: null,
         });
@@ -372,7 +391,7 @@ export default function ManualScanScreen() {
     await lookupBarcodeValue(barcode);
   }
 
-  function runConfirmedIngredientScan(options?: {
+  async function runConfirmedIngredientScan(options?: {
     ingredientTextOverride?: string;
     allergenStatementOverride?: string;
     scanSource?: "manual_paste" | "barcode" | "ocr";
@@ -392,6 +411,11 @@ export default function ManualScanScreen() {
       customAllergiesText,
     });
 
+    const [{ runManualScan }, barcodeScanModule] = await Promise.all([
+      loadManualScanModule(),
+      barcodeDraftProduct ? loadBarcodeScanModule() : Promise.resolve(null),
+    ]);
+
     const result = runManualScan({
       ...input,
       barcode: barcodeDraftProduct?.barcode,
@@ -406,9 +430,10 @@ export default function ManualScanScreen() {
       additionalConfidenceNotes: options?.additionalConfidenceNotes ?? [],
     });
 
-    const finalResult = barcodeDraftProduct
-      ? applyBarcodeConfidenceNotes(result, barcodeDraftProduct)
-      : result;
+    const finalResult =
+      barcodeDraftProduct && barcodeScanModule
+        ? barcodeScanModule.applyBarcodeConfidenceNotes(result, barcodeDraftProduct)
+        : result;
 
     if (
       barcodeDraftProduct &&
@@ -456,14 +481,18 @@ export default function ManualScanScreen() {
     });
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     try {
-      runConfirmedIngredientScan();
+      await runConfirmedIngredientScan();
     } catch (error) {
-      if (error instanceof ManualScanValidationError) {
-        setErrorMessage(error.message);
+      if (hasErrorName(error, "ManualScanValidationError")) {
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "Please paste the ingredient list so Truthlabel can scan the product.",
+        );
         return;
       }
 
@@ -481,7 +510,7 @@ export default function ManualScanScreen() {
     }
 
     try {
-      runConfirmedIngredientScan({
+      await runConfirmedIngredientScan({
         ingredientTextOverride: extractedIngredientText,
         allergenStatementOverride: details?.possibleAllergenStatement,
         scanSource: "ocr",
@@ -489,8 +518,12 @@ export default function ManualScanScreen() {
       });
       setIsOcrScannerOpen(false);
     } catch (error) {
-      if (error instanceof ManualScanValidationError) {
-        setErrorMessage(error.message);
+      if (hasErrorName(error, "ManualScanValidationError")) {
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "Please paste the ingredient list so Truthlabel can scan the product.",
+        );
         return;
       }
 
