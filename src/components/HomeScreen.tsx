@@ -8,17 +8,10 @@ import {
   getDemoProductById,
   getPrimaryDemoProducts,
 } from "@/data/demoProducts";
-import {
-  demoBenchmarkComments,
-  defaultDemoCategory,
-  demoCategoryProfiles,
-  demoCheckLabels,
-  demoDisplayRules,
-} from "@/data/demoExposure";
 import { publicAppConfig } from "@/lib/appConfig";
 import { saveProfile, useStoredProfile } from "@/lib/profileStorage";
 
-const defaultProductHref = `/product?category=${defaultDemoCategory}&demo=${defaultDemoProductId}`;
+const defaultProductHref = `/product?category=packaged-processed-foods&demo=${defaultDemoProductId}`;
 const defaultDemoProduct = getDemoProductById(defaultDemoProductId);
 const primaryDemoProducts = getPrimaryDemoProducts();
 const featureFlags = publicAppConfig.flags;
@@ -233,105 +226,6 @@ export default function HomeScreen() {
                   </span>
                 </div>
               </Link>
-            ))}
-          </div>
-        </section>
-        ) : null}
-
-        {featureFlags.enableDemoProducts ? (
-        <section
-          id="demo-categories"
-          className="rounded-[24px] border border-white/72 bg-[var(--surface-strong)] px-4 py-4 shadow-[var(--shadow)]"
-        >
-          <SectionLabel>Demo categories</SectionLabel>
-          <p className="mt-1.5 text-[14px] leading-5 text-[#55645c]">
-            These are the main demo categories. Under each category, you can see
-            the default rows that belong to it and open that exact category logic.
-          </p>
-
-          <div className="mt-3 space-y-3">
-            {demoCategoryProfiles.map((category) => (
-              <div
-                key={category.key}
-                className="rounded-[20px] border border-[#e7decf] bg-white/78 p-3.5"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <h2 className="text-[14px] font-semibold text-[#1d2b24]">
-                      {category.label}
-                    </h2>
-                    <p className="mt-1 text-[12px] leading-5 text-[#596860]">
-                      {category.description}
-                    </p>
-                  </div>
-                  <Link
-                    href={`/product?category=${category.key}`}
-                    onClick={() => saveProfile(profile)}
-                    className="inline-flex rounded-full border border-[#ddd4c3] bg-[#faf7f0] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#304139] transition hover:bg-white active:scale-[0.99]"
-                  >
-                    Open
-                  </Link>
-                </div>
-
-                <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#7a705c]">
-                  Main category rows
-                </p>
-                <ol className="mt-2 space-y-1.5">
-                  {category.quickOverviewIds.map((id, index) => (
-                    <li
-                      key={`${category.key}-${id}`}
-                      className="grid grid-cols-[20px_minmax(0,1fr)] items-start gap-2 text-[12px] leading-5 text-[#49584f]"
-                    >
-                      <span className="font-semibold text-[#7a705c]">{index + 1}.</span>
-                      <span>{demoCheckLabels[id]}</span>
-                    </li>
-                  ))}
-                </ol>
-              </div>
-            ))}
-          </div>
-        </section>
-        ) : null}
-
-        {featureFlags.enableDemoProducts ? (
-        <section className="rounded-[24px] border border-white/72 bg-[var(--surface-strong)] px-4 py-4 shadow-[var(--shadow)]">
-          <SectionLabel>Display rules</SectionLabel>
-          <div className="mt-3 space-y-2.5">
-            {demoDisplayRules.map((rule) => (
-              <div
-                key={rule.title}
-                className="rounded-[18px] border border-[#ebe3d7] bg-white/76 px-3.5 py-3"
-              >
-                <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#7a705c]">
-                  {rule.title}
-                </p>
-                <p className="mt-1.5 text-[13px] leading-5 text-[#49584f]">{rule.text}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-        ) : null}
-
-        {featureFlags.enableDemoProducts ? (
-        <section className="rounded-[24px] border border-white/72 bg-[var(--surface-strong)] px-4 py-4 shadow-[var(--shadow)]">
-          <SectionLabel>Benchmark comments</SectionLabel>
-          <p className="mt-1.5 text-[14px] leading-5 text-[#55645c]">
-            Notes at the bottom that explain how the category logic works and
-            what benchmark makes a row appear, stay hidden, or override category.
-          </p>
-          <div className="mt-3 space-y-2.5">
-            {demoBenchmarkComments.map((comment) => (
-              <div
-                key={comment.title}
-                className="rounded-[18px] border border-[#ebe3d7] bg-white/76 px-3.5 py-3"
-              >
-                <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#7a705c]">
-                  {comment.title}
-                </p>
-                <p className="mt-1.5 text-[13px] leading-5 text-[#49584f]">
-                  {comment.text}
-                </p>
-              </div>
             ))}
           </div>
         </section>
