@@ -299,7 +299,7 @@ test("runManualScan throws a validation error when the ingredient list is missin
       assert.ok(error instanceof ManualScanValidationError);
       assert.equal(
         error.message,
-        "Please paste the ingredient list so InsideIt can scan the product.",
+        "Please paste the ingredient list so Truthlabel can scan the product.",
       );
       return true;
     },

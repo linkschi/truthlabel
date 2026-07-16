@@ -69,7 +69,7 @@ export const meatSpecificConcernsDataPack = {
       reason:
         "Meat-processing marker showing meat recovered or separated by mechanical processing.",
       userFacingReason:
-        "This product contains mechanically separated or mechanically recovered meat. InsideIt flags this as a meat-processing concern because the meat source has been heavily processed.",
+        "This product contains mechanically separated or mechanically recovered meat. Truthlabel flags this as a meat-processing concern because the meat source has been heavily processed.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -115,7 +115,7 @@ export const meatSpecificConcernsDataPack = {
       reason:
         "Marker that meat pieces may have been shaped, bound, or reconstructed into a product.",
       userFacingReason:
-        "This product uses formed, reformed, or restructured meat wording. InsideIt flags this as a meat-construction review item.",
+        "This product uses formed, reformed, or restructured meat wording. Truthlabel flags this as a meat-construction review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -151,7 +151,7 @@ export const meatSpecificConcernsDataPack = {
       reason:
         "Enzyme used to bind protein pieces together or modify texture.",
       userFacingReason:
-        "This product contains or references transglutaminase, sometimes used to bind meat or protein pieces together. InsideIt flags this as a meat-structure review item.",
+        "This product contains or references transglutaminase, sometimes used to bind meat or protein pieces together. Truthlabel flags this as a meat-structure review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -197,7 +197,7 @@ export const meatSpecificConcernsDataPack = {
       reason:
         "Marker that the meat product may contain added water, brine, or solution.",
       userFacingReason:
-        "This product appears to contain added water, brine, or solution. InsideIt flags this as a meat-processing and transparency review item.",
+        "This product appears to contain added water, brine, or solution. Truthlabel flags this as a meat-processing and transparency review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -242,7 +242,7 @@ export const meatSpecificConcernsDataPack = {
       reason:
         "Meat-processing marker showing the product may be treated with brine, marinade, or solution.",
       userFacingReason:
-        "This product appears to use a brine, marinade, or added solution. InsideIt flags this as a meat-specific processing marker.",
+        "This product appears to use a brine, marinade, or added solution. Truthlabel flags this as a meat-specific processing marker.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -283,7 +283,7 @@ export const meatSpecificConcernsDataPack = {
       reason:
         "Phosphates can be used in processed meats to improve water retention, texture, and processing performance.",
       userFacingReason:
-        "This product contains phosphate additives. InsideIt flags this as a meat-processing review item because phosphates are often used to improve moisture retention or texture.",
+        "This product contains phosphate additives. Truthlabel flags this as a meat-processing review item because phosphates are often used to improve moisture retention or texture.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -325,7 +325,7 @@ export const meatSpecificConcernsDataPack = {
       reason:
         "Processed-meat marker connected to curing systems.",
       userFacingReason:
-        "This product uses cured-meat wording. InsideIt flags this as a meat-processing review item.",
+        "This product uses cured-meat wording. Truthlabel flags this as a meat-processing review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -378,7 +378,7 @@ export const meatSpecificConcernsDataPack = {
       reason:
         "Curing preservatives used in processed meats.",
       userFacingReason:
-        "This product contains nitrite or nitrate curing markers. InsideIt flags this as a processed-meat and preservative review item.",
+        "This product contains nitrite or nitrate curing markers. Truthlabel flags this as a processed-meat and preservative review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -415,7 +415,7 @@ export const meatSpecificConcernsDataPack = {
       reason:
         "Smoke or smoke-flavour processing marker.",
       userFacingReason:
-        "This product uses smoke or smoke-flavour wording. InsideIt flags this as a meat-processing and flavouring review item.",
+        "This product uses smoke or smoke-flavour wording. Truthlabel flags this as a meat-processing and flavouring review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -466,7 +466,7 @@ export const meatSpecificConcernsDataPack = {
       reason:
         "Ingredient markers that may extend, bind, or bulk out processed meat products.",
       userFacingReason:
-        "This product contains binder, filler, or extender-style ingredients. InsideIt flags this as a meat-processing and construction review item.",
+        "This product contains binder, filler, or extender-style ingredients. Truthlabel flags this as a meat-processing and construction review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -514,7 +514,7 @@ export const meatSpecificConcernsDataPack = {
       reason:
         "Plant protein may be used to extend or texture processed meat products.",
       userFacingReason:
-        "This product contains plant protein in a meat-style product. InsideIt flags this as a meat-extension or texture review item.",
+        "This product contains plant protein in a meat-style product. Truthlabel flags this as a meat-extension or texture review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -555,7 +555,7 @@ export const meatSpecificConcernsDataPack = {
       reason:
         "Texture additives sometimes used in processed meat products.",
       userFacingReason:
-        "This product contains gum or stabiliser ingredients in a meat-style product. InsideIt flags this as a meat-texture additive review item.",
+        "This product contains gum or stabiliser ingredients in a meat-style product. Truthlabel flags this as a meat-texture additive review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -601,7 +601,7 @@ export const meatSpecificConcernsDataPack = {
       reason:
         "Processed-meat product marker.",
       userFacingReason:
-        "This product appears to be a processed meat product. InsideIt flags this as a meat-specific review item.",
+        "This product appears to be a processed meat product. Truthlabel flags this as a meat-specific review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -644,7 +644,7 @@ export const meatSpecificConcernsDataPack = {
       reason:
         "Meat-style product form often associated with further processing, binders, coatings, or fillers.",
       userFacingReason:
-        "This product appears to be a processed meat-style item. InsideIt flags this as a meat-specific review item.",
+        "This product appears to be a processed meat-style item. Truthlabel flags this as a meat-specific review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -682,7 +682,7 @@ export const meatSpecificConcernsDataPack = {
       reason:
         "Coated meat products often include extra starches, oils, additives, or seasoning systems.",
       userFacingReason:
-        "This product uses breaded, battered, or coated meat wording. InsideIt flags this as a processed meat-style review item.",
+        "This product uses breaded, battered, or coated meat wording. Truthlabel flags this as a processed meat-style review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -721,7 +721,7 @@ export const meatSpecificConcernsDataPack = {
       reason:
         "Feed or source claim that may help transparency but should not be treated as a medical claim.",
       userFacingReason:
-        "This product includes a grass-fed or pasture-related claim. InsideIt records this as meat-source transparency information, not as proof that the product is healthier.",
+        "This product includes a grass-fed or pasture-related claim. Truthlabel records this as meat-source transparency information, not as proof that the product is healthier.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -755,7 +755,7 @@ export const meatSpecificConcernsDataPack = {
       reason:
         "Feed or source claim relevant to meat-source transparency.",
       userFacingReason:
-        "This product includes a feed-source claim. InsideIt records this as meat-source transparency information.",
+        "This product includes a feed-source claim. Truthlabel records this as meat-source transparency information.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -792,7 +792,7 @@ export const meatSpecificConcernsDataPack = {
       reason:
         "Animal-raising claim that may be relevant to transparency but should not be treated as proof of health.",
       userFacingReason:
-        "This product includes an antibiotic or hormone-related animal-raising claim. InsideIt records this as label transparency information, not as a guarantee of safety or health.",
+        "This product includes an antibiotic or hormone-related animal-raising claim. Truthlabel records this as label transparency information, not as a guarantee of safety or health.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -832,7 +832,7 @@ export const meatSpecificConcernsDataPack = {
       reason:
         "Vague meat-source wording may not clearly identify the animal source or processing type.",
       userFacingReason:
-        "This product uses vague meat-source wording. InsideIt flags this as a meat-source transparency review item.",
+        "This product uses vague meat-source wording. Truthlabel flags this as a meat-source transparency review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -873,7 +873,7 @@ export const meatSpecificConcernsDataPack = {
       reason:
         "Engineered or novel meat-production marker.",
       userFacingReason:
-        "This product appears to use cultivated or cell-cultured meat wording. InsideIt flags this as an engineered food-construction and transparency review item.",
+        "This product appears to use cultivated or cell-cultured meat wording. Truthlabel flags this as an engineered food-construction and transparency review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],

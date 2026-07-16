@@ -5,12 +5,12 @@ const deploymentUrl = process.env.NEXT_PUBLIC_DEPLOYMENT_URL?.trim();
 
 export const metadata: Metadata = {
   title: {
-    default: "InsideIt",
-    template: "%s | InsideIt",
+    default: "Truthlabel",
+    template: "%s | Truthlabel",
   },
   description:
     "Scan ingredient labels, barcodes, and official safety signals before you trust the product.",
-  applicationName: "InsideIt",
+  applicationName: "Truthlabel",
   manifest: "/manifest.webmanifest",
   metadataBase: deploymentUrl ? new URL(deploymentUrl) : undefined,
   icons: {

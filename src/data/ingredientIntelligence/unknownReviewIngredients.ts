@@ -68,7 +68,7 @@ export const unknownReviewIngredientsDataPack = {
       reason:
         "Vague flavouring term that does not identify the exact source or compound.",
       userFacingReason:
-        "This product contains natural flavouring, but the label does not clearly identify the exact source. InsideIt flags this as a label-transparency review item.",
+        "This product contains natural flavouring, but the label does not clearly identify the exact source. Truthlabel flags this as a label-transparency review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -111,7 +111,7 @@ export const unknownReviewIngredientsDataPack = {
       reason:
         "Artificial flavouring term that does not identify the exact flavouring substances used.",
       userFacingReason:
-        "This product contains artificial flavouring. InsideIt flags this because the exact flavouring substances are not clearly identified on the label.",
+        "This product contains artificial flavouring. Truthlabel flags this because the exact flavouring substances are not clearly identified on the label.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -147,7 +147,7 @@ export const unknownReviewIngredientsDataPack = {
       reason:
         "Generic flavouring wording that does not identify the exact ingredient source.",
       userFacingReason:
-        "This label uses generic flavouring wording. InsideIt flags this because the exact flavouring ingredient is not clearly named.",
+        "This label uses generic flavouring wording. Truthlabel flags this because the exact flavouring ingredient is not clearly named.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -179,7 +179,7 @@ export const unknownReviewIngredientsDataPack = {
       reason:
         "Generic spice wording that may not identify each spice individually.",
       userFacingReason:
-        "This product lists spices without naming each one. InsideIt flags this as a mild transparency review item because the exact spices are not fully shown.",
+        "This product lists spices without naming each one. Truthlabel flags this as a mild transparency review item because the exact spices are not fully shown.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -212,7 +212,7 @@ export const unknownReviewIngredientsDataPack = {
       reason:
         "Generic seasoning wording that may contain multiple ingredients not clearly named.",
       userFacingReason:
-        "This product lists seasoning without fully identifying what is inside it. InsideIt flags this as a label-transparency review item.",
+        "This product lists seasoning without fully identifying what is inside it. Truthlabel flags this as a label-transparency review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -252,7 +252,7 @@ export const unknownReviewIngredientsDataPack = {
       reason:
         "Generic oil wording that does not identify the exact oil source.",
       userFacingReason:
-        "This product lists vegetable oil without clearly naming the oil source. InsideIt flags this because the exact oil type is not transparent.",
+        "This product lists vegetable oil without clearly naming the oil source. Truthlabel flags this because the exact oil type is not transparent.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -285,7 +285,7 @@ export const unknownReviewIngredientsDataPack = {
       reason:
         "Generic fat wording that does not identify the exact fat source or processing method.",
       userFacingReason:
-        "This product lists vegetable fat without clearly naming the source. InsideIt flags this as a label-transparency review item.",
+        "This product lists vegetable fat without clearly naming the source. Truthlabel flags this as a label-transparency review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -317,7 +317,7 @@ export const unknownReviewIngredientsDataPack = {
       reason:
         "Oil blend wording may hide the exact oil sources or proportions.",
       userFacingReason:
-        "This product uses an oil blend, but the label may not clearly show each oil source or amount. InsideIt flags this as a transparency review item.",
+        "This product uses an oil blend, but the label may not clearly show each oil source or amount. Truthlabel flags this as a transparency review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -348,7 +348,7 @@ export const unknownReviewIngredientsDataPack = {
       reason:
         "Generic starch wording that does not identify the exact source.",
       userFacingReason:
-        "This product lists starch without clearly naming the source. InsideIt flags this as a label-transparency review item.",
+        "This product lists starch without clearly naming the source. Truthlabel flags this as a label-transparency review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -381,7 +381,7 @@ export const unknownReviewIngredientsDataPack = {
       reason:
         "Modified starch is a processed texture ingredient and may not always clearly identify source or modification type.",
       userFacingReason:
-        "This product contains modified starch. InsideIt flags this because it is a processed texture ingredient and may not clearly show the exact source or processing type.",
+        "This product contains modified starch. Truthlabel flags this because it is a processed texture ingredient and may not clearly show the exact source or processing type.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -414,7 +414,7 @@ export const unknownReviewIngredientsDataPack = {
       reason:
         "Protein blend wording may combine multiple protein sources without clear breakdown.",
       userFacingReason:
-        "This product lists a protein blend. InsideIt flags this because the exact protein sources or proportions may not be clearly shown.",
+        "This product lists a protein blend. Truthlabel flags this because the exact protein sources or proportions may not be clearly shown.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -454,7 +454,7 @@ export const unknownReviewIngredientsDataPack = {
       reason:
         "Generic plant or vegetable protein wording may not identify the exact source.",
       userFacingReason:
-        "This product lists vegetable or plant protein without always clearly naming the source. InsideIt flags this as a transparency review item.",
+        "This product lists vegetable or plant protein without always clearly naming the source. Truthlabel flags this as a transparency review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -492,7 +492,7 @@ export const unknownReviewIngredientsDataPack = {
       reason:
         "Hydrolyzed protein is a processed protein ingredient and may not always clearly explain source or use.",
       userFacingReason:
-        "This product contains hydrolyzed protein. InsideIt flags this as a processed ingredient review item.",
+        "This product contains hydrolyzed protein. Truthlabel flags this as a processed ingredient review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -529,7 +529,7 @@ export const unknownReviewIngredientsDataPack = {
       reason:
         "Natural colour wording may not identify the exact colour source.",
       userFacingReason:
-        "This product lists natural colour without clearly naming the exact source. InsideIt flags this as a label-transparency review item.",
+        "This product lists natural colour without clearly naming the exact source. Truthlabel flags this as a label-transparency review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -565,7 +565,7 @@ export const unknownReviewIngredientsDataPack = {
       reason:
         "Generic colour wording does not identify the exact colour additive.",
       userFacingReason:
-        "This product lists added colour without clearly naming the exact colour additive. InsideIt flags this as a label-transparency review item.",
+        "This product lists added colour without clearly naming the exact colour additive. Truthlabel flags this as a label-transparency review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -595,7 +595,7 @@ export const unknownReviewIngredientsDataPack = {
       reason:
         "Generic preservative wording does not identify the exact preservative used.",
       userFacingReason:
-        "This product lists a preservative without clearly naming it. InsideIt flags this because the exact preservative is not transparent.",
+        "This product lists a preservative without clearly naming it. Truthlabel flags this because the exact preservative is not transparent.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -620,7 +620,7 @@ export const unknownReviewIngredientsDataPack = {
       reason:
         "Generic emulsifier wording does not identify the exact emulsifier used.",
       userFacingReason:
-        "This product lists an emulsifier without clearly naming it. InsideIt flags this because the exact texture additive is not transparent.",
+        "This product lists an emulsifier without clearly naming it. Truthlabel flags this because the exact texture additive is not transparent.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -652,7 +652,7 @@ export const unknownReviewIngredientsDataPack = {
       reason:
         "Generic stabiliser wording does not identify the exact stabiliser used.",
       userFacingReason:
-        "This product lists a stabiliser without clearly naming it. InsideIt flags this because the exact texture additive is not transparent.",
+        "This product lists a stabiliser without clearly naming it. Truthlabel flags this because the exact texture additive is not transparent.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -677,7 +677,7 @@ export const unknownReviewIngredientsDataPack = {
       reason:
         "Generic thickener wording does not identify the exact thickening agent used.",
       userFacingReason:
-        "This product lists a thickener without clearly naming it. InsideIt flags this because the exact texture additive is not transparent.",
+        "This product lists a thickener without clearly naming it. Truthlabel flags this because the exact texture additive is not transparent.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -715,7 +715,7 @@ export const unknownReviewIngredientsDataPack = {
       reason:
         "Gum blend wording may combine multiple gums without clearly listing each one.",
       userFacingReason:
-        "This product lists a gum or stabiliser blend. InsideIt flags this because the exact texture additives may not be clearly identified.",
+        "This product lists a gum or stabiliser blend. Truthlabel flags this because the exact texture additives may not be clearly identified.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -746,7 +746,7 @@ export const unknownReviewIngredientsDataPack = {
       reason:
         "Generic enzyme wording may not identify the exact enzyme or source.",
       userFacingReason:
-        "This product lists enzymes without clearly naming the exact enzyme or source. InsideIt flags this as a label-transparency review item.",
+        "This product lists enzymes without clearly naming the exact enzyme or source. Truthlabel flags this as a label-transparency review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -776,7 +776,7 @@ export const unknownReviewIngredientsDataPack = {
       reason:
         "Processing aid wording may not identify the exact substance used.",
       userFacingReason:
-        "This product mentions processing aids without clearly identifying the exact substance. InsideIt flags this as a transparency review item.",
+        "This product mentions processing aids without clearly identifying the exact substance. Truthlabel flags this as a transparency review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -808,7 +808,7 @@ export const unknownReviewIngredientsDataPack = {
       reason:
         "Proprietary blend wording can hide exact ingredient amounts or composition.",
       userFacingReason:
-        "This product uses proprietary blend wording. InsideIt flags this because the label may not fully show the exact ingredient breakdown.",
+        "This product uses proprietary blend wording. Truthlabel flags this because the label may not fully show the exact ingredient breakdown.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -846,7 +846,7 @@ export const unknownReviewIngredientsDataPack = {
       reason:
         "Compound ingredient wording may hide sub-ingredients if not expanded.",
       userFacingReason:
-        "This product uses a compound ingredient term. InsideIt flags this if the label does not clearly show the sub-ingredients.",
+        "This product uses a compound ingredient term. Truthlabel flags this if the label does not clearly show the sub-ingredients.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -879,7 +879,7 @@ export const unknownReviewIngredientsDataPack = {
       reason:
         "Generic extract wording may not identify the exact plant, compound, or purpose.",
       userFacingReason:
-        "This product lists an extract without clearly identifying the exact source or purpose. InsideIt flags this as a transparency review item.",
+        "This product lists an extract without clearly identifying the exact source or purpose. Truthlabel flags this as a transparency review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],

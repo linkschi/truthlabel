@@ -39,7 +39,7 @@ export default function SettingsPage() {
               Settings
             </h1>
             <p className="mt-2 max-w-sm text-[14px] leading-5 text-[#58665e]">
-              Keep allergy, region, and scan defaults on this device so InsideIt can personalize scans without sending them elsewhere.
+              Keep allergy, region, and scan defaults on this device so Truthlabel can personalize scans without sending them elsewhere.
             </p>
           </div>
           <AppMenu />
@@ -142,7 +142,7 @@ export default function SettingsPage() {
               type="button"
               onClick={() => {
                 resetUserSettings();
-                handleStatus("All settings reset to the InsideIt MVP defaults.");
+                handleStatus("All settings reset to the Truthlabel MVP defaults.");
               }}
               className="rounded-full border border-[#1c3028] bg-[#1c3028] px-4 py-2 text-[12px] font-semibold uppercase tracking-[0.14em] text-white transition active:scale-[0.99]"
             >

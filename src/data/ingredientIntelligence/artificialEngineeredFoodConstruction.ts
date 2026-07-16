@@ -64,7 +64,7 @@ export const artificialEngineeredFoodConstructionGroups: ArtificialEngineeredFoo
       severityDefault: "yellow",
       redTriggers: [],
       userFacingWarning:
-        "Bioengineered or genetically engineered ingredient detected. InsideIt flags this for transparency because some customers may want to avoid genetically engineered ingredients.",
+        "Bioengineered or genetically engineered ingredient detected. Truthlabel flags this for transparency because some customers may want to avoid genetically engineered ingredients.",
       strongerWarning:
         "Bioengineered or genetically engineered ingredient detected. This product should be reviewed closely for transparency before buying or eating.",
       dataStatus,
@@ -105,9 +105,9 @@ export const artificialEngineeredFoodConstructionGroups: ArtificialEngineeredFoo
         "Verified mislabeling exists.",
       ],
       userFacingWarning:
-        "This product appears to contain cultivated or cell-cultured animal protein. InsideIt flags this because it is not conventional whole-cut meat and should be clearly disclosed.",
+        "This product appears to contain cultivated or cell-cultured animal protein. Truthlabel flags this because it is not conventional whole-cut meat and should be clearly disclosed.",
       strongerWarning:
-        "This product appears to contain cultivated or cell-cultured animal protein and additional construction signals. InsideIt flags this as a stronger food-construction concern.",
+        "This product appears to contain cultivated or cell-cultured animal protein and additional construction signals. Truthlabel flags this as a stronger food-construction concern.",
       dataStatus,
       matchingNotes:
         "Match cultivated and cell-cultured wording case-insensitively after normalization.",
@@ -151,9 +151,9 @@ export const artificialEngineeredFoodConstructionGroups: ArtificialEngineeredFoo
         "Combined with artificial texture or appearance systems.",
       ],
       userFacingWarning:
-        "This product appears to be an imitation or analogue food. InsideIt flags this because it may be constructed to resemble a natural food using processed ingredients.",
+        "This product appears to be an imitation or analogue food. Truthlabel flags this because it may be constructed to resemble a natural food using processed ingredients.",
       strongerWarning:
-        "This product appears to be an imitation or analogue food with added construction signals. InsideIt flags this as a stronger food-construction concern.",
+        "This product appears to be an imitation or analogue food with added construction signals. Truthlabel flags this as a stronger food-construction concern.",
       dataStatus,
       matchingNotes:
         "Normalize analogue/analog and flavored/flavoured variants before matching.",
@@ -190,9 +190,9 @@ export const artificialEngineeredFoodConstructionGroups: ArtificialEngineeredFoo
         "Combined with multiple fillers, binders, or extenders.",
       ],
       userFacingWarning:
-        "This product contains reformed or reconstructed food markers. InsideIt flags this because the product may not be simple whole meat or whole seafood.",
+        "This product contains reformed or reconstructed food markers. Truthlabel flags this because the product may not be simple whole meat or whole seafood.",
       strongerWarning:
-        "This product contains reconstructed meat or seafood markers plus additional construction signals. InsideIt flags this as a serious food-construction concern.",
+        "This product contains reconstructed meat or seafood markers plus additional construction signals. Truthlabel flags this as a serious food-construction concern.",
       dataStatus,
       matchingNotes:
         "Match reformed, restructured, reconstituted, surimi, and shaped-product wording after normalization.",
@@ -222,9 +222,9 @@ export const artificialEngineeredFoodConstructionGroups: ArtificialEngineeredFoo
         "Combined with multiple fillers, binders, or extenders.",
       ],
       userFacingWarning:
-        "This product contains mechanically separated or highly processed meat. InsideIt flags this because it is not simple whole-cut meat.",
+        "This product contains mechanically separated or highly processed meat. Truthlabel flags this because it is not simple whole-cut meat.",
       strongerWarning:
-        "This product contains mechanically separated or recovered meat plus added construction markers. InsideIt flags this as a serious food-construction concern.",
+        "This product contains mechanically separated or recovered meat plus added construction markers. Truthlabel flags this as a serious food-construction concern.",
       dataStatus,
       matchingNotes:
         "Match mechanically separated, recovered, deboned, and paste wording after normalization.",
@@ -269,9 +269,9 @@ export const artificialEngineeredFoodConstructionGroups: ArtificialEngineeredFoo
         "Four or more total construction markers found.",
       ],
       userFacingWarning:
-        "This product contains protein isolates or textured proteins. InsideIt flags this because these ingredients are often used to build, extend, or imitate food texture.",
+        "This product contains protein isolates or textured proteins. Truthlabel flags this because these ingredients are often used to build, extend, or imitate food texture.",
       strongerWarning:
-        "This product contains multiple artificial construction markers, including protein isolates or textured proteins. InsideIt flags this as a serious food-construction concern.",
+        "This product contains multiple artificial construction markers, including protein isolates or textured proteins. Truthlabel flags this as a serious food-construction concern.",
       dataStatus,
       matchingNotes:
         "Match protein isolates, concentrates, textured proteins, and caseinate variants case-insensitively after normalization.",
@@ -317,9 +317,9 @@ export const artificialEngineeredFoodConstructionGroups: ArtificialEngineeredFoo
         "Two or more filler or extender markers appear in a meat, fish, seafood, or simple-food product.",
       ],
       userFacingWarning:
-        "This product contains fillers or extenders. InsideIt flags this because the ingredient list suggests the product may be extended rather than being simple whole food.",
+        "This product contains fillers or extenders. Truthlabel flags this because the ingredient list suggests the product may be extended rather than being simple whole food.",
       strongerWarning:
-        "This product contains multiple filler or extender signals. InsideIt flags this as a serious food-construction concern.",
+        "This product contains multiple filler or extender signals. Truthlabel flags this as a serious food-construction concern.",
       dataStatus,
       matchingNotes:
         "Normalize fibre/fiber variants and match filler-style starch, flour, breadcrumb, and added-water terms.",
@@ -364,9 +364,9 @@ export const artificialEngineeredFoodConstructionGroups: ArtificialEngineeredFoo
         "Found in meat or fish products with artificial construction markers.",
       ],
       userFacingWarning:
-        "This product contains binders or texture builders. InsideIt flags this because these ingredients can be used to hold, shape, thicken, or reconstruct food texture.",
+        "This product contains binders or texture builders. Truthlabel flags this because these ingredients can be used to hold, shape, thicken, or reconstruct food texture.",
       strongerWarning:
-        "This product contains multiple binders or texture builders alongside other construction markers. InsideIt flags this as a serious food-construction concern.",
+        "This product contains multiple binders or texture builders alongside other construction markers. Truthlabel flags this as a serious food-construction concern.",
       dataStatus,
       matchingNotes:
         "Match gum, alginate, phosphate, and transglutaminase terms after normalization.",
@@ -402,9 +402,9 @@ export const artificialEngineeredFoodConstructionGroups: ArtificialEngineeredFoo
         "Combined with other fillers, binders, or flavor systems.",
       ],
       userFacingWarning:
-        "This product contains modified starches or industrial carbohydrate ingredients. InsideIt flags this because these are common markers of engineered texture, bulk, or processing.",
+        "This product contains modified starches or industrial carbohydrate ingredients. Truthlabel flags this because these are common markers of engineered texture, bulk, or processing.",
       strongerWarning:
-        "This product contains multiple modified starch or industrial carbohydrate markers. InsideIt flags this as a serious food-construction concern.",
+        "This product contains multiple modified starch or industrial carbohydrate markers. Truthlabel flags this as a serious food-construction concern.",
       dataStatus,
       matchingNotes:
         "Normalize fibre/fiber and pregelatinised/pregelatinized variants before matching.",
@@ -439,9 +439,9 @@ export const artificialEngineeredFoodConstructionGroups: ArtificialEngineeredFoo
         "Combined with imitation or cultivated meat markers.",
       ],
       userFacingWarning:
-        "This product contains emulsifiers or stabilisers. InsideIt flags this because these ingredients are often used to engineer texture, mouthfeel, and shelf stability.",
+        "This product contains emulsifiers or stabilisers. Truthlabel flags this because these ingredients are often used to engineer texture, mouthfeel, and shelf stability.",
       strongerWarning:
-        "This product contains multiple emulsifier or stabiliser signals alongside other construction markers. InsideIt flags this as a serious food-construction concern.",
+        "This product contains multiple emulsifier or stabiliser signals alongside other construction markers. Truthlabel flags this as a serious food-construction concern.",
       dataStatus,
       matchingNotes:
         "Match emulsifier abbreviations and lecithin variants case-insensitively after normalization.",
@@ -491,9 +491,9 @@ export const artificialEngineeredFoodConstructionGroups: ArtificialEngineeredFoo
         "Combined with imitation, cultivated, or high-count construction markers.",
       ],
       userFacingWarning:
-        "This product contains flavouring systems or flavour enhancers. InsideIt flags this because the taste may be built with added flavour technology rather than coming only from simple whole ingredients.",
+        "This product contains flavouring systems or flavour enhancers. Truthlabel flags this because the taste may be built with added flavour technology rather than coming only from simple whole ingredients.",
       strongerWarning:
-        "This product contains multiple flavour-system markers alongside other construction signals. InsideIt flags this as a serious food-construction concern.",
+        "This product contains multiple flavour-system markers alongside other construction signals. Truthlabel flags this as a serious food-construction concern.",
       dataStatus,
       matchingNotes:
         "Normalize flavour/flavor and hydrolysed/hydrolyzed variants. Avoid double counting HVP aliases from the same ingredient line.",
@@ -538,9 +538,9 @@ export const artificialEngineeredFoodConstructionGroups: ArtificialEngineeredFoo
         "Any matched marker also appears in Banned / Restricted Items.",
       ],
       userFacingWarning:
-        "This product contains colour or appearance additives. InsideIt flags this because the product's appearance may be artificially enhanced.",
+        "This product contains colour or appearance additives. Truthlabel flags this because the product's appearance may be artificially enhanced.",
       strongerWarning:
-        "This product contains color or appearance additives that overlap with stronger safety or restriction signals. InsideIt flags this as a serious food-construction concern.",
+        "This product contains color or appearance additives that overlap with stronger safety or restriction signals. Truthlabel flags this as a serious food-construction concern.",
       dataStatus,
       matchingNotes:
         "Normalize colour/color variants and match E-number style aliases after punctuation cleanup.",
@@ -576,9 +576,9 @@ export const artificialEngineeredFoodConstructionGroups: ArtificialEngineeredFoo
         "Any matched marker also appears in Banned / Restricted Items.",
       ],
       userFacingWarning:
-        "This product contains artificial or high-intensity sweeteners. InsideIt flags this because sweetness is being created through added sweetening systems rather than simple sugar or whole-food sweetness.",
+        "This product contains artificial or high-intensity sweeteners. Truthlabel flags this because sweetness is being created through added sweetening systems rather than simple sugar or whole-food sweetness.",
       strongerWarning:
-        "This product contains artificial sweetener markers that overlap with stronger restriction signals. InsideIt flags this as a serious food-construction concern.",
+        "This product contains artificial sweetener markers that overlap with stronger restriction signals. Truthlabel flags this as a serious food-construction concern.",
       dataStatus,
       matchingNotes:
         "Match sweetener names and abbreviations case-insensitively after normalization.",
@@ -615,9 +615,9 @@ export const artificialEngineeredFoodConstructionGroups: ArtificialEngineeredFoo
         "Partially hydrogenated oil is found.",
       ],
       userFacingWarning:
-        "This product contains processed oils or engineered fats. InsideIt flags this because these fats are industrial ingredients often used in ultra-processed foods.",
+        "This product contains processed oils or engineered fats. Truthlabel flags this because these fats are industrial ingredients often used in ultra-processed foods.",
       strongerWarning:
-        "This product contains stronger processed-oil or engineered-fat signals. InsideIt flags this as a serious food-construction concern.",
+        "This product contains stronger processed-oil or engineered-fat signals. Truthlabel flags this as a serious food-construction concern.",
       dataStatus,
       matchingNotes:
         "Match processed oil, hydrogenated oil, and engineered fat terms after normalization.",
@@ -658,9 +658,9 @@ export const artificialEngineeredFoodConstructionGroups: ArtificialEngineeredFoo
         "Any matched marker also appears in Banned / Restricted Items or Cancer-linked Watch.",
       ],
       userFacingWarning:
-        "This product contains preservatives or shelf-life additives. InsideIt flags this because the product is chemically supported for longer storage or stability.",
+        "This product contains preservatives or shelf-life additives. Truthlabel flags this because the product is chemically supported for longer storage or stability.",
       strongerWarning:
-        "This product contains preservative markers that overlap with stronger watch-list signals. InsideIt flags this as a serious food-construction concern.",
+        "This product contains preservative markers that overlap with stronger watch-list signals. Truthlabel flags this as a serious food-construction concern.",
       dataStatus,
       matchingNotes:
         "Normalize sulphite/sulfite variants and match preservative acronyms case-insensitively.",
@@ -700,9 +700,9 @@ export const artificialEngineeredFoodConstructionGroups: ArtificialEngineeredFoo
         "Combined with other construction markers at a heavy load.",
       ],
       userFacingWarning:
-        "This product contains powder, concentrate, or reconstructed ingredient markers. InsideIt flags this because the product may be built from processed components rather than simple fresh ingredients.",
+        "This product contains powder, concentrate, or reconstructed ingredient markers. Truthlabel flags this because the product may be built from processed components rather than simple fresh ingredients.",
       strongerWarning:
-        "This product contains multiple powder or concentrate markers alongside other construction signals. InsideIt flags this as a serious food-construction concern.",
+        "This product contains multiple powder or concentrate markers alongside other construction signals. Truthlabel flags this as a serious food-construction concern.",
       dataStatus,
       matchingNotes:
         "Normalize flavour/flavor variants and match powder, premix, and concentrate wording after punctuation cleanup.",
@@ -735,9 +735,9 @@ export const artificialEngineeredFoodConstructionGroups: ArtificialEngineeredFoo
         "Combined with flavor systems or broader heavy construction signals.",
       ],
       userFacingWarning:
-        "This product contains concentrate or reconstituted ingredient markers. InsideIt flags this because the product may be rebuilt from processed components.",
+        "This product contains concentrate or reconstituted ingredient markers. Truthlabel flags this because the product may be rebuilt from processed components.",
       strongerWarning:
-        "This product contains multiple concentrate or reconstituted markers alongside other construction signals. InsideIt flags this as a serious food-construction concern.",
+        "This product contains multiple concentrate or reconstituted markers alongside other construction signals. Truthlabel flags this as a serious food-construction concern.",
       dataStatus,
       matchingNotes:
         "Match concentrate, reconstituted, and rehydrated wording after normalization.",
@@ -768,9 +768,9 @@ export const artificialEngineeredFoodConstructionGroups: ArtificialEngineeredFoo
       severityDefault: "neutral",
       redTriggers: [],
       userFacingWarning:
-        "This product contains added fortification ingredients. InsideIt flags this as an added nutrient system, not a whole-food nutrient source.",
+        "This product contains added fortification ingredients. Truthlabel flags this as an added nutrient system, not a whole-food nutrient source.",
       strongerWarning:
-        "This product contains added fortification ingredients alongside multiple other construction markers. InsideIt flags this as part of a broader food-construction concern.",
+        "This product contains added fortification ingredients alongside multiple other construction markers. Truthlabel flags this as part of a broader food-construction concern.",
       dataStatus,
       matchingNotes:
         "Normalize sulphate/sulfate variants. Treat this as a transparency marker, not an automatic harm claim.",
@@ -801,9 +801,9 @@ export const artificialEngineeredFoodConstructionGroups: ArtificialEngineeredFoo
         "Combined with other filler, binder, or extender markers.",
       ],
       userFacingWarning:
-        "This product contains added fibre or bulking ingredients. InsideIt flags this because these ingredients can be used to change texture, bulk, or nutrition claims.",
+        "This product contains added fibre or bulking ingredients. Truthlabel flags this because these ingredients can be used to change texture, bulk, or nutrition claims.",
       strongerWarning:
-        "This product contains multiple fibre or bulking markers alongside other construction signals. InsideIt flags this as a serious food-construction concern.",
+        "This product contains multiple fibre or bulking markers alongside other construction signals. Truthlabel flags this as a serious food-construction concern.",
       dataStatus,
       matchingNotes:
         "Normalize fibre/fiber variants and count industrial bulking fibers once per ingredient line.",
@@ -859,9 +859,9 @@ export const artificialEngineeredFoodConstructionGroups: ArtificialEngineeredFoo
         "Combined with fillers, binders, flavour systems, colour systems, or reconstructed meat/seafood markers.",
       ],
       userFacingWarning:
-        "This product contains animal-free or fermentation-derived dairy protein. InsideIt flags this because the product may use engineered microbes or precision fermentation to create dairy-like proteins without animals.",
+        "This product contains animal-free or fermentation-derived dairy protein. Truthlabel flags this because the product may use engineered microbes or precision fermentation to create dairy-like proteins without animals.",
       strongerWarning:
-        "This product contains dairy-like proteins made through fermentation or recombinant food technology. InsideIt flags this as an engineered food-construction marker.",
+        "This product contains dairy-like proteins made through fermentation or recombinant food technology. Truthlabel flags this as an engineered food-construction marker.",
       dataStatus,
       matchingNotes:
         "Prefer animal-free dairy, precision-fermented dairy protein, and fermentation-derived milk protein wording. Do not call it lab-grown milk unless the product itself does.",
@@ -899,9 +899,9 @@ export const artificialEngineeredFoodConstructionGroups: ArtificialEngineeredFoo
         "Combined with fillers, binders, flavour systems, or broader construction markers.",
       ],
       userFacingWarning:
-        "This product contains animal-free or fermentation-derived egg protein. InsideIt flags this because the product may use precision fermentation or recombinant protein technology instead of conventional eggs.",
+        "This product contains animal-free or fermentation-derived egg protein. Truthlabel flags this because the product may use precision fermentation or recombinant protein technology instead of conventional eggs.",
       strongerWarning:
-        "This product contains animal-free or fermentation-derived egg protein plus additional construction signals. InsideIt flags this as an engineered food-construction marker.",
+        "This product contains animal-free or fermentation-derived egg protein plus additional construction signals. Truthlabel flags this as an engineered food-construction marker.",
       dataStatus,
       matchingNotes:
         "Treat this as an engineered or animal-free protein marker, not an automatic unsafe claim.",
@@ -934,9 +934,9 @@ export const artificialEngineeredFoodConstructionGroups: ArtificialEngineeredFoo
         "Combined with fillers, binders, colour systems, or broader imitation-food markers.",
       ],
       userFacingWarning:
-        "This product contains an engineered heme or meat-like flavour system. InsideIt flags this because the meat-like taste or appearance may be built using engineered food technology.",
+        "This product contains an engineered heme or meat-like flavour system. Truthlabel flags this because the meat-like taste or appearance may be built using engineered food technology.",
       strongerWarning:
-        "This product contains engineered heme or meat-like flavour technology alongside other construction signals. InsideIt flags this as an engineered food-construction marker.",
+        "This product contains engineered heme or meat-like flavour technology alongside other construction signals. Truthlabel flags this as an engineered food-construction marker.",
       dataStatus,
       matchingNotes:
         "Treat engineered heme as a food-construction and transparency marker, not an automatic safety claim.",
@@ -971,9 +971,9 @@ export const artificialEngineeredFoodConstructionGroups: ArtificialEngineeredFoo
         "Combined with fillers, binders, flavour systems, or broader engineered-protein signals.",
       ],
       userFacingWarning:
-        "This product contains or claims plant-made recombinant protein technology. InsideIt flags this because the product may use engineered plants to produce animal-like proteins.",
+        "This product contains or claims plant-made recombinant protein technology. Truthlabel flags this because the product may use engineered plants to produce animal-like proteins.",
       strongerWarning:
-        "This product contains plant-made recombinant protein technology alongside additional construction markers. InsideIt flags this as an engineered food-construction marker.",
+        "This product contains plant-made recombinant protein technology alongside additional construction markers. Truthlabel flags this as an engineered food-construction marker.",
       dataStatus,
       matchingNotes:
         "Treat this as a transparency marker. Do not automatically call it dangerous.",
@@ -1016,9 +1016,9 @@ export const artificialEngineeredFoodConstructionGroups: ArtificialEngineeredFoo
       severityDefault: "yellow",
       redTriggers: [],
       userFacingWarning:
-        "This product contains or may contain a bioengineered food ingredient. InsideIt flags this for transparency because some customers may want to know when genetic engineering is involved.",
+        "This product contains or may contain a bioengineered food ingredient. Truthlabel flags this for transparency because some customers may want to know when genetic engineering is involved.",
       strongerWarning:
-        "This product contains a named bioengineered food disclosure marker alongside other construction signals. InsideIt flags this as an engineered food-construction marker.",
+        "This product contains a named bioengineered food disclosure marker alongside other construction signals. Truthlabel flags this as an engineered food-construction marker.",
       dataStatus,
       matchingNotes:
         "Only flag when the label, database, or verified source supports it. Do not infer this from animal feed alone.",
@@ -1066,9 +1066,9 @@ export const artificialEngineeredFoodConstructionGroups: ArtificialEngineeredFoo
         "Combined with fillers, binders, flavour systems, colour systems, or reconstructed meat/seafood markers.",
       ],
       userFacingWarning:
-        "This product contains cultivated, cell-derived, or fermentation-derived animal-like ingredients. InsideIt flags this because the product may not come from conventional animal farming or simple whole-food sources.",
+        "This product contains cultivated, cell-derived, or fermentation-derived animal-like ingredients. Truthlabel flags this because the product may not come from conventional animal farming or simple whole-food sources.",
       strongerWarning:
-        "This product contains cultivated, cell-derived, or fermentation-derived animal-like ingredients alongside additional construction markers. InsideIt flags this as an engineered food-construction marker.",
+        "This product contains cultivated, cell-derived, or fermentation-derived animal-like ingredients alongside additional construction markers. Truthlabel flags this as an engineered food-construction marker.",
       dataStatus,
       matchingNotes:
         "Treat these as cultivated or cell-derived ingredient markers. Do not call them banned unless region-specific restriction data exists.",
@@ -1106,9 +1106,9 @@ export const artificialEngineeredFoodConstructionGroups: ArtificialEngineeredFoo
         "Combined with fillers, binders, flavour systems, or broader engineered-protein markers.",
       ],
       userFacingWarning:
-        "This product contains microbial, fungal, algae, or biomass-fermentation protein. InsideIt flags this because the product uses alternative protein technology rather than simple traditional protein sources.",
+        "This product contains microbial, fungal, algae, or biomass-fermentation protein. Truthlabel flags this because the product uses alternative protein technology rather than simple traditional protein sources.",
       strongerWarning:
-        "This product contains microbial or biomass-fermentation protein alongside additional construction markers. InsideIt flags this as an engineered food-construction marker.",
+        "This product contains microbial or biomass-fermentation protein alongside additional construction markers. Truthlabel flags this as an engineered food-construction marker.",
       dataStatus,
       matchingNotes:
         "Treat this as a construction and transparency marker, not an automatic safety claim.",
@@ -1144,9 +1144,9 @@ export const artificialEngineeredFoodConstructionGroups: ArtificialEngineeredFoo
         "Combined with imitation-food, binder, filler, or broader engineered-protein markers.",
       ],
       userFacingWarning:
-        "This product contains structured, extruded, or printed food-technology markers. InsideIt flags this because the product texture may be engineered through processing technology rather than coming from simple whole food.",
+        "This product contains structured, extruded, or printed food-technology markers. Truthlabel flags this because the product texture may be engineered through processing technology rather than coming from simple whole food.",
       strongerWarning:
-        "This product contains structured, extruded, or printed food-technology markers alongside additional construction signals. InsideIt flags this as an engineered food-construction marker.",
+        "This product contains structured, extruded, or printed food-technology markers alongside additional construction signals. Truthlabel flags this as an engineered food-construction marker.",
       dataStatus,
       matchingNotes:
         "Treat this as a food-construction marker, not an automatic unsafe claim.",
@@ -1163,9 +1163,9 @@ export const artificialEngineeredFoodConstructionGroups: ArtificialEngineeredFoo
         "Heavy construction load or strong mismatch exists.",
       ],
       userFacingWarning:
-        "This product contains artificial or engineered food-construction markers. InsideIt flags this because the ingredient list shows it may not be simple whole food.",
+        "This product contains artificial or engineered food-construction markers. Truthlabel flags this because the ingredient list shows it may not be simple whole food.",
       strongerWarning:
-        "This product contains multiple construction markers, including fillers, binders, extenders, flavour systems, colour systems, or engineered ingredients. InsideIt flags this as a serious food-construction concern.",
+        "This product contains multiple construction markers, including fillers, binders, extenders, flavour systems, colour systems, or engineered ingredients. Truthlabel flags this as a serious food-construction concern.",
       dataStatus,
       matchingNotes:
         "Trigger this group from evidence patterns such as heavy marker count, meat or seafood reconstruction, imitation systems, or strong simple-food mismatch.",

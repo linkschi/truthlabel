@@ -2,7 +2,7 @@ export const emulsifiersStabilisersGumsDataPack = {
   id: "emulsifiers_stabilisers_thickeners_gums",
   categoryName: "Emulsifiers / Stabilisers / Thickeners / Gums",
   categoryMeaning:
-    "This category detects ingredients used to hold food together, thicken texture, stop separation, bind water, create creaminess, stabilise mixtures, or rebuild food texture. InsideIt flags these because they show the product's texture is being engineered or chemically supported.",
+    "This category detects ingredients used to hold food together, thicken texture, stop separation, bind water, create creaminess, stabilise mixtures, or rebuild food texture. Truthlabel flags these because they show the product's texture is being engineered or chemically supported.",
   dataStatus: "starter_needs_expansion",
   defaultCategorySeverity: "yellow",
 
@@ -45,7 +45,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       healthConcernType: "emulsifier_texture_stabiliser",
       warningLabel: "EMULSIFIER FOUND",
       userFacingReason:
-        "This product contains lecithin, an emulsifier used to hold ingredients together and improve texture. InsideIt flags this because the product's texture is being supported by an added emulsifier.",
+        "This product contains lecithin, an emulsifier used to hold ingredients together and improve texture. Truthlabel flags this because the product's texture is being supported by an added emulsifier.",
       matchingNotes:
         "Match lecithin, soy lecithin, soya lecithin, sunflower lecithin, E322, and INS 322. Do not double count if both name and E-number appear.",
       scoringImpact: "yellow_emulsifier",
@@ -90,7 +90,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       healthConcernType: "emulsifier_texture_stabiliser",
       warningLabel: "EMULSIFIER FOUND",
       userFacingReason:
-        "This product contains mono- and diglycerides, emulsifiers used to build texture and stop separation. InsideIt flags this as a processed texture-support ingredient.",
+        "This product contains mono- and diglycerides, emulsifiers used to build texture and stop separation. Truthlabel flags this as a processed texture-support ingredient.",
       matchingNotes:
         "Match mono- and diglycerides, monoglycerides, diglycerides, glycerol monostearate, glyceryl monostearate, E471, and INS 471.",
       scoringImpact: "yellow_emulsifier",
@@ -126,7 +126,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       healthConcernType: "bakery_emulsifier_dough_conditioner",
       warningLabel: "DOUGH EMULSIFIER FOUND",
       userFacingReason:
-        "This product contains DATEM, a dough emulsifier used to strengthen and engineer bread texture. InsideIt flags this as a processed bakery texture additive.",
+        "This product contains DATEM, a dough emulsifier used to strengthen and engineer bread texture. Truthlabel flags this as a processed bakery texture additive.",
       matchingNotes:
         "Match DATEM, diacetyl tartaric acid esters of mono- and diglycerides, E472e, and INS 472e.",
       scoringImpact: "yellow_emulsifier",
@@ -193,7 +193,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       healthConcernType: "emulsifier_texture_stabiliser",
       warningLabel: "EMULSIFIER FOUND",
       userFacingReason:
-        "This product contains E472 emulsifier esters, used to engineer texture and stability in processed foods. InsideIt flags this as a texture-support additive.",
+        "This product contains E472 emulsifier esters, used to engineer texture and stability in processed foods. Truthlabel flags this as a texture-support additive.",
       matchingNotes:
         "Match E472a, E472b, E472c, E472d, E472f, ACETEM, LACTEM, CITREM, MATEM, and named mono/diglyceride esters.",
       scoringImpact: "yellow_emulsifier",
@@ -266,7 +266,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       healthConcernType: "synthetic_emulsifier",
       warningLabel: "EMULSIFIER FOUND",
       userFacingReason:
-        "This product contains polysorbates, synthetic emulsifiers used to keep mixtures stable. InsideIt flags this because the product's texture and stability are being chemically supported.",
+        "This product contains polysorbates, synthetic emulsifiers used to keep mixtures stable. Truthlabel flags this because the product's texture and stability are being chemically supported.",
       matchingNotes:
         "Match polysorbate 20/40/60/65/80, Tween names, E432, E433, E434, E435, E436, and INS variants.",
       scoringImpact: "yellow_emulsifier",
@@ -334,7 +334,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       healthConcernType: "emulsifier_texture_stabiliser",
       warningLabel: "EMULSIFIER FOUND",
       userFacingReason:
-        "This product contains sorbitan esters, emulsifiers used to stabilise texture and prevent separation. InsideIt flags this as a processed texture-support ingredient.",
+        "This product contains sorbitan esters, emulsifiers used to stabilise texture and prevent separation. Truthlabel flags this as a processed texture-support ingredient.",
       matchingNotes:
         "Match sorbitan monostearate, tristearate, monolaurate, monooleate, monopalmitate, Span names, and E491-E495.",
       scoringImpact: "yellow_emulsifier",
@@ -368,7 +368,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       healthConcernType: "emulsifier_viscosity_modifier",
       warningLabel: "EMULSIFIER FOUND",
       userFacingReason:
-        "This product contains PGPR, an emulsifier used to control texture and flow, especially in chocolate-style products. InsideIt flags this as a processed texture additive.",
+        "This product contains PGPR, an emulsifier used to control texture and flow, especially in chocolate-style products. Truthlabel flags this as a processed texture additive.",
       matchingNotes:
         "Match PGPR, polyglycerol polyricinoleate, E476, and INS 476.",
       scoringImpact: "yellow_emulsifier",
@@ -408,7 +408,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       healthConcernType: "bakery_emulsifier_dough_conditioner",
       warningLabel: "DOUGH EMULSIFIER FOUND",
       userFacingReason:
-        "This product contains stearoyl lactylates, emulsifiers used to engineer softness, volume, and texture in processed foods. InsideIt flags this as a texture-support additive.",
+        "This product contains stearoyl lactylates, emulsifiers used to engineer softness, volume, and texture in processed foods. Truthlabel flags this as a texture-support additive.",
       matchingNotes:
         "Match sodium stearoyl lactylate, calcium stearoyl lactylate, SSL, CSL, E481, E482, and INS variants.",
       scoringImpact: "yellow_emulsifier",
@@ -447,7 +447,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       healthConcernType: "emulsifier_texture_stabiliser",
       warningLabel: "EMULSIFIER FOUND",
       userFacingReason:
-        "This product contains sucrose esters or sucroglycerides, emulsifiers used to build texture and stability. InsideIt flags this as a processed texture-support ingredient.",
+        "This product contains sucrose esters or sucroglycerides, emulsifiers used to build texture and stability. Truthlabel flags this as a processed texture-support ingredient.",
       matchingNotes:
         "Match sucrose esters, sucrose esters of fatty acids, sucroglycerides, E473, E474, and INS variants.",
       scoringImpact: "yellow_emulsifier",
@@ -479,7 +479,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       healthConcernType: "emulsifier_texture_stabiliser",
       warningLabel: "EMULSIFIER FOUND",
       userFacingReason:
-        "This product contains polyglycerol esters, emulsifiers used to support texture and stability. InsideIt flags this as a processed texture additive.",
+        "This product contains polyglycerol esters, emulsifiers used to support texture and stability. Truthlabel flags this as a processed texture additive.",
       matchingNotes:
         "Match polyglycerol esters of fatty acids, polyglycerol esters, E475, and INS 475.",
       scoringImpact: "yellow_emulsifier",
@@ -512,7 +512,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       healthConcernType: "emulsifier_texture_stabiliser",
       warningLabel: "EMULSIFIER FOUND",
       userFacingReason:
-        "This product contains propylene glycol esters, emulsifiers used to support texture and stability. InsideIt flags this as a processed texture additive.",
+        "This product contains propylene glycol esters, emulsifiers used to support texture and stability. Truthlabel flags this as a processed texture additive.",
       matchingNotes:
         "Match propylene glycol esters of fatty acids, propylene glycol monostearate, PGMS, E477, and INS 477.",
       scoringImpact: "yellow_emulsifier",
@@ -549,7 +549,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       healthConcernType: "thickener_gelling_stabiliser",
       warningLabel: "THICKENER / STABILISER FOUND",
       userFacingReason:
-        "This product contains carrageenan, a thickener and stabiliser used to build texture and prevent separation. InsideIt flags this as a texture-engineering additive.",
+        "This product contains carrageenan, a thickener and stabiliser used to build texture and prevent separation. Truthlabel flags this as a texture-engineering additive.",
       matchingNotes:
         "Match carrageenan, carrageen, Irish moss extract, E407, and INS 407.",
       scoringImpact: "yellow_thickener_stabiliser",
@@ -584,7 +584,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       healthConcernType: "thickener_gelling_stabiliser",
       warningLabel: "THICKENER / STABILISER FOUND",
       userFacingReason:
-        "This product contains processed eucheuma seaweed, a thickener and stabiliser used to build food texture. InsideIt flags this as a texture-engineering additive.",
+        "This product contains processed eucheuma seaweed, a thickener and stabiliser used to build food texture. Truthlabel flags this as a texture-engineering additive.",
       matchingNotes:
         "Match processed eucheuma seaweed, semi-refined carrageenan, PES, E407a, and INS 407a.",
       scoringImpact: "yellow_thickener_stabiliser",
@@ -618,7 +618,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       healthConcernType: "gum_thickener_stabiliser",
       warningLabel: "GUM / THICKENER FOUND",
       userFacingReason:
-        "This product contains xanthan gum, a thickener used to build and stabilise texture. InsideIt flags this as a texture-engineering additive.",
+        "This product contains xanthan gum, a thickener used to build and stabilise texture. Truthlabel flags this as a texture-engineering additive.",
       matchingNotes:
         "Match xanthan gum, xanthan, E415, and INS 415.",
       scoringImpact: "yellow_gum_thickener",
@@ -652,7 +652,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       healthConcernType: "gum_thickener_stabiliser",
       warningLabel: "GUM / THICKENER FOUND",
       userFacingReason:
-        "This product contains guar gum, a thickener used to build and stabilise texture. InsideIt flags this as a texture-engineering additive.",
+        "This product contains guar gum, a thickener used to build and stabilise texture. Truthlabel flags this as a texture-engineering additive.",
       matchingNotes:
         "Match guar gum, guaran, guar flour, E412, and INS 412.",
       scoringImpact: "yellow_gum_thickener",
@@ -687,7 +687,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       healthConcernType: "gum_thickener_stabiliser",
       warningLabel: "GUM / THICKENER FOUND",
       userFacingReason:
-        "This product contains locust bean gum, a thickener used to stabilise texture. InsideIt flags this as a texture-engineering additive.",
+        "This product contains locust bean gum, a thickener used to stabilise texture. Truthlabel flags this as a texture-engineering additive.",
       matchingNotes:
         "Match locust bean gum, carob bean gum, carob gum, LBG, E410, and INS 410.",
       scoringImpact: "yellow_gum_thickener",
@@ -722,7 +722,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       healthConcernType: "gum_gelling_stabiliser",
       warningLabel: "GUM / STABILISER FOUND",
       userFacingReason:
-        "This product contains gellan gum, a stabiliser used to suspend ingredients and build texture. InsideIt flags this as a texture-engineering additive.",
+        "This product contains gellan gum, a stabiliser used to suspend ingredients and build texture. Truthlabel flags this as a texture-engineering additive.",
       matchingNotes:
         "Match gellan gum, high acyl gellan gum, low acyl gellan gum, E418, and INS 418.",
       scoringImpact: "yellow_gum_thickener",
@@ -755,7 +755,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       healthConcernType: "gum_thickener_stabiliser",
       warningLabel: "GUM / THICKENER FOUND",
       userFacingReason:
-        "This product contains tara gum, a thickener used to build and stabilise food texture. InsideIt flags this as a texture-engineering additive.",
+        "This product contains tara gum, a thickener used to build and stabilise food texture. Truthlabel flags this as a texture-engineering additive.",
       matchingNotes:
         "Match tara gum, Peruvian carob gum, E417, and INS 417.",
       scoringImpact: "yellow_gum_thickener",
@@ -792,7 +792,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       healthConcernType: "gum_emulsifier_stabiliser",
       warningLabel: "GUM / STABILISER FOUND",
       userFacingReason:
-        "This product contains acacia gum/gum arabic, used to stabilise texture and support processed food structure. InsideIt flags this as a texture-support additive.",
+        "This product contains acacia gum/gum arabic, used to stabilise texture and support processed food structure. Truthlabel flags this as a texture-support additive.",
       matchingNotes:
         "Match acacia gum, gum arabic, arabic gum, acacia fibre/fiber, E414, and INS 414.",
       scoringImpact: "yellow_gum_thickener",
@@ -826,7 +826,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       healthConcernType: "gum_thickener_stabiliser",
       warningLabel: "GUM / THICKENER FOUND",
       userFacingReason:
-        "This product contains tragacanth gum, a thickener and stabiliser. InsideIt flags this as a texture-engineering additive.",
+        "This product contains tragacanth gum, a thickener and stabiliser. Truthlabel flags this as a texture-engineering additive.",
       matchingNotes:
         "Match tragacanth, tragacanth gum, gum tragacanth, E413, and INS 413.",
       scoringImpact: "yellow_gum_thickener",
@@ -860,7 +860,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       healthConcernType: "gum_thickener_stabiliser",
       warningLabel: "GUM / THICKENER FOUND",
       userFacingReason:
-        "This product contains karaya gum, a thickener and stabiliser. InsideIt flags this as a texture-engineering additive.",
+        "This product contains karaya gum, a thickener and stabiliser. Truthlabel flags this as a texture-engineering additive.",
       matchingNotes:
         "Match karaya gum, gum karaya, sterculia gum, E416, and INS 416.",
       scoringImpact: "yellow_gum_thickener",
@@ -898,7 +898,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       healthConcernType: "gum_thickener_gelling_agent",
       warningLabel: "GUM / THICKENER FOUND",
       userFacingReason:
-        "This product contains konjac gum/glucomannan, a thickener used to build texture and gel structure. InsideIt flags this as a texture-engineering additive.",
+        "This product contains konjac gum/glucomannan, a thickener used to build texture and gel structure. Truthlabel flags this as a texture-engineering additive.",
       matchingNotes:
         "Match konjac gum, konjac flour, glucomannan, konjac glucomannan, konnyaku, E425, and INS 425.",
       scoringImpact: "yellow_gum_thickener",
@@ -937,7 +937,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       healthConcernType: "gelling_thickener_stabiliser",
       warningLabel: "GELLING / THICKENING AGENT FOUND",
       userFacingReason:
-        "This product contains pectin, a gelling or thickening ingredient used to build texture. InsideIt flags this as a texture-support additive.",
+        "This product contains pectin, a gelling or thickening ingredient used to build texture. Truthlabel flags this as a texture-support additive.",
       matchingNotes:
         "Match pectin, pectins, amidated pectin, fruit pectin, apple pectin, citrus pectin, E440, E440i, E440ii, and INS variants.",
       scoringImpact: "yellow_thickener_stabiliser",
@@ -972,7 +972,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       healthConcernType: "gelling_thickener_stabiliser",
       warningLabel: "GELLING / THICKENING AGENT FOUND",
       userFacingReason:
-        "This product contains agar, a gelling ingredient used to build texture. InsideIt flags this as a texture-support additive.",
+        "This product contains agar, a gelling ingredient used to build texture. Truthlabel flags this as a texture-support additive.",
       matchingNotes:
         "Match agar, agar-agar, agar agar, E406, and INS 406.",
       scoringImpact: "yellow_thickener_stabiliser",
@@ -1045,7 +1045,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       healthConcernType: "thickener_gelling_stabiliser",
       warningLabel: "THICKENER / STABILISER FOUND",
       userFacingReason:
-        "This product contains alginates, ingredients used to thicken, gel, and stabilise texture. InsideIt flags this as a texture-engineering additive.",
+        "This product contains alginates, ingredients used to thicken, gel, and stabilise texture. Truthlabel flags this as a texture-engineering additive.",
       matchingNotes:
         "Match alginic acid, sodium alginate, potassium alginate, ammonium alginate, calcium alginate, propylene glycol alginate, E400-E405, and INS variants.",
       scoringImpact: "yellow_thickener_stabiliser",
@@ -1084,7 +1084,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       healthConcernType: "cellulose_texture_bulking_stabiliser",
       warningLabel: "TEXTURE / BULKING ADDITIVE FOUND",
       userFacingReason:
-        "This product contains cellulose or microcrystalline cellulose, used to build texture, bulk, or stability. InsideIt flags this as a processed texture-support ingredient.",
+        "This product contains cellulose or microcrystalline cellulose, used to build texture, bulk, or stability. Truthlabel flags this as a processed texture-support ingredient.",
       matchingNotes:
         "Match cellulose, microcrystalline cellulose, powdered cellulose, cellulose fibre/fiber, MCC, E460, E460i, E460ii, and INS variants.",
       scoringImpact: "yellow_texture_builder",
@@ -1174,7 +1174,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       healthConcernType: "cellulose_thickener_binder_stabiliser",
       warningLabel: "THICKENER / BINDER FOUND",
       userFacingReason:
-        "This product contains cellulose-derived thickeners or binders, used to build and hold texture. InsideIt flags this as a food-construction additive.",
+        "This product contains cellulose-derived thickeners or binders, used to build and hold texture. Truthlabel flags this as a food-construction additive.",
       matchingNotes:
         "Match methylcellulose, ethyl cellulose, hydroxypropyl cellulose, HPMC, carboxymethyl cellulose, sodium CMC, cellulose gum, E461, E462, E463, E464, E466, E468, E469, and INS variants.",
       scoringImpact: "yellow_texture_builder",
@@ -1285,7 +1285,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       healthConcernType: "modified_starch_thickener_stabiliser",
       warningLabel: "MODIFIED STARCH / THICKENER FOUND",
       userFacingReason:
-        "This product contains modified starches, used to thicken, bind, or stabilise processed food texture. InsideIt flags this as a food-construction marker.",
+        "This product contains modified starches, used to thicken, bind, or stabilise processed food texture. Truthlabel flags this as a food-construction marker.",
       matchingNotes:
         "Match modified starch, modified food starch, named modified starches, E1404, E1410, E1412, E1413, E1414, E1420, E1422, E1440, E1442, E1450, E1451, and INS variants.",
       scoringImpact: "yellow_texture_builder",
@@ -1374,7 +1374,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       healthConcernType: "phosphate_water_binding_stabiliser",
       warningLabel: "PHOSPHATE STABILISER FOUND",
       userFacingReason:
-        "This product contains phosphate stabilisers, often used to hold water and support processed texture. InsideIt flags this as a food-construction and texture-support marker.",
+        "This product contains phosphate stabilisers, often used to hold water and support processed texture. Truthlabel flags this as a food-construction and texture-support marker.",
       matchingNotes:
         "Match phosphates, sodium phosphate, disodium phosphate, trisodium phosphate, potassium phosphate, calcium phosphate, diphosphates, triphosphates, polyphosphates, SAPP, STPP, E339, E340, E341, E450, E451, E452, and INS variants.",
       scoringImpact: "yellow_texture_builder",
@@ -1422,7 +1422,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       healthConcernType: "gelling_texture_stabiliser",
       warningLabel: "GELLING AGENT FOUND",
       userFacingReason:
-        "This product contains gelatin/gelatine, a gelling ingredient used to build texture. InsideIt flags this as a texture-support ingredient.",
+        "This product contains gelatin/gelatine, a gelling ingredient used to build texture. Truthlabel flags this as a texture-support ingredient.",
       matchingNotes:
         "Match gelatin, gelatine, beef gelatin, pork gelatin, fish gelatin, hydrolyzed/hydrolysed gelatin, collagen protein, and hydrolyzed/hydrolysed collagen.",
       scoringImpact: "yellow_thickener_stabiliser",
@@ -1448,7 +1448,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       display: "red_count_badge",
       scoreImpact: 22,
       reason:
-        "Product contains multiple texture-engineering systems. InsideIt treats this as a high emulsifier/stabiliser load."
+        "Product contains multiple texture-engineering systems. Truthlabel treats this as a high emulsifier/stabiliser load."
     },
     anyBannedRestrictedTextureAdditive: {
       severity: "red",
@@ -1461,11 +1461,11 @@ export const emulsifiersStabilisersGumsDataPack = {
 
   finalVerdictRules: {
     yellow:
-      "This product contains emulsifiers, stabilisers, thickeners, gums, or texture-support additives. InsideIt flags this because the product's texture is being engineered or chemically supported.",
+      "This product contains emulsifiers, stabilisers, thickeners, gums, or texture-support additives. Truthlabel flags this because the product's texture is being engineered or chemically supported.",
     redLoad:
-      "This product contains multiple emulsifiers, stabilisers, thickeners, gums, or texture-support systems. InsideIt flags this as a high texture-engineering load.",
+      "This product contains multiple emulsifiers, stabilisers, thickeners, gums, or texture-support systems. Truthlabel flags this as a high texture-engineering load.",
     redRestricted:
-      "This product contains a banned or restricted texture additive. InsideIt flags this as a serious regulatory concern."
+      "This product contains a banned or restricted texture additive. Truthlabel flags this as a serious regulatory concern."
   },
 
   matchingNormalizationRules: [

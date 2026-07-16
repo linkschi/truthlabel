@@ -2,10 +2,10 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "InsideIt",
-    short_name: "InsideIt",
+    name: "Truthlabel",
+    short_name: "Truthlabel",
     description:
-      "InsideIt scans ingredient labels, barcodes, and safety signals before you trust the product.",
+      "Truthlabel scans ingredient labels, barcodes, and safety signals before you trust the product.",
     start_url: "/",
     display: "standalone",
     background_color: "#f5efe6",

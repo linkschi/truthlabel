@@ -60,7 +60,7 @@ test("barcode scan storage keeps an in-memory fallback when localStorage is unav
       lookupStatus: "found",
       productData: {
         productName: "Fallback Barcode Product",
-        brandName: "InsideIt Test",
+        brandName: "Truthlabel Test",
         barcode: "0123456789012",
         productCategory: "General / Unknown",
         ingredientText: "Water, Sugar",

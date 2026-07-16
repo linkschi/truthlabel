@@ -1,8 +1,8 @@
-# InsideIt MVP
+# Truthlabel MVP
 
-InsideIt is a mobile-first Next.js app that helps people scan food products and review ingredient-label signals, barcode product data, OCR-extracted labels, and official recall-style safety signals in one place.
+Truthlabel is a mobile-first Next.js app that helps people scan food products and review ingredient-label signals, barcode product data, OCR-extracted labels, and official recall-style safety signals in one place.
 
-## What InsideIt does
+## What Truthlabel does
 
 - Manual ingredient scans for pasted label text
 - Barcode lookup with Open Food Facts
@@ -12,7 +12,7 @@ InsideIt is a mobile-first Next.js app that helps people scan food products and 
 - Optional external safety lookup for official recall and safety signals
 - Demo products for QA, design review, and onboarding
 
-InsideIt helps explain ingredient labels and safety signals. It is not medical advice. Always check the product label, especially for allergies.
+Truthlabel helps explain ingredient labels and safety signals. It is not medical advice. Always check the product label, especially for allergies.
 
 ## Stack
 
@@ -44,7 +44,7 @@ npm run build
 
 Copy `.env.example` to `.env.local` if you want to override defaults.
 
-InsideIt MVP currently does not require private API keys for core scanning.
+Truthlabel MVP currently does not require private API keys for core scanning.
 
 ### Public config
 
@@ -89,13 +89,13 @@ InsideIt MVP currently does not require private API keys for core scanning.
 - OCR can misread labels.
 - External safety checks depend on available official data and match confidence.
 - Missing data is not proof of absence.
-- InsideIt is not medical advice.
+- Truthlabel is not medical advice.
 - Allergy users should always check the package label.
 - Some browser/device combinations may not support camera barcode scan or OCR equally well.
 
 ## Deployment notes
 
-InsideIt is currently best suited to a standard Node-capable Next.js deployment.
+Truthlabel is currently best suited to a standard Node-capable Next.js deployment.
 
 Recommended platform:
 

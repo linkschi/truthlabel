@@ -1,14 +1,14 @@
 {
-  "name": "insideit",
+  "name": "truthlabel",
   "version": "0.1.0",
   "private": true,
   "packageManager": "npm@11.6.2",
   "scripts": {
     "dev": "next dev",
     "build": "next build --webpack",
-    "build:cloudflare": "opennextjs-cloudflare build",
-    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "deploy:cloudflare": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "build:cloudflare": "next build --webpack && opennextjs-cloudflare build --skipNextBuild && node scripts/prepare-opennext-dist.mjs",
+    "preview": "npm run build:cloudflare && opennextjs-cloudflare preview",
+    "deploy:cloudflare": "npm run build:cloudflare && opennextjs-cloudflare deploy",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "start": "next start",
     "lint": "eslint",

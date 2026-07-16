@@ -30,7 +30,7 @@ MVP Launch Candidate
 - OCR can misread labels
 - External safety data depends on available official records
 - Missing data is not proof of absence
-- InsideIt is not medical advice
+- Truthlabel is not medical advice
 - Allergy users should always check product packaging
 
 ## Testing completed

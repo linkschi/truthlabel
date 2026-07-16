@@ -62,7 +62,7 @@ export const naturalPositiveIngredientsDataPack = {
       reason:
         "Simple recognizable ingredient commonly listed directly on packaged foods and drinks.",
       userFacingReason:
-        "Water is a simple recognizable ingredient. InsideIt classifies it as Natural / Positive based on available label data.",
+        "Water is a simple recognizable ingredient. Truthlabel classifies it as Natural / Positive based on available label data.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -96,7 +96,7 @@ export const naturalPositiveIngredientsDataPack = {
       reason:
         "Common kitchen ingredient often listed directly and recognized easily by shoppers.",
       userFacingReason:
-        "Salt is a common kitchen ingredient. InsideIt classifies it as a simple ingredient, but this does not judge the total sodium level.",
+        "Salt is a common kitchen ingredient. Truthlabel classifies it as a simple ingredient, but this does not judge the total sodium level.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -140,7 +140,7 @@ export const naturalPositiveIngredientsDataPack = {
       reason:
         "Recognizable sweetening ingredients that are easy to identify on a label.",
       userFacingReason:
-        "This is a recognizable sweetening ingredient. InsideIt classifies it as simple/recognizable, but it does not mean the product is automatically healthy.",
+        "This is a recognizable sweetening ingredient. Truthlabel classifies it as simple/recognizable, but it does not mean the product is automatically healthy.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -224,7 +224,7 @@ export const naturalPositiveIngredientsDataPack = {
       reason:
         "Recognizable fruit ingredients often identifiable as whole-food or minimally processed ingredients.",
       userFacingReason:
-        "Fruit ingredients are recognizable food ingredients. InsideIt classifies them as Natural / Positive when they appear clearly in the ingredient list.",
+        "Fruit ingredients are recognizable food ingredients. Truthlabel classifies them as Natural / Positive when they appear clearly in the ingredient list.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -301,7 +301,7 @@ export const naturalPositiveIngredientsDataPack = {
       reason:
         "Recognizable vegetable ingredients often identifiable as simple or minimally processed foods.",
       userFacingReason:
-        "Vegetable ingredients are recognizable food ingredients. InsideIt classifies them as Natural / Positive when they appear clearly in the ingredient list.",
+        "Vegetable ingredients are recognizable food ingredients. Truthlabel classifies them as Natural / Positive when they appear clearly in the ingredient list.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -362,7 +362,7 @@ export const naturalPositiveIngredientsDataPack = {
       reason:
         "Recognizable grain ingredients that can support simple ingredient classification when clearly named.",
       userFacingReason:
-        "Grains and whole grains are recognizable food ingredients. InsideIt classifies them as Natural / Positive when they appear clearly in the ingredient list.",
+        "Grains and whole grains are recognizable food ingredients. Truthlabel classifies them as Natural / Positive when they appear clearly in the ingredient list.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -408,7 +408,7 @@ export const naturalPositiveIngredientsDataPack = {
       reason:
         "Recognizable legume and pulse ingredients often identifiable as simple food components.",
       userFacingReason:
-        "Legumes and pulses are recognizable food ingredients. InsideIt classifies them as Natural / Positive when they appear clearly in the ingredient list.",
+        "Legumes and pulses are recognizable food ingredients. Truthlabel classifies them as Natural / Positive when they appear clearly in the ingredient list.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -455,7 +455,7 @@ export const naturalPositiveIngredientsDataPack = {
       reason:
         "Recognizable nut ingredients often identifiable as simple food ingredients.",
       userFacingReason:
-        "Nuts are recognizable food ingredients. InsideIt classifies them as Natural / Positive, while still allowing Allergy Risk to flag them for users with nut allergies.",
+        "Nuts are recognizable food ingredients. Truthlabel classifies them as Natural / Positive, while still allowing Allergy Risk to flag them for users with nut allergies.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -494,7 +494,7 @@ export const naturalPositiveIngredientsDataPack = {
       reason:
         "Recognizable seed ingredients often identifiable as simple food ingredients.",
       userFacingReason:
-        "Seeds are recognizable food ingredients. InsideIt classifies them as Natural / Positive, while still allowing Allergy Risk to flag sesame or mustard where relevant.",
+        "Seeds are recognizable food ingredients. Truthlabel classifies them as Natural / Positive, while still allowing Allergy Risk to flag sesame or mustard where relevant.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -536,7 +536,7 @@ export const naturalPositiveIngredientsDataPack = {
       reason:
         "Recognizable kitchen herbs often identifiable as simple or minimally processed ingredients.",
       userFacingReason:
-        "Herbs are recognizable kitchen ingredients. InsideIt classifies them as Natural / Positive when they appear clearly in the ingredient list.",
+        "Herbs are recognizable kitchen ingredients. Truthlabel classifies them as Natural / Positive when they appear clearly in the ingredient list.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -583,7 +583,7 @@ export const naturalPositiveIngredientsDataPack = {
       reason:
         "Recognizable kitchen spices often identifiable as simple or minimally processed ingredients.",
       userFacingReason:
-        "Spices are recognizable kitchen ingredients. InsideIt classifies them as Natural / Positive when they appear clearly in the ingredient list.",
+        "Spices are recognizable kitchen ingredients. Truthlabel classifies them as Natural / Positive when they appear clearly in the ingredient list.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -633,7 +633,7 @@ export const naturalPositiveIngredientsDataPack = {
       reason:
         "Named animal protein ingredients can be recognizable simple food ingredients when clearly declared.",
       userFacingReason:
-        "Simple named animal protein ingredients are recognizable food ingredients. InsideIt classifies them as Natural / Positive when they appear clearly in the ingredient list.",
+        "Simple named animal protein ingredients are recognizable food ingredients. Truthlabel classifies them as Natural / Positive when they appear clearly in the ingredient list.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -668,7 +668,7 @@ export const naturalPositiveIngredientsDataPack = {
       reason:
         "Recognizable dairy ingredients often identifiable as simple food ingredients when clearly listed.",
       userFacingReason:
-        "Simple dairy ingredients are recognizable food ingredients. InsideIt classifies them as Natural / Positive while still allowing Allergy Risk to flag milk for users with milk allergies.",
+        "Simple dairy ingredients are recognizable food ingredients. Truthlabel classifies them as Natural / Positive while still allowing Allergy Risk to flag milk for users with milk allergies.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -712,7 +712,7 @@ export const naturalPositiveIngredientsDataPack = {
       reason:
         "Recognizable named oils and fats that can support simple ingredient classification when clearly listed.",
       userFacingReason:
-        "These are recognizable fat or oil ingredients. InsideIt classifies them as simple ingredients, but this does not judge the total fat content or make a health claim.",
+        "These are recognizable fat or oil ingredients. Truthlabel classifies them as simple ingredients, but this does not judge the total fat content or make a health claim.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -747,7 +747,7 @@ export const naturalPositiveIngredientsDataPack = {
       reason:
         "Recognizable cocoa and cacao ingredients often identifiable as simple or minimally processed food components.",
       userFacingReason:
-        "Cocoa and cacao ingredients are recognizable food ingredients. InsideIt classifies them as Natural / Positive when they appear clearly in the ingredient list.",
+        "Cocoa and cacao ingredients are recognizable food ingredients. Truthlabel classifies them as Natural / Positive when they appear clearly in the ingredient list.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -786,7 +786,7 @@ export const naturalPositiveIngredientsDataPack = {
       reason:
         "Recognizable beverage ingredients often identifiable as simple food or infusion ingredients.",
       userFacingReason:
-        "Tea, coffee, and herbal infusion ingredients are recognizable food ingredients. InsideIt classifies them as Natural / Positive when they appear clearly in the ingredient list.",
+        "Tea, coffee, and herbal infusion ingredients are recognizable food ingredients. Truthlabel classifies them as Natural / Positive when they appear clearly in the ingredient list.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -820,7 +820,7 @@ export const naturalPositiveIngredientsDataPack = {
       reason:
         "Recognizable kitchen-acid ingredients often identifiable as simple label ingredients.",
       userFacingReason:
-        "Vinegar and simple citrus juices are recognizable kitchen ingredients. InsideIt classifies them as Natural / Positive when they appear clearly in the ingredient list.",
+        "Vinegar and simple citrus juices are recognizable kitchen ingredients. Truthlabel classifies them as Natural / Positive when they appear clearly in the ingredient list.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -860,7 +860,7 @@ export const naturalPositiveIngredientsDataPack = {
       reason:
         "Recognizable fermentation culture ingredients used in common food-production processes.",
       userFacingReason:
-        "Fermentation cultures are recognizable food-production ingredients. InsideIt classifies them as Natural / Positive when they appear clearly in the ingredient list.",
+        "Fermentation cultures are recognizable food-production ingredients. Truthlabel classifies them as Natural / Positive when they appear clearly in the ingredient list.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -894,7 +894,7 @@ export const naturalPositiveIngredientsDataPack = {
       reason:
         "Recognizable baking ingredients used for fermentation or leavening.",
       userFacingReason:
-        "Yeast and simple leavening ingredients are recognizable baking ingredients. InsideIt classifies them as Natural / Positive when they appear clearly in the ingredient list.",
+        "Yeast and simple leavening ingredients are recognizable baking ingredients. Truthlabel classifies them as Natural / Positive when they appear clearly in the ingredient list.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -934,7 +934,7 @@ export const naturalPositiveIngredientsDataPack = {
       reason:
         "Recognizable flour and starch ingredients that can support simple ingredient classification when clearly named.",
       userFacingReason:
-        "Simple flour or starch ingredients are recognizable food ingredients. InsideIt classifies them as Natural / Positive when they appear clearly in the ingredient list.",
+        "Simple flour or starch ingredients are recognizable food ingredients. Truthlabel classifies them as Natural / Positive when they appear clearly in the ingredient list.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],

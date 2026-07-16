@@ -164,7 +164,7 @@ export function buildFeedbackReport(input: BuildFeedbackReportInput) {
   );
 
   const lines = [
-    "InsideIt MVP Feedback Report",
+    "Truthlabel MVP Feedback Report",
     `Created: ${reportCreatedAt}`,
     "",
     `Issue type: ${cleanValue(input.issueType) || "other_feedback"}`,

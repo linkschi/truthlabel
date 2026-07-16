@@ -227,7 +227,7 @@ export const artificialColoursStarter: ArtificialColourStarterItem[] = [
       ZA: "unknown",
     },
     explanation:
-      "A synthetic red colour additive included in InsideIt's restricted-colour and cancer-concern watchlist.",
+      "A synthetic red colour additive included in Truthlabel's restricted-colour and cancer-concern watchlist.",
     matchingNotes:
       "Match Erythrosine, Red No. 3, Red 3, FD&C Red No. 3, E127, and INS 127.",
     displaySections: [
@@ -238,7 +238,7 @@ export const artificialColoursStarter: ArtificialColourStarterItem[] = [
     ],
     warningLabel: "Restricted colour watch item",
     userFacingReason:
-      "This colour appears on InsideIt's banned/restricted or cancer-concern watchlist.",
+      "This colour appears on Truthlabel's banned/restricted or cancer-concern watchlist.",
     duplicateGroupId: "erythrosine",
     dataSources: ["FDA", "UK/E-number list", "Canada permitted colours", "FSANZ"],
   },
@@ -763,7 +763,7 @@ export const artificialColoursStarter: ArtificialColourStarterItem[] = [
       ZA: "unknown",
     },
     explanation:
-      "A synthetic red colour additive included in InsideIt's restricted-colour watchlist.",
+      "A synthetic red colour additive included in Truthlabel's restricted-colour watchlist.",
     matchingNotes: "Match Citrus Red No. 2 and Citrus Red 2.",
     displaySections: [
       "quick_overview",
@@ -773,7 +773,7 @@ export const artificialColoursStarter: ArtificialColourStarterItem[] = [
     ],
     warningLabel: "Restricted colour watch item",
     userFacingReason:
-      "This colour appears on InsideIt's banned/restricted watchlist.",
+      "This colour appears on Truthlabel's banned/restricted watchlist.",
     duplicateGroupId: "citrus_red_no_2",
     dataSources: ["FDA"],
   },
@@ -804,7 +804,7 @@ export const artificialColoursStarter: ArtificialColourStarterItem[] = [
       ZA: "unknown",
     },
     explanation:
-      "A synthetic orange colour additive included in InsideIt's restricted-colour watchlist.",
+      "A synthetic orange colour additive included in Truthlabel's restricted-colour watchlist.",
     matchingNotes: "Match Orange B.",
     displaySections: [
       "quick_overview",
@@ -814,7 +814,7 @@ export const artificialColoursStarter: ArtificialColourStarterItem[] = [
     ],
     warningLabel: "Restricted colour watch item",
     userFacingReason:
-      "This colour appears on InsideIt's banned/restricted watchlist.",
+      "This colour appears on Truthlabel's banned/restricted watchlist.",
     duplicateGroupId: "orange_b",
     dataSources: ["FDA"],
   },
@@ -846,7 +846,7 @@ export const artificialColoursStarter: ArtificialColourStarterItem[] = [
       ZA: "unknown",
     },
     explanation:
-      "A white colour additive included in InsideIt's region-restricted colour watchlist.",
+      "A white colour additive included in Truthlabel's region-restricted colour watchlist.",
     matchingNotes:
       "Match Titanium Dioxide, E171, INS 171, and CI 77891.",
     displaySections: [
@@ -857,7 +857,7 @@ export const artificialColoursStarter: ArtificialColourStarterItem[] = [
     ],
     warningLabel: "Restricted colour watch item",
     userFacingReason:
-      "This colour additive has different regulatory treatment by region and is on InsideIt's restricted-colour watchlist.",
+      "This colour additive has different regulatory treatment by region and is on Truthlabel's restricted-colour watchlist.",
     duplicateGroupId: "titanium_dioxide",
     dataSources: ["UK/E-number list", "Canada permitted colours", "FSANZ"],
   },

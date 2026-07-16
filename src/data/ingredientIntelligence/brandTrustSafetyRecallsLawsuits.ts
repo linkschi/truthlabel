@@ -88,7 +88,7 @@ export const brandTrustSafetyRecallsLawsuitsDataPack = {
   id: "brand_trust_safety",
   categoryName: "Brand Trust / Safety / Recalls / Lawsuits",
   categoryMeaning:
-    "This category tracks brand and product-level safety and trust signals from external data such as recalls, public health alerts, official enforcement signals, outbreak investigations, undeclared allergen events, contamination recalls, repeated recall history, lawsuits, settlements, and product-specific safety notices. It is not an ingredient-list-only category. InsideIt uses it to add external context without claiming that every product from a brand is unsafe.",
+    "This category tracks brand and product-level safety and trust signals from external data such as recalls, public health alerts, official enforcement signals, outbreak investigations, undeclared allergen events, contamination recalls, repeated recall history, lawsuits, settlements, and product-specific safety notices. It is not an ingredient-list-only category. Truthlabel uses it to add external context without claiming that every product from a brand is unsafe.",
   dataStatus: "starter_needs_external_data",
   defaultCategorySeverity: "yellow",
 
@@ -107,7 +107,7 @@ export const brandTrustSafetyRecallsLawsuitsDataPack = {
       reason:
         "Official active recall signal for a specific product, batch, or product group.",
       userFacingReason:
-        "This product has an active official recall signal. InsideIt flags this as a serious safety concern based on external recall data.",
+        "This product has an active official recall signal. Truthlabel flags this as a serious safety concern based on external recall data.",
       dataStatus: "needs_external_data",
       confidenceLevel: null,
       sourceRefs: [
@@ -132,7 +132,7 @@ export const brandTrustSafetyRecallsLawsuitsDataPack = {
       reason:
         "Past recall signal that may be relevant to trust or history but may not affect the current product.",
       userFacingReason:
-        "This product or brand has a historical recall signal. InsideIt flags this for review, but it may not apply to the current product or batch.",
+        "This product or brand has a historical recall signal. Truthlabel flags this for review, but it may not apply to the current product or batch.",
       dataStatus: "needs_external_data",
       confidenceLevel: null,
       sourceRefs: [
@@ -157,7 +157,7 @@ export const brandTrustSafetyRecallsLawsuitsDataPack = {
       reason:
         "Official public health alert signal for a product or product group.",
       userFacingReason:
-        "This product has an official public health alert signal. InsideIt flags this as a serious safety review item.",
+        "This product has an official public health alert signal. Truthlabel flags this as a serious safety review item.",
       dataStatus: "needs_external_data",
       confidenceLevel: null,
       sourceRefs: [
@@ -181,7 +181,7 @@ export const brandTrustSafetyRecallsLawsuitsDataPack = {
       reason:
         "Official recall or alert because a product contains an undeclared allergen.",
       userFacingReason:
-        "This product has an undeclared allergen recall or alert signal. InsideIt flags this as a serious label safety concern.",
+        "This product has an undeclared allergen recall or alert signal. Truthlabel flags this as a serious label safety concern.",
       dataStatus: "needs_external_data",
       confidenceLevel: null,
       sourceRefs: [
@@ -205,7 +205,7 @@ export const brandTrustSafetyRecallsLawsuitsDataPack = {
       reason:
         "Official recall or alert for possible pathogen contamination.",
       userFacingReason:
-        "This product has an official contamination recall or alert signal. InsideIt flags this as a serious safety concern based on external data.",
+        "This product has an official contamination recall or alert signal. Truthlabel flags this as a serious safety concern based on external data.",
       dataStatus: "needs_external_data",
       confidenceLevel: null,
       sourceRefs: [
@@ -229,7 +229,7 @@ export const brandTrustSafetyRecallsLawsuitsDataPack = {
       reason:
         "Official recall or alert because of possible foreign material contamination.",
       userFacingReason:
-        "This product has an official foreign-material recall or alert signal. InsideIt flags this as a serious safety review item.",
+        "This product has an official foreign-material recall or alert signal. Truthlabel flags this as a serious safety review item.",
       dataStatus: "needs_external_data",
       confidenceLevel: null,
       sourceRefs: [
@@ -253,7 +253,7 @@ export const brandTrustSafetyRecallsLawsuitsDataPack = {
       reason:
         "Official recall, warning, or verified testing signal related to lead, arsenic, cadmium, mercury, or other heavy metal concerns.",
       userFacingReason:
-        "This product has an official heavy-metal warning or recall signal. InsideIt flags this as a serious safety concern based on external data.",
+        "This product has an official heavy-metal warning or recall signal. Truthlabel flags this as a serious safety concern based on external data.",
       dataStatus: "needs_external_data",
       confidenceLevel: null,
       sourceRefs: [],
@@ -274,7 +274,7 @@ export const brandTrustSafetyRecallsLawsuitsDataPack = {
       reason:
         "Official recall or alert for chemical contamination or excess chemical residue.",
       userFacingReason:
-        "This product has an official chemical-contamination recall or alert signal. InsideIt flags this as a serious safety review item.",
+        "This product has an official chemical-contamination recall or alert signal. Truthlabel flags this as a serious safety review item.",
       dataStatus: "needs_external_data",
       confidenceLevel: null,
       sourceRefs: ["FDA_RECALLS_MARKET_WITHDRAWALS_SAFETY_ALERTS"],
@@ -295,7 +295,7 @@ export const brandTrustSafetyRecallsLawsuitsDataPack = {
       reason:
         "Official recall or alert for misbranding, incorrect labeling, or label mismatch.",
       userFacingReason:
-        "This product has a misbranding or labeling recall signal. InsideIt flags this as a label trust review item.",
+        "This product has a misbranding or labeling recall signal. Truthlabel flags this as a label trust review item.",
       dataStatus: "needs_external_data",
       confidenceLevel: null,
       sourceRefs: [
@@ -319,7 +319,7 @@ export const brandTrustSafetyRecallsLawsuitsDataPack = {
       reason:
         "Official active outbreak investigation linked to a product, brand, facility, or food category.",
       userFacingReason:
-        "This product, brand, or category has an active outbreak investigation signal. InsideIt flags this as a serious safety review item based on external data.",
+        "This product, brand, or category has an active outbreak investigation signal. Truthlabel flags this as a serious safety review item based on external data.",
       dataStatus: "needs_external_data",
       confidenceLevel: null,
       sourceRefs: ["CDC_FOODBORNE_OUTBREAKS"],
@@ -340,7 +340,7 @@ export const brandTrustSafetyRecallsLawsuitsDataPack = {
       reason:
         "Official regulatory warning or enforcement signal related to manufacturing, labeling, quality, contamination, or safety practices.",
       userFacingReason:
-        "This brand or company has a regulatory warning or enforcement signal. InsideIt flags this as a brand trust review item.",
+        "This brand or company has a regulatory warning or enforcement signal. Truthlabel flags this as a brand trust review item.",
       dataStatus: "needs_external_data",
       confidenceLevel: null,
       sourceRefs: ["FDA_WARNING_LETTERS"],
@@ -361,7 +361,7 @@ export const brandTrustSafetyRecallsLawsuitsDataPack = {
       reason:
         "Brand or company has multiple recall signals within a defined time window.",
       userFacingReason:
-        "This brand has repeated recall history in available external data. InsideIt flags this as a brand trust review item.",
+        "This brand has repeated recall history in available external data. Truthlabel flags this as a brand trust review item.",
       dataStatus: "needs_external_data",
       confidenceLevel: null,
       sourceRefs: [
@@ -385,7 +385,7 @@ export const brandTrustSafetyRecallsLawsuitsDataPack = {
       redOnlyWhenVerified: true,
       reason: "Product-specific lawsuit allegation exists in external data.",
       userFacingReason:
-        "This product has a lawsuit allegation signal. InsideIt flags this for review, but allegations are not proof unless confirmed by a court decision, settlement, or verified official finding.",
+        "This product has a lawsuit allegation signal. Truthlabel flags this for review, but allegations are not proof unless confirmed by a court decision, settlement, or verified official finding.",
       dataStatus: "needs_external_data",
       confidenceLevel: null,
       sourceRefs: ["COURT_RECORDS", "CLASS_ACTION_DATABASES"],
@@ -405,7 +405,7 @@ export const brandTrustSafetyRecallsLawsuitsDataPack = {
       redOnlyWhenVerified: true,
       reason: "Brand-level lawsuit allegation exists in external data.",
       userFacingReason:
-        "This brand has a lawsuit allegation signal. InsideIt flags this as a brand trust review item, not proof that this specific product is unsafe.",
+        "This brand has a lawsuit allegation signal. Truthlabel flags this as a brand trust review item, not proof that this specific product is unsafe.",
       dataStatus: "needs_external_data",
       confidenceLevel: null,
       sourceRefs: ["COURT_RECORDS", "CLASS_ACTION_DATABASES"],
@@ -426,7 +426,7 @@ export const brandTrustSafetyRecallsLawsuitsDataPack = {
       reason:
         "Settlement or court-confirmed signal exists in external data.",
       userFacingReason:
-        "This brand or product has a settlement or court-confirmed legal signal. InsideIt flags this as a trust review item and should show the exact issue and date when available.",
+        "This brand or product has a settlement or court-confirmed legal signal. Truthlabel flags this as a trust review item and should show the exact issue and date when available.",
       dataStatus: "needs_external_data",
       confidenceLevel: null,
       sourceRefs: ["COURT_RECORDS", "CLASS_ACTION_DATABASES"],
@@ -451,7 +451,7 @@ export const brandTrustSafetyRecallsLawsuitsDataPack = {
       reason:
         "Third-party testing signal exists for product safety or contaminant review.",
       userFacingReason:
-        "This product has a third-party testing signal. InsideIt flags this for review and should show the test source, date, and result when available.",
+        "This product has a third-party testing signal. Truthlabel flags this for review and should show the test source, date, and result when available.",
       dataStatus: "needs_external_data",
       confidenceLevel: null,
       sourceRefs: ["THIRD_PARTY_TESTING_REPORTS"],
@@ -472,7 +472,7 @@ export const brandTrustSafetyRecallsLawsuitsDataPack = {
       reason:
         "Brand provides transparency disclosures such as ingredient sourcing, COAs, testing reports, allergen protocols, or manufacturing details.",
       userFacingReason:
-        "This brand has transparency information available. InsideIt records this as brand trust context, not as proof the product is safer.",
+        "This brand has transparency information available. Truthlabel records this as brand trust context, not as proof the product is safer.",
       dataStatus: "needs_external_data",
       confidenceLevel: null,
       sourceRefs: ["BRAND_COA_DOCUMENTS", "COMPANY_RECALL_PAGES"],
@@ -492,7 +492,7 @@ export const brandTrustSafetyRecallsLawsuitsDataPack = {
       redOnlyWhenVerified: true,
       reason: "Brand or product safety data is missing or not available.",
       userFacingReason:
-        "InsideIt could not confirm brand or product safety history from available external data. Missing data is not proof of safety or danger.",
+        "Truthlabel could not confirm brand or product safety history from available external data. Missing data is not proof of safety or danger.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -512,7 +512,7 @@ export const brandTrustSafetyRecallsLawsuitsDataPack = {
       redOnlyWhenVerified: true,
       reason: "User-submitted concern exists but is not verified.",
       userFacingReason:
-        "InsideIt has a user-reported concern for this product. This is not verified and should be treated as review information only.",
+        "Truthlabel has a user-reported concern for this product. This is not verified and should be treated as review information only.",
       dataStatus: "starter",
       confidenceLevel: "low",
       sourceRefs: ["USER_REPORTS"],

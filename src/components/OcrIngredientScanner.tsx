@@ -377,7 +377,7 @@ export default function OcrIngredientScanner({
               Scan Ingredient Label
             </h2>
             <p className="mt-2 text-[13px] leading-5 text-white/72">
-              Scan or upload the ingredient label. You can edit the text before InsideIt scans it.
+              Scan or upload the ingredient label. You can edit the text before Truthlabel scans it.
             </p>
           </div>
           <button

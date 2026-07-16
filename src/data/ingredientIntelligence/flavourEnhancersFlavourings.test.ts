@@ -37,7 +37,7 @@ test("flavourEnhancersFlavouringsDataPack uses the green yellow red flavour-syst
     display: "red_count_badge",
     scoreImpact: 22,
     reason:
-      "Product contains multiple flavouring or flavour-enhancing systems. InsideIt treats this as a high flavour-system load.",
+      "Product contains multiple flavouring or flavour-enhancing systems. Truthlabel treats this as a high flavour-system load.",
   });
   assert.deepEqual(categoryScoringRules.anyBannedRestrictedFlavouring, {
     severity: "red",
@@ -53,11 +53,11 @@ test("flavourEnhancersFlavouringsDataPack uses the green yellow red flavour-syst
   });
   assert.equal(
     finalVerdictRules.redLoad,
-    "This product contains multiple flavouring or flavour-enhancing systems. InsideIt flags this as a high flavour-system load.",
+    "This product contains multiple flavouring or flavour-enhancing systems. Truthlabel flags this as a high flavour-system load.",
   );
   assert.equal(
     finalVerdictRules.redRestricted,
-    "This product contains a banned or restricted flavouring ingredient. InsideIt flags this as a serious regulatory concern.",
+    "This product contains a banned or restricted flavouring ingredient. Truthlabel flags this as a serious regulatory concern.",
   );
 });
 

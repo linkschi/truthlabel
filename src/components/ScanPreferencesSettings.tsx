@@ -58,7 +58,7 @@ export default function ScanPreferencesSettings({
     <section className="rounded-[24px] border border-[#e7decf] bg-white/78 px-4 py-4 shadow-[var(--shadow)]">
       <SectionLabel>Scan Preferences</SectionLabel>
       <p className="mt-1.5 text-[14px] leading-5 text-[#55645c]">
-        Keep the active scan flow simple and set the defaults you want InsideIt to use.
+        Keep the active scan flow simple and set the defaults you want Truthlabel to use.
       </p>
 
       <label className="mt-4 block">

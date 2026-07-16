@@ -67,7 +67,7 @@ export const artificialSweetenersDataPack = {
   id: "artificial_sweeteners_sugar_substitutes",
   categoryName: "Artificial Sweeteners / Sugar Substitutes",
   categoryMeaning:
-    "This category detects artificial sweeteners, high-intensity sweeteners, sugar alcohols, and non-sugar sweetening systems. InsideIt flags these because the product's sweetness is being created through added sweetener technology rather than simple whole-food sweetness.",
+    "This category detects artificial sweeteners, high-intensity sweeteners, sugar alcohols, and non-sugar sweetening systems. Truthlabel flags these because the product's sweetness is being created through added sweetener technology rather than simple whole-food sweetness.",
   dataStatus: "starter_verified_core",
   defaultCategorySeverity: "yellow",
 
@@ -91,7 +91,7 @@ export const artificialSweetenersDataPack = {
       healthConcernType: "high_intensity_artificial_sweetener",
       warningLabel: "ARTIFICIAL SWEETENER FOUND",
       userFacingReason:
-        "This product contains aspartame, a high-intensity artificial sweetener. InsideIt flags this because the product's sweetness is being created through added sweetener technology rather than simple sugar or whole-food sweetness.",
+        "This product contains aspartame, a high-intensity artificial sweetener. Truthlabel flags this because the product's sweetness is being created through added sweetener technology rather than simple sugar or whole-food sweetness.",
       matchingNotes:
         "Match aspartame, E951, INS 951, NutraSweet, Equal, Canderel, and APM.",
       scoringImpact: "yellow_sweetener",
@@ -118,7 +118,7 @@ export const artificialSweetenersDataPack = {
       healthConcernType: "high_intensity_artificial_sweetener",
       warningLabel: "ARTIFICIAL SWEETENER FOUND",
       userFacingReason:
-        "This product contains acesulfame potassium, a high-intensity artificial sweetener. InsideIt flags this because the product uses a non-sugar sweetening system.",
+        "This product contains acesulfame potassium, a high-intensity artificial sweetener. Truthlabel flags this because the product uses a non-sugar sweetening system.",
       matchingNotes:
         "Match acesulfame potassium, acesulfame K, Ace-K, Ace K, E950, INS 950, Sunett, and Sweet One.",
       scoringImpact: "yellow_sweetener",
@@ -134,7 +134,7 @@ export const artificialSweetenersDataPack = {
       healthConcernType: "high_intensity_artificial_sweetener",
       warningLabel: "ARTIFICIAL SWEETENER FOUND",
       userFacingReason:
-        "This product contains sucralose, a high-intensity artificial sweetener. InsideIt flags this because the sweetness is built with a non-sugar sweetener system.",
+        "This product contains sucralose, a high-intensity artificial sweetener. Truthlabel flags this because the sweetness is built with a non-sugar sweetener system.",
       matchingNotes: "Match sucralose, E955, INS 955, and Splenda.",
       scoringImpact: "yellow_sweetener",
       dataStatus: "verified_core",
@@ -159,7 +159,7 @@ export const artificialSweetenersDataPack = {
       healthConcernType: "high_intensity_artificial_sweetener",
       warningLabel: "ARTIFICIAL SWEETENER FOUND",
       userFacingReason:
-        "This product contains saccharin, a high-intensity artificial sweetener. InsideIt flags this because the product uses an added non-sugar sweetening system.",
+        "This product contains saccharin, a high-intensity artificial sweetener. Truthlabel flags this because the product uses an added non-sugar sweetening system.",
       matchingNotes:
         "Match saccharin, sodium saccharin, calcium saccharin, potassium saccharin, E954, INS 954, Sweet'N Low, and Sweet N Low.",
       scoringImpact: "yellow_sweetener",
@@ -188,7 +188,7 @@ export const artificialSweetenersDataPack = {
       healthConcernType: "banned_restricted_sweetener",
       warningLabel: "BANNED / RESTRICTED SWEETENER",
       userFacingReason:
-        "This product contains cyclamate, a sweetener banned/restricted for food use in some regions including the United States and Canadian foods. InsideIt flags this as a serious regulatory concern.",
+        "This product contains cyclamate, a sweetener banned/restricted for food use in some regions including the United States and Canadian foods. Truthlabel flags this as a serious regulatory concern.",
       matchingNotes:
         "Match cyclamate, cyclamates, cyclamic acid, sodium cyclamate, calcium cyclamate, magnesium cyclamate, potassium cyclamate, E952, and INS 952.",
       scoringImpact: "automatic_red",
@@ -209,7 +209,7 @@ export const artificialSweetenersDataPack = {
       healthConcernType: "high_intensity_artificial_sweetener",
       warningLabel: "ARTIFICIAL SWEETENER FOUND",
       userFacingReason:
-        "This product contains neotame, a high-intensity artificial sweetener. InsideIt flags this because the product uses added sweetener technology.",
+        "This product contains neotame, a high-intensity artificial sweetener. Truthlabel flags this because the product uses added sweetener technology.",
       matchingNotes: "Match neotame, E961, INS 961, and Newtame.",
       scoringImpact: "yellow_sweetener",
       dataStatus: "verified_core",
@@ -224,7 +224,7 @@ export const artificialSweetenersDataPack = {
       healthConcernType: "high_intensity_artificial_sweetener",
       warningLabel: "ARTIFICIAL SWEETENER FOUND",
       userFacingReason:
-        "This product contains advantame, a very high-intensity artificial sweetener. InsideIt flags this because the product uses added sweetener technology.",
+        "This product contains advantame, a very high-intensity artificial sweetener. Truthlabel flags this because the product uses added sweetener technology.",
       matchingNotes: "Match advantame, E969, and INS 969.",
       scoringImpact: "yellow_sweetener",
       dataStatus: "verified_core",
@@ -235,11 +235,11 @@ export const artificialSweetenersDataPack = {
       otherNames: ["Alitame", "E956", "E-956", "INS 956", "Aclame"],
       severity: "yellow",
       reason:
-        "High-intensity sweetener with region-specific approval status. InsideIt flags it as a non-sugar sweetener requiring review.",
+        "High-intensity sweetener with region-specific approval status. Truthlabel flags it as a non-sugar sweetener requiring review.",
       healthConcernType: "high_intensity_sweetener_region_review",
       warningLabel: "ARTIFICIAL SWEETENER FOUND",
       userFacingReason:
-        "This product contains alitame, a high-intensity sweetener with region-specific approval status. InsideIt flags this as a non-sugar sweetener for review.",
+        "This product contains alitame, a high-intensity sweetener with region-specific approval status. Truthlabel flags this as a non-sugar sweetener for review.",
       matchingNotes: "Match alitame, E956, INS 956, and Aclame.",
       scoringImpact: "yellow_sweetener",
       dataStatus: "needs_region_verification",
@@ -260,7 +260,7 @@ export const artificialSweetenersDataPack = {
       healthConcernType: "combined_high_intensity_sweetener",
       warningLabel: "ARTIFICIAL SWEETENER FOUND",
       userFacingReason:
-        "This product contains aspartame-acesulfame salt, a combined high-intensity sweetener. InsideIt flags this because the product uses added sweetener technology.",
+        "This product contains aspartame-acesulfame salt, a combined high-intensity sweetener. Truthlabel flags this because the product uses added sweetener technology.",
       matchingNotes:
         "Match aspartame-acesulfame salt, acesulfame-aspartame salt, E962, and INS 962.",
       scoringImpact: "yellow_sweetener",
@@ -288,11 +288,11 @@ export const artificialSweetenersDataPack = {
       ],
       severity: "yellow",
       reason:
-        "High-intensity non-sugar sweetener derived from stevia compounds. InsideIt flags it because it is still an added sweetening system.",
+        "High-intensity non-sugar sweetener derived from stevia compounds. Truthlabel flags it because it is still an added sweetening system.",
       healthConcernType: "non_sugar_high_intensity_sweetener",
       warningLabel: "NON-SUGAR SWEETENER FOUND",
       userFacingReason:
-        "This product contains steviol glycosides, a non-sugar high-intensity sweetener. InsideIt flags this because sweetness is being added through a concentrated sweetener system.",
+        "This product contains steviol glycosides, a non-sugar high-intensity sweetener. Truthlabel flags this because sweetness is being added through a concentrated sweetener system.",
       matchingNotes:
         "Match steviol glycosides, stevia extract, stevia leaf extract, rebaudioside A/M/D, Reb A/M/D, stevioside, E960, and INS 960.",
       scoringImpact: "yellow_sweetener",
@@ -314,7 +314,7 @@ export const artificialSweetenersDataPack = {
       healthConcernType: "not_permitted_sweetener",
       warningLabel: "NOT-PERMITTED SWEETENER",
       userFacingReason:
-        "This product contains whole-leaf or crude stevia extract, which is not permitted for use as a sweetener in the United States. InsideIt flags this as a serious regulatory concern.",
+        "This product contains whole-leaf or crude stevia extract, which is not permitted for use as a sweetener in the United States. Truthlabel flags this as a serious regulatory concern.",
       matchingNotes:
         "Match whole-leaf stevia, whole leaf stevia, crude stevia extract, crude stevia, and unrefined stevia leaf extract. Do not confuse with approved purified steviol glycosides.",
       scoringImpact: "automatic_red",
@@ -341,7 +341,7 @@ export const artificialSweetenersDataPack = {
       healthConcernType: "non_sugar_high_intensity_sweetener",
       warningLabel: "NON-SUGAR SWEETENER FOUND",
       userFacingReason:
-        "This product contains monk fruit extract, a non-sugar high-intensity sweetener. InsideIt flags this because the product uses a concentrated sweetener system.",
+        "This product contains monk fruit extract, a non-sugar high-intensity sweetener. Truthlabel flags this because the product uses a concentrated sweetener system.",
       matchingNotes:
         "Match monk fruit extract, luo han guo extract, lo han kuo extract, mogrosides, mogroside V, monk fruit sweetener, and Lakanto.",
       scoringImpact: "yellow_sweetener",
@@ -356,7 +356,7 @@ export const artificialSweetenersDataPack = {
       healthConcernType: "intense_sweetener_flavour_modifier",
       warningLabel: "NON-SUGAR SWEETENER FOUND",
       userFacingReason:
-        "This product contains thaumatin, an intense sweetener or flavour modifier. InsideIt flags this because the product uses a concentrated sweetening or taste-modifying system.",
+        "This product contains thaumatin, an intense sweetener or flavour modifier. Truthlabel flags this because the product uses a concentrated sweetening or taste-modifying system.",
       matchingNotes: "Match thaumatin, E957, INS 957, and Talin.",
       scoringImpact: "yellow_sweetener",
       dataStatus: "starter",
@@ -378,7 +378,7 @@ export const artificialSweetenersDataPack = {
       healthConcernType: "intense_sweetener_flavour_modifier",
       warningLabel: "NON-SUGAR SWEETENER FOUND",
       userFacingReason:
-        "This product contains neohesperidin DC, a high-intensity sweetener or taste modifier. InsideIt flags this as an added sweetening system.",
+        "This product contains neohesperidin DC, a high-intensity sweetener or taste modifier. Truthlabel flags this as an added sweetening system.",
       matchingNotes:
         "Match neohesperidin DC, neohesperidin dihydrochalcone, NHDC, E959, and INS 959.",
       scoringImpact: "yellow_sweetener",
@@ -394,7 +394,7 @@ export const artificialSweetenersDataPack = {
       healthConcernType: "sugar_substitute_rare_sugar",
       warningLabel: "SUGAR SUBSTITUTE FOUND",
       userFacingReason:
-        "This product contains allulose, a low-calorie sugar substitute. InsideIt flags this because the product uses a sweetening system instead of ordinary sugar alone.",
+        "This product contains allulose, a low-calorie sugar substitute. Truthlabel flags this because the product uses a sweetening system instead of ordinary sugar alone.",
       matchingNotes:
         "Match allulose, D-allulose, D-psicose, psicose, and rare sugar.",
       scoringImpact: "yellow_sweetener",
@@ -409,7 +409,7 @@ export const artificialSweetenersDataPack = {
       healthConcernType: "sugar_alcohol_polyol",
       warningLabel: "SUGAR ALCOHOL FOUND",
       userFacingReason:
-        "This product contains erythritol, a sugar alcohol sweetener. InsideIt flags this because the product uses a non-sugar sweetening system.",
+        "This product contains erythritol, a sugar alcohol sweetener. Truthlabel flags this because the product uses a non-sugar sweetening system.",
       matchingNotes: "Match erythritol, E968, and INS 968.",
       scoringImpact: "yellow_sweetener",
       dataStatus: "starter",
@@ -424,7 +424,7 @@ export const artificialSweetenersDataPack = {
       healthConcernType: "sugar_alcohol_polyol",
       warningLabel: "SUGAR ALCOHOL FOUND",
       userFacingReason:
-        "This product contains xylitol, a sugar alcohol sweetener. InsideIt flags this because the product uses a non-sugar sweetening system.",
+        "This product contains xylitol, a sugar alcohol sweetener. Truthlabel flags this because the product uses a non-sugar sweetening system.",
       matchingNotes: "Match xylitol, E967, INS 967, and birch sugar.",
       scoringImpact: "yellow_sweetener",
       dataStatus: "starter",
@@ -447,7 +447,7 @@ export const artificialSweetenersDataPack = {
       healthConcernType: "sugar_alcohol_polyol",
       warningLabel: "SUGAR ALCOHOL FOUND",
       userFacingReason:
-        "This product contains sorbitol, a sugar alcohol sweetener. InsideIt flags this because the product uses a non-sugar sweetening and texture system.",
+        "This product contains sorbitol, a sugar alcohol sweetener. Truthlabel flags this because the product uses a non-sugar sweetening and texture system.",
       matchingNotes:
         "Match sorbitol, sorbitol syrup, D-glucitol, glucitol, E420, and INS 420.",
       scoringImpact: "yellow_sweetener",
@@ -470,7 +470,7 @@ export const artificialSweetenersDataPack = {
       healthConcernType: "sugar_alcohol_polyol",
       warningLabel: "SUGAR ALCOHOL FOUND",
       userFacingReason:
-        "This product contains maltitol, a sugar alcohol sweetener. InsideIt flags this because the product uses a non-sugar sweetening system.",
+        "This product contains maltitol, a sugar alcohol sweetener. Truthlabel flags this because the product uses a non-sugar sweetening system.",
       matchingNotes:
         "Match maltitol, maltitol syrup, hydrogenated maltose, E965, and INS 965.",
       scoringImpact: "yellow_sweetener",
@@ -485,7 +485,7 @@ export const artificialSweetenersDataPack = {
       healthConcernType: "sugar_alcohol_polyol",
       warningLabel: "SUGAR ALCOHOL FOUND",
       userFacingReason:
-        "This product contains mannitol, a sugar alcohol sweetener or bulking ingredient. InsideIt flags this as a non-sugar sweetening system.",
+        "This product contains mannitol, a sugar alcohol sweetener or bulking ingredient. Truthlabel flags this as a non-sugar sweetening system.",
       matchingNotes: "Match mannitol, E421, and INS 421.",
       scoringImpact: "yellow_sweetener",
       dataStatus: "starter",
@@ -500,7 +500,7 @@ export const artificialSweetenersDataPack = {
       healthConcernType: "sugar_alcohol_polyol",
       warningLabel: "SUGAR ALCOHOL FOUND",
       userFacingReason:
-        "This product contains isomalt, a sugar alcohol sweetener. InsideIt flags this because the product uses a non-sugar sweetening system.",
+        "This product contains isomalt, a sugar alcohol sweetener. Truthlabel flags this because the product uses a non-sugar sweetening system.",
       matchingNotes: "Match isomalt, E953, and INS 953.",
       scoringImpact: "yellow_sweetener",
       dataStatus: "starter",
@@ -515,7 +515,7 @@ export const artificialSweetenersDataPack = {
       healthConcernType: "sugar_alcohol_polyol",
       warningLabel: "SUGAR ALCOHOL FOUND",
       userFacingReason:
-        "This product contains lactitol, a sugar alcohol sweetener. InsideIt flags this as a non-sugar sweetening or bulking system.",
+        "This product contains lactitol, a sugar alcohol sweetener. Truthlabel flags this as a non-sugar sweetening or bulking system.",
       matchingNotes: "Match lactitol, E966, and INS 966.",
       scoringImpact: "yellow_sweetener",
       dataStatus: "starter",
@@ -538,7 +538,7 @@ export const artificialSweetenersDataPack = {
       healthConcernType: "sugar_alcohol_polyol_syrup",
       warningLabel: "SUGAR ALCOHOL FOUND",
       userFacingReason:
-        "This product contains polyglycitol syrup or hydrogenated starch hydrolysates, a sugar alcohol sweetening system. InsideIt flags this as a non-sugar sweetener and texture ingredient.",
+        "This product contains polyglycitol syrup or hydrogenated starch hydrolysates, a sugar alcohol sweetening system. Truthlabel flags this as a non-sugar sweetener and texture ingredient.",
       matchingNotes:
         "Match polyglycitol syrup, hydrogenated starch hydrolysate, hydrogenated starch hydrolysates, HSH, E964, and INS 964.",
       scoringImpact: "yellow_sweetener",
@@ -797,7 +797,7 @@ export const artificialSweetenersDataPack = {
       display: "red_count_badge",
       scoreImpact: 20,
       reason:
-        "Product contains multiple sweetener systems. InsideIt treats this as a high sweetener-load concern.",
+        "Product contains multiple sweetener systems. Truthlabel treats this as a high sweetener-load concern.",
     },
     anyBannedRestrictedSweetener: {
       severity: "red",
@@ -809,11 +809,11 @@ export const artificialSweetenersDataPack = {
 
   finalVerdictRules: {
     yellow:
-      "This product contains artificial or non-sugar sweeteners. InsideIt flags this because the product's sweetness is being created through added sweetener systems.",
+      "This product contains artificial or non-sugar sweeteners. Truthlabel flags this because the product's sweetness is being created through added sweetener systems.",
     redLoad:
-      "This product contains multiple sweetener systems. InsideIt flags this as a high sweetener-load concern.",
+      "This product contains multiple sweetener systems. Truthlabel flags this as a high sweetener-load concern.",
     redRestricted:
-      "This product contains a banned or restricted sweetener. InsideIt flags this as a serious regulatory concern.",
+      "This product contains a banned or restricted sweetener. Truthlabel flags this as a serious regulatory concern.",
   },
 
   matchingNormalizationRules: [

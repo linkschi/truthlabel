@@ -65,7 +65,7 @@ export const preservativesShelfLifeSystemsDataPack = {
   id: "preservatives_shelf_life_systems",
   categoryName: "Preservatives & Shelf-Life Systems",
   categoryMeaning:
-    "This category detects ingredients used to preserve food, prevent mould, slow oxidation, cure meat, protect colour, or extend shelf life. InsideIt flags these because they show the product is chemically supported for longer storage or stability.",
+    "This category detects ingredients used to preserve food, prevent mould, slow oxidation, cure meat, protect colour, or extend shelf life. Truthlabel flags these because they show the product is chemically supported for longer storage or stability.",
   dataStatus: "starter_verified_core",
   defaultCategorySeverity: "yellow",
 
@@ -86,7 +86,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       healthConcernType: "chemical_preservative",
       warningLabel: "PRESERVATIVE FOUND",
       userFacingReason:
-        "This product contains sodium benzoate, a chemical preservative used to extend shelf life. InsideIt flags this because the product is chemically preserved rather than relying only on simple fresh ingredients.",
+        "This product contains sodium benzoate, a chemical preservative used to extend shelf life. Truthlabel flags this because the product is chemically preserved rather than relying only on simple fresh ingredients.",
       matchingNotes:
         "Match sodium benzoate, E211, E-211, INS 211, and benzoate of soda.",
       scoringImpact: "yellow_preservative",
@@ -102,7 +102,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       healthConcernType: "chemical_preservative",
       warningLabel: "PRESERVATIVE FOUND",
       userFacingReason:
-        "This product contains potassium benzoate, a preservative used to extend shelf life. InsideIt flags this as a shelf-life additive.",
+        "This product contains potassium benzoate, a preservative used to extend shelf life. Truthlabel flags this as a shelf-life additive.",
       matchingNotes: "Match potassium benzoate, E212, E-212, and INS 212.",
       scoringImpact: "yellow_preservative",
       dataStatus: "starter",
@@ -117,7 +117,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       healthConcernType: "chemical_preservative",
       warningLabel: "PRESERVATIVE FOUND",
       userFacingReason:
-        "This product contains calcium benzoate, a preservative used to slow spoilage. InsideIt flags this as a shelf-life additive.",
+        "This product contains calcium benzoate, a preservative used to slow spoilage. Truthlabel flags this as a shelf-life additive.",
       matchingNotes: "Match calcium benzoate, E213, E-213, and INS 213.",
       scoringImpact: "yellow_preservative",
       dataStatus: "starter",
@@ -132,7 +132,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       healthConcernType: "chemical_preservative",
       warningLabel: "PRESERVATIVE FOUND",
       userFacingReason:
-        "This product contains benzoic acid, a preservative used to control spoilage. InsideIt flags this as a shelf-life additive.",
+        "This product contains benzoic acid, a preservative used to control spoilage. Truthlabel flags this as a shelf-life additive.",
       matchingNotes: "Match benzoic acid, E210, E-210, and INS 210.",
       scoringImpact: "yellow_preservative",
       dataStatus: "starter",
@@ -147,7 +147,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       healthConcernType: "mould_yeast_control_preservative",
       warningLabel: "PRESERVATIVE FOUND",
       userFacingReason:
-        "This product contains potassium sorbate, a preservative used to slow mould and yeast growth. InsideIt flags this because the product is chemically supported for longer shelf life.",
+        "This product contains potassium sorbate, a preservative used to slow mould and yeast growth. Truthlabel flags this because the product is chemically supported for longer shelf life.",
       matchingNotes: "Match potassium sorbate, E202, E-202, and INS 202.",
       scoringImpact: "yellow_preservative",
       dataStatus: "starter",
@@ -161,7 +161,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       healthConcernType: "mould_yeast_control_preservative",
       warningLabel: "PRESERVATIVE FOUND",
       userFacingReason:
-        "This product contains sodium sorbate, a preservative used to extend shelf life. InsideIt flags this as a shelf-life additive.",
+        "This product contains sodium sorbate, a preservative used to extend shelf life. Truthlabel flags this as a shelf-life additive.",
       matchingNotes: "Match sodium sorbate, E201, E-201, and INS 201.",
       scoringImpact: "yellow_preservative",
       dataStatus: "starter",
@@ -175,7 +175,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       healthConcernType: "mould_yeast_control_preservative",
       warningLabel: "PRESERVATIVE FOUND",
       userFacingReason:
-        "This product contains calcium sorbate, a preservative used to slow spoilage. InsideIt flags this as a shelf-life additive.",
+        "This product contains calcium sorbate, a preservative used to slow spoilage. Truthlabel flags this as a shelf-life additive.",
       matchingNotes: "Match calcium sorbate, E203, E-203, and INS 203.",
       scoringImpact: "yellow_preservative",
       dataStatus: "starter",
@@ -190,7 +190,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       healthConcernType: "mould_yeast_control_preservative",
       warningLabel: "PRESERVATIVE FOUND",
       userFacingReason:
-        "This product contains sorbic acid, a preservative used to slow mould and yeast growth. InsideIt flags this as a shelf-life additive.",
+        "This product contains sorbic acid, a preservative used to slow mould and yeast growth. Truthlabel flags this as a shelf-life additive.",
       matchingNotes: "Match sorbic acid, E200, E-200, and INS 200.",
       scoringImpact: "yellow_preservative",
       dataStatus: "starter",
@@ -205,7 +205,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       healthConcernType: "bakery_mould_control_preservative",
       warningLabel: "PRESERVATIVE FOUND",
       userFacingReason:
-        "This product contains calcium propionate, a preservative often used to stop bread and baked goods from moulding quickly. InsideIt flags this as a shelf-life additive.",
+        "This product contains calcium propionate, a preservative often used to stop bread and baked goods from moulding quickly. Truthlabel flags this as a shelf-life additive.",
       matchingNotes: "Match calcium propionate, E282, E-282, and INS 282.",
       scoringImpact: "yellow_preservative",
       dataStatus: "starter",
@@ -220,7 +220,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       healthConcernType: "bakery_mould_control_preservative",
       warningLabel: "PRESERVATIVE FOUND",
       userFacingReason:
-        "This product contains sodium propionate, a preservative used to slow mould growth. InsideIt flags this as a shelf-life additive.",
+        "This product contains sodium propionate, a preservative used to slow mould growth. Truthlabel flags this as a shelf-life additive.",
       matchingNotes: "Match sodium propionate, E281, E-281, and INS 281.",
       scoringImpact: "yellow_preservative",
       dataStatus: "starter",
@@ -234,7 +234,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       healthConcernType: "bakery_mould_control_preservative",
       warningLabel: "PRESERVATIVE FOUND",
       userFacingReason:
-        "This product contains propionic acid, a preservative used to slow mould growth. InsideIt flags this as a shelf-life additive.",
+        "This product contains propionic acid, a preservative used to slow mould growth. Truthlabel flags this as a shelf-life additive.",
       matchingNotes: "Match propionic acid, E280, E-280, and INS 280.",
       scoringImpact: "yellow_preservative",
       dataStatus: "starter",
@@ -257,7 +257,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       healthConcernType: "processed_meat_curing_preservative",
       warningLabel: "CURING PRESERVATIVE FOUND",
       userFacingReason:
-        "This product contains sodium nitrite, a curing preservative commonly used in processed meat. InsideIt flags this because nitrite curing is a higher-concern shelf-life system, especially in processed meat products.",
+        "This product contains sodium nitrite, a curing preservative commonly used in processed meat. Truthlabel flags this because nitrite curing is a higher-concern shelf-life system, especially in processed meat products.",
       matchingNotes:
         "Match sodium nitrite, nitrite, curing salt, cure salt, E250, E-250, and INS 250.",
       scoringImpact: "yellow_preservative",
@@ -273,7 +273,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       healthConcernType: "processed_meat_curing_preservative",
       warningLabel: "CURING PRESERVATIVE FOUND",
       userFacingReason:
-        "This product contains potassium nitrite, a curing preservative. InsideIt flags this because nitrite curing is a higher-concern shelf-life system in processed meat products.",
+        "This product contains potassium nitrite, a curing preservative. Truthlabel flags this because nitrite curing is a higher-concern shelf-life system in processed meat products.",
       matchingNotes: "Match potassium nitrite, E249, E-249, and INS 249.",
       scoringImpact: "yellow_preservative",
       dataStatus: "starter",
@@ -288,7 +288,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       healthConcernType: "processed_meat_curing_preservative",
       warningLabel: "CURING PRESERVATIVE FOUND",
       userFacingReason:
-        "This product contains sodium nitrate, a curing preservative. InsideIt flags this because nitrate/nitrite curing systems are higher-concern preservatives in processed foods.",
+        "This product contains sodium nitrate, a curing preservative. Truthlabel flags this because nitrate/nitrite curing systems are higher-concern preservatives in processed foods.",
       matchingNotes: "Match sodium nitrate, nitrate, E251, E-251, and INS 251.",
       scoringImpact: "yellow_preservative",
       dataStatus: "starter",
@@ -310,7 +310,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       healthConcernType: "processed_meat_curing_preservative",
       warningLabel: "CURING PRESERVATIVE FOUND",
       userFacingReason:
-        "This product contains potassium nitrate, a curing preservative. InsideIt flags this because nitrate curing is a higher-concern shelf-life system.",
+        "This product contains potassium nitrate, a curing preservative. Truthlabel flags this because nitrate curing is a higher-concern shelf-life system.",
       matchingNotes:
         "Match potassium nitrate, saltpetre, saltpeter, E252, E-252, and INS 252.",
       scoringImpact: "yellow_preservative",
@@ -336,7 +336,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       healthConcernType: "sulfite_sensitivity_or_allergy_risk",
       warningLabel: "SULFITE PRESERVATIVE FOUND",
       userFacingReason:
-        "This product contains sulphites/sulfites, preservatives that can trigger reactions in sensitive people. InsideIt flags this as a shelf-life and sensitivity concern.",
+        "This product contains sulphites/sulfites, preservatives that can trigger reactions in sensitive people. Truthlabel flags this as a shelf-life and sensitivity concern.",
       matchingNotes:
         "Match sulfur dioxide, sulphur dioxide, sulfites, sulphites, sulfiting agents, sulphiting agents, E220, and INS 220. Normalize sulfur/sulphur and sulfite/sulphite.",
       scoringImpact: "yellow_preservative",
@@ -352,7 +352,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       healthConcernType: "sulfite_sensitivity_or_allergy_risk",
       warningLabel: "SULFITE PRESERVATIVE FOUND",
       userFacingReason:
-        "This product contains sodium sulfite/sulphite, a preservative that can affect sulfite-sensitive people. InsideIt flags this as a shelf-life and sensitivity concern.",
+        "This product contains sodium sulfite/sulphite, a preservative that can affect sulfite-sensitive people. Truthlabel flags this as a shelf-life and sensitivity concern.",
       matchingNotes:
         "Match sodium sulfite, sodium sulphite, E221, E-221, and INS 221.",
       scoringImpact: "yellow_preservative",
@@ -376,7 +376,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       healthConcernType: "sulfite_sensitivity_or_allergy_risk",
       warningLabel: "SULFITE PRESERVATIVE FOUND",
       userFacingReason:
-        "This product contains sodium bisulfite/bisulphite, a sulfite preservative. InsideIt flags this as a shelf-life and sensitivity concern.",
+        "This product contains sodium bisulfite/bisulphite, a sulfite preservative. Truthlabel flags this as a shelf-life and sensitivity concern.",
       matchingNotes:
         "Match sodium bisulfite, sodium bisulphite, sodium hydrogen sulfite, sodium hydrogen sulphite, E222, and INS 222.",
       scoringImpact: "yellow_preservative",
@@ -398,7 +398,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       healthConcernType: "sulfite_sensitivity_or_allergy_risk",
       warningLabel: "SULFITE PRESERVATIVE FOUND",
       userFacingReason:
-        "This product contains sodium metabisulfite/metabisulphite, a sulfite preservative. InsideIt flags this as a shelf-life and sensitivity concern.",
+        "This product contains sodium metabisulfite/metabisulphite, a sulfite preservative. Truthlabel flags this as a shelf-life and sensitivity concern.",
       matchingNotes:
         "Match sodium metabisulfite, sodium metabisulphite, E223, E-223, and INS 223.",
       scoringImpact: "yellow_preservative",
@@ -420,7 +420,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       healthConcernType: "sulfite_sensitivity_or_allergy_risk",
       warningLabel: "SULFITE PRESERVATIVE FOUND",
       userFacingReason:
-        "This product contains potassium metabisulfite/metabisulphite, a sulfite preservative. InsideIt flags this as a shelf-life and sensitivity concern.",
+        "This product contains potassium metabisulfite/metabisulphite, a sulfite preservative. Truthlabel flags this as a shelf-life and sensitivity concern.",
       matchingNotes:
         "Match potassium metabisulfite, potassium metabisulphite, E224, E-224, and INS 224.",
       scoringImpact: "yellow_preservative",
@@ -436,7 +436,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       healthConcernType: "sulfite_sensitivity_or_allergy_risk",
       warningLabel: "SULFITE PRESERVATIVE FOUND",
       userFacingReason:
-        "This product contains calcium sulfite/sulphite, a sulfite preservative. InsideIt flags this as a shelf-life and sensitivity concern.",
+        "This product contains calcium sulfite/sulphite, a sulfite preservative. Truthlabel flags this as a shelf-life and sensitivity concern.",
       matchingNotes:
         "Match calcium sulfite, calcium sulphite, E226, E-226, and INS 226.",
       scoringImpact: "yellow_preservative",
@@ -460,7 +460,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       healthConcernType: "sulfite_sensitivity_or_allergy_risk",
       warningLabel: "SULFITE PRESERVATIVE FOUND",
       userFacingReason:
-        "This product contains calcium bisulfite/bisulphite, a sulfite preservative. InsideIt flags this as a shelf-life and sensitivity concern.",
+        "This product contains calcium bisulfite/bisulphite, a sulfite preservative. Truthlabel flags this as a shelf-life and sensitivity concern.",
       matchingNotes:
         "Match calcium bisulfite, calcium bisulphite, calcium hydrogen sulfite, calcium hydrogen sulphite, E227, and INS 227.",
       scoringImpact: "yellow_preservative",
@@ -484,7 +484,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       healthConcernType: "sulfite_sensitivity_or_allergy_risk",
       warningLabel: "SULFITE PRESERVATIVE FOUND",
       userFacingReason:
-        "This product contains potassium bisulfite/bisulphite, a sulfite preservative. InsideIt flags this as a shelf-life and sensitivity concern.",
+        "This product contains potassium bisulfite/bisulphite, a sulfite preservative. Truthlabel flags this as a shelf-life and sensitivity concern.",
       matchingNotes:
         "Match potassium bisulfite, potassium bisulphite, potassium hydrogen sulfite, potassium hydrogen sulphite, E228, and INS 228.",
       scoringImpact: "yellow_preservative",
@@ -503,11 +503,11 @@ export const preservativesShelfLifeSystemsDataPack = {
       ],
       severity: "yellow",
       reason:
-        "Synthetic antioxidant preservative used to slow fat and oil rancidity. FDA has launched a reassessment of BHA, so InsideIt treats it as a higher-review preservative.",
+        "Synthetic antioxidant preservative used to slow fat and oil rancidity. FDA has launched a reassessment of BHA, so Truthlabel treats it as a higher-review preservative.",
       healthConcernType: "synthetic_antioxidant_preservative_under_review",
       warningLabel: "HIGH-REVIEW PRESERVATIVE FOUND",
       userFacingReason:
-        "This product contains BHA, a synthetic preservative used to prevent fats and oils from going rancid. InsideIt flags this as a higher-review preservative because it is under renewed safety review.",
+        "This product contains BHA, a synthetic preservative used to prevent fats and oils from going rancid. Truthlabel flags this as a higher-review preservative because it is under renewed safety review.",
       matchingNotes:
         "Match BHA, butylated hydroxyanisole, butyl hydroxyanisole, E320, and INS 320.",
       scoringImpact: "yellow_preservative",
@@ -530,7 +530,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       healthConcernType: "synthetic_antioxidant_preservative",
       warningLabel: "PRESERVATIVE FOUND",
       userFacingReason:
-        "This product contains BHT, a synthetic preservative used to stop fats and oils from going rancid. InsideIt flags this as a shelf-life additive.",
+        "This product contains BHT, a synthetic preservative used to stop fats and oils from going rancid. Truthlabel flags this as a shelf-life additive.",
       matchingNotes:
         "Match BHT, butylated hydroxytoluene, butyl hydroxytoluene, E321, and INS 321.",
       scoringImpact: "yellow_preservative",
@@ -554,7 +554,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       healthConcernType: "synthetic_antioxidant_preservative",
       warningLabel: "PRESERVATIVE FOUND",
       userFacingReason:
-        "This product contains TBHQ, a synthetic preservative used to protect oils and fats from rancidity. InsideIt flags this as a shelf-life additive.",
+        "This product contains TBHQ, a synthetic preservative used to protect oils and fats from rancidity. Truthlabel flags this as a shelf-life additive.",
       matchingNotes:
         "Match TBHQ, tertiary butylhydroquinone, tert-butylhydroquinone, E319, and INS 319.",
       scoringImpact: "yellow_preservative",
@@ -577,7 +577,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       healthConcernType: "chelating_shelf_life_stabiliser",
       warningLabel: "SHELF-LIFE STABILISER FOUND",
       userFacingReason:
-        "This product contains calcium disodium EDTA, a shelf-life stabiliser used to protect colour, flavour, and stability. InsideIt flags this as a processed shelf-life additive.",
+        "This product contains calcium disodium EDTA, a shelf-life stabiliser used to protect colour, flavour, and stability. Truthlabel flags this as a processed shelf-life additive.",
       matchingNotes:
         "Match calcium disodium EDTA, calcium disodium ethylenediaminetetraacetate, CaNa2EDTA, E385, and INS 385.",
       scoringImpact: "yellow_preservative",
@@ -600,7 +600,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       healthConcernType: "chelating_shelf_life_stabiliser",
       warningLabel: "SHELF-LIFE STABILISER FOUND",
       userFacingReason:
-        "This product contains disodium EDTA, a stabiliser used to protect shelf life and quality. InsideIt flags this as a processed shelf-life additive.",
+        "This product contains disodium EDTA, a stabiliser used to protect shelf life and quality. Truthlabel flags this as a processed shelf-life additive.",
       matchingNotes:
         "Match disodium EDTA, disodium ethylenediaminetetraacetate, EDTA, E386, and INS 386.",
       scoringImpact: "yellow_preservative",
@@ -616,7 +616,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       healthConcernType: "antifungal_preservative",
       warningLabel: "ANTIFUNGAL PRESERVATIVE FOUND",
       userFacingReason:
-        "This product contains natamycin, an antifungal preservative used to control mould and yeast. InsideIt flags this as a shelf-life treatment.",
+        "This product contains natamycin, an antifungal preservative used to control mould and yeast. Truthlabel flags this as a shelf-life treatment.",
       matchingNotes: "Match natamycin, pimaricin, E235, and INS 235.",
       scoringImpact: "yellow_preservative",
       dataStatus: "starter",
@@ -631,7 +631,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       healthConcernType: "antimicrobial_preservative",
       warningLabel: "ANTIMICROBIAL PRESERVATIVE FOUND",
       userFacingReason:
-        "This product contains nisin, an antimicrobial preservative. InsideIt flags this because the product uses an added preservation system.",
+        "This product contains nisin, an antimicrobial preservative. Truthlabel flags this because the product uses an added preservation system.",
       matchingNotes: "Match nisin, E234, and INS 234.",
       scoringImpact: "yellow_preservative",
       dataStatus: "starter",
@@ -653,7 +653,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       healthConcernType: "antimicrobial_preservative_possible_egg_allergen",
       warningLabel: "ANTIMICROBIAL PRESERVATIVE FOUND",
       userFacingReason:
-        "This product contains lysozyme, an antimicrobial preservation ingredient. InsideIt flags this as a shelf-life system and may also review it for egg allergy if egg-sourced.",
+        "This product contains lysozyme, an antimicrobial preservation ingredient. Truthlabel flags this as a shelf-life system and may also review it for egg allergy if egg-sourced.",
       matchingNotes:
         "Match lysozyme, egg lysozyme, lysozyme from egg, E1105, and INS 1105.",
       scoringImpact: "yellow_preservative",
@@ -676,7 +676,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       healthConcernType: "beverage_preservation_agent",
       warningLabel: "BEVERAGE PRESERVATION AGENT FOUND",
       userFacingReason:
-        "This product contains dimethyl dicarbonate/DMDC, a beverage preservation agent used to control microorganisms. InsideIt flags this as a processing and shelf-life marker.",
+        "This product contains dimethyl dicarbonate/DMDC, a beverage preservation agent used to control microorganisms. Truthlabel flags this as a processing and shelf-life marker.",
       matchingNotes:
         "Match dimethyl dicarbonate, DMDC, Velcorin, E242, and INS 242.",
       scoringImpact: "yellow_preservative",
@@ -700,7 +700,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       healthConcernType: "antimicrobial_preservative",
       warningLabel: "ANTIMICROBIAL PRESERVATIVE FOUND",
       userFacingReason:
-        "This product contains ethyl lauroyl arginate, an antimicrobial preservative. InsideIt flags this because the product uses an added preservation system.",
+        "This product contains ethyl lauroyl arginate, an antimicrobial preservative. Truthlabel flags this because the product uses an added preservation system.",
       matchingNotes:
         "Match ethyl lauroyl arginate, ethyl lauroyl arginate HCl, lauric arginate, LAE, E243, and INS 243.",
       scoringImpact: "yellow_preservative",
@@ -725,11 +725,11 @@ export const preservativesShelfLifeSystemsDataPack = {
       ],
       severity: "yellow",
       reason:
-        "Paraben preservative. InsideIt flags parabens for review because this preservative family has region-specific rules and safety discussion.",
+        "Paraben preservative. Truthlabel flags parabens for review because this preservative family has region-specific rules and safety discussion.",
       healthConcernType: "paraben_preservative_review",
       warningLabel: "PARABEN PRESERVATIVE FOUND",
       userFacingReason:
-        "This product contains a paraben preservative. InsideIt flags this because parabens are synthetic preservatives with region-specific safety review history.",
+        "This product contains a paraben preservative. Truthlabel flags this because parabens are synthetic preservatives with region-specific safety review history.",
       matchingNotes:
         "Match methylparaben, methyl paraben, methyl p-hydroxybenzoate, E218, sodium methylparaben, and E219.",
       scoringImpact: "yellow_preservative",
@@ -754,11 +754,11 @@ export const preservativesShelfLifeSystemsDataPack = {
       ],
       severity: "yellow",
       reason:
-        "Paraben preservative. InsideIt flags parabens for review because this preservative family has region-specific rules and safety discussion.",
+        "Paraben preservative. Truthlabel flags parabens for review because this preservative family has region-specific rules and safety discussion.",
       healthConcernType: "paraben_preservative_review",
       warningLabel: "PARABEN PRESERVATIVE FOUND",
       userFacingReason:
-        "This product contains a paraben preservative. InsideIt flags this because parabens are synthetic preservatives with region-specific safety review history.",
+        "This product contains a paraben preservative. Truthlabel flags this because parabens are synthetic preservatives with region-specific safety review history.",
       matchingNotes:
         "Match ethylparaben, ethyl paraben, ethyl p-hydroxybenzoate, E214, sodium ethylparaben, and E215.",
       scoringImpact: "yellow_preservative",
@@ -787,7 +787,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       healthConcernType: "endocrine_or_reproductive_concern",
       warningLabel: "BANNED / RESTRICTED PRESERVATIVE",
       userFacingReason:
-        "This product contains propylparaben, a preservative banned/restricted in some regions because of reproductive or hormone-related safety concerns. InsideIt flags this as a serious safety concern.",
+        "This product contains propylparaben, a preservative banned/restricted in some regions because of reproductive or hormone-related safety concerns. Truthlabel flags this as a serious safety concern.",
       matchingNotes:
         "Match propylparaben, propyl paraben, propyl p-hydroxybenzoate, E216, sodium propylparaben, and E217.",
       scoringImpact: "automatic_red",
@@ -1270,11 +1270,11 @@ export const preservativesShelfLifeSystemsDataPack = {
 
   finalVerdictRules: {
     yellow:
-      "This product contains preservatives or shelf-life additives. InsideIt flags this because the product is chemically supported for longer storage or stability.",
+      "This product contains preservatives or shelf-life additives. Truthlabel flags this because the product is chemically supported for longer storage or stability.",
     redFromLoad:
-      "This product contains multiple preservative systems. InsideIt flags this as a high shelf-life additive load.",
+      "This product contains multiple preservative systems. Truthlabel flags this as a high shelf-life additive load.",
     redFromBannedRestricted:
-      "This product contains a banned or restricted preservative. InsideIt flags this as a serious safety concern.",
+      "This product contains a banned or restricted preservative. Truthlabel flags this as a serious safety concern.",
   },
 
   matchingNormalizationRules: [

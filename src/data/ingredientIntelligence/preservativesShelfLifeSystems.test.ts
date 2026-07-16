@@ -37,11 +37,11 @@ test("preservativesShelfLifeSystemsDataPack uses the corrected green yellow red 
   assert.equal(categoryScoringRules.threeOrMorePreservatives.display, "red_count_badge");
   assert.equal(
     finalVerdictRules.redFromLoad,
-    "This product contains multiple preservative systems. InsideIt flags this as a high shelf-life additive load.",
+    "This product contains multiple preservative systems. Truthlabel flags this as a high shelf-life additive load.",
   );
   assert.equal(
     finalVerdictRules.redFromBannedRestricted,
-    "This product contains a banned or restricted preservative. InsideIt flags this as a serious safety concern.",
+    "This product contains a banned or restricted preservative. Truthlabel flags this as a serious safety concern.",
   );
 });
 

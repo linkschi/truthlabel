@@ -54,7 +54,7 @@ export const heavyMetalsDataPack = {
   id: "heavy_metals",
   categoryName: "Heavy Metals",
   categoryMeaning:
-    "This category tracks heavy-metal exposure review signals such as lead, inorganic arsenic, cadmium, mercury, high-mercury seafood markers, rice/infant cereal arsenic review markers, cocoa and spice review markers, and verified external warning signals. It is not a normal ingredient-only category. InsideIt uses it to show review context or verified external concerns without pretending that ordinary ingredient text proves contamination.",
+    "This category tracks heavy-metal exposure review signals such as lead, inorganic arsenic, cadmium, mercury, high-mercury seafood markers, rice/infant cereal arsenic review markers, cocoa and spice review markers, and verified external warning signals. It is not a normal ingredient-only category. Truthlabel uses it to show review context or verified external concerns without pretending that ordinary ingredient text proves contamination.",
   dataStatus: "starter_needs_external_data",
   defaultCategorySeverity: "yellow",
 
@@ -79,7 +79,7 @@ export const heavyMetalsDataPack = {
       reason:
         "Heavy metal contaminant. Red should only trigger from verified product-specific testing, official recall, or official warning data.",
       userFacingReason:
-        "This product has a verified lead-related warning or testing signal. InsideIt flags this as a serious heavy-metal concern based on external data.",
+        "This product has a verified lead-related warning or testing signal. Truthlabel flags this as a serious heavy-metal concern based on external data.",
       dataStatus: "needs_external_data",
       confidenceLevel: null,
       sourceRefs: [],
@@ -115,7 +115,7 @@ export const heavyMetalsDataPack = {
       reason:
         "Heavy metal or metalloid contaminant. Red should only trigger from verified product-specific testing, official recall, or official warning data.",
       userFacingReason:
-        "This product has a verified arsenic-related warning or testing signal. InsideIt flags this as a serious heavy-metal concern based on external data.",
+        "This product has a verified arsenic-related warning or testing signal. Truthlabel flags this as a serious heavy-metal concern based on external data.",
       dataStatus: "needs_external_data",
       confidenceLevel: null,
       sourceRefs: ["FDA_INORGANIC_ARSENIC_INFANT_RICE_CEREAL"],
@@ -146,7 +146,7 @@ export const heavyMetalsDataPack = {
       reason:
         "Heavy metal contaminant. Red should only trigger from verified product-specific testing, official recall, or official warning data.",
       userFacingReason:
-        "This product has a verified cadmium-related warning or testing signal. InsideIt flags this as a serious heavy-metal concern based on external data.",
+        "This product has a verified cadmium-related warning or testing signal. Truthlabel flags this as a serious heavy-metal concern based on external data.",
       dataStatus: "needs_external_data",
       confidenceLevel: null,
       sourceRefs: [],
@@ -183,7 +183,7 @@ export const heavyMetalsDataPack = {
       reason:
         "Heavy metal contaminant, especially relevant to some seafood categories. Red should only trigger from verified product-specific data or official high-mercury seafood rules.",
       userFacingReason:
-        "This product has a verified mercury-related warning or high-mercury seafood signal. InsideIt flags this as a heavy-metal review concern.",
+        "This product has a verified mercury-related warning or high-mercury seafood signal. Truthlabel flags this as a heavy-metal review concern.",
       dataStatus: "needs_external_data",
       confidenceLevel: null,
       sourceRefs: ["FDA_FISH_MERCURY_ADVICE"],
@@ -226,7 +226,7 @@ export const heavyMetalsDataPack = {
       reason:
         "Some fish types are commonly treated as higher-mercury choices in seafood guidance.",
       userFacingReason:
-        "This seafood type is flagged for mercury review. InsideIt flags this as a heavy-metal review marker, not proof of a product-specific test result.",
+        "This seafood type is flagged for mercury review. Truthlabel flags this as a heavy-metal review marker, not proof of a product-specific test result.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: ["FDA_FISH_MERCURY_ADVICE"],
@@ -264,7 +264,7 @@ export const heavyMetalsDataPack = {
       reason:
         "Seafood may require mercury review depending on species and serving context.",
       userFacingReason:
-        "This product is a seafood item. InsideIt may flag it for mercury review depending on the exact species and available data.",
+        "This product is a seafood item. Truthlabel may flag it for mercury review depending on the exact species and available data.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: ["FDA_FISH_MERCURY_ADVICE"],
@@ -297,7 +297,7 @@ export const heavyMetalsDataPack = {
       reason:
         "Rice cereal for infants is a known category for inorganic arsenic review and action-level guidance.",
       userFacingReason:
-        "This product appears to be an infant rice cereal or rice-based baby cereal. InsideIt flags this for inorganic arsenic review based on product category.",
+        "This product appears to be an infant rice cereal or rice-based baby cereal. Truthlabel flags this for inorganic arsenic review based on product category.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: ["FDA_INORGANIC_ARSENIC_INFANT_RICE_CEREAL"],
@@ -347,7 +347,7 @@ export const heavyMetalsDataPack = {
       reason:
         "Rice-based ingredients may require inorganic arsenic review depending on product type and testing data.",
       userFacingReason:
-        "This product contains rice-based ingredients. InsideIt flags this as an arsenic review marker, not proof that this product has elevated arsenic.",
+        "This product contains rice-based ingredients. Truthlabel flags this as an arsenic review marker, not proof that this product has elevated arsenic.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: ["FDA_INORGANIC_ARSENIC_INFANT_RICE_CEREAL"],
@@ -391,7 +391,7 @@ export const heavyMetalsDataPack = {
       reason:
         "Foods for babies and young children are a priority category for reducing exposure to lead, arsenic, cadmium, and mercury.",
       userFacingReason:
-        "This appears to be a baby or toddler food product. InsideIt flags it for heavy-metal review because toxic elements are a priority concern in foods for young children.",
+        "This appears to be a baby or toddler food product. Truthlabel flags it for heavy-metal review because toxic elements are a priority concern in foods for young children.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: ["FDA_CLOSER_TO_ZERO"],
@@ -426,7 +426,7 @@ export const heavyMetalsDataPack = {
       reason:
         "Some fruit juice categories have lead or arsenic review relevance depending on testing data and region.",
       userFacingReason:
-        "This product appears to be a fruit juice or juice drink. InsideIt flags this as a lead or arsenic review marker, not proof of elevated heavy metals.",
+        "This product appears to be a fruit juice or juice drink. Truthlabel flags this as a lead or arsenic review marker, not proof of elevated heavy metals.",
       dataStatus: "needs_region_verification",
       confidenceLevel: null,
       sourceRefs: [],
@@ -463,7 +463,7 @@ export const heavyMetalsDataPack = {
       reason:
         "Cocoa and chocolate products may require lead or cadmium review depending on product-specific testing data.",
       userFacingReason:
-        "This product contains cocoa or chocolate ingredients. InsideIt flags this as a lead or cadmium review marker, not proof that this product has elevated heavy metals.",
+        "This product contains cocoa or chocolate ingredients. Truthlabel flags this as a lead or cadmium review marker, not proof that this product has elevated heavy metals.",
       dataStatus: "needs_external_data",
       confidenceLevel: null,
       sourceRefs: [],
@@ -505,7 +505,7 @@ export const heavyMetalsDataPack = {
       reason:
         "Some spices can require lead review depending on source, testing data, or recall history.",
       userFacingReason:
-        "This product contains spices or cinnamon. InsideIt flags this as a lead-review marker only when product category, recall data, or external testing supports it.",
+        "This product contains spices or cinnamon. Truthlabel flags this as a lead-review marker only when product category, recall data, or external testing supports it.",
       dataStatus: "needs_external_data",
       confidenceLevel: null,
       sourceRefs: [],
@@ -542,7 +542,7 @@ export const heavyMetalsDataPack = {
       reason:
         "Seaweed products may require heavy-metal review depending on species, source, and testing data.",
       userFacingReason:
-        "This product contains seaweed or kelp. InsideIt flags this as a heavy-metal review marker, not proof of elevated heavy metals.",
+        "This product contains seaweed or kelp. Truthlabel flags this as a heavy-metal review marker, not proof of elevated heavy metals.",
       dataStatus: "needs_external_data",
       confidenceLevel: null,
       sourceRefs: [],
@@ -583,7 +583,7 @@ export const heavyMetalsDataPack = {
       basicSeveritySuggestion: "red",
       reason: "Official recall or warning related to heavy metal contamination.",
       userFacingReason:
-        "This product has an official heavy-metal recall or warning signal. InsideIt flags this as a serious heavy-metal concern.",
+        "This product has an official heavy-metal recall or warning signal. Truthlabel flags this as a serious heavy-metal concern.",
       dataStatus: "needs_external_data",
       confidenceLevel: null,
       sourceRefs: [],
@@ -622,7 +622,7 @@ export const heavyMetalsDataPack = {
       reason:
         "Lab-test marker. The severity depends on the actual measured result, not the phrase alone.",
       userFacingReason:
-        "This product mentions heavy-metal testing or a certificate of analysis. InsideIt records this as external-data context and should use the actual result if available.",
+        "This product mentions heavy-metal testing or a certificate of analysis. Truthlabel records this as external-data context and should use the actual result if available.",
       dataStatus: "needs_external_data",
       confidenceLevel: null,
       sourceRefs: [],

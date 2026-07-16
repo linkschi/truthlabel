@@ -138,7 +138,7 @@ function buildArtificialColourExplanation(
   }
 
   if (summary.totalCount >= 3) {
-    return "This product contains multiple artificial colours, which InsideIt treats as a high artificial colour load.";
+    return "This product contains multiple artificial colours, which Truthlabel treats as a high artificial colour load.";
   }
 
   return "Artificial colour additives were found in this product.";
@@ -175,7 +175,7 @@ function buildFlavourSystemExplanation(
   }
 
   if (summary.totalCount >= 3) {
-    return "This product contains multiple flavouring or flavour-enhancing systems. InsideIt treats this as a high flavour-system load.";
+    return "This product contains multiple flavouring or flavour-enhancing systems. Truthlabel treats this as a high flavour-system load.";
   }
 
   return "This product contains flavourings or flavour enhancers that build or boost taste.";
@@ -284,7 +284,7 @@ function buildUltraProcessedExplanation(
   }
 
   if (summary.categorySeverity === "red") {
-    return "This product contains multiple ultra-processed markers. InsideIt treats this as a high ultra-processed load.";
+    return "This product contains multiple ultra-processed markers. Truthlabel treats this as a high ultra-processed load.";
   }
 
   if (summary.categorySeverity === "yellow") {
@@ -323,7 +323,7 @@ function buildProcessedOilExplanation(
   }
 
   if (summary.totalCount >= 2) {
-    return "This product contains multiple seed oils, processed oils, refined oils, or processed fat systems. InsideIt treats this as a high processed-oil load.";
+    return "This product contains multiple seed oils, processed oils, refined oils, or processed fat systems. Truthlabel treats this as a high processed-oil load.";
   }
 
   return "This product contains a seed oil, processed oil, refined oil, frying oil, or processed fat marker.";
@@ -1118,8 +1118,8 @@ export function analyzeNormalizedProduct(
             label: "What this means",
             text:
               hydrogenatedOilSummary.hasPartiallyHydrogenatedOil
-                ? "InsideIt treats PHO as a red regulatory concern because it is linked to artificial trans fat and major restrictions in some regions."
-                : "InsideIt treats this as a serious processed-fat marker because the fat system has been chemically modified.",
+                ? "Truthlabel treats PHO as a red regulatory concern because it is linked to artificial trans fat and major restrictions in some regions."
+                : "Truthlabel treats this as a serious processed-fat marker because the fat system has been chemically modified.",
           },
           {
             label: "What to do",

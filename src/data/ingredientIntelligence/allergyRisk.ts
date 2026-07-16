@@ -45,7 +45,7 @@ export const allergyRiskDataPack = {
   id: "allergy_risk",
   categoryName: "Allergy Risk",
   categoryMeaning:
-    "This category detects common allergen ingredients, gluten-source ingredients, sulphite/sulfite sensitivity markers, and allergen warning label phrases. It is personal-risk based. InsideIt uses it to show allergy review signals without claiming the same ingredient is dangerous for everyone.",
+    "This category detects common allergen ingredients, gluten-source ingredients, sulphite/sulfite sensitivity markers, and allergen warning label phrases. It is personal-risk based. Truthlabel uses it to show allergy review signals without claiming the same ingredient is dangerous for everyone.",
   dataStatus: "starter_needs_expansion",
   defaultCategorySeverity: "yellow",
 
@@ -123,7 +123,7 @@ export const allergyRiskDataPack = {
       reason:
         "Major allergen ingredient group covering milk and dairy-derived ingredients.",
       userFacingReason:
-        "This product contains milk or dairy-related ingredients. InsideIt flags this as an allergy risk because milk is a major allergen for some people.",
+        "This product contains milk or dairy-related ingredients. Truthlabel flags this as an allergy risk because milk is a major allergen for some people.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -175,7 +175,7 @@ export const allergyRiskDataPack = {
       reason:
         "Major allergen ingredient group covering egg and egg-derived ingredients.",
       userFacingReason:
-        "This product contains egg or egg-derived ingredients. InsideIt flags this as an allergy risk because egg is a major allergen for some people.",
+        "This product contains egg or egg-derived ingredients. Truthlabel flags this as an allergy risk because egg is a major allergen for some people.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -223,7 +223,7 @@ export const allergyRiskDataPack = {
       reason:
         "Major allergen ingredient group covering peanut and peanut-derived ingredients.",
       userFacingReason:
-        "This product contains peanut or peanut-derived ingredients. InsideIt flags this as an allergy risk because peanut is a major allergen for some people.",
+        "This product contains peanut or peanut-derived ingredients. Truthlabel flags this as an allergy risk because peanut is a major allergen for some people.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -288,7 +288,7 @@ export const allergyRiskDataPack = {
       reason:
         "Major allergen ingredient group covering tree nuts and tree-nut-derived ingredients.",
       userFacingReason:
-        "This product contains tree nuts or tree-nut-derived ingredients. InsideIt flags this as an allergy risk because tree nuts are major allergens for some people.",
+        "This product contains tree nuts or tree-nut-derived ingredients. Truthlabel flags this as an allergy risk because tree nuts are major allergens for some people.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -354,12 +354,12 @@ export const allergyRiskDataPack = {
       reason:
         "Major allergen and gluten-source group covering wheat and cereals containing gluten.",
       userFacingReason:
-        "This product contains wheat or gluten-source ingredients. InsideIt flags this as an allergy or gluten-related review risk because wheat and gluten sources matter for some people.",
+        "This product contains wheat or gluten-source ingredients. Truthlabel flags this as an allergy or gluten-related review risk because wheat and gluten sources matter for some people.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
       matchingNotes:
-        "InsideIt should separate wheat allergy from gluten/celiac relevance in the UI later. For now, flag as allergy/gluten-source review.",
+        "Truthlabel should separate wheat allergy from gluten/celiac relevance in the UI later. For now, flag as allergy/gluten-source review.",
     },
     {
       id: "soy_soya",
@@ -415,7 +415,7 @@ export const allergyRiskDataPack = {
       reason:
         "Major allergen ingredient group covering soy and soy-derived ingredients.",
       userFacingReason:
-        "This product contains soy or soy-derived ingredients. InsideIt flags this as an allergy risk because soy is a major allergen for some people.",
+        "This product contains soy or soy-derived ingredients. Truthlabel flags this as an allergy risk because soy is a major allergen for some people.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -471,7 +471,7 @@ export const allergyRiskDataPack = {
       reason:
         "Major allergen ingredient group covering fish and fish-derived ingredients.",
       userFacingReason:
-        "This product contains fish or fish-derived ingredients. InsideIt flags this as an allergy risk because fish is a major allergen for some people.",
+        "This product contains fish or fish-derived ingredients. Truthlabel flags this as an allergy risk because fish is a major allergen for some people.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -519,7 +519,7 @@ export const allergyRiskDataPack = {
       reason:
         "Major allergen ingredient group covering crustacean shellfish and related ingredients.",
       userFacingReason:
-        "This product contains crustacean shellfish or shellfish-derived ingredients. InsideIt flags this as an allergy risk because crustacean shellfish is a major allergen group for some people.",
+        "This product contains crustacean shellfish or shellfish-derived ingredients. Truthlabel flags this as an allergy risk because crustacean shellfish is a major allergen group for some people.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -564,7 +564,7 @@ export const allergyRiskDataPack = {
       reason:
         "Major allergen ingredient group covering sesame and sesame-derived ingredients.",
       userFacingReason:
-        "This product contains sesame or sesame-derived ingredients. InsideIt flags this as an allergy risk because sesame is a major allergen in some regions.",
+        "This product contains sesame or sesame-derived ingredients. Truthlabel flags this as an allergy risk because sesame is a major allergen in some regions.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -603,7 +603,7 @@ export const allergyRiskDataPack = {
       reason:
         "Regulated allergen ingredient group in some regions covering celery and celery-derived ingredients.",
       userFacingReason:
-        "This product contains celery or celery-derived ingredients. InsideIt flags this as an allergy risk because celery is a regulated allergen in some regions.",
+        "This product contains celery or celery-derived ingredients. Truthlabel flags this as an allergy risk because celery is a regulated allergen in some regions.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -647,7 +647,7 @@ export const allergyRiskDataPack = {
       reason:
         "Regulated allergen ingredient group in some regions covering mustard and mustard-derived ingredients.",
       userFacingReason:
-        "This product contains mustard or mustard-derived ingredients. InsideIt flags this as an allergy risk because mustard is a regulated allergen in some regions.",
+        "This product contains mustard or mustard-derived ingredients. Truthlabel flags this as an allergy risk because mustard is a regulated allergen in some regions.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -687,7 +687,7 @@ export const allergyRiskDataPack = {
       reason:
         "Regulated allergen ingredient group in some regions covering lupin and lupin-derived ingredients.",
       userFacingReason:
-        "This product contains lupin or lupin-derived ingredients. InsideIt flags this as an allergy risk because lupin is a regulated allergen in some regions.",
+        "This product contains lupin or lupin-derived ingredients. Truthlabel flags this as an allergy risk because lupin is a regulated allergen in some regions.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -743,7 +743,7 @@ export const allergyRiskDataPack = {
       reason:
         "Regulated allergen ingredient group in some regions covering molluscs and mollusc-derived ingredients.",
       userFacingReason:
-        "This product contains molluscs or mollusc-derived ingredients. InsideIt flags this as an allergy risk because molluscs are regulated allergens in some regions.",
+        "This product contains molluscs or mollusc-derived ingredients. Truthlabel flags this as an allergy risk because molluscs are regulated allergens in some regions.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -817,7 +817,7 @@ export const allergyRiskDataPack = {
       reason:
         "Sensitivity-relevant ingredient group covering sulphites/sulfites and declared sulphiting agents.",
       userFacingReason:
-        "This product contains sulphites or sulfites. InsideIt flags this as an allergy or sensitivity risk because sulphites can matter for sensitive people.",
+        "This product contains sulphites or sulfites. Truthlabel flags this as an allergy or sensitivity risk because sulphites can matter for sensitive people.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -865,7 +865,7 @@ export const allergyRiskDataPack = {
       reason:
         "Allergen warning or cross-contact label phrase suggesting possible allergen presence.",
       userFacingReason:
-        "This product includes an allergen warning statement. InsideIt flags this because the label suggests possible allergen presence or cross-contact risk.",
+        "This product includes an allergen warning statement. Truthlabel flags this because the label suggests possible allergen presence or cross-contact risk.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],

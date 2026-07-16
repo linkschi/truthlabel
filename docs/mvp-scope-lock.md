@@ -1,4 +1,4 @@
-# InsideIt MVP Scope Lock
+# Truthlabel MVP Scope Lock
 
 ## Current MVP features
 

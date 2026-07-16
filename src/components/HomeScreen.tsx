@@ -51,8 +51,8 @@ export default function HomeScreen() {
       href: "/manual",
       label: "Manual Scan",
       detail: featureFlags.enableBarcodeLookup
-        ? "Type a barcode or paste a real ingredient list and run it through the current InsideIt engine."
-        : "Paste a real ingredient list and run it through the current InsideIt engine.",
+        ? "Type a barcode or paste a real ingredient list and run it through the current Truthlabel engine."
+        : "Paste a real ingredient list and run it through the current Truthlabel engine.",
       meta: "Live input",
       style: "border-[#ddd4c3] bg-white/82 text-[#22342c]",
       detailStyle: "text-[#5a6960]",
@@ -131,7 +131,7 @@ export default function HomeScreen() {
         <section className="rounded-[24px] border border-white/72 bg-[var(--surface-strong)] px-4 py-4 shadow-[var(--shadow)]">
           <SectionLabel>Trust note</SectionLabel>
           <p className="mt-1.5 text-[13px] leading-5 text-[#55645c]">
-            InsideIt helps explain ingredient labels and safety signals. It is not medical advice. Always check the product label, especially for allergies.
+            Truthlabel helps explain ingredient labels and safety signals. It is not medical advice. Always check the product label, especially for allergies.
           </p>
         </section>
 

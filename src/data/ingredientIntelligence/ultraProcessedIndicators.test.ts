@@ -33,7 +33,7 @@ test("ultraProcessedIndicatorsDataPack uses the requested green yellow red thres
     display: "red_count_badge",
     scoreImpact: 25,
     reason:
-      "Product contains multiple ultra-processed markers. InsideIt treats this as a high ultra-processed load.",
+      "Product contains multiple ultra-processed markers. Truthlabel treats this as a high ultra-processed load.",
   });
   assert.deepEqual(categoryScoringRules.anyAutomaticRedMarker, {
     severity: "red",
@@ -44,7 +44,7 @@ test("ultraProcessedIndicatorsDataPack uses the requested green yellow red thres
   });
   assert.equal(
     finalVerdictRules.redLoad,
-    "This product contains multiple ultra-processed markers. InsideIt flags this as a high ultra-processed load.",
+    "This product contains multiple ultra-processed markers. Truthlabel flags this as a high ultra-processed load.",
   );
 });
 

@@ -50,7 +50,7 @@ export const ultraProcessedIndicatorsDataPack = {
       healthConcernType: "ultra_processed_starch_marker",
       warningLabel: "ULTRA-PROCESSED MARKER FOUND",
       userFacingReason:
-        "This product contains maltodextrin, a processed starch-derived ingredient used to build body, texture, or carry flavours. InsideIt flags this as an ultra-processed marker.",
+        "This product contains maltodextrin, a processed starch-derived ingredient used to build body, texture, or carry flavours. Truthlabel flags this as an ultra-processed marker.",
       matchingNotes:
         "Match maltodextrin, corn/maize/wheat/potato/rice/tapioca maltodextrin, dextrin, and dextrins. Do not double count source-specific and generic maltodextrin if they refer to the same ingredient.",
       scoringImpact: "yellow_ultra_processed_marker",
@@ -111,7 +111,7 @@ export const ultraProcessedIndicatorsDataPack = {
       healthConcernType: "processed_sweetening_system",
       warningLabel: "PROCESSED SWEETENING SYSTEM FOUND",
       userFacingReason:
-        "This product contains a processed syrup or syrup-solid ingredient. InsideIt flags this because sweetness, body, or texture is being built with an industrial sweetening system.",
+        "This product contains a processed syrup or syrup-solid ingredient. Truthlabel flags this because sweetness, body, or texture is being built with an industrial sweetening system.",
       matchingNotes:
         "Match glucose syrup, corn syrup, corn syrup solids, dried glucose syrup, HFCS, glucose-fructose syrup, fructose-glucose syrup, and invert sugar syrup.",
       scoringImpact: "yellow_ultra_processed_marker",
@@ -210,7 +210,7 @@ export const ultraProcessedIndicatorsDataPack = {
       healthConcernType: "modified_starch_ultra_processed_marker",
       warningLabel: "MODIFIED STARCH FOUND",
       userFacingReason:
-        "This product contains modified starch, used to thicken, bind, or stabilise processed food texture. InsideIt flags this as an ultra-processed texture marker.",
+        "This product contains modified starch, used to thicken, bind, or stabilise processed food texture. Truthlabel flags this as an ultra-processed texture marker.",
       matchingNotes:
         "Match modified starch, modified food starch, named modified starches, E1404, E1410, E1412, E1413, E1414, E1420, E1422, E1440, E1442, E1450, E1451, and INS variants.",
       scoringImpact: "yellow_ultra_processed_marker",
@@ -282,7 +282,7 @@ export const ultraProcessedIndicatorsDataPack = {
       healthConcernType: "isolated_protein_ultra_processed_marker",
       warningLabel: "PROTEIN ISOLATE / CONCENTRATE FOUND",
       userFacingReason:
-        "This product contains protein isolates, concentrates, or textured proteins. InsideIt flags this because the food may be built from isolated ingredient fractions rather than simple whole ingredients.",
+        "This product contains protein isolates, concentrates, or textured proteins. Truthlabel flags this because the food may be built from isolated ingredient fractions rather than simple whole ingredients.",
       matchingNotes:
         "Match protein isolate, protein concentrate, soy/soya/pea/whey/milk/wheat protein isolate or concentrate, TVP, TSP, SPI, WPI, WPC, MPC, and MPI.",
       scoringImpact: "yellow_ultra_processed_marker",
@@ -342,7 +342,7 @@ export const ultraProcessedIndicatorsDataPack = {
       healthConcernType: "hydrolyzed_protein_ultra_processed_marker",
       warningLabel: "HYDROLYZED PROTEIN FOUND",
       userFacingReason:
-        "This product contains hydrolyzed protein, a processed protein ingredient often used to build flavour or function. InsideIt flags this as an ultra-processed marker.",
+        "This product contains hydrolyzed protein, a processed protein ingredient often used to build flavour or function. Truthlabel flags this as an ultra-processed marker.",
       matchingNotes:
         "Match hydrolyzed/hydrolysed protein, hydrolyzed vegetable/plant/soy/corn/wheat protein, protein hydrolysate, HVP, HPP, and HSP.",
       scoringImpact: "yellow_ultra_processed_marker",
@@ -417,7 +417,7 @@ export const ultraProcessedIndicatorsDataPack = {
       healthConcernType: "emulsifier_ultra_processed_marker",
       warningLabel: "EMULSIFIER SYSTEM FOUND",
       userFacingReason:
-        "This product contains emulsifiers, used to hold ingredients together and stabilise texture. InsideIt flags this as an ultra-processed texture marker.",
+        "This product contains emulsifiers, used to hold ingredients together and stabilise texture. Truthlabel flags this as an ultra-processed texture marker.",
       matchingNotes:
         "Match generic emulsifier terms and common emulsifiers. Also link to the Emulsifiers / Stabilisers / Thickeners / Gums category. Avoid unfair double scoring in the overall score if the same ingredient is already counted elsewhere.",
       scoringImpact: "yellow_ultra_processed_marker",
@@ -498,7 +498,7 @@ export const ultraProcessedIndicatorsDataPack = {
       healthConcernType: "texture_engineering_ultra_processed_marker",
       warningLabel: "TEXTURE SYSTEM FOUND",
       userFacingReason:
-        "This product contains gums, thickeners, or stabilisers. InsideIt flags this because the product's texture is being engineered or chemically supported.",
+        "This product contains gums, thickeners, or stabilisers. Truthlabel flags this because the product's texture is being engineered or chemically supported.",
       matchingNotes:
         "Match generic gum/thickener/stabiliser terms and common gums. Also link to the Emulsifiers / Stabilisers / Thickeners / Gums category.",
       scoringImpact: "yellow_ultra_processed_marker",
@@ -559,7 +559,7 @@ export const ultraProcessedIndicatorsDataPack = {
       healthConcernType: "flavouring_ultra_processed_marker",
       warningLabel: "FLAVOURING SYSTEM FOUND",
       userFacingReason:
-        "This product contains flavouring terms. InsideIt flags this because the product's taste may be built or boosted with added flavour systems.",
+        "This product contains flavouring terms. Truthlabel flags this because the product's taste may be built or boosted with added flavour systems.",
       matchingNotes:
         "Match flavour/flavor terms, natural flavour, artificial flavour, aroma, smoke flavour, reaction flavour, and process flavour. Also link to the Flavour Enhancers / Flavourings category.",
       scoringImpact: "yellow_ultra_processed_marker",
@@ -629,7 +629,7 @@ export const ultraProcessedIndicatorsDataPack = {
       healthConcernType: "flavour_enhancer_ultra_processed_marker",
       warningLabel: "FLAVOUR ENHANCER FOUND",
       userFacingReason:
-        "This product contains flavour enhancers. InsideIt flags this because the taste is being boosted with added flavour technology.",
+        "This product contains flavour enhancers. Truthlabel flags this because the taste is being boosted with added flavour technology.",
       matchingNotes:
         "Match flavour enhancer terms, MSG, glutamates, inosinates, guanylates, ribonucleotides, yeast extract, E621, E627, E631, E635, and INS variants.",
       scoringImpact: "yellow_ultra_processed_marker",
@@ -699,7 +699,7 @@ export const ultraProcessedIndicatorsDataPack = {
       healthConcernType: "artificial_colour_ultra_processed_marker",
       warningLabel: "ARTIFICIAL COLOUR FOUND",
       userFacingReason:
-        "This product contains artificial colours or colourings. InsideIt flags this because appearance is being built with added colour systems.",
+        "This product contains artificial colours or colourings. Truthlabel flags this because appearance is being built with added colour systems.",
       matchingNotes:
         "Match artificial colour/color terms and known artificial colour names/codes. If a banned/restricted colour appears, the Artificial Colours and Banned/Restricted categories control the red severity.",
       scoringImpact: "yellow_ultra_processed_marker",
@@ -780,7 +780,7 @@ export const ultraProcessedIndicatorsDataPack = {
       healthConcernType: "sweetener_ultra_processed_marker",
       warningLabel: "SWEETENER SYSTEM FOUND",
       userFacingReason:
-        "This product contains artificial or non-sugar sweeteners. InsideIt flags this because sweetness is being built with added sweetener systems.",
+        "This product contains artificial or non-sugar sweeteners. Truthlabel flags this because sweetness is being built with added sweetener systems.",
       matchingNotes:
         "Match artificial sweetener terms and common sweeteners. If cyclamate or another restricted sweetener appears, the Artificial Sweeteners and Banned/Restricted categories control the red severity.",
       scoringImpact: "yellow_ultra_processed_marker",
@@ -865,7 +865,7 @@ export const ultraProcessedIndicatorsDataPack = {
       healthConcernType: "preservative_ultra_processed_marker",
       warningLabel: "PRESERVATIVE SYSTEM FOUND",
       userFacingReason:
-        "This product contains preservatives or shelf-life systems. InsideIt flags this because the product is chemically supported for longer storage or stability.",
+        "This product contains preservatives or shelf-life systems. Truthlabel flags this because the product is chemically supported for longer storage or stability.",
       matchingNotes:
         "Match generic preservative terms and common preservatives. If a banned/restricted preservative appears, the Preservatives and Banned/Restricted categories control the red severity.",
       scoringImpact: "yellow_ultra_processed_marker",
@@ -925,7 +925,7 @@ export const ultraProcessedIndicatorsDataPack = {
       healthConcernType: "engineered_fat_ultra_processed_marker",
       warningLabel: "ENGINEERED FAT SYSTEM FOUND",
       userFacingReason:
-        "This product contains hydrogenated, partially hydrogenated, interesterified, or engineered fat systems. InsideIt flags this as a serious ultra-processed fat marker.",
+        "This product contains hydrogenated, partially hydrogenated, interesterified, or engineered fat systems. Truthlabel flags this as a serious ultra-processed fat marker.",
       matchingNotes:
         "Match hydrogenated oils/fats, partially hydrogenated oils/fats, interesterified oils/fats, modified vegetable fat, structured fat, and shortening. If partially hydrogenated appears, also trigger the Hydrogenated / Partially Hydrogenated Oils red rule.",
       scoringImpact: "automatic_red_if_partially_hydrogenated_else_red_marker",
@@ -985,7 +985,7 @@ export const ultraProcessedIndicatorsDataPack = {
       healthConcernType: "processed_oil_ultra_processed_marker",
       warningLabel: "PROCESSED OIL FOUND",
       userFacingReason:
-        "This product contains refined or processed oils. InsideIt flags this because the product uses processed oil systems rather than simple whole-food fats.",
+        "This product contains refined or processed oils. Truthlabel flags this because the product uses processed oil systems rather than simple whole-food fats.",
       matchingNotes:
         "Match refined oils, RBD oils, generic vegetable oils, and common seed/processed oils. Also link to Seed Oils / Processed Oils category.",
       scoringImpact: "yellow_ultra_processed_marker",
@@ -1038,7 +1038,7 @@ export const ultraProcessedIndicatorsDataPack = {
       healthConcernType: "reconstituted_powdered_ultra_processed_marker",
       warningLabel: "RECONSTITUTED / POWDERED INGREDIENT FOUND",
       userFacingReason:
-        "This product contains powdered, reconstituted, or concentrate-based ingredients. InsideIt flags this because the food may be assembled from processed ingredient fractions.",
+        "This product contains powdered, reconstituted, or concentrate-based ingredients. Truthlabel flags this because the food may be assembled from processed ingredient fractions.",
       matchingNotes:
         "Match milk/whey/buttermilk/cream/cheese/egg powders, dried milk, dried egg, reconstituted ingredients, made from concentrate, and from concentrate terms.",
       scoringImpact: "yellow_ultra_processed_marker",
@@ -1091,7 +1091,7 @@ export const ultraProcessedIndicatorsDataPack = {
       healthConcernType: "constructed_creamer_ultra_processed_marker",
       warningLabel: "CREAMER / WHITENER SYSTEM FOUND",
       userFacingReason:
-        "This product contains creamer or whitener ingredients. InsideIt flags this because these are often built from processed oils, powders, emulsifiers, and stabilisers.",
+        "This product contains creamer or whitener ingredients. Truthlabel flags this because these are often built from processed oils, powders, emulsifiers, and stabilisers.",
       matchingNotes:
         "Match non-dairy creamer, coffee creamer, coffee whitener, dairy whitener, vegetable creamer, powdered creamer, instant creamer, and Coffee-Mate/Coffee Mate.",
       scoringImpact: "yellow_ultra_processed_marker",
@@ -1161,7 +1161,7 @@ export const ultraProcessedIndicatorsDataPack = {
       healthConcernType: "carrier_humectant_ultra_processed_marker",
       warningLabel: "HUMECTANT / CARRIER FOUND",
       userFacingReason:
-        "This product contains humectants, solvents, or carriers. InsideIt flags this because the product uses functional processing ingredients to control moisture, texture, or ingredient delivery.",
+        "This product contains humectants, solvents, or carriers. Truthlabel flags this because the product uses functional processing ingredients to control moisture, texture, or ingredient delivery.",
       matchingNotes:
         "Match humectant terms, glycerol/glycerine/glycerin, propylene glycol, sorbitol, maltitol syrup, polydextrose, triacetin, carrier, and solvent terms.",
       scoringImpact: "yellow_ultra_processed_marker",
@@ -1230,7 +1230,7 @@ export const ultraProcessedIndicatorsDataPack = {
       healthConcernType: "anti_caking_ultra_processed_marker",
       warningLabel: "ANTI-CAKING / FLOW AGENT FOUND",
       userFacingReason:
-        "This product contains anti-caking or flow agents. InsideIt flags this because the product uses functional additives to manage powder flow or shelf stability.",
+        "This product contains anti-caking or flow agents. Truthlabel flags this because the product uses functional additives to manage powder flow or shelf stability.",
       matchingNotes:
         "Match anti-caking/anticaking terms, flow agents, silicon dioxide, silica, calcium silicate, magnesium silicate, sodium aluminosilicate, tricalcium phosphate, and E/INS variants.",
       scoringImpact: "yellow_ultra_processed_marker",
@@ -1295,7 +1295,7 @@ export const ultraProcessedIndicatorsDataPack = {
       healthConcernType: "glazing_coating_ultra_processed_marker",
       warningLabel: "GLAZING / COATING AGENT FOUND",
       userFacingReason:
-        "This product contains glazing or coating agents. InsideIt flags this because the product's appearance or surface finish is being supported by added coating systems.",
+        "This product contains glazing or coating agents. Truthlabel flags this because the product's appearance or surface finish is being supported by added coating systems.",
       matchingNotes:
         "Match glazing agent, coating agent, shellac, confectioner's/confectioners glaze, carnauba wax, beeswax, candelilla wax, microcrystalline wax, paraffin wax, and E/INS variants.",
       scoringImpact: "yellow_ultra_processed_marker",
@@ -1355,7 +1355,7 @@ export const ultraProcessedIndicatorsDataPack = {
       healthConcernType: "processing_method_ultra_processed_marker",
       warningLabel: "PROCESSING METHOD MARKER FOUND",
       userFacingReason:
-        "This product uses processing terms such as instantized, extruded, reformed, or mechanically separated. InsideIt flags this because the food appears industrially processed or reconstructed.",
+        "This product uses processing terms such as instantized, extruded, reformed, or mechanically separated. Truthlabel flags this because the food appears industrially processed or reconstructed.",
       matchingNotes:
         "Match instantized/instantised, agglomerated, extruded, extrusion-cooked, textured/texturised, puffed, expanded, reconstituted, reformed, restructured, mechanically separated, mechanically recovered, MSM, and MRM.",
       scoringImpact: "yellow_ultra_processed_marker",
@@ -1410,7 +1410,7 @@ export const ultraProcessedIndicatorsDataPack = {
       healthConcernType: "imitation_analogue_ultra_processed_marker",
       warningLabel: "IMITATION / ANALOGUE FOOD MARKER FOUND",
       userFacingReason:
-        "This product uses imitation, analogue, or substitute wording. InsideIt flags this because the food may be constructed to imitate another food rather than being the simple original form.",
+        "This product uses imitation, analogue, or substitute wording. Truthlabel flags this because the food may be constructed to imitate another food rather than being the simple original form.",
       matchingNotes:
         "Match imitation, analogue/analog, substitute terms, imitation cheese/cream/meat, cheese analogue/analog, meat analogue/analog, dairy substitute, cream substitute, and butter substitute.",
       scoringImpact: "yellow_ultra_processed_marker",
@@ -1477,7 +1477,7 @@ export const ultraProcessedIndicatorsDataPack = {
       healthConcernType: "fortification_ultra_processed_marker",
       warningLabel: "FORTIFICATION SYSTEM FOUND",
       userFacingReason:
-        "This product contains fortification or nutrient premix markers. InsideIt flags this because the product may be nutritionally adjusted or rebuilt after processing.",
+        "This product contains fortification or nutrient premix markers. Truthlabel flags this because the product may be nutritionally adjusted or rebuilt after processing.",
       matchingNotes:
         "Match fortified/enriched wording, vitamin premix, mineral premix, nutrient premix, and common synthetic vitamin/mineral names. Do not frame fortification as automatically harmful; treat it as an ultra-processing marker only.",
       scoringImpact: "yellow_ultra_processed_marker",
@@ -1505,7 +1505,7 @@ export const ultraProcessedIndicatorsDataPack = {
       display: "red_count_badge",
       scoreImpact: 25,
       reason:
-        "Product contains multiple ultra-processed markers. InsideIt treats this as a high ultra-processed load."
+        "Product contains multiple ultra-processed markers. Truthlabel treats this as a high ultra-processed load."
     },
 
     anyAutomaticRedMarker: {
@@ -1522,13 +1522,13 @@ export const ultraProcessedIndicatorsDataPack = {
       "No ultra-processed markers were found from the available ingredient list.",
 
     yellow:
-      "This product contains ultra-processed markers. InsideIt flags this because some ingredients suggest the food is processed, stabilised, flavour-built, texture-built, or made from ingredient systems rather than simple whole ingredients.",
+      "This product contains ultra-processed markers. Truthlabel flags this because some ingredients suggest the food is processed, stabilised, flavour-built, texture-built, or made from ingredient systems rather than simple whole ingredients.",
 
     redLoad:
-      "This product contains multiple ultra-processed markers. InsideIt flags this as a high ultra-processed load.",
+      "This product contains multiple ultra-processed markers. Truthlabel flags this as a high ultra-processed load.",
 
     redAutomatic:
-      "This product contains an ultra-processed marker that also triggers a red rule in another category. InsideIt flags this as a serious ingredient concern."
+      "This product contains an ultra-processed marker that also triggers a red rule in another category. Truthlabel flags this as a serious ingredient concern."
   },
 
   matchingNormalizationRules: [

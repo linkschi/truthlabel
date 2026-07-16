@@ -433,9 +433,9 @@ function buildArtificialSweetenerDetail(
       summary.totalCount === 0
         ? "This is one of the calmer lower-level checks."
         : summary.hasAutomaticRed
-          ? "InsideIt treats this as a serious regulatory sweetener concern."
+          ? "Truthlabel treats this as a serious regulatory sweetener concern."
           : summary.categorySeverity === "red"
-            ? "InsideIt treats 3 or more sweetener systems as a red sweetener-load concern."
+            ? "Truthlabel treats 3 or more sweetener systems as a red sweetener-load concern."
             : "This product uses added non-sugar sweetening systems instead of a simpler sweetness profile.",
     whatToDo:
       summary.totalCount === 0
@@ -735,7 +735,7 @@ function buildAdditiveBreakdown(
                       : "No flavour-system signal was found in this demo ingredient list.",
                 whatItMeans:
                   count >= 3
-                    ? "InsideIt treats 3 or more flavour systems as a red flavour-system load, not as a banned/restricted claim by itself."
+                    ? "Truthlabel treats 3 or more flavour systems as a red flavour-system load, not as a banned/restricted claim by itself."
                     : count > 0
                       ? "This means the product's taste may be built or boosted with added flavour systems."
                       : "This is one of the calmer results in the additive breakdown.",
@@ -1042,7 +1042,7 @@ function buildCheckRows({
           hydrogenatedOilCount > 0
             ? `The ingredient list contains ${hydrogenatedOilCount} hydrogenated oil signal${hydrogenatedOilCount === 1 ? "" : "s"}, which crosses the red threshold for this category.`
             : processedOilCount >= 2
-              ? `The ingredient list contains ${processedOilCount} seed or processed-oil signal${processedOilCount === 1 ? "" : "s"}, which InsideIt treats as a high processed-oil load.`
+              ? `The ingredient list contains ${processedOilCount} seed or processed-oil signal${processedOilCount === 1 ? "" : "s"}, which Truthlabel treats as a high processed-oil load.`
             : processedOilCount > 0
               ? `The ingredient list contains ${processedOilCount} processed-oil signal${processedOilCount === 1 ? "" : "s"}, but none are hydrogenated or partially hydrogenated.`
             : "No processed-oil signal was found in the current demo ingredient list.",
@@ -1114,9 +1114,9 @@ function buildCheckRows({
             : "The ingredient mix does not strongly point toward an ultra-processed profile in this demo pass.",
         whatItMeans:
           ultraProcessedIndicatorSummary.hasAutomaticRed
-            ? "InsideIt treats this as a serious ingredient concern because another category already marks the ingredient red."
+            ? "Truthlabel treats this as a serious ingredient concern because another category already marks the ingredient red."
             : processedIngredientSeverity === "red"
-              ? "InsideIt treats 4 or more ultra-processed markers as a red ultra-processed load."
+              ? "Truthlabel treats 4 or more ultra-processed markers as a red ultra-processed load."
               : processedIngredientSeverity === "yellow"
                 ? "The label leans harder into engineered support ingredients than a simpler food usually would."
             : "This check is not one of the main drivers of concern for this result.",

@@ -1,4 +1,4 @@
-# InsideIt Mobile Testing Checklist
+# Truthlabel Mobile Testing Checklist
 
 ## Scope
 

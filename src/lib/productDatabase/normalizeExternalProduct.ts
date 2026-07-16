@@ -254,7 +254,7 @@ export function normalizeExternalProduct(
 
   if (!result.ingredientsText?.trim() && ingredients.length > 0) {
     warnings.add(
-      "Ingredient text was missing, so InsideIt used the available ingredient name list instead.",
+      "Ingredient text was missing, so Truthlabel used the available ingredient name list instead.",
     );
   }
 

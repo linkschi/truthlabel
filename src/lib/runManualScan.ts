@@ -62,7 +62,7 @@ export function runIngredientScan(input: IngredientScanInput): ScanResult {
 
   if (ingredients.length === 0) {
     throw new ManualScanValidationError(
-      "Please paste the ingredient list so InsideIt can scan the product.",
+      "Please paste the ingredient list so Truthlabel can scan the product.",
     );
   }
 

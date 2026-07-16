@@ -69,7 +69,7 @@ export const fryOilFastFoodOilDataPack = {
       reason:
         "Label or product wording that suggests the food is fried or deep-fried.",
       userFacingReason:
-        "This product uses fried or deep-fried wording. InsideIt flags this as a frying-oil processing marker.",
+        "This product uses fried or deep-fried wording. Truthlabel flags this as a frying-oil processing marker.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -106,7 +106,7 @@ export const fryOilFastFoodOilDataPack = {
       reason:
         "Generic frying-oil wording that does not clearly identify the exact oil source.",
       userFacingReason:
-        "This product mentions frying oil without clearly identifying the exact oil source. InsideIt flags this as a frying-oil transparency review item.",
+        "This product mentions frying oil without clearly identifying the exact oil source. Truthlabel flags this as a frying-oil transparency review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -151,7 +151,7 @@ export const fryOilFastFoodOilDataPack = {
       reason:
         "Generic vegetable oil wording often used for frying or processed snacks without naming the exact oil source.",
       userFacingReason:
-        "This product lists vegetable oil or a vegetable oil blend. InsideIt flags this because the exact oil source may not be clear and the product may use processed frying oils.",
+        "This product lists vegetable oil or a vegetable oil blend. Truthlabel flags this because the exact oil source may not be clear and the product may use processed frying oils.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -187,7 +187,7 @@ export const fryOilFastFoodOilDataPack = {
       reason:
         "Processed oil often used in packaged foods, frying, snacks, and fast-food oil systems.",
       userFacingReason:
-        "This product contains canola or rapeseed oil. InsideIt flags this as a processed-oil or frying-oil review item.",
+        "This product contains canola or rapeseed oil. Truthlabel flags this as a processed-oil or frying-oil review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -224,7 +224,7 @@ export const fryOilFastFoodOilDataPack = {
       reason:
         "Processed oil commonly used in packaged foods, fried foods, sauces, and fast-food oil systems.",
       userFacingReason:
-        "This product contains soybean oil. InsideIt flags this as a processed-oil or frying-oil review item.",
+        "This product contains soybean oil. Truthlabel flags this as a processed-oil or frying-oil review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -254,7 +254,7 @@ export const fryOilFastFoodOilDataPack = {
       reason:
         "Processed seed/grain oil used in frying, snacks, and packaged foods.",
       userFacingReason:
-        "This product contains corn or maize oil. InsideIt flags this as a processed-oil or frying-oil review item.",
+        "This product contains corn or maize oil. Truthlabel flags this as a processed-oil or frying-oil review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -289,7 +289,7 @@ export const fryOilFastFoodOilDataPack = {
       reason:
         "Processed seed oil used in some fried foods, shortenings, snacks, and packaged products.",
       userFacingReason:
-        "This product contains cottonseed oil. InsideIt flags this as a processed-oil or frying-oil review item.",
+        "This product contains cottonseed oil. Truthlabel flags this as a processed-oil or frying-oil review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -324,7 +324,7 @@ export const fryOilFastFoodOilDataPack = {
       reason:
         "Processed seed oil commonly used in fried foods, snacks, crisps/chips, and packaged products.",
       userFacingReason:
-        "This product contains sunflower oil. InsideIt flags this as a processed-oil or frying-oil review item.",
+        "This product contains sunflower oil. Truthlabel flags this as a processed-oil or frying-oil review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -354,7 +354,7 @@ export const fryOilFastFoodOilDataPack = {
       reason:
         "Processed seed oil used in snacks, packaged foods, and frying oil systems.",
       userFacingReason:
-        "This product contains safflower oil. InsideIt flags this as a processed-oil or frying-oil review item.",
+        "This product contains safflower oil. Truthlabel flags this as a processed-oil or frying-oil review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -392,7 +392,7 @@ export const fryOilFastFoodOilDataPack = {
       reason:
         "Processed tropical oil/fat often used in frying, snacks, fast food, and shelf-stable products.",
       userFacingReason:
-        "This product contains palm oil, palm olein, or palm fat. InsideIt flags this as a frying-oil or processed-fat review item.",
+        "This product contains palm oil, palm olein, or palm fat. Truthlabel flags this as a frying-oil or processed-fat review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -426,7 +426,7 @@ export const fryOilFastFoodOilDataPack = {
       reason:
         "Oil sometimes used for frying and relevant to allergen transparency.",
       userFacingReason:
-        "This product contains peanut or groundnut oil. InsideIt flags this as a frying-oil review item and allergy transparency marker.",
+        "This product contains peanut or groundnut oil. Truthlabel flags this as a frying-oil review item and allergy transparency marker.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -451,7 +451,7 @@ export const fryOilFastFoodOilDataPack = {
       reason:
         "Processed oil sometimes used in frying and packaged foods.",
       userFacingReason:
-        "This product contains rice bran oil. InsideIt flags this as a processed-oil or frying-oil review item.",
+        "This product contains rice bran oil. Truthlabel flags this as a processed-oil or frying-oil review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -489,7 +489,7 @@ export const fryOilFastFoodOilDataPack = {
       reason:
         "Shortening or frying fat wording may indicate processed fat used for texture, frying, or shelf life.",
       userFacingReason:
-        "This product contains shortening or frying fat. InsideIt flags this as a processed-fat and frying-oil review item.",
+        "This product contains shortening or frying fat. Truthlabel flags this as a processed-fat and frying-oil review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -533,7 +533,7 @@ export const fryOilFastFoodOilDataPack = {
       reason:
         "Hydrogenated oil marker that may indicate heavily processed fat.",
       userFacingReason:
-        "This product contains hydrogenated oil or fat. InsideIt flags this as a serious processed-fat concern.",
+        "This product contains hydrogenated oil or fat. Truthlabel flags this as a serious processed-fat concern.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -576,7 +576,7 @@ export const fryOilFastFoodOilDataPack = {
       reason:
         "Partially hydrogenated oil marker linked to industrial trans fat concern and restricted status in some regions.",
       userFacingReason:
-        "This product contains partially hydrogenated oil. InsideIt flags this as a serious processed-fat and regulatory concern.",
+        "This product contains partially hydrogenated oil. Truthlabel flags this as a serious processed-fat and regulatory concern.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -618,7 +618,7 @@ export const fryOilFastFoodOilDataPack = {
       reason:
         "Processed fat marker used to change fat structure or performance.",
       userFacingReason:
-        "This product contains interesterified or modified fat wording. InsideIt flags this as a processed-fat review item.",
+        "This product contains interesterified or modified fat wording. Truthlabel flags this as a processed-fat review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -655,7 +655,7 @@ export const fryOilFastFoodOilDataPack = {
       reason:
         "Anti-foaming agent sometimes used in oil or frying systems.",
       userFacingReason:
-        "This product contains an anti-foaming agent used in processing or oil systems. InsideIt flags this as a frying-oil/additive review item.",
+        "This product contains an anti-foaming agent used in processing or oil systems. Truthlabel flags this as a frying-oil/additive review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -698,7 +698,7 @@ export const fryOilFastFoodOilDataPack = {
       reason:
         "Antioxidants or preservatives may be added to oils to slow oxidation or extend shelf life.",
       userFacingReason:
-        "This product contains oil-stability additives or antioxidants. InsideIt flags this as a frying-oil/additive review item.",
+        "This product contains oil-stability additives or antioxidants. Truthlabel flags this as a frying-oil/additive review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -738,7 +738,7 @@ export const fryOilFastFoodOilDataPack = {
       reason:
         "Coated products are often fried or designed for frying and may include oil, starches, additives, and seasoning systems.",
       userFacingReason:
-        "This product uses breaded, battered, or coated wording. InsideIt flags this as a fried-food processing review item.",
+        "This product uses breaded, battered, or coated wording. Truthlabel flags this as a fried-food processing review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -782,7 +782,7 @@ export const fryOilFastFoodOilDataPack = {
       reason:
         "Product-form marker often associated with frying or fast-food oil systems.",
       userFacingReason:
-        "This product appears to be a fried or fast-food style item. InsideIt flags this as a frying-oil review item.",
+        "This product appears to be a fried or fast-food style item. Truthlabel flags this as a frying-oil review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -815,7 +815,7 @@ export const fryOilFastFoodOilDataPack = {
       reason:
         "Restaurant/menu marker that may matter for allergen cross-contact and frying-oil transparency.",
       userFacingReason:
-        "This label or menu mentions shared frying oil. InsideIt flags this as a frying-oil and cross-contact review item.",
+        "This label or menu mentions shared frying oil. Truthlabel flags this as a frying-oil and cross-contact review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -852,7 +852,7 @@ export const fryOilFastFoodOilDataPack = {
       reason:
         "Animal fat used as a cooking or frying fat. This is a frying/source transparency marker.",
       userFacingReason:
-        "This product uses animal fat or tallow wording. InsideIt records this as frying-fat/source transparency information.",
+        "This product uses animal fat or tallow wording. Truthlabel records this as frying-fat/source transparency information.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],

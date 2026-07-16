@@ -35,7 +35,7 @@ test("artificialSweetenersDataPack uses the corrected green yellow red threshold
     display: "red_count_badge",
     scoreImpact: 20,
     reason:
-      "Product contains multiple sweetener systems. InsideIt treats this as a high sweetener-load concern.",
+      "Product contains multiple sweetener systems. Truthlabel treats this as a high sweetener-load concern.",
   });
   assert.deepEqual(categoryScoringRules.anyBannedRestrictedSweetener, {
     severity: "red",
@@ -45,11 +45,11 @@ test("artificialSweetenersDataPack uses the corrected green yellow red threshold
   });
   assert.equal(
     finalVerdictRules.redLoad,
-    "This product contains multiple sweetener systems. InsideIt flags this as a high sweetener-load concern.",
+    "This product contains multiple sweetener systems. Truthlabel flags this as a high sweetener-load concern.",
   );
   assert.equal(
     finalVerdictRules.redRestricted,
-    "This product contains a banned or restricted sweetener. InsideIt flags this as a serious regulatory concern.",
+    "This product contains a banned or restricted sweetener. Truthlabel flags this as a serious regulatory concern.",
   );
 });
 

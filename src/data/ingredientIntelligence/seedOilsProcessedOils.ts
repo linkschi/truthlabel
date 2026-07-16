@@ -2,7 +2,7 @@ export const seedOilsProcessedOilsDataPack = {
   id: "seed_oils_processed_oils",
   categoryName: "Seed Oils / Processed Oils",
   categoryMeaning:
-    "This category detects seed oils, generic vegetable oils, refined oils, frying oils, oil blends, shortenings, margarines, hydrogenated oils, and highly processed fat systems. InsideIt flags these because the product uses processed oil systems rather than simple whole-food fats.",
+    "This category detects seed oils, generic vegetable oils, refined oils, frying oils, oil blends, shortenings, margarines, hydrogenated oils, and highly processed fat systems. Truthlabel flags these because the product uses processed oil systems rather than simple whole-food fats.",
   dataStatus: "starter_needs_expansion",
   defaultCategorySeverity: "yellow",
 
@@ -54,7 +54,7 @@ export const seedOilsProcessedOilsDataPack = {
       healthConcernType: "generic_processed_oil",
       warningLabel: "PROCESSED OIL FOUND",
       userFacingReason:
-        "This product contains vegetable oil or a vegetable oil blend. InsideIt flags this because the exact oil source may not be clearly shown and the product uses a processed oil system.",
+        "This product contains vegetable oil or a vegetable oil blend. Truthlabel flags this because the exact oil source may not be clearly shown and the product uses a processed oil system.",
       matchingNotes:
         "Match vegetable oil, vegetable oils, vegetable fat, edible vegetable oil, refined vegetable oil, oil blend, and mixed vegetable oils. If a specific oil is also listed, count the specific oil separately only if it appears as a separate ingredient.",
       scoringImpact: "yellow_processed_oil",
@@ -110,7 +110,7 @@ export const seedOilsProcessedOilsDataPack = {
       healthConcernType: "seed_oil",
       warningLabel: "SEED OIL FOUND",
       userFacingReason:
-        "This product contains canola/rapeseed oil, a seed oil commonly used in processed foods. InsideIt flags this as a processed oil marker.",
+        "This product contains canola/rapeseed oil, a seed oil commonly used in processed foods. Truthlabel flags this as a processed oil marker.",
       matchingNotes:
         "Match canola oil, rapeseed oil, LEAR oil, high oleic canola oil, refined canola oil, and refined rapeseed oil.",
       scoringImpact: "yellow_seed_oil",
@@ -159,7 +159,7 @@ export const seedOilsProcessedOilsDataPack = {
       healthConcernType: "seed_oil_processed_oil",
       warningLabel: "SEED OIL FOUND",
       userFacingReason:
-        "This product contains soybean/soya oil, a processed seed/bean oil commonly used in packaged foods. InsideIt flags this as a processed oil marker.",
+        "This product contains soybean/soya oil, a processed seed/bean oil commonly used in packaged foods. Truthlabel flags this as a processed oil marker.",
       matchingNotes:
         "Match soybean oil, soya oil, soy oil, soyabean oil, refined soybean oil, and high oleic soybean oil.",
       scoringImpact: "yellow_seed_oil",
@@ -209,7 +209,7 @@ export const seedOilsProcessedOilsDataPack = {
       healthConcernType: "seed_oil",
       warningLabel: "SEED OIL FOUND",
       userFacingReason:
-        "This product contains sunflower oil, a seed oil commonly used in processed foods. InsideIt flags this as a processed oil marker.",
+        "This product contains sunflower oil, a seed oil commonly used in processed foods. Truthlabel flags this as a processed oil marker.",
       matchingNotes:
         "Match sunflower oil, sunflower seed oil, refined sunflower oil, high oleic sunflower oil, mid oleic sunflower oil, and linoleic sunflower oil.",
       scoringImpact: "yellow_seed_oil",
@@ -250,7 +250,7 @@ export const seedOilsProcessedOilsDataPack = {
       healthConcernType: "seed_oil_processed_oil",
       warningLabel: "SEED OIL FOUND",
       userFacingReason:
-        "This product contains corn/maize oil, a processed oil commonly used in packaged foods and frying. InsideIt flags this as a processed oil marker.",
+        "This product contains corn/maize oil, a processed oil commonly used in packaged foods and frying. Truthlabel flags this as a processed oil marker.",
       matchingNotes:
         "Match corn oil, maize oil, corn germ oil, maize germ oil, refined corn oil, and refined maize oil.",
       scoringImpact: "yellow_seed_oil",
@@ -289,7 +289,7 @@ export const seedOilsProcessedOilsDataPack = {
       healthConcernType: "seed_oil_processed_oil",
       warningLabel: "SEED OIL FOUND",
       userFacingReason:
-        "This product contains cottonseed oil, a processed seed oil. InsideIt flags this as a processed oil marker.",
+        "This product contains cottonseed oil, a processed seed oil. Truthlabel flags this as a processed oil marker.",
       matchingNotes:
         "Match cottonseed oil, cotton seed oil, refined cottonseed oil, and fully refined cottonseed oil.",
       scoringImpact: "yellow_seed_oil",
@@ -328,7 +328,7 @@ export const seedOilsProcessedOilsDataPack = {
       healthConcernType: "seed_oil",
       warningLabel: "SEED OIL FOUND",
       userFacingReason:
-        "This product contains safflower oil, a seed oil used in processed foods. InsideIt flags this as a processed oil marker.",
+        "This product contains safflower oil, a seed oil used in processed foods. Truthlabel flags this as a processed oil marker.",
       matchingNotes:
         "Match safflower oil, safflower seed oil, refined safflower oil, high oleic safflower oil, and linoleic safflower oil.",
       scoringImpact: "yellow_seed_oil",
@@ -365,7 +365,7 @@ export const seedOilsProcessedOilsDataPack = {
       healthConcernType: "seed_oil",
       warningLabel: "SEED OIL FOUND",
       userFacingReason:
-        "This product contains grapeseed oil, a seed oil. InsideIt flags this as a processed oil marker.",
+        "This product contains grapeseed oil, a seed oil. Truthlabel flags this as a processed oil marker.",
       matchingNotes:
         "Match grapeseed oil, grape seed oil, refined grapeseed oil, and refined grape seed oil.",
       scoringImpact: "yellow_seed_oil",
@@ -398,7 +398,7 @@ export const seedOilsProcessedOilsDataPack = {
       healthConcernType: "processed_oil",
       warningLabel: "PROCESSED OIL FOUND",
       userFacingReason:
-        "This product contains rice bran oil, a processed oil used in packaged foods and frying. InsideIt flags this as a processed oil marker.",
+        "This product contains rice bran oil, a processed oil used in packaged foods and frying. Truthlabel flags this as a processed oil marker.",
       matchingNotes:
         "Match rice bran oil, refined rice bran oil, rice oil, and RBO when oil context is clear.",
       scoringImpact: "yellow_processed_oil",
@@ -449,7 +449,7 @@ export const seedOilsProcessedOilsDataPack = {
       healthConcernType: "processed_oil_allergen_relevant",
       warningLabel: "PROCESSED OIL FOUND",
       userFacingReason:
-        "This product contains peanut/groundnut oil, a processed oil. InsideIt flags this as a processed oil marker. This may also be relevant for peanut allergy checks depending on the product and region.",
+        "This product contains peanut/groundnut oil, a processed oil. Truthlabel flags this as a processed oil marker. This may also be relevant for peanut allergy checks depending on the product and region.",
       matchingNotes:
         "Match peanut oil, groundnut oil, arachis oil, refined peanut oil, and refined groundnut oil. Also link to Allergy Risk where appropriate.",
       scoringImpact: "yellow_processed_oil",
@@ -491,7 +491,7 @@ export const seedOilsProcessedOilsDataPack = {
       healthConcernType: "seed_oil_allergen_relevant",
       warningLabel: "SEED OIL FOUND",
       userFacingReason:
-        "This product contains sesame oil, a seed oil. InsideIt flags this as a processed oil marker and may also check it under allergy risk where relevant.",
+        "This product contains sesame oil, a seed oil. Truthlabel flags this as a processed oil marker and may also check it under allergy risk where relevant.",
       matchingNotes:
         "Match sesame oil, sesame seed oil, refined sesame oil, toasted sesame oil, roasted sesame oil, gingelly oil, and til oil. Also link to Allergy Risk where appropriate.",
       scoringImpact: "yellow_seed_oil",
@@ -532,7 +532,7 @@ export const seedOilsProcessedOilsDataPack = {
       healthConcernType: "processed_oil",
       warningLabel: "PROCESSED OIL FOUND",
       userFacingReason:
-        "This product contains palm oil or palm fat fractions. InsideIt flags this as a processed oil/fat marker.",
+        "This product contains palm oil or palm fat fractions. Truthlabel flags this as a processed oil/fat marker.",
       matchingNotes:
         "Match palm oil, refined palm oil, palm olein, palm stearin, palm fruit oil, sustainable palm oil, and RSPO palm oil.",
       scoringImpact: "yellow_processed_oil",
@@ -576,7 +576,7 @@ export const seedOilsProcessedOilsDataPack = {
       healthConcernType: "processed_kernel_oil",
       warningLabel: "PROCESSED OIL FOUND",
       userFacingReason:
-        "This product contains palm kernel oil, a processed kernel oil used in packaged foods. InsideIt flags this as a processed oil/fat marker.",
+        "This product contains palm kernel oil, a processed kernel oil used in packaged foods. Truthlabel flags this as a processed oil/fat marker.",
       matchingNotes:
         "Match palm kernel oil, palmkernel oil, palm kernel fat, refined palm kernel oil, palm kernel olein, palm kernel stearin, and PKO. If hydrogenated or partially hydrogenated appears, also trigger hydrogenated oil red rule.",
       scoringImpact: "yellow_processed_oil",
@@ -617,7 +617,7 @@ export const seedOilsProcessedOilsDataPack = {
       healthConcernType: "processed_added_oil",
       warningLabel: "ADDED OIL FOUND",
       userFacingReason:
-        "This product contains coconut oil, an added isolated oil/fat. InsideIt flags this under processed oils because the product uses added oil rather than whole-food fat alone.",
+        "This product contains coconut oil, an added isolated oil/fat. Truthlabel flags this under processed oils because the product uses added oil rather than whole-food fat alone.",
       matchingNotes:
         "Match coconut oil, refined coconut oil, virgin coconut oil, extra virgin coconut oil, and coconut fat. If hydrogenated or partially hydrogenated appears, also trigger hydrogenated oil red rule.",
       scoringImpact: "yellow_processed_oil",
@@ -668,7 +668,7 @@ export const seedOilsProcessedOilsDataPack = {
       healthConcernType: "processed_fat_system",
       warningLabel: "PROCESSED FAT SYSTEM FOUND",
       userFacingReason:
-        "This product contains shortening, a processed fat system used to build texture, crispness, or shelf stability. InsideIt flags this as a processed oil/fat marker.",
+        "This product contains shortening, a processed fat system used to build texture, crispness, or shelf stability. Truthlabel flags this as a processed oil/fat marker.",
       matchingNotes:
         "Match shortening, vegetable shortening, baking shortening, frying shortening, palm shortening, and Crisco. If hydrogenated or partially hydrogenated appears, also trigger hydrogenated oil red rule.",
       scoringImpact: "yellow_processed_fat",
@@ -717,7 +717,7 @@ export const seedOilsProcessedOilsDataPack = {
       healthConcernType: "processed_fat_spread",
       warningLabel: "PROCESSED FAT SPREAD FOUND",
       userFacingReason:
-        "This product contains margarine or vegetable fat spread. InsideIt flags this because it is a processed fat system, often built from oils, emulsifiers, colours, flavours, and stabilisers.",
+        "This product contains margarine or vegetable fat spread. Truthlabel flags this because it is a processed fat system, often built from oils, emulsifiers, colours, flavours, and stabilisers.",
       matchingNotes:
         "Match margarine, vegetable fat spread, vegetable oil spread, table spread, baking margarine, reduced fat spread, dairy-free spread, and plant-based spread.",
       scoringImpact: "yellow_processed_fat",
@@ -765,7 +765,7 @@ export const seedOilsProcessedOilsDataPack = {
       healthConcernType: "generic_frying_oil",
       warningLabel: "FRYING OIL FOUND",
       userFacingReason:
-        "This product lists frying oil or cooking oil without clearly showing the exact oil source. InsideIt flags this as a processed oil marker.",
+        "This product lists frying oil or cooking oil without clearly showing the exact oil source. Truthlabel flags this as a processed oil marker.",
       matchingNotes:
         "Match frying oil, deep frying oil, deep-frying oil, fryer oil, fry oil, cooking oil, refined cooking oil, and high heat frying oil.",
       scoringImpact: "yellow_processed_oil",
@@ -813,7 +813,7 @@ export const seedOilsProcessedOilsDataPack = {
       healthConcernType: "engineered_fat_system",
       warningLabel: "ENGINEERED FAT SYSTEM FOUND",
       userFacingReason:
-        "This product contains interesterified oil or fat, an engineered fat system used to change texture, melting point, or stability. InsideIt flags this as a processed fat marker.",
+        "This product contains interesterified oil or fat, an engineered fat system used to change texture, melting point, or stability. Truthlabel flags this as a processed fat marker.",
       matchingNotes:
         "Match interesterified oil, interesterified vegetable fat, enzymatically interesterified oil, chemically interesterified oil, modified vegetable fat, structured fat, and rearranged fat.",
       scoringImpact: "yellow_processed_fat",
@@ -861,11 +861,11 @@ export const seedOilsProcessedOilsDataPack = {
       regionalNames: [],
       severity: "red",
       reason:
-        "Hydrogenated oil is a highly processed fat marker. InsideIt treats hydrogenated fat systems as a red processed-oil concern.",
+        "Hydrogenated oil is a highly processed fat marker. Truthlabel treats hydrogenated fat systems as a red processed-oil concern.",
       healthConcernType: "hydrogenated_processed_fat",
       warningLabel: "HYDROGENATED OIL FOUND",
       userFacingReason:
-        "This product contains hydrogenated oil or fat. InsideIt flags this as a serious processed-oil concern because the fat system has been chemically hardened or modified.",
+        "This product contains hydrogenated oil or fat. Truthlabel flags this as a serious processed-oil concern because the fat system has been chemically hardened or modified.",
       matchingNotes:
         "Match hydrogenated oil, hydrogenated vegetable oil, fully hydrogenated oil, hydrogenated fat, hydrogenated soybean/soya/canola/rapeseed/cottonseed/palm/palm kernel/coconut/sunflower oil, and HVO.",
       scoringImpact: "red_processed_fat",
@@ -917,11 +917,11 @@ export const seedOilsProcessedOilsDataPack = {
       regionalNames: [],
       severity: "red",
       reason:
-        "Partially hydrogenated oils are treated by InsideIt as an automatic red processed-oil concern and should also connect to the Hydrogenated / Partially Hydrogenated Oils category.",
+        "Partially hydrogenated oils are treated by Truthlabel as an automatic red processed-oil concern and should also connect to the Hydrogenated / Partially Hydrogenated Oils category.",
       healthConcernType: "partially_hydrogenated_oil_trans_fat_marker",
       warningLabel: "PARTIALLY HYDROGENATED OIL FOUND",
       userFacingReason:
-        "This product contains partially hydrogenated oil, a serious processed-oil marker. InsideIt flags this as red immediately and links it to the hydrogenated oils check.",
+        "This product contains partially hydrogenated oil, a serious processed-oil marker. Truthlabel flags this as red immediately and links it to the hydrogenated oils check.",
       matchingNotes:
         "Match partially hydrogenated oil, partially hydrogenated vegetable oil, partially hydrogenated fat, partially hydrogenated soybean/soya/canola/rapeseed/cottonseed/palm/palm kernel/coconut/sunflower oil, PHO, and PHOs.",
       scoringImpact: "automatic_red",
@@ -977,7 +977,7 @@ export const seedOilsProcessedOilsDataPack = {
       healthConcernType: "refined_processed_oil_marker",
       warningLabel: "REFINED OIL FOUND",
       userFacingReason:
-        "This product contains refined oil or RBD oil. InsideIt flags this because the oil has been industrially processed for stability, appearance, taste, or performance.",
+        "This product contains refined oil or RBD oil. Truthlabel flags this because the oil has been industrially processed for stability, appearance, taste, or performance.",
       matchingNotes:
         "Match refined oil, refined vegetable oil, refined seed oil, refined cooking oil, RBD oil, refined bleached deodorized/deodorised oil, bleached oil, and deodorized/deodorised oil.",
       scoringImpact: "yellow_processed_oil",
@@ -1003,7 +1003,7 @@ export const seedOilsProcessedOilsDataPack = {
       display: "red_count_badge",
       scoreImpact: 18,
       reason:
-        "Product contains multiple seed/processed oil systems. InsideIt treats this as a high processed-oil load."
+        "Product contains multiple seed/processed oil systems. Truthlabel treats this as a high processed-oil load."
     },
     anyHydrogenatedOrPartiallyHydrogenatedOil: {
       severity: "red",
@@ -1020,11 +1020,11 @@ export const seedOilsProcessedOilsDataPack = {
 
   finalVerdictRules: {
     yellow:
-      "This product contains a seed oil, processed oil, refined oil, frying oil, or processed fat marker. InsideIt flags this because the product uses processed oil systems rather than simple whole-food fats.",
+      "This product contains a seed oil, processed oil, refined oil, frying oil, or processed fat marker. Truthlabel flags this because the product uses processed oil systems rather than simple whole-food fats.",
     redLoad:
-      "This product contains multiple seed oils, processed oils, refined oils, or processed fat systems. InsideIt flags this as a high processed-oil load.",
+      "This product contains multiple seed oils, processed oils, refined oils, or processed fat systems. Truthlabel flags this as a high processed-oil load.",
     redHydrogenated:
-      "This product contains hydrogenated or partially hydrogenated oil. InsideIt flags this as a serious processed-oil concern."
+      "This product contains hydrogenated or partially hydrogenated oil. Truthlabel flags this as a serious processed-oil concern."
   },
 
   matchingNormalizationRules: [

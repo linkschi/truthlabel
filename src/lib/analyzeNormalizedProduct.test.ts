@@ -14,7 +14,7 @@ test("real product analysis flags a yellow artificial colour match", () => {
     {
       barcode: "10001",
       name: "Test Drink",
-      brand: "InsideIt Demo",
+      brand: "Truthlabel Demo",
       ingredients: [
         {
           name: "Tartrazine",
@@ -44,7 +44,7 @@ test("real product analysis flags a red restricted artificial colour match", () 
     {
       barcode: "10002",
       name: "Test Candy",
-      brand: "InsideIt Demo",
+      brand: "Truthlabel Demo",
       ingredients: [
         {
           name: "Red No. 3",
@@ -78,7 +78,7 @@ test("real product analysis flags flavour systems as yellow review items", () =>
     {
       barcode: "10003",
       name: "Test Soup",
-      brand: "InsideIt Demo",
+      brand: "Truthlabel Demo",
       ingredients: [
         {
           name: "Yeast extract",
@@ -108,7 +108,7 @@ test("real product analysis turns three flavour systems into a red load check", 
     {
       barcode: "10004",
       name: "Test Snack",
-      brand: "InsideIt Demo",
+      brand: "Truthlabel Demo",
       ingredients: [
         {
           name: "Monosodium glutamate",
@@ -144,7 +144,7 @@ test("real product analysis treats restricted flavouring as an immediate red iss
     {
       barcode: "10005",
       name: "Test Flavouring",
-      brand: "InsideIt Demo",
+      brand: "Truthlabel Demo",
       ingredients: [
         {
           name: "Safrole flavouring",
@@ -178,7 +178,7 @@ test("real product analysis flags one processed oil as yellow", () => {
     {
       barcode: "10006",
       name: "Test Crackers",
-      brand: "InsideIt Demo",
+      brand: "Truthlabel Demo",
       ingredients: [
         {
           name: "Canola oil",
@@ -208,7 +208,7 @@ test("real product analysis turns two processed oils into a red load check", () 
     {
       barcode: "10007",
       name: "Test Chips",
-      brand: "InsideIt Demo",
+      brand: "Truthlabel Demo",
       ingredients: [
         {
           name: "Canola oil",
@@ -240,7 +240,7 @@ test("real product analysis treats hydrogenated oil as a red processed-oil conce
     {
       barcode: "10008",
       name: "Test Spread",
-      brand: "InsideIt Demo",
+      brand: "Truthlabel Demo",
       ingredients: [
         {
           name: "Hydrogenated soybean oil",
@@ -272,7 +272,7 @@ test("real product analysis treats fully hydrogenated oil as a red processed-fat
     {
       barcode: "10009",
       name: "Test Spread",
-      brand: "InsideIt Demo",
+      brand: "Truthlabel Demo",
       ingredients: [
         {
           name: "Fully hydrogenated soybean oil",
@@ -304,7 +304,7 @@ test("real product analysis treats partially hydrogenated oil as PHO regulatory 
     {
       barcode: "10010",
       name: "Test Cookie",
-      brand: "InsideIt Demo",
+      brand: "Truthlabel Demo",
       ingredients: [
         {
           name: "Partially hydrogenated soybean oil",
@@ -337,7 +337,7 @@ test("real product analysis flags positive trans fat markers but not trans-fat-f
     {
       barcode: "10011",
       name: "Test Frosting",
-      brand: "InsideIt Demo",
+      brand: "Truthlabel Demo",
       ingredients: [
         {
           name: "Contains trans fat",
@@ -355,7 +355,7 @@ test("real product analysis flags positive trans fat markers but not trans-fat-f
     {
       barcode: "10012",
       name: "Test Label Claim",
-      brand: "InsideIt Demo",
+      brand: "Truthlabel Demo",
       ingredients: [
         {
           name: "0g trans fat",
@@ -394,7 +394,7 @@ test("real product analysis flags one ultra-processed marker as yellow", () => {
     {
       barcode: "10013",
       name: "Test Powder",
-      brand: "InsideIt Demo",
+      brand: "Truthlabel Demo",
       ingredients: [
         {
           name: "Maltodextrin",
@@ -423,7 +423,7 @@ test("real product analysis turns four ultra-processed markers into a red load c
     {
       barcode: "10014",
       name: "Test Bar",
-      brand: "InsideIt Demo",
+      brand: "Truthlabel Demo",
       ingredients: [
         {
           name: "Maltodextrin",
@@ -462,7 +462,7 @@ test("real product analysis makes ultra-processed check red for automatic red ov
     {
       barcode: "10015",
       name: "Test Shortening",
-      brand: "InsideIt Demo",
+      brand: "Truthlabel Demo",
       ingredients: [
         {
           name: "Partially hydrogenated oil",
@@ -489,7 +489,7 @@ test("real product analysis keeps ultra-processed check green for trans-fat-free
     {
       barcode: "10016",
       name: "Test Claim",
-      brand: "InsideIt Demo",
+      brand: "Truthlabel Demo",
       ingredients: [
         {
           name: "Trans fat free",

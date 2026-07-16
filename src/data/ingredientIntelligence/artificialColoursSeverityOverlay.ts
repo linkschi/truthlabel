@@ -43,7 +43,7 @@ export const artificialColoursSeverityOverlay: ArtificialColourSeverityOverlayIt
     alertTone: "firm_review",
     warningLabel: "ARTIFICIAL COLOUR FOUND",
     userFacingReason:
-      "This is an artificial colour additive. Some regions require warning labels for this colour because of possible effects on activity and attention in children. InsideIt flags it as an artificial additive. Avoid products with artificial colours where possible.",
+      "This is an artificial colour additive. Some regions require warning labels for this colour because of possible effects on activity and attention in children. Truthlabel flags it as an artificial additive. Avoid products with artificial colours where possible.",
   },
   {
     id: "sunset_yellow_fcf",
@@ -57,7 +57,7 @@ export const artificialColoursSeverityOverlay: ArtificialColourSeverityOverlayIt
     alertTone: "firm_review",
     warningLabel: "ARTIFICIAL COLOUR FOUND",
     userFacingReason:
-      "This is an artificial colour additive. Some regions require warning labels for this colour because of possible effects on activity and attention in children. InsideIt flags it as an artificial additive. Avoid products with artificial colours where possible.",
+      "This is an artificial colour additive. Some regions require warning labels for this colour because of possible effects on activity and attention in children. Truthlabel flags it as an artificial additive. Avoid products with artificial colours where possible.",
   },
   {
     id: "allura_red_ac",
@@ -71,7 +71,7 @@ export const artificialColoursSeverityOverlay: ArtificialColourSeverityOverlayIt
     alertTone: "firm_review",
     warningLabel: "ARTIFICIAL COLOUR FOUND",
     userFacingReason:
-      "This is an artificial colour additive. Some regions require warning labels for this colour because of possible effects on activity and attention in children. InsideIt flags it as an artificial additive. Avoid products with artificial colours where possible.",
+      "This is an artificial colour additive. Some regions require warning labels for this colour because of possible effects on activity and attention in children. Truthlabel flags it as an artificial additive. Avoid products with artificial colours where possible.",
   },
   {
     id: "erythrosine",
@@ -85,7 +85,7 @@ export const artificialColoursSeverityOverlay: ArtificialColourSeverityOverlayIt
     alertTone: "firm_alert",
     warningLabel: "BANNED / RESTRICTED COLOUR",
     userFacingReason:
-      "This ingredient was revoked for food use in the United States for cancer-related regulatory concerns. InsideIt flags this as a serious safety concern. Avoid this ingredient where possible.",
+      "This ingredient was revoked for food use in the United States for cancer-related regulatory concerns. Truthlabel flags this as a serious safety concern. Avoid this ingredient where possible.",
   },
   {
     id: "brilliant_blue_fcf",
@@ -98,7 +98,7 @@ export const artificialColoursSeverityOverlay: ArtificialColourSeverityOverlayIt
     alertTone: "firm_review",
     warningLabel: "ARTIFICIAL COLOUR FOUND",
     userFacingReason:
-      "This is an artificial colour additive. InsideIt flags it because it is a synthetic additive used to change the appearance of food. Avoid products with artificial colours where possible.",
+      "This is an artificial colour additive. Truthlabel flags it because it is a synthetic additive used to change the appearance of food. Avoid products with artificial colours where possible.",
   },
   {
     id: "indigotine",
@@ -111,7 +111,7 @@ export const artificialColoursSeverityOverlay: ArtificialColourSeverityOverlayIt
     alertTone: "firm_review",
     warningLabel: "ARTIFICIAL COLOUR FOUND",
     userFacingReason:
-      "This is an artificial colour additive. InsideIt flags it because it is a synthetic additive used to change the appearance of food. Avoid products with artificial colours where possible.",
+      "This is an artificial colour additive. Truthlabel flags it because it is a synthetic additive used to change the appearance of food. Avoid products with artificial colours where possible.",
   },
   {
     id: "fast_green_fcf",
@@ -124,7 +124,7 @@ export const artificialColoursSeverityOverlay: ArtificialColourSeverityOverlayIt
     alertTone: "firm_review",
     warningLabel: "ARTIFICIAL COLOUR FOUND",
     userFacingReason:
-      "This is an artificial colour additive. InsideIt flags it because it is a synthetic additive used to change the appearance of food. Avoid products with artificial colours where possible.",
+      "This is an artificial colour additive. Truthlabel flags it because it is a synthetic additive used to change the appearance of food. Avoid products with artificial colours where possible.",
   },
   {
     id: "amaranth",
@@ -138,7 +138,7 @@ export const artificialColoursSeverityOverlay: ArtificialColourSeverityOverlayIt
     alertTone: "firm_review",
     warningLabel: "ARTIFICIAL COLOUR FOUND",
     userFacingReason:
-      "This is an artificial colour additive. InsideIt flags it because it is a synthetic additive used to change the appearance of food. Avoid products with artificial colours where possible.",
+      "This is an artificial colour additive. Truthlabel flags it because it is a synthetic additive used to change the appearance of food. Avoid products with artificial colours where possible.",
   },
   {
     id: "ponceau_4r",
@@ -152,7 +152,7 @@ export const artificialColoursSeverityOverlay: ArtificialColourSeverityOverlayIt
     alertTone: "firm_review",
     warningLabel: "ARTIFICIAL COLOUR FOUND",
     userFacingReason:
-      "This is an artificial colour additive. Some regions require warning labels for this colour because of possible effects on activity and attention in children. InsideIt flags it as an artificial additive. Avoid products with artificial colours where possible.",
+      "This is an artificial colour additive. Some regions require warning labels for this colour because of possible effects on activity and attention in children. Truthlabel flags it as an artificial additive. Avoid products with artificial colours where possible.",
   },
   {
     id: "azorubine",
@@ -166,7 +166,7 @@ export const artificialColoursSeverityOverlay: ArtificialColourSeverityOverlayIt
     alertTone: "firm_review",
     warningLabel: "ARTIFICIAL COLOUR FOUND",
     userFacingReason:
-      "This is an artificial colour additive. Some regions require warning labels for this colour because of possible effects on activity and attention in children. InsideIt flags it as an artificial additive. Avoid products with artificial colours where possible.",
+      "This is an artificial colour additive. Some regions require warning labels for this colour because of possible effects on activity and attention in children. Truthlabel flags it as an artificial additive. Avoid products with artificial colours where possible.",
   },
   {
     id: "quinoline_yellow",
@@ -180,7 +180,7 @@ export const artificialColoursSeverityOverlay: ArtificialColourSeverityOverlayIt
     alertTone: "firm_review",
     warningLabel: "ARTIFICIAL COLOUR FOUND",
     userFacingReason:
-      "This is an artificial colour additive. Some regions require warning labels for this colour because of possible effects on activity and attention in children. InsideIt flags it as an artificial additive. Avoid products with artificial colours where possible.",
+      "This is an artificial colour additive. Some regions require warning labels for this colour because of possible effects on activity and attention in children. Truthlabel flags it as an artificial additive. Avoid products with artificial colours where possible.",
   },
   {
     id: "patent_blue_v",
@@ -194,7 +194,7 @@ export const artificialColoursSeverityOverlay: ArtificialColourSeverityOverlayIt
     alertTone: "firm_review",
     warningLabel: "ARTIFICIAL COLOUR FOUND",
     userFacingReason:
-      "This is an artificial colour additive. InsideIt flags it because it is a synthetic additive used to change the appearance of food. Avoid products with artificial colours where possible.",
+      "This is an artificial colour additive. Truthlabel flags it because it is a synthetic additive used to change the appearance of food. Avoid products with artificial colours where possible.",
   },
   {
     id: "green_s",
@@ -208,7 +208,7 @@ export const artificialColoursSeverityOverlay: ArtificialColourSeverityOverlayIt
     alertTone: "firm_review",
     warningLabel: "ARTIFICIAL COLOUR FOUND",
     userFacingReason:
-      "This is an artificial colour additive. InsideIt flags it because it is a synthetic additive used to change the appearance of food. Avoid products with artificial colours where possible.",
+      "This is an artificial colour additive. Truthlabel flags it because it is a synthetic additive used to change the appearance of food. Avoid products with artificial colours where possible.",
   },
   {
     id: "brilliant_black_bn",
@@ -222,7 +222,7 @@ export const artificialColoursSeverityOverlay: ArtificialColourSeverityOverlayIt
     alertTone: "firm_review",
     warningLabel: "ARTIFICIAL COLOUR FOUND",
     userFacingReason:
-      "This is an artificial colour additive. InsideIt flags it because it is a synthetic additive used to change the appearance of food. Avoid products with artificial colours where possible.",
+      "This is an artificial colour additive. Truthlabel flags it because it is a synthetic additive used to change the appearance of food. Avoid products with artificial colours where possible.",
   },
   {
     id: "brown_ht",
@@ -236,7 +236,7 @@ export const artificialColoursSeverityOverlay: ArtificialColourSeverityOverlayIt
     alertTone: "firm_review",
     warningLabel: "ARTIFICIAL COLOUR FOUND",
     userFacingReason:
-      "This is an artificial colour additive. InsideIt flags it because it is a synthetic additive used to change the appearance of food. Avoid products with artificial colours where possible.",
+      "This is an artificial colour additive. Truthlabel flags it because it is a synthetic additive used to change the appearance of food. Avoid products with artificial colours where possible.",
   },
   {
     id: "litholrubine_bk",
@@ -250,7 +250,7 @@ export const artificialColoursSeverityOverlay: ArtificialColourSeverityOverlayIt
     alertTone: "firm_review",
     warningLabel: "ARTIFICIAL COLOUR FOUND",
     userFacingReason:
-      "This is an artificial colour additive. InsideIt flags it because it is a synthetic additive used to change the appearance of food. Avoid products with artificial colours where possible.",
+      "This is an artificial colour additive. Truthlabel flags it because it is a synthetic additive used to change the appearance of food. Avoid products with artificial colours where possible.",
   },
   {
     id: "citrus_red_no_2",
@@ -264,7 +264,7 @@ export const artificialColoursSeverityOverlay: ArtificialColourSeverityOverlayIt
     alertTone: "firm_alert",
     warningLabel: "BANNED / RESTRICTED COLOUR",
     userFacingReason:
-      "This ingredient is under regulatory removal action in the United States. InsideIt flags this as a serious safety concern. Avoid this ingredient where possible.",
+      "This ingredient is under regulatory removal action in the United States. Truthlabel flags this as a serious safety concern. Avoid this ingredient where possible.",
   },
   {
     id: "orange_b",
@@ -278,7 +278,7 @@ export const artificialColoursSeverityOverlay: ArtificialColourSeverityOverlayIt
     alertTone: "firm_alert",
     warningLabel: "BANNED / RESTRICTED COLOUR",
     userFacingReason:
-      "This ingredient is under regulatory removal action in the United States. InsideIt flags this as a serious safety concern. Avoid this ingredient where possible.",
+      "This ingredient is under regulatory removal action in the United States. Truthlabel flags this as a serious safety concern. Avoid this ingredient where possible.",
   },
   {
     id: "titanium_dioxide",
@@ -292,7 +292,7 @@ export const artificialColoursSeverityOverlay: ArtificialColourSeverityOverlayIt
     alertTone: "firm_alert",
     warningLabel: "BANNED / RESTRICTED COLOUR",
     userFacingReason:
-      "This ingredient is banned/restricted in the European Union because regulators could not rule out genotoxicity concerns. InsideIt flags this as a serious safety concern. Avoid this ingredient where possible.",
+      "This ingredient is banned/restricted in the European Union because regulators could not rule out genotoxicity concerns. Truthlabel flags this as a serious safety concern. Avoid this ingredient where possible.",
   },
   {
     id: "caramel_colour",
@@ -305,7 +305,7 @@ export const artificialColoursSeverityOverlay: ArtificialColourSeverityOverlayIt
     alertTone: "firm_review",
     warningLabel: "COLOUR ADDITIVE FOUND",
     userFacingReason:
-      "This is a colour additive used to change the appearance of food or drinks. InsideIt counts it as a processed/artificial ingredient.",
+      "This is a colour additive used to change the appearance of food or drinks. Truthlabel counts it as a processed/artificial ingredient.",
   },
   {
     id: "caramel_i",
@@ -319,7 +319,7 @@ export const artificialColoursSeverityOverlay: ArtificialColourSeverityOverlayIt
     alertTone: "firm_review",
     warningLabel: "COLOUR ADDITIVE FOUND",
     userFacingReason:
-      "This is a colour additive used to change the appearance of food or drinks. InsideIt counts it as a processed/artificial ingredient.",
+      "This is a colour additive used to change the appearance of food or drinks. Truthlabel counts it as a processed/artificial ingredient.",
   },
   {
     id: "caramel_ii",
@@ -332,7 +332,7 @@ export const artificialColoursSeverityOverlay: ArtificialColourSeverityOverlayIt
     alertTone: "firm_review",
     warningLabel: "COLOUR ADDITIVE FOUND",
     userFacingReason:
-      "This is a colour additive used to change the appearance of food or drinks. InsideIt counts it as a processed/artificial ingredient.",
+      "This is a colour additive used to change the appearance of food or drinks. Truthlabel counts it as a processed/artificial ingredient.",
   },
   {
     id: "caramel_iii",
@@ -345,7 +345,7 @@ export const artificialColoursSeverityOverlay: ArtificialColourSeverityOverlayIt
     alertTone: "firm_review",
     warningLabel: "COLOUR ADDITIVE FOUND",
     userFacingReason:
-      "This is a colour additive used to change the appearance of food or drinks. InsideIt counts it as a processed/artificial ingredient.",
+      "This is a colour additive used to change the appearance of food or drinks. Truthlabel counts it as a processed/artificial ingredient.",
   },
   {
     id: "caramel_iv",
@@ -358,7 +358,7 @@ export const artificialColoursSeverityOverlay: ArtificialColourSeverityOverlayIt
     alertTone: "firm_review",
     warningLabel: "COLOUR ADDITIVE FOUND",
     userFacingReason:
-      "This is a colour additive used to change the appearance of food or drinks. InsideIt counts it as a processed/artificial ingredient.",
+      "This is a colour additive used to change the appearance of food or drinks. Truthlabel counts it as a processed/artificial ingredient.",
   },
 ];
 

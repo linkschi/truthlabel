@@ -36,7 +36,7 @@ test("hydrogenatedPartiallyHydrogenatedOilsDataPack uses green red only for cate
     display: "red_count_badge",
     scoreImpact: 25,
     reason:
-      "Product contains hydrogenated oil or hydrogenated fat, which InsideIt treats as a serious processed-fat marker.",
+      "Product contains hydrogenated oil or hydrogenated fat, which Truthlabel treats as a serious processed-fat marker.",
   });
   assert.deepEqual(categoryScoringRules.anyPartiallyHydrogenatedOilFound, {
     severity: "red",

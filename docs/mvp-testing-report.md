@@ -1,4 +1,4 @@
-# InsideIt MVP Testing Report
+# Truthlabel MVP Testing Report
 
 ## 1. Testing completed
 
@@ -74,7 +74,7 @@ Automated coverage currently exercises:
 - OCR can misread labels.
 - Barcode product data may be incomplete or user-submitted.
 - External safety checks depend on official data availability.
-- InsideIt is not medical advice.
+- Truthlabel is not medical advice.
 
 ## 11. Recommended next fixes
 
@@ -108,6 +108,6 @@ Results:
 
 ## 14. MVP readiness
 
-InsideIt is ready for controlled real-user MVP testing.
+Truthlabel is ready for controlled real-user MVP testing.
 
 It is not yet ready to treat camera/OCR/device behavior as fully validated across phones until the real-device checklist is completed.

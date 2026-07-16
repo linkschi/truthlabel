@@ -1,4 +1,4 @@
-# InsideIt Known Issues
+# Truthlabel Known Issues
 
 ## 1. Product database ingredient data can be missing
 

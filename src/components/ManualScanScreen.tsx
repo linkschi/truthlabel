@@ -422,7 +422,7 @@ export default function ManualScanScreen() {
         lookupStatus: "found",
         productData: barcodeDraftProduct,
         result: finalResult,
-        message: "Product found. InsideIt scanned the available ingredient data.",
+        message: "Product found. Truthlabel scanned the available ingredient data.",
         dataQualityWarnings: barcodeDraftProduct.dataQualityWarnings,
         savedAt: new Date().toISOString(),
       });
@@ -524,8 +524,8 @@ export default function ManualScanScreen() {
             </h1>
             <p className="mt-2 max-w-sm text-[14px] leading-5 text-[#58665e]">
               {barcodeLookupEnabled
-                ? "Type a barcode or paste a real product label and run it through the current InsideIt engine."
-                : "Paste a real product label and run it through the current InsideIt engine."}
+                ? "Type a barcode or paste a real product label and run it through the current Truthlabel engine."
+                : "Paste a real product label and run it through the current Truthlabel engine."}
             </p>
             <p className="mt-1 text-[13px] font-medium text-[#7a705c]">
               {barcodeLookupEnabled
@@ -539,7 +539,7 @@ export default function ManualScanScreen() {
         <section className="rounded-[24px] border border-white/72 bg-[var(--surface-strong)] px-4 py-4 shadow-[var(--shadow)]">
           <SectionLabel>Trust note</SectionLabel>
           <p className="mt-1.5 text-[13px] leading-5 text-[#55645c]">
-            InsideIt helps explain ingredient labels and safety signals. It is not medical advice. Always check the product label, especially for allergies.
+            Truthlabel helps explain ingredient labels and safety signals. It is not medical advice. Always check the product label, especially for allergies.
           </p>
         </section>
 
@@ -575,7 +575,7 @@ export default function ManualScanScreen() {
             </p>
           </div>
           <p className="mt-1.5 text-[14px] leading-5 text-[#55645c]">
-            Type a barcode to fetch product data, then let InsideIt scan the available ingredient list.
+            Type a barcode to fetch product data, then let Truthlabel scan the available ingredient list.
           </p>
           <p className="mt-2 text-[12px] leading-5 text-[#6a776f]">
             Product database data may be incomplete or user-submitted. Check the package label if something looks missing.
@@ -810,7 +810,7 @@ export default function ManualScanScreen() {
                 placeholder="Ingredients: Carbonated water, sugar, citric acid, Red No. 3, sodium benzoate, natural flavour."
               />
               <p className="mt-1.5 text-[12px] leading-5 text-[#6a776f]">
-                Paste the visible ingredient text. InsideIt will parse commas, line breaks, semicolons, and common label prefixes.
+                Paste the visible ingredient text. Truthlabel will parse commas, line breaks, semicolons, and common label prefixes.
               </p>
             </label>
 

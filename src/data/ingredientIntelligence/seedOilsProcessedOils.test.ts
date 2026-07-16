@@ -34,7 +34,7 @@ test("seedOilsProcessedOilsDataPack uses the green yellow red oil thresholds", (
     display: "red_count_badge",
     scoreImpact: 18,
     reason:
-      "Product contains multiple seed/processed oil systems. InsideIt treats this as a high processed-oil load.",
+      "Product contains multiple seed/processed oil systems. Truthlabel treats this as a high processed-oil load.",
   });
   assert.deepEqual(categoryScoringRules.anyHydrogenatedOrPartiallyHydrogenatedOil, {
     severity: "red",
@@ -45,11 +45,11 @@ test("seedOilsProcessedOilsDataPack uses the green yellow red oil thresholds", (
   });
   assert.equal(
     finalVerdictRules.redLoad,
-    "This product contains multiple seed oils, processed oils, refined oils, or processed fat systems. InsideIt flags this as a high processed-oil load.",
+    "This product contains multiple seed oils, processed oils, refined oils, or processed fat systems. Truthlabel flags this as a high processed-oil load.",
   );
   assert.equal(
     finalVerdictRules.redHydrogenated,
-    "This product contains hydrogenated or partially hydrogenated oil. InsideIt flags this as a serious processed-oil concern.",
+    "This product contains hydrogenated or partially hydrogenated oil. Truthlabel flags this as a serious processed-oil concern.",
   );
 });
 

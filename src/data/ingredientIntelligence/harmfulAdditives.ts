@@ -39,7 +39,7 @@ export const harmfulAdditivesDataPack = {
   id: "harmful_additives",
   categoryName: "Harmful Additives",
   categoryMeaning:
-    "This category works as a cross-category warning index for additives that InsideIt treats as higher-concern, regulatory-concern, or stronger review additives. It does not replace the more specific packs. It helps the app surface additive overlap without pretending the same ingredient is multiple different causes.",
+    "This category works as a cross-category warning index for additives that Truthlabel treats as higher-concern, regulatory-concern, or stronger review additives. It does not replace the more specific packs. It helps the app surface additive overlap without pretending the same ingredient is multiple different causes.",
   dataStatus: "starter_needs_expansion",
   defaultCategorySeverity: "yellow",
 
@@ -515,7 +515,7 @@ export const harmfulAdditivesDataPack = {
       basicSeveritySuggestion: "yellow",
       reason: "Synthetic antioxidant preservative.",
       userFacingReason:
-        "This product contains BHA, a synthetic antioxidant preservative. InsideIt flags this as an additive review concern.",
+        "This product contains BHA, a synthetic antioxidant preservative. Truthlabel flags this as an additive review concern.",
       dataStatus: "needs_region_verification",
       confidenceLevel: "medium",
       sourceRefs: [],
@@ -544,7 +544,7 @@ export const harmfulAdditivesDataPack = {
       basicSeveritySuggestion: "yellow",
       reason: "Synthetic antioxidant preservative.",
       userFacingReason:
-        "This product contains BHT, a synthetic antioxidant preservative. InsideIt flags this as an additive review concern.",
+        "This product contains BHT, a synthetic antioxidant preservative. Truthlabel flags this as an additive review concern.",
       dataStatus: "starter",
       confidenceLevel: "medium",
       sourceRefs: [],
@@ -578,7 +578,7 @@ export const harmfulAdditivesDataPack = {
       basicSeveritySuggestion: "yellow",
       reason: "Synthetic antioxidant preservative.",
       userFacingReason:
-        "This product contains TBHQ, a synthetic antioxidant preservative. InsideIt flags this as an additive review concern.",
+        "This product contains TBHQ, a synthetic antioxidant preservative. Truthlabel flags this as an additive review concern.",
       dataStatus: "starter",
       confidenceLevel: "medium",
       sourceRefs: [],
@@ -616,7 +616,7 @@ export const harmfulAdditivesDataPack = {
       basicSeveritySuggestion: "yellow",
       reason: "Curing preservative used in processed meats.",
       userFacingReason:
-        "This product contains sodium nitrite, a curing preservative often used in processed meats. InsideIt flags this as a higher-review additive.",
+        "This product contains sodium nitrite, a curing preservative often used in processed meats. Truthlabel flags this as a higher-review additive.",
       dataStatus: "starter",
       confidenceLevel: "medium",
       sourceRefs: [],
@@ -646,7 +646,7 @@ export const harmfulAdditivesDataPack = {
       basicSeveritySuggestion: "yellow",
       reason: "Curing preservative used in some processed meats.",
       userFacingReason:
-        "This product contains sodium nitrate, a curing preservative. InsideIt flags this as an additive review concern.",
+        "This product contains sodium nitrate, a curing preservative. Truthlabel flags this as an additive review concern.",
       dataStatus: "starter",
       confidenceLevel: "medium",
       sourceRefs: [],
@@ -684,7 +684,7 @@ export const harmfulAdditivesDataPack = {
       basicSeveritySuggestion: "yellow",
       reason: "Curing preservative used in some processed meats.",
       userFacingReason:
-        "This product contains potassium nitrate, a curing preservative. InsideIt flags this as an additive review concern.",
+        "This product contains potassium nitrate, a curing preservative. Truthlabel flags this as an additive review concern.",
       dataStatus: "starter",
       confidenceLevel: "medium",
       sourceRefs: [],
@@ -759,7 +759,7 @@ export const harmfulAdditivesDataPack = {
       reason:
         "Preservative group with sensitivity/allergy relevance for some people.",
       userFacingReason:
-        "This product contains sulfites or sulfiting agents. InsideIt flags this because sulfites are a preservative group that can matter for sensitive people.",
+        "This product contains sulfites or sulfiting agents. Truthlabel flags this because sulfites are a preservative group that can matter for sensitive people.",
       dataStatus: "starter",
       confidenceLevel: "medium",
       sourceRefs: [],
@@ -795,7 +795,7 @@ export const harmfulAdditivesDataPack = {
       basicSeveritySuggestion: "yellow",
       reason: "Flavour enhancer used to intensify savoury taste.",
       userFacingReason:
-        "This product contains MSG, a flavour enhancer. InsideIt flags this as an additive review concern.",
+        "This product contains MSG, a flavour enhancer. Truthlabel flags this as an additive review concern.",
       dataStatus: "starter",
       confidenceLevel: "medium",
       sourceRefs: [],
@@ -828,7 +828,7 @@ export const harmfulAdditivesDataPack = {
       basicSeveritySuggestion: "yellow",
       reason: "Flavour enhancer often used with glutamates.",
       userFacingReason:
-        "This product contains disodium inosinate, a flavour enhancer. InsideIt flags this as an additive review concern.",
+        "This product contains disodium inosinate, a flavour enhancer. Truthlabel flags this as an additive review concern.",
       dataStatus: "starter",
       confidenceLevel: "medium",
       sourceRefs: [],
@@ -861,7 +861,7 @@ export const harmfulAdditivesDataPack = {
       basicSeveritySuggestion: "yellow",
       reason: "Flavour enhancer often used with glutamates.",
       userFacingReason:
-        "This product contains disodium guanylate, a flavour enhancer. InsideIt flags this as an additive review concern.",
+        "This product contains disodium guanylate, a flavour enhancer. Truthlabel flags this as an additive review concern.",
       dataStatus: "starter",
       confidenceLevel: "medium",
       sourceRefs: [],
@@ -895,7 +895,7 @@ export const harmfulAdditivesDataPack = {
       reason:
         "Thickener/stabiliser used in dairy, plant milks, desserts, sauces, and processed foods.",
       userFacingReason:
-        "This product contains carrageenan, a thickener or stabiliser. InsideIt flags this as a texture-additive review concern.",
+        "This product contains carrageenan, a thickener or stabiliser. Truthlabel flags this as a texture-additive review concern.",
       dataStatus: "starter",
       confidenceLevel: "medium",
       sourceRefs: [],
@@ -929,7 +929,7 @@ export const harmfulAdditivesDataPack = {
       reason:
         "Emulsifier used to blend ingredients and stabilise processed foods.",
       userFacingReason:
-        "This product contains polysorbate 80, an emulsifier. InsideIt flags this as a texture-additive review concern.",
+        "This product contains polysorbate 80, an emulsifier. Truthlabel flags this as a texture-additive review concern.",
       dataStatus: "starter",
       confidenceLevel: "medium",
       sourceRefs: [],
@@ -966,7 +966,7 @@ export const harmfulAdditivesDataPack = {
       basicSeveritySuggestion: "yellow",
       reason: "Thickener/stabiliser used to improve texture.",
       userFacingReason:
-        "This product contains carboxymethylcellulose, a thickener or stabiliser. InsideIt flags this as a texture-additive review concern.",
+        "This product contains carboxymethylcellulose, a thickener or stabiliser. Truthlabel flags this as a texture-additive review concern.",
       dataStatus: "starter",
       confidenceLevel: "medium",
       sourceRefs: [],
@@ -1005,7 +1005,7 @@ export const harmfulAdditivesDataPack = {
       basicSeveritySuggestion: "yellow",
       reason: "Emulsifier commonly used in baked goods.",
       userFacingReason:
-        "This product contains DATEM, an emulsifier used to improve texture and structure. InsideIt flags this as an additive review concern.",
+        "This product contains DATEM, an emulsifier used to improve texture and structure. Truthlabel flags this as an additive review concern.",
       dataStatus: "starter",
       confidenceLevel: "medium",
       sourceRefs: [],
@@ -1046,7 +1046,7 @@ export const harmfulAdditivesDataPack = {
       basicSeveritySuggestion: "yellow",
       reason: "Emulsifier used in processed foods.",
       userFacingReason:
-        "This product contains mono- and diglycerides, an emulsifier system. InsideIt flags this as an additive review concern.",
+        "This product contains mono- and diglycerides, an emulsifier system. Truthlabel flags this as an additive review concern.",
       dataStatus: "starter",
       confidenceLevel: "medium",
       sourceRefs: [],
@@ -1090,7 +1090,7 @@ export const harmfulAdditivesDataPack = {
       basicSeveritySuggestion: "yellow",
       reason: "Artificial flavouring system.",
       userFacingReason:
-        "This product contains artificial flavouring. InsideIt flags this because the product uses artificial taste-building additives.",
+        "This product contains artificial flavouring. Truthlabel flags this because the product uses artificial taste-building additives.",
       dataStatus: "starter",
       confidenceLevel: "medium",
       sourceRefs: [],
@@ -1134,7 +1134,7 @@ export const harmfulAdditivesDataPack = {
       reason:
         "Processed colour additive used in drinks, sauces, snacks, and packaged foods.",
       userFacingReason:
-        "This product contains caramel colour made through industrial colour-processing systems. InsideIt flags this as an additive review concern.",
+        "This product contains caramel colour made through industrial colour-processing systems. Truthlabel flags this as an additive review concern.",
       dataStatus: "needs_region_verification",
       confidenceLevel: "medium",
       sourceRefs: [],
@@ -1176,7 +1176,7 @@ export const harmfulAdditivesDataPack = {
       basicSeveritySuggestion: "yellow",
       reason: "General artificial colour label wording.",
       userFacingReason:
-        "This product uses artificial colour additives. InsideIt flags this as an artificial additive concern.",
+        "This product uses artificial colour additives. Truthlabel flags this as an artificial additive concern.",
       dataStatus: "needs_expansion",
       confidenceLevel: "low",
       sourceRefs: [],
@@ -1219,7 +1219,7 @@ export const harmfulAdditivesDataPack = {
       basicSeveritySuggestion: "yellow",
       reason: "General artificial or non-sugar sweetener wording.",
       userFacingReason:
-        "This product uses artificial or non-sugar sweeteners. InsideIt flags this as an added sweetener-system concern.",
+        "This product uses artificial or non-sugar sweeteners. Truthlabel flags this as an added sweetener-system concern.",
       dataStatus: "needs_expansion",
       confidenceLevel: "low",
       sourceRefs: [],

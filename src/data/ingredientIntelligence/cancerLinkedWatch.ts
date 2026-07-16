@@ -57,7 +57,7 @@ export const cancerLinkedWatchDataPack = {
   id: "cancer_linked_watch",
   categoryName: "Cancer-linked Watch",
   categoryMeaning:
-    "This category tracks ingredients or additive systems that carry cancer-related watch signals such as regulatory concern, genotoxicity concern, IARC-style hazard discussion, animal-study carcinogenicity concern, processed-meat nitrosamine context, or overlap with existing banned/restricted items. InsideIt uses this as a careful review watchlist, not as a claim that one product causes cancer.",
+    "This category tracks ingredients or additive systems that carry cancer-related watch signals such as regulatory concern, genotoxicity concern, IARC-style hazard discussion, animal-study carcinogenicity concern, processed-meat nitrosamine context, or overlap with existing banned/restricted items. Truthlabel uses this as a careful review watchlist, not as a claim that one product causes cancer.",
   dataStatus: "starter_needs_expansion",
   defaultCategorySeverity: "yellow",
 
@@ -101,7 +101,7 @@ export const cancerLinkedWatchDataPack = {
       reason:
         "Food colour additive with cancer-related regulatory revocation or restriction in some regions.",
       userFacingReason:
-        "This ingredient is on InsideIt's Cancer-linked Watch because it has cancer-related regulatory concern and has been revoked or restricted for food use in some regions.",
+        "This ingredient is on Truthlabel's Cancer-linked Watch because it has cancer-related regulatory concern and has been revoked or restricted for food use in some regions.",
       dataStatus: "needs_region_verification",
       confidenceLevel: null,
       sourceRefs: ["FDA_RED_3_2025", "CALIFORNIA_AB_418"],
@@ -145,7 +145,7 @@ export const cancerLinkedWatchDataPack = {
       reason:
         "Food colour additive with official genotoxicity concern in some regions.",
       userFacingReason:
-        "This ingredient is on InsideIt's Cancer-linked Watch because some regulators raised genotoxicity concerns for food use.",
+        "This ingredient is on Truthlabel's Cancer-linked Watch because some regulators raised genotoxicity concerns for food use.",
       dataStatus: "needs_region_verification",
       confidenceLevel: null,
       sourceRefs: ["EFSA_E171_2021", "EU_E171_BAN_2022"],
@@ -183,7 +183,7 @@ export const cancerLinkedWatchDataPack = {
       reason:
         "Flour treatment additive with cancer-hazard concern and banned/restricted status in some regions.",
       userFacingReason:
-        "This ingredient is on InsideIt's Cancer-linked Watch because it has cancer-hazard concern signals and restricted status in some regions.",
+        "This ingredient is on Truthlabel's Cancer-linked Watch because it has cancer-hazard concern signals and restricted status in some regions.",
       dataStatus: "needs_region_verification",
       confidenceLevel: null,
       sourceRefs: ["IARC_POTASSIUM_BROMATE_1999"],
@@ -224,7 +224,7 @@ export const cancerLinkedWatchDataPack = {
       reason:
         "Synthetic antioxidant preservative with animal-study cancer concern signals.",
       userFacingReason:
-        "This ingredient is on InsideIt's Cancer-linked Watch because it has animal-study cancer concern signals. InsideIt flags it for review, not as proof that the product causes cancer.",
+        "This ingredient is on Truthlabel's Cancer-linked Watch because it has animal-study cancer concern signals. Truthlabel flags it for review, not as proof that the product causes cancer.",
       dataStatus: "needs_region_verification",
       confidenceLevel: null,
       sourceRefs: ["NTP_BHA_REPORT_ON_CARCINOGENS"],
@@ -269,7 +269,7 @@ export const cancerLinkedWatchDataPack = {
       reason:
         "Curing preservative used in processed meats; relevant to processed-meat and nitrosamine concern context.",
       userFacingReason:
-        "This ingredient is on InsideIt's Cancer-linked Watch because nitrite-cured processed meat is part of a cancer-concern discussion. InsideIt flags this as a review concern, not proof of harm from one product.",
+        "This ingredient is on Truthlabel's Cancer-linked Watch because nitrite-cured processed meat is part of a cancer-concern discussion. Truthlabel flags this as a review concern, not proof of harm from one product.",
       dataStatus: "needs_region_verification",
       confidenceLevel: null,
       sourceRefs: ["WHO_IARC_PROCESSED_MEAT_2015"],
@@ -307,7 +307,7 @@ export const cancerLinkedWatchDataPack = {
       reason:
         "Curing preservative used in processed meats; relevant to processed-meat and nitrosamine concern context.",
       userFacingReason:
-        "This ingredient is on InsideIt's Cancer-linked Watch because nitrite-cured processed meat is part of a cancer-concern discussion. InsideIt flags this as a review concern.",
+        "This ingredient is on Truthlabel's Cancer-linked Watch because nitrite-cured processed meat is part of a cancer-concern discussion. Truthlabel flags this as a review concern.",
       dataStatus: "needs_region_verification",
       confidenceLevel: null,
       sourceRefs: ["WHO_IARC_PROCESSED_MEAT_2015"],
@@ -348,7 +348,7 @@ export const cancerLinkedWatchDataPack = {
       reason:
         "Curing preservative used in some processed meats; relevant to processed-meat/nitrosamine concern context.",
       userFacingReason:
-        "This ingredient is on InsideIt's Cancer-linked Watch because nitrate-cured processed meat can be part of a cancer-concern discussion. InsideIt flags this as a review concern.",
+        "This ingredient is on Truthlabel's Cancer-linked Watch because nitrate-cured processed meat can be part of a cancer-concern discussion. Truthlabel flags this as a review concern.",
       dataStatus: "needs_region_verification",
       confidenceLevel: null,
       sourceRefs: ["WHO_IARC_PROCESSED_MEAT_2015"],
@@ -393,7 +393,7 @@ export const cancerLinkedWatchDataPack = {
       reason:
         "Curing preservative used in some processed meats; relevant to processed-meat/nitrosamine concern context.",
       userFacingReason:
-        "This ingredient is on InsideIt's Cancer-linked Watch because nitrate-cured processed meat can be part of a cancer-concern discussion. InsideIt flags this as a review concern.",
+        "This ingredient is on Truthlabel's Cancer-linked Watch because nitrate-cured processed meat can be part of a cancer-concern discussion. Truthlabel flags this as a review concern.",
       dataStatus: "needs_region_verification",
       confidenceLevel: null,
       sourceRefs: ["WHO_IARC_PROCESSED_MEAT_2015"],
@@ -429,7 +429,7 @@ export const cancerLinkedWatchDataPack = {
       reason:
         "Flavouring-related substance with banned/restricted status and cancer-related concern signals in some regions.",
       userFacingReason:
-        "This ingredient is on InsideIt's Cancer-linked Watch because it has been treated as a serious flavouring safety concern in some regions.",
+        "This ingredient is on Truthlabel's Cancer-linked Watch because it has been treated as a serious flavouring safety concern in some regions.",
       dataStatus: "needs_region_verification",
       confidenceLevel: null,
       sourceRefs: [],
@@ -471,7 +471,7 @@ export const cancerLinkedWatchDataPack = {
       reason:
         "Flavouring-related substance with restricted status when added directly in some regions.",
       userFacingReason:
-        "This ingredient is on InsideIt's Cancer-linked Watch because added coumarin or tonka bean extract has restricted food-use status in some regions.",
+        "This ingredient is on Truthlabel's Cancer-linked Watch because added coumarin or tonka bean extract has restricted food-use status in some regions.",
       dataStatus: "needs_region_verification",
       confidenceLevel: null,
       sourceRefs: [],
@@ -507,7 +507,7 @@ export const cancerLinkedWatchDataPack = {
       reason:
         "Botanical flavouring-related ingredient with restricted food-use status in some regions.",
       userFacingReason:
-        "This ingredient is on InsideIt's Cancer-linked Watch because it has been treated as a serious botanical flavouring concern in some regions.",
+        "This ingredient is on Truthlabel's Cancer-linked Watch because it has been treated as a serious botanical flavouring concern in some regions.",
       dataStatus: "needs_region_verification",
       confidenceLevel: null,
       sourceRefs: [],
@@ -549,7 +549,7 @@ export const cancerLinkedWatchDataPack = {
       reason:
         "Flavouring substance with banned/restricted status and cancer-related concern signals in some regions.",
       userFacingReason:
-        "This ingredient is on InsideIt's Cancer-linked Watch because it has been treated as a serious flavouring safety concern in some regions.",
+        "This ingredient is on Truthlabel's Cancer-linked Watch because it has been treated as a serious flavouring safety concern in some regions.",
       dataStatus: "needs_region_verification",
       confidenceLevel: null,
       sourceRefs: [],
@@ -599,7 +599,7 @@ export const cancerLinkedWatchDataPack = {
       reason:
         "Industrial caramel colour systems sometimes discussed because of processing byproduct concerns.",
       userFacingReason:
-        "This ingredient is on InsideIt's Cancer-linked Watch as a processing-byproduct review item. InsideIt flags it for review, not as proof that the product causes cancer.",
+        "This ingredient is on Truthlabel's Cancer-linked Watch as a processing-byproduct review item. Truthlabel flags it for review, not as proof that the product causes cancer.",
       dataStatus: "needs_expansion",
       confidenceLevel: null,
       sourceRefs: [],
@@ -643,7 +643,7 @@ export const cancerLinkedWatchDataPack = {
       reason:
         "Smoke flavouring or smoke-derived ingredients may need review because smoke-processing can involve compounds of concern depending on source and process.",
       userFacingReason:
-        "This ingredient is on InsideIt's Cancer-linked Watch as a smoke-processing review item. InsideIt flags it for review, not as proof that the product causes cancer.",
+        "This ingredient is on Truthlabel's Cancer-linked Watch as a smoke-processing review item. Truthlabel flags it for review, not as proof that the product causes cancer.",
       dataStatus: "needs_expansion",
       confidenceLevel: null,
       sourceRefs: [],
@@ -692,7 +692,7 @@ export const cancerLinkedWatchDataPack = {
       reason:
         "Processed meat curing and smoking are relevant to cancer-concern context.",
       userFacingReason:
-        "This product appears to use a processed-meat curing or smoking system. InsideIt flags this as a cancer-watch review concern, not proof of harm from one product.",
+        "This product appears to use a processed-meat curing or smoking system. Truthlabel flags this as a cancer-watch review concern, not proof of harm from one product.",
       dataStatus: "needs_expansion",
       confidenceLevel: null,
       sourceRefs: ["WHO_IARC_PROCESSED_MEAT_2015"],

@@ -4,7 +4,7 @@ import ProductResult from "@/components/ProductResult";
 export const metadata: Metadata = {
   title: "Result",
   description:
-    "Review the current InsideIt exposure result, ingredient groups, and safety notes.",
+    "Review the current Truthlabel exposure result, ingredient groups, and safety notes.",
 };
 
 export default async function ProductPage({

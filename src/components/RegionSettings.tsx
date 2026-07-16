@@ -38,7 +38,7 @@ export default function RegionSettings({
     <section className="rounded-[24px] border border-[#e7decf] bg-white/78 px-4 py-4 shadow-[var(--shadow)]">
       <SectionLabel>Region Settings</SectionLabel>
       <p className="mt-1.5 text-[14px] leading-5 text-[#55645c]">
-        Choose the region InsideIt should use for regulatory wording and recall context.
+        Choose the region Truthlabel should use for regulatory wording and recall context.
       </p>
       <p className="mt-2 rounded-[18px] border border-[#efe6d8] bg-[#fbf7ef] px-3.5 py-3 text-[12px] leading-5 text-[#5d685f]">
         This ingredient is restricted in some regions. Check local rules if this matters for your location.

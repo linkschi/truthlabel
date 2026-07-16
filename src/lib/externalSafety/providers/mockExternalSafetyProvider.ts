@@ -116,7 +116,7 @@ function buildSignal(
         matchedBy: ["product_name", "brand_name"],
         matchConfidence: "high",
         userFacingMessage:
-          "Verified heavy-metal warning or testing signal found. InsideIt flags this as a serious external safety concern.",
+          "Verified heavy-metal warning or testing signal found. Truthlabel flags this as a serious external safety concern.",
       };
     case "medium_confidence_active_match":
       return {
@@ -175,7 +175,7 @@ function buildSignal(
         matchedBy: ["product_name", "brand_name"],
         matchConfidence: "high",
         userFacingMessage:
-          "Verified microplastic or nanoplastic detection signal found. InsideIt flags this as a serious external review concern.",
+          "Verified microplastic or nanoplastic detection signal found. Truthlabel flags this as a serious external review concern.",
       };
     default:
       return null;

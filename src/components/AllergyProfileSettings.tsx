@@ -82,7 +82,7 @@ export default function AllergyProfileSettings({
         <div>
           <SectionLabel>Allergy Profile</SectionLabel>
           <p className="mt-1.5 text-[14px] leading-5 text-[#55645c]">
-            Choose allergens you want InsideIt to treat as high priority during scans.
+            Choose allergens you want Truthlabel to treat as high priority during scans.
           </p>
         </div>
         <span className="rounded-full border border-[#e1d8ca] bg-[#faf7f0] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#6d6a5d]">
@@ -91,7 +91,7 @@ export default function AllergyProfileSettings({
       </div>
 
       <p className="mt-3 rounded-[18px] border border-[#efe6d8] bg-[#fbf7ef] px-3.5 py-3 text-[12px] leading-5 text-[#5d685f]">
-        InsideIt can help flag matching ingredients, but always check the product label yourself.
+        Truthlabel can help flag matching ingredients, but always check the product label yourself.
       </p>
 
       <div className="mt-4 flex flex-wrap gap-1.5">

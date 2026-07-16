@@ -4,7 +4,7 @@ import HomeScreen from "@/components/HomeScreen";
 export const metadata: Metadata = {
   title: "Home",
   description:
-    "Start a scan, review demo products, and open the InsideIt ingredient scanner.",
+    "Start a scan, review demo products, and open the Truthlabel ingredient scanner.",
 };
 
 export default function Home() {

@@ -1,4 +1,4 @@
-# InsideIt Launch Candidate Checklist
+# Truthlabel Launch Candidate Checklist
 
 - [x] build passes
 - [x] tests pass

@@ -2,7 +2,7 @@ export const flavourEnhancersFlavouringsDataPack = {
   id: "flavour_enhancers_flavourings",
   categoryName: "Flavour Enhancers / Flavourings",
   categoryMeaning:
-    "This category detects flavour enhancers, flavourings, taste boosters, smoke flavours, savoury boosters, reaction flavours, and artificial or vague flavour systems. InsideIt flags these because the product's taste may be built or intensified with added flavour technology rather than coming only from simple whole ingredients.",
+    "This category detects flavour enhancers, flavourings, taste boosters, smoke flavours, savoury boosters, reaction flavours, and artificial or vague flavour systems. Truthlabel flags these because the product's taste may be built or intensified with added flavour technology rather than coming only from simple whole ingredients.",
   dataStatus: "starter_needs_expansion",
   defaultCategorySeverity: "yellow",
 
@@ -46,7 +46,7 @@ export const flavourEnhancersFlavouringsDataPack = {
       healthConcernType: "flavour_enhancer_umami_booster",
       warningLabel: "FLAVOUR ENHANCER FOUND",
       userFacingReason:
-        "This product contains MSG, a flavour enhancer used to intensify savoury taste. InsideIt flags this because the product's flavour is being boosted with an added taste enhancer.",
+        "This product contains MSG, a flavour enhancer used to intensify savoury taste. Truthlabel flags this because the product's flavour is being boosted with an added taste enhancer.",
       matchingNotes:
         "Match monosodium glutamate, MSG, sodium glutamate, E621, INS 621, Accent, and Ajinomoto. Do not double count if MSG and E621 both appear.",
       scoringImpact: "yellow_flavour_enhancer",
@@ -120,7 +120,7 @@ export const flavourEnhancersFlavouringsDataPack = {
       healthConcernType: "flavour_enhancer_umami_booster",
       warningLabel: "FLAVOUR ENHANCER FOUND",
       userFacingReason:
-        "This product contains glutamate flavour enhancers used to boost savoury taste. InsideIt flags this as an added flavour-enhancing system.",
+        "This product contains glutamate flavour enhancers used to boost savoury taste. Truthlabel flags this as an added flavour-enhancing system.",
       matchingNotes:
         "Match glutamic acid, glutamates, monopotassium glutamate, calcium diglutamate, monoammonium glutamate, magnesium diglutamate, E620, E622, E623, E624, E625, and INS variants.",
       scoringImpact: "yellow_flavour_enhancer",
@@ -188,7 +188,7 @@ export const flavourEnhancersFlavouringsDataPack = {
       healthConcernType: "nucleotide_flavour_enhancer",
       warningLabel: "FLAVOUR ENHANCER FOUND",
       userFacingReason:
-        "This product contains guanylate flavour enhancers, used to intensify savoury taste. InsideIt flags this as an added flavour-boosting system.",
+        "This product contains guanylate flavour enhancers, used to intensify savoury taste. Truthlabel flags this as an added flavour-boosting system.",
       matchingNotes:
         "Match guanylic acid, disodium guanylate, dipotassium guanylate, calcium guanylate, GMP, E626, E627, E628, E629, and INS variants.",
       scoringImpact: "yellow_flavour_enhancer",
@@ -257,7 +257,7 @@ export const flavourEnhancersFlavouringsDataPack = {
       healthConcernType: "nucleotide_flavour_enhancer",
       warningLabel: "FLAVOUR ENHANCER FOUND",
       userFacingReason:
-        "This product contains inosinate flavour enhancers, used to intensify savoury taste. InsideIt flags this as an added flavour-boosting system.",
+        "This product contains inosinate flavour enhancers, used to intensify savoury taste. Truthlabel flags this as an added flavour-boosting system.",
       matchingNotes:
         "Match inosinic acid, disodium inosinate, dipotassium inosinate, calcium inosinate, IMP, E630, E631, E632, E633, and INS variants.",
       scoringImpact: "yellow_flavour_enhancer",
@@ -313,7 +313,7 @@ export const flavourEnhancersFlavouringsDataPack = {
       healthConcernType: "nucleotide_flavour_enhancer",
       warningLabel: "FLAVOUR ENHANCER FOUND",
       userFacingReason:
-        "This product contains ribonucleotide flavour enhancers, used to intensify savoury taste. InsideIt flags this as a strong added flavour-boosting system.",
+        "This product contains ribonucleotide flavour enhancers, used to intensify savoury taste. Truthlabel flags this as a strong added flavour-boosting system.",
       matchingNotes:
         "Match disodium ribonucleotides, disodium 5'-ribonucleotides, calcium ribonucleotides, E634, E635, INS 634, and INS 635.",
       scoringImpact: "yellow_flavour_enhancer",
@@ -349,7 +349,7 @@ export const flavourEnhancersFlavouringsDataPack = {
       healthConcernType: "savoury_flavouring_umami_marker",
       warningLabel: "FLAVOURING SYSTEM FOUND",
       userFacingReason:
-        "This product contains yeast extract, a savoury flavouring ingredient used to boost umami taste. InsideIt flags this because flavour is being built with an added taste system.",
+        "This product contains yeast extract, a savoury flavouring ingredient used to boost umami taste. Truthlabel flags this because flavour is being built with an added taste system.",
       matchingNotes:
         "Match yeast extract, yeast extracts, nutritional yeast extract, yeast autolysate, and yeast seasoning.",
       scoringImpact: "yellow_flavouring",
@@ -390,7 +390,7 @@ export const flavourEnhancersFlavouringsDataPack = {
       healthConcernType: "savoury_flavouring_umami_marker",
       warningLabel: "FLAVOURING SYSTEM FOUND",
       userFacingReason:
-        "This product contains autolyzed yeast extract, a processed savoury flavouring used to boost taste. InsideIt flags this as an added flavour system.",
+        "This product contains autolyzed yeast extract, a processed savoury flavouring used to boost taste. Truthlabel flags this as an added flavour system.",
       matchingNotes:
         "Match autolyzed/autolysed yeast extract, autolyzed/autolysed yeast, yeast autolysate, and AYE.",
       scoringImpact: "yellow_flavouring",
@@ -457,7 +457,7 @@ export const flavourEnhancersFlavouringsDataPack = {
       healthConcernType: "hydrolyzed_protein_flavouring",
       warningLabel: "PROCESSED FLAVOURING FOUND",
       userFacingReason:
-        "This product contains hydrolyzed protein flavouring, used to build savoury processed taste. InsideIt flags this as an added flavour-construction ingredient.",
+        "This product contains hydrolyzed protein flavouring, used to build savoury processed taste. Truthlabel flags this as an added flavour-construction ingredient.",
       matchingNotes:
         "Match hydrolyzed/hydrolysed vegetable protein, plant protein, soy protein, wheat protein, corn/maize protein, HVP, HPP, HSP, and protein hydrolysate.",
       scoringImpact: "yellow_flavouring",
@@ -510,7 +510,7 @@ export const flavourEnhancersFlavouringsDataPack = {
       healthConcernType: "vague_flavouring_label",
       warningLabel: "VAGUE FLAVOURING FOUND",
       userFacingReason:
-        "This product lists natural flavouring. InsideIt flags this because the exact flavouring ingredients are not clearly shown on the label.",
+        "This product lists natural flavouring. Truthlabel flags this because the exact flavouring ingredients are not clearly shown on the label.",
       matchingNotes:
         "Match natural flavour/flavor, natural flavouring/flavoring, natural aroma, natural aromatic substances, and natural flavouring substances.",
       scoringImpact: "yellow_flavouring",
@@ -566,7 +566,7 @@ export const flavourEnhancersFlavouringsDataPack = {
       healthConcernType: "artificial_flavouring",
       warningLabel: "ARTIFICIAL FLAVOURING FOUND",
       userFacingReason:
-        "This product contains artificial flavouring. InsideIt flags this because the product's taste is being created or boosted with artificial flavour technology.",
+        "This product contains artificial flavouring. Truthlabel flags this because the product's taste is being created or boosted with artificial flavour technology.",
       matchingNotes:
         "Match artificial flavour/flavor, artificial flavouring/flavoring, synthetic flavour/flavor, artificial aroma, and artificially flavoured/flavored.",
       scoringImpact: "yellow_flavouring",
@@ -622,7 +622,7 @@ export const flavourEnhancersFlavouringsDataPack = {
       healthConcernType: "vague_flavouring_label",
       warningLabel: "VAGUE FLAVOURING FOUND",
       userFacingReason:
-        "This product uses a generic flavouring term. InsideIt flags this because the exact flavouring substances are not clearly disclosed.",
+        "This product uses a generic flavouring term. Truthlabel flags this because the exact flavouring substances are not clearly disclosed.",
       matchingNotes:
         "Match flavouring/flavoring, flavourings/flavorings, aroma, aromas, aromatic substances, and flavour/flavor preparation.",
       scoringImpact: "yellow_flavouring",
@@ -680,7 +680,7 @@ export const flavourEnhancersFlavouringsDataPack = {
       healthConcernType: "smoke_flavouring_system",
       warningLabel: "SMOKE FLAVOURING FOUND",
       userFacingReason:
-        "This product contains smoke flavouring. InsideIt flags this because smoked taste may be added through a flavouring system rather than coming only from traditional smoking.",
+        "This product contains smoke flavouring. Truthlabel flags this because smoked taste may be added through a flavouring system rather than coming only from traditional smoking.",
       matchingNotes:
         "Match smoke flavour/flavor, natural smoke flavour/flavor, artificial smoke flavour/flavor, liquid smoke, smoke extract, and wood/hickory/mesquite smoke flavour terms.",
       scoringImpact: "yellow_flavouring",
@@ -738,7 +738,7 @@ export const flavourEnhancersFlavouringsDataPack = {
       healthConcernType: "meat_like_flavour_system",
       warningLabel: "MEAT-LIKE FLAVOURING FOUND",
       userFacingReason:
-        "This product contains meat-style flavouring. InsideIt flags this because meat-like taste may be built or boosted with added flavour systems.",
+        "This product contains meat-style flavouring. Truthlabel flags this because meat-like taste may be built or boosted with added flavour systems.",
       matchingNotes:
         "Match beef/chicken/pork/bacon/meat flavour/flavor, BBQ flavour/flavor, roast flavour/flavor, grilled meat flavour/flavor, and related flavouring terms.",
       scoringImpact: "yellow_flavouring",
@@ -801,7 +801,7 @@ export const flavourEnhancersFlavouringsDataPack = {
       healthConcernType: "dairy_like_flavour_system",
       warningLabel: "DAIRY-LIKE FLAVOURING FOUND",
       userFacingReason:
-        "This product contains dairy-style flavouring. InsideIt flags this because cheese, butter, cream, or dairy-like taste may be built with added flavour systems.",
+        "This product contains dairy-style flavouring. Truthlabel flags this because cheese, butter, cream, or dairy-like taste may be built with added flavour systems.",
       matchingNotes:
         "Match cheese/butter/cream/milk/dairy/yoghurt/yogurt flavour/flavor, buttery/creamy flavour terms, diacetyl, acetoin, acetyl propionyl, and 2,3-pentanedione when used as flavouring.",
       scoringImpact: "yellow_flavouring",
@@ -852,7 +852,7 @@ export const flavourEnhancersFlavouringsDataPack = {
       healthConcernType: "flavouring_system",
       warningLabel: "FLAVOURING SYSTEM FOUND",
       userFacingReason:
-        "This product contains vanilla flavouring or vanillin. InsideIt flags this because vanilla-like taste may be built with added flavouring substances rather than coming only from whole vanilla.",
+        "This product contains vanilla flavouring or vanillin. Truthlabel flags this because vanilla-like taste may be built with added flavouring substances rather than coming only from whole vanilla.",
       matchingNotes:
         "Match vanillin, ethyl vanillin, vanilla flavour/flavor, artificial vanilla, imitation vanilla, and vanilla flavouring/flavoring.",
       scoringImpact: "yellow_flavouring",
@@ -892,7 +892,7 @@ export const flavourEnhancersFlavouringsDataPack = {
       healthConcernType: "sweet_flavour_enhancer",
       warningLabel: "FLAVOUR ENHANCER FOUND",
       userFacingReason:
-        "This product contains maltol or ethyl maltol, flavour enhancers used to intensify sweet or caramel-like taste. InsideIt flags this as an added flavour-enhancing system.",
+        "This product contains maltol or ethyl maltol, flavour enhancers used to intensify sweet or caramel-like taste. Truthlabel flags this as an added flavour-enhancing system.",
       matchingNotes:
         "Match maltol, ethyl maltol, ethylmaltol, Veltol, E636, E637, and INS variants.",
       scoringImpact: "yellow_flavour_enhancer",
@@ -929,7 +929,7 @@ export const flavourEnhancersFlavouringsDataPack = {
       healthConcernType: "flavour_enhancer_modifier",
       warningLabel: "FLAVOUR ENHANCER FOUND",
       userFacingReason:
-        "This product contains glycine or glycinates used as a flavour enhancer or modifier. InsideIt flags this as an added taste-modifying ingredient.",
+        "This product contains glycine or glycinates used as a flavour enhancer or modifier. Truthlabel flags this as an added taste-modifying ingredient.",
       matchingNotes:
         "Match glycine, sodium glycinate, glycinates, E640, and INS 640.",
       scoringImpact: "yellow_flavour_enhancer",
@@ -981,7 +981,7 @@ export const flavourEnhancersFlavouringsDataPack = {
       healthConcernType: "manufactured_flavour_system",
       warningLabel: "MANUFACTURED FLAVOUR SYSTEM FOUND",
       userFacingReason:
-        "This product contains reaction or process flavours. InsideIt flags this because cooked, roasted, savoury, or meat-like taste may be manufactured through flavour technology.",
+        "This product contains reaction or process flavours. Truthlabel flags this because cooked, roasted, savoury, or meat-like taste may be manufactured through flavour technology.",
       matchingNotes:
         "Match reaction flavour/flavor, process flavour/flavor, thermal process flavour/flavor, Maillard reaction flavour/flavor, and roasted flavouring/flavoring.",
       scoringImpact: "yellow_flavouring",
@@ -1024,7 +1024,7 @@ export const flavourEnhancersFlavouringsDataPack = {
       healthConcernType: "vague_seasoning_label",
       warningLabel: "VAGUE SEASONING FOUND",
       userFacingReason:
-        "This product uses a vague seasoning or flavour blend term. InsideIt flags this because the exact taste-building ingredients are not fully shown on the label.",
+        "This product uses a vague seasoning or flavour blend term. Truthlabel flags this because the exact taste-building ingredients are not fully shown on the label.",
       matchingNotes:
         "Match seasoning, seasonings, seasoning blend, flavour/flavor blend, spice blend, spices, mixed spices, herbs and spices, natural seasoning, and seasoning mix. Do not treat simple named spices like garlic or black pepper as this vague marker.",
       scoringImpact: "yellow_flavouring",
@@ -1063,7 +1063,7 @@ export const flavourEnhancersFlavouringsDataPack = {
       healthConcernType: "banned_restricted_flavouring",
       warningLabel: "BANNED / RESTRICTED FLAVOURING",
       userFacingReason:
-        "This product contains safrole or a safrole-related flavouring marker. InsideIt flags this as a serious regulatory concern because safrole is prohibited/restricted for food use in some regions.",
+        "This product contains safrole or a safrole-related flavouring marker. Truthlabel flags this as a serious regulatory concern because safrole is prohibited/restricted for food use in some regions.",
       matchingNotes:
         "Match safrole, sassafras oil constituent, sassafras oil, and chemical names. Also link to Banned / Restricted Items.",
       scoringImpact: "automatic_red",
@@ -1107,7 +1107,7 @@ export const flavourEnhancersFlavouringsDataPack = {
       healthConcernType: "banned_restricted_flavouring",
       warningLabel: "BANNED / RESTRICTED FLAVOURING",
       userFacingReason:
-        "This product contains added coumarin or tonka bean extract, which is prohibited/restricted for food use in some regions. InsideIt flags this as a serious regulatory concern.",
+        "This product contains added coumarin or tonka bean extract, which is prohibited/restricted for food use in some regions. Truthlabel flags this as a serious regulatory concern.",
       matchingNotes:
         "Match coumarin, added coumarin, tonka bean, tonka bean extract, tonka extract, 1,2-benzopyrone, and benzopyrone. Do not confuse normal trace coumarin in cinnamon unless separate rules are added.",
       scoringImpact: "automatic_red",
@@ -1150,7 +1150,7 @@ export const flavourEnhancersFlavouringsDataPack = {
       healthConcernType: "banned_restricted_flavouring",
       warningLabel: "BANNED / RESTRICTED FLAVOURING",
       userFacingReason:
-        "This product contains calamus or sweet flag, which is prohibited/restricted for food use in some regions. InsideIt flags this as a serious regulatory concern.",
+        "This product contains calamus or sweet flag, which is prohibited/restricted for food use in some regions. Truthlabel flags this as a serious regulatory concern.",
       matchingNotes:
         "Match calamus, sweet flag, calamus root, Acorus calamus, calamus oil, and calamus extract. Also link to Banned / Restricted Items.",
       scoringImpact: "automatic_red",
@@ -1185,7 +1185,7 @@ export const flavourEnhancersFlavouringsDataPack = {
       healthConcernType: "banned_restricted_flavouring",
       warningLabel: "BANNED / RESTRICTED FLAVOURING",
       userFacingReason:
-        "This product contains cinnamyl anthranilate, a flavouring substance prohibited/restricted for food use in some regions. InsideIt flags this as a serious regulatory concern.",
+        "This product contains cinnamyl anthranilate, a flavouring substance prohibited/restricted for food use in some regions. Truthlabel flags this as a serious regulatory concern.",
       matchingNotes:
         "Match cinnamyl anthranilate, cinnamyl 2-aminobenzoate, and cinnamyl o-aminobenzoate. Also link to Banned / Restricted Items.",
       scoringImpact: "automatic_red",
@@ -1211,7 +1211,7 @@ export const flavourEnhancersFlavouringsDataPack = {
       display: "red_count_badge",
       scoreImpact: 22,
       reason:
-        "Product contains multiple flavouring or flavour-enhancing systems. InsideIt treats this as a high flavour-system load."
+        "Product contains multiple flavouring or flavour-enhancing systems. Truthlabel treats this as a high flavour-system load."
     },
     anyBannedRestrictedFlavouring: {
       severity: "red",
@@ -1230,11 +1230,11 @@ export const flavourEnhancersFlavouringsDataPack = {
 
   finalVerdictRules: {
     yellow:
-      "This product contains flavourings or flavour enhancers. InsideIt flags this because the product's taste may be built or boosted with added flavour systems.",
+      "This product contains flavourings or flavour enhancers. Truthlabel flags this because the product's taste may be built or boosted with added flavour systems.",
     redLoad:
-      "This product contains multiple flavouring or flavour-enhancing systems. InsideIt flags this as a high flavour-system load.",
+      "This product contains multiple flavouring or flavour-enhancing systems. Truthlabel flags this as a high flavour-system load.",
     redRestricted:
-      "This product contains a banned or restricted flavouring ingredient. InsideIt flags this as a serious regulatory concern."
+      "This product contains a banned or restricted flavouring ingredient. Truthlabel flags this as a serious regulatory concern."
   },
 
   matchingNormalizationRules: [

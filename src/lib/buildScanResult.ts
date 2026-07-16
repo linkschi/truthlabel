@@ -399,7 +399,7 @@ function toUnmatchedIngredientItem(value: string): ScanResultIngredientItem {
     matchedCategories: [],
     severity: "yellow",
     userFacingReason:
-      "Unmatched ingredients were not found in the current InsideIt database.",
+      "Unmatched ingredients were not found in the current Truthlabel database.",
     canonicalIngredientId: `unmatched_${normalizeIngredientIntelligenceText(value).replace(/\s+/g, "_")}`,
     duplicateSafe: true,
   };
@@ -560,10 +560,10 @@ function buildAdditivesAndPreservatives(
   if (!combinedSummary) {
     if (groups.some((group) => group.severity === "red") || totalAdditiveMatches >= 4) {
       summaryMessage =
-        "This product contains multiple additive and preservative systems. InsideIt flags this as a high additive-load concern.";
+        "This product contains multiple additive and preservative systems. Truthlabel flags this as a high additive-load concern.";
     } else if (totalAdditiveMatches >= 1) {
       summaryMessage =
-        "This product contains additive or preservative systems. InsideIt flags this for review.";
+        "This product contains additive or preservative systems. Truthlabel flags this for review.";
     }
   }
 

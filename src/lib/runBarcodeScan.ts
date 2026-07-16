@@ -402,7 +402,7 @@ export async function runBarcodeScan(
       },
       scanResult,
       manualInputNeeded: false,
-      message: "Product found. InsideIt scanned the available ingredient data.",
+      message: "Product found. Truthlabel scanned the available ingredient data.",
       dataQualityWarnings: uniqueStrings([
         ...productData.dataQualityWarnings,
         ...externalSafetyWarnings,

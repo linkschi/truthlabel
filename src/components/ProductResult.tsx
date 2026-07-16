@@ -1049,7 +1049,7 @@ export default function ProductResult({
         label: "Unmatched",
         tone: getIngredientGroupTone(scanResult.ingredientBreakdown.unmatchedIngredients, "neutral"),
         helperText:
-          "Unmatched ingredients were not found in the current InsideIt database.",
+          "Unmatched ingredients were not found in the current Truthlabel database.",
         items: scanResult.ingredientBreakdown.unmatchedIngredients,
       },
     ].filter((group) => group.items.length > 0),
@@ -1690,7 +1690,7 @@ export default function ProductResult({
               ) : null}
 
               <p className="mt-4 text-[11px] leading-5 text-[var(--text-secondary)]">
-                InsideIt helps explain ingredient labels and safety signals. It is not medical advice. Always check the package label, especially for allergies.
+                Truthlabel helps explain ingredient labels and safety signals. It is not medical advice. Always check the package label, especially for allergies.
               </p>
             </div>
 

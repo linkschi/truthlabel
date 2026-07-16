@@ -1,4 +1,4 @@
-# InsideIt MVP User Testing Plan
+# Truthlabel MVP User Testing Plan
 
 ## 1. Testing goal
 
@@ -40,7 +40,7 @@ This phase is not about proving every score is perfect. It is about catching obv
 - OCR can misread labels, especially with glare, curved packaging, or blurry text.
 - External recall and safety checks depend on available official data and match confidence.
 - Missing data is not proof of absence.
-- InsideIt is not medical advice and should not replace the package label.
+- Truthlabel is not medical advice and should not replace the package label.
 
 ## 6. Safety and trust reminders
 

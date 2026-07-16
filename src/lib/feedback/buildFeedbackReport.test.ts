@@ -8,7 +8,7 @@ import { buildFeedbackReport } from "./buildFeedbackReport";
 test("buildFeedbackReport includes product context, warnings, and privacy note", () => {
   const result = runManualScan({
     productName: "Tester Soda",
-    brandName: "InsideIt Labs",
+    brandName: "Truthlabel Labs",
     ingredientText: "Carbonated water, Red No. 3, Sodium benzoate",
   });
 
@@ -21,9 +21,9 @@ test("buildFeedbackReport includes product context, warnings, and privacy note",
     reportCreatedAt: "2026-07-15T12:00:00.000Z",
   });
 
-  assert.ok(report.includes("InsideIt MVP Feedback Report"));
+  assert.ok(report.includes("Truthlabel MVP Feedback Report"));
   assert.ok(report.includes("Product name: Tester Soda"));
-  assert.ok(report.includes("Brand name: InsideIt Labs"));
+  assert.ok(report.includes("Brand name: Truthlabel Labs"));
   assert.ok(report.includes("Scan method: manual"));
   assert.ok(report.includes("Top warnings shown:"));
   assert.ok(report.includes("Banned / Restricted Items"));

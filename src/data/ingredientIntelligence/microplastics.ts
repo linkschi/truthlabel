@@ -53,7 +53,7 @@ export const microplasticsDataPack = {
   id: "microplastics",
   categoryName: "Microplastics",
   categoryMeaning:
-    "This category tracks microplastic and nanoplastic exposure review signals such as bottled water, plastic packaging, microwave-in-plastic markers, tea bag or coffee pod plastic-contact markers, seafood or salt review markers, and verified external testing signals. It is not a normal ingredient-only category. InsideIt uses it to surface review context or verified external concern without pretending ordinary ingredient text proves contamination.",
+    "This category tracks microplastic and nanoplastic exposure review signals such as bottled water, plastic packaging, microwave-in-plastic markers, tea bag or coffee pod plastic-contact markers, seafood or salt review markers, and verified external testing signals. It is not a normal ingredient-only category. Truthlabel uses it to surface review context or verified external concern without pretending ordinary ingredient text proves contamination.",
   dataStatus: "starter_needs_external_data",
   defaultCategorySeverity: "yellow",
 
@@ -88,7 +88,7 @@ export const microplasticsDataPack = {
       reason:
         "Microplastic contaminant marker. Red should only trigger from verified product-specific testing, official warning, or external dataset evidence.",
       userFacingReason:
-        "This product has a verified microplastic-related testing signal. InsideIt flags this as a serious microplastic concern based on external data.",
+        "This product has a verified microplastic-related testing signal. Truthlabel flags this as a serious microplastic concern based on external data.",
       dataStatus: "needs_external_data",
       confidenceLevel: null,
       sourceRefs: [],
@@ -130,7 +130,7 @@ export const microplasticsDataPack = {
       reason:
         "Nanoplastic contaminant marker. Red should only trigger from verified product-specific testing, official warning, or external dataset evidence.",
       userFacingReason:
-        "This product has a verified nanoplastic-related testing signal. InsideIt flags this as a serious nanoplastic concern based on external data.",
+        "This product has a verified nanoplastic-related testing signal. Truthlabel flags this as a serious nanoplastic concern based on external data.",
       dataStatus: "needs_external_data",
       confidenceLevel: null,
       sourceRefs: [],
@@ -170,7 +170,7 @@ export const microplasticsDataPack = {
       reason:
         "Bottled water in plastic packaging is a product category where microplastic review may be relevant, but product-specific testing is needed.",
       userFacingReason:
-        "This appears to be bottled water or plastic-packaged water. InsideIt flags this as a microplastic review marker, not proof that this exact product contains elevated microplastics.",
+        "This appears to be bottled water or plastic-packaged water. Truthlabel flags this as a microplastic review marker, not proof that this exact product contains elevated microplastics.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: ["WHO_MICROPLASTICS_DRINKING_WATER_2019"],
@@ -211,7 +211,7 @@ export const microplasticsDataPack = {
       reason:
         "Plastic-bottle packaging may be relevant to microplastic review, but packaging alone does not prove contamination.",
       userFacingReason:
-        "This product appears to use plastic bottle packaging. InsideIt flags this as a plastic-contact review marker, not proof of microplastic contamination.",
+        "This product appears to use plastic bottle packaging. Truthlabel flags this as a plastic-contact review marker, not proof of microplastic contamination.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: ["FDA_MICROPLASTICS_NANOPLASTICS_FOODS"],
@@ -257,7 +257,7 @@ export const microplasticsDataPack = {
       reason:
         "Plastic-contact food packaging may be relevant to microplastic review, but packaging alone does not prove contamination.",
       userFacingReason:
-        "This product appears to use plastic food packaging. InsideIt flags this as a plastic-contact review marker, not proof of microplastic contamination.",
+        "This product appears to use plastic food packaging. Truthlabel flags this as a plastic-contact review marker, not proof of microplastic contamination.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: ["FDA_MICROPLASTICS_NANOPLASTICS_FOODS"],
@@ -303,7 +303,7 @@ export const microplasticsDataPack = {
       reason:
         "Heating food in plastic-contact packaging is a plastic-contact review marker.",
       userFacingReason:
-        "This product appears designed to be heated in plastic packaging. InsideIt flags this as a plastic-contact review item.",
+        "This product appears designed to be heated in plastic packaging. Truthlabel flags this as a plastic-contact review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -338,7 +338,7 @@ export const microplasticsDataPack = {
       reason:
         "Some tea bag materials may involve plastic contact, which can be relevant to microplastic review.",
       userFacingReason:
-        "This product may use plastic-contact tea bag material. InsideIt flags this as a microplastic review marker when packaging details support it.",
+        "This product may use plastic-contact tea bag material. Truthlabel flags this as a microplastic review marker when packaging details support it.",
       dataStatus: "needs_external_data",
       confidenceLevel: null,
       sourceRefs: [],
@@ -380,7 +380,7 @@ export const microplasticsDataPack = {
       reason:
         "Single-serve pods or capsules may involve plastic contact and heat, which can be relevant to microplastic review.",
       userFacingReason:
-        "This product uses a pod or capsule format. InsideIt flags this as a plastic-contact review marker when packaging details support it.",
+        "This product uses a pod or capsule format. Truthlabel flags this as a plastic-contact review marker when packaging details support it.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -424,7 +424,7 @@ export const microplasticsDataPack = {
       reason:
         "Seafood is a product category where microplastic review may be relevant depending on species, sourcing, and testing data.",
       userFacingReason:
-        "This product is a seafood item. InsideIt flags this as a microplastic review marker, not proof that this exact product contains elevated microplastics.",
+        "This product is a seafood item. Truthlabel flags this as a microplastic review marker, not proof that this exact product contains elevated microplastics.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -458,7 +458,7 @@ export const microplasticsDataPack = {
       reason:
         "Bivalve shellfish are a seafood subgroup often discussed in microplastic exposure review because they may be eaten whole.",
       userFacingReason:
-        "This product appears to contain bivalve shellfish. InsideIt flags this as a microplastic review marker, not proof of product-specific contamination.",
+        "This product appears to contain bivalve shellfish. Truthlabel flags this as a microplastic review marker, not proof of product-specific contamination.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -492,7 +492,7 @@ export const microplasticsDataPack = {
       reason:
         "Salt products may require microplastic review depending on source and testing data.",
       userFacingReason:
-        "This product contains salt or sea salt. InsideIt may flag this as a microplastic review item when product category or testing data supports it.",
+        "This product contains salt or sea salt. Truthlabel may flag this as a microplastic review item when product category or testing data supports it.",
       dataStatus: "needs_external_data",
       confidenceLevel: null,
       sourceRefs: [],
@@ -530,7 +530,7 @@ export const microplasticsDataPack = {
       reason:
         "Chewing gum base may include synthetic polymer ingredients depending on formulation.",
       userFacingReason:
-        "This product contains gum base or synthetic polymer gum-base wording. InsideIt flags this as a plastic-polymer review item.",
+        "This product contains gum base or synthetic polymer gum-base wording. Truthlabel flags this as a plastic-polymer review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -570,7 +570,7 @@ export const microplasticsDataPack = {
       reason:
         "External testing context. Severity depends on actual measured results.",
       userFacingReason:
-        "This product has microplastic or packaging-migration testing context. InsideIt should use the actual result if available.",
+        "This product has microplastic or packaging-migration testing context. Truthlabel should use the actual result if available.",
       dataStatus: "needs_external_data",
       confidenceLevel: null,
       sourceRefs: [],
@@ -607,7 +607,7 @@ export const microplasticsDataPack = {
       reason:
         "Verified detection marker from official testing or a credible external dataset.",
       userFacingReason:
-        "This product has verified microplastic detection data. InsideIt flags this as a serious microplastic concern based on external evidence.",
+        "This product has verified microplastic detection data. Truthlabel flags this as a serious microplastic concern based on external evidence.",
       dataStatus: "needs_external_data",
       confidenceLevel: null,
       sourceRefs: [],
@@ -644,7 +644,7 @@ export const microplasticsDataPack = {
       reason:
         "Verified nanoplastic detection marker from official testing or a credible external dataset.",
       userFacingReason:
-        "This product has verified nanoplastic detection data. InsideIt flags this as a serious nanoplastic concern based on external evidence.",
+        "This product has verified nanoplastic detection data. Truthlabel flags this as a serious nanoplastic concern based on external evidence.",
       dataStatus: "needs_external_data",
       confidenceLevel: null,
       sourceRefs: [],

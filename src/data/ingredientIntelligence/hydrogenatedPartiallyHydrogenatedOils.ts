@@ -2,7 +2,7 @@ export const hydrogenatedPartiallyHydrogenatedOilsDataPack = {
   id: "hydrogenated_partially_hydrogenated_oils",
   categoryName: "Hydrogenated / Partially Hydrogenated Oils",
   categoryMeaning:
-    "This category detects hydrogenated oils, partially hydrogenated oils, hydrogenated vegetable fats, shortenings, margarines, and trans-fat markers. InsideIt flags these because they show the product uses chemically modified fat systems rather than simple whole-food fats.",
+    "This category detects hydrogenated oils, partially hydrogenated oils, hydrogenated vegetable fats, shortenings, margarines, and trans-fat markers. Truthlabel flags these because they show the product uses chemically modified fat systems rather than simple whole-food fats.",
   dataStatus: "starter_verified_core",
   defaultCategorySeverity: "red",
 
@@ -52,7 +52,7 @@ export const hydrogenatedPartiallyHydrogenatedOilsDataPack = {
       healthConcernType: "partially_hydrogenated_oil_trans_fat_marker",
       warningLabel: "PARTIALLY HYDROGENATED OIL FOUND",
       userFacingReason:
-        "This product contains partially hydrogenated oil, a serious processed-fat marker. InsideIt flags this as red immediately because partially hydrogenated oils are linked to artificial trans fat and major regulatory restrictions in some regions.",
+        "This product contains partially hydrogenated oil, a serious processed-fat marker. Truthlabel flags this as red immediately because partially hydrogenated oils are linked to artificial trans fat and major regulatory restrictions in some regions.",
       matchingNotes:
         "Match partially hydrogenated oil, partially hydrogenated vegetable oil, partially hydrogenated fat, PHO, and PHOs. Do not double count if PHO and the full phrase both appear.",
       scoringImpact: "automatic_red",
@@ -90,11 +90,11 @@ export const hydrogenatedPartiallyHydrogenatedOilsDataPack = {
       regionalNames: ["Soya oil"],
       severity: "red",
       reason:
-        "Specific partially hydrogenated oil source. InsideIt treats this as an automatic red PHO/trans-fat marker.",
+        "Specific partially hydrogenated oil source. Truthlabel treats this as an automatic red PHO/trans-fat marker.",
       healthConcernType: "partially_hydrogenated_oil_trans_fat_marker",
       warningLabel: "PARTIALLY HYDROGENATED SOYBEAN OIL FOUND",
       userFacingReason:
-        "This product contains partially hydrogenated soybean/soya oil. InsideIt flags this as red immediately because it is a partially hydrogenated oil marker.",
+        "This product contains partially hydrogenated soybean/soya oil. Truthlabel flags this as red immediately because it is a partially hydrogenated oil marker.",
       matchingNotes:
         "Match partially hydrogenated soybean oil, soya oil, soy oil, soyabean oil, and PH soybean oil.",
       scoringImpact: "automatic_red",
@@ -127,11 +127,11 @@ export const hydrogenatedPartiallyHydrogenatedOilsDataPack = {
       regionalNames: [],
       severity: "red",
       reason:
-        "Specific partially hydrogenated oil source. InsideIt treats this as an automatic red PHO/trans-fat marker.",
+        "Specific partially hydrogenated oil source. Truthlabel treats this as an automatic red PHO/trans-fat marker.",
       healthConcernType: "partially_hydrogenated_oil_trans_fat_marker",
       warningLabel: "PARTIALLY HYDROGENATED COTTONSEED OIL FOUND",
       userFacingReason:
-        "This product contains partially hydrogenated cottonseed oil. InsideIt flags this as red immediately because it is a partially hydrogenated oil marker.",
+        "This product contains partially hydrogenated cottonseed oil. Truthlabel flags this as red immediately because it is a partially hydrogenated oil marker.",
       matchingNotes:
         "Match partially hydrogenated cottonseed oil, partially hydrogenated cotton seed oil, and PH cottonseed oil.",
       scoringImpact: "automatic_red",
@@ -166,11 +166,11 @@ export const hydrogenatedPartiallyHydrogenatedOilsDataPack = {
       regionalNames: ["Rapeseed oil"],
       severity: "red",
       reason:
-        "Specific partially hydrogenated oil source. InsideIt treats this as an automatic red PHO/trans-fat marker.",
+        "Specific partially hydrogenated oil source. Truthlabel treats this as an automatic red PHO/trans-fat marker.",
       healthConcernType: "partially_hydrogenated_oil_trans_fat_marker",
       warningLabel: "PARTIALLY HYDROGENATED CANOLA / RAPESEED OIL FOUND",
       userFacingReason:
-        "This product contains partially hydrogenated canola/rapeseed oil. InsideIt flags this as red immediately because it is a partially hydrogenated oil marker.",
+        "This product contains partially hydrogenated canola/rapeseed oil. Truthlabel flags this as red immediately because it is a partially hydrogenated oil marker.",
       matchingNotes:
         "Match partially hydrogenated canola oil, partially hydrogenated rapeseed oil, partially hydrogenated LEAR oil, PH canola oil, and PH rapeseed oil.",
       scoringImpact: "automatic_red",
@@ -215,11 +215,11 @@ export const hydrogenatedPartiallyHydrogenatedOilsDataPack = {
       regionalNames: [],
       severity: "red",
       reason:
-        "Specific partially hydrogenated oil/fat source. InsideIt treats this as an automatic red PHO/trans-fat marker.",
+        "Specific partially hydrogenated oil/fat source. Truthlabel treats this as an automatic red PHO/trans-fat marker.",
       healthConcernType: "partially_hydrogenated_oil_trans_fat_marker",
       warningLabel: "PARTIALLY HYDROGENATED PALM FAT FOUND",
       userFacingReason:
-        "This product contains partially hydrogenated palm or palm kernel oil. InsideIt flags this as red immediately because it is a partially hydrogenated fat marker.",
+        "This product contains partially hydrogenated palm or palm kernel oil. Truthlabel flags this as red immediately because it is a partially hydrogenated fat marker.",
       matchingNotes:
         "Match partially hydrogenated palm oil, palm kernel oil, palm fat, palm olein, palm stearin, palm kernel olein, and palm kernel stearin.",
       scoringImpact: "automatic_red",
@@ -260,11 +260,11 @@ export const hydrogenatedPartiallyHydrogenatedOilsDataPack = {
       regionalNames: ["Maize oil"],
       severity: "red",
       reason:
-        "Specific partially hydrogenated oil sources. InsideIt treats these as automatic red PHO/trans-fat markers.",
+        "Specific partially hydrogenated oil sources. Truthlabel treats these as automatic red PHO/trans-fat markers.",
       healthConcernType: "partially_hydrogenated_oil_trans_fat_marker",
       warningLabel: "PARTIALLY HYDROGENATED SEED OIL FOUND",
       userFacingReason:
-        "This product contains partially hydrogenated corn, maize, sunflower, or safflower oil. InsideIt flags this as red immediately because it is a partially hydrogenated oil marker.",
+        "This product contains partially hydrogenated corn, maize, sunflower, or safflower oil. Truthlabel flags this as red immediately because it is a partially hydrogenated oil marker.",
       matchingNotes:
         "Match partially hydrogenated corn oil, maize oil, sunflower oil, sunflower seed oil, safflower oil, and safflower seed oil.",
       scoringImpact: "automatic_red",
@@ -306,11 +306,11 @@ export const hydrogenatedPartiallyHydrogenatedOilsDataPack = {
       regionalNames: [],
       severity: "red",
       reason:
-        "Hydrogenated oils are chemically modified fat systems. InsideIt treats them as serious processed-fat markers, but not automatically as banned unless partially hydrogenated or region-specific rules apply.",
+        "Hydrogenated oils are chemically modified fat systems. Truthlabel treats them as serious processed-fat markers, but not automatically as banned unless partially hydrogenated or region-specific rules apply.",
       healthConcernType: "hydrogenated_processed_fat",
       warningLabel: "HYDROGENATED OIL FOUND",
       userFacingReason:
-        "This product contains hydrogenated oil or fat. InsideIt flags this as a serious processed-fat marker because the oil has been chemically hardened or modified.",
+        "This product contains hydrogenated oil or fat. Truthlabel flags this as a serious processed-fat marker because the oil has been chemically hardened or modified.",
       matchingNotes:
         "Match hydrogenated oil, hydrogenated vegetable oil, hydrogenated fat, hydrogenated vegetable fat, and HVO. If the phrase says partially hydrogenated, use the PHO red rule.",
       scoringImpact: "red_processed_fat",
@@ -358,11 +358,11 @@ export const hydrogenatedPartiallyHydrogenatedOilsDataPack = {
       regionalNames: [],
       severity: "red",
       reason:
-        "Fully hydrogenated oils are chemically hardened fat systems. InsideIt flags them red as a serious processed-fat marker, but they should not be described as PHOs unless the label says partially hydrogenated.",
+        "Fully hydrogenated oils are chemically hardened fat systems. Truthlabel flags them red as a serious processed-fat marker, but they should not be described as PHOs unless the label says partially hydrogenated.",
       healthConcernType: "fully_hydrogenated_processed_fat",
       warningLabel: "FULLY HYDROGENATED OIL FOUND",
       userFacingReason:
-        "This product contains fully hydrogenated oil or fat. InsideIt flags this as a serious processed-fat marker because the oil has been chemically hardened or modified.",
+        "This product contains fully hydrogenated oil or fat. Truthlabel flags this as a serious processed-fat marker because the oil has been chemically hardened or modified.",
       matchingNotes:
         "Match fully hydrogenated oil, fully hydrogenated vegetable oil, fully hydrogenated fat, fully hydrogenated soybean/soya/canola/rapeseed/cottonseed/palm/palm kernel/coconut/sunflower oil, and FHVO. Do not call it partially hydrogenated unless the label says partially.",
       scoringImpact: "red_processed_fat",
@@ -407,7 +407,7 @@ export const hydrogenatedPartiallyHydrogenatedOilsDataPack = {
       healthConcernType: "hydrogenated_shortening_processed_fat",
       warningLabel: "HYDROGENATED SHORTENING FOUND",
       userFacingReason:
-        "This product contains hydrogenated or partially hydrogenated shortening. InsideIt flags this as red because it is a chemically modified processed-fat system.",
+        "This product contains hydrogenated or partially hydrogenated shortening. Truthlabel flags this as red because it is a chemically modified processed-fat system.",
       matchingNotes:
         "Match hydrogenated shortening, partially hydrogenated shortening, hydrogenated vegetable shortening, and partially hydrogenated vegetable shortening. If partially hydrogenated appears, classify under PHO automatic red.",
       scoringImpact: "automatic_red_if_partially_hydrogenated_else_red_processed_fat",
@@ -452,7 +452,7 @@ export const hydrogenatedPartiallyHydrogenatedOilsDataPack = {
       healthConcernType: "hydrogenated_spread_processed_fat",
       warningLabel: "HYDROGENATED FAT SPREAD FOUND",
       userFacingReason:
-        "This product contains a hydrogenated or partially hydrogenated fat spread. InsideIt flags this as red because it is a chemically modified processed-fat system.",
+        "This product contains a hydrogenated or partially hydrogenated fat spread. Truthlabel flags this as red because it is a chemically modified processed-fat system.",
       matchingNotes:
         "Match hydrogenated margarine, partially hydrogenated margarine, hydrogenated vegetable fat spread, and partially hydrogenated vegetable fat spread. If partially hydrogenated appears, classify under PHO automatic red.",
       scoringImpact: "automatic_red_if_partially_hydrogenated_else_red_processed_fat",
@@ -503,7 +503,7 @@ export const hydrogenatedPartiallyHydrogenatedOilsDataPack = {
       healthConcernType: "trans_fat_marker",
       warningLabel: "TRANS FAT MARKER FOUND",
       userFacingReason:
-        "This product contains a trans fat marker. InsideIt flags this as red because industrial trans fats are a serious fat-quality concern.",
+        "This product contains a trans fat marker. Truthlabel flags this as red because industrial trans fats are a serious fat-quality concern.",
       matchingNotes:
         "Match trans fat only when it appears as a positive ingredient/claim such as contains trans fat or trans fatty acids. Do not trigger from '0g trans fat', 'zero trans fat', 'no trans fat', or 'trans fat free' unless partially hydrogenated oil also appears in the ingredient list.",
       scoringImpact: "automatic_red",
@@ -523,7 +523,7 @@ export const hydrogenatedPartiallyHydrogenatedOilsDataPack = {
       display: "red_count_badge",
       scoreImpact: 25,
       reason:
-        "Product contains hydrogenated oil or hydrogenated fat, which InsideIt treats as a serious processed-fat marker.",
+        "Product contains hydrogenated oil or hydrogenated fat, which Truthlabel treats as a serious processed-fat marker.",
     },
 
     anyPartiallyHydrogenatedOilFound: {
@@ -545,13 +545,13 @@ export const hydrogenatedPartiallyHydrogenatedOilsDataPack = {
 
   finalVerdictRules: {
     redHydrogenated:
-      "This product contains hydrogenated oil or fat. InsideIt flags this as a serious processed-fat marker because the oil has been chemically hardened or modified.",
+      "This product contains hydrogenated oil or fat. Truthlabel flags this as a serious processed-fat marker because the oil has been chemically hardened or modified.",
 
     redPartiallyHydrogenated:
-      "This product contains partially hydrogenated oil. InsideIt flags this as red immediately because partially hydrogenated oils are linked to artificial trans fat and major regulatory restrictions in some regions.",
+      "This product contains partially hydrogenated oil. Truthlabel flags this as red immediately because partially hydrogenated oils are linked to artificial trans fat and major regulatory restrictions in some regions.",
 
     redTransFat:
-      "This product contains a trans fat marker. InsideIt flags this as a serious fat-quality concern.",
+      "This product contains a trans fat marker. Truthlabel flags this as a serious fat-quality concern.",
 
     green:
       "No hydrogenated or partially hydrogenated oils were found from the available ingredient list.",

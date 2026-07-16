@@ -1,5 +1,5 @@
 /**
- * InsideIt — Banned / Restricted Items Database
+ * Truthlabel — Banned / Restricted Items Database
  *
  * Scope:
  * Western-market label-relevant banned/restricted ingredients, additives, colours,
@@ -66,7 +66,7 @@ export const bannedRestrictedItems = [
     scoreImpact: "automatic_red",
     warningLabel: "BANNED / RESTRICTED INGREDIENT",
     userFacingReason:
-      "This ingredient has been revoked/prohibited for food use in the United States because of cancer-related regulatory concerns. InsideIt flags this as a serious safety concern. Avoid this ingredient where possible.",
+      "This ingredient has been revoked/prohibited for food use in the United States because of cancer-related regulatory concerns. Truthlabel flags this as a serious safety concern. Avoid this ingredient where possible.",
     codexNotes:
       "Do not claim this definitely causes cancer in humans. Say it triggered a cancer-related regulatory rule and was revoked/prohibited.",
     sourceRefs: ["FDA_RED_3_2025", "CALIFORNIA_AB_418"]
@@ -122,7 +122,7 @@ export const bannedRestrictedItems = [
     scoreImpact: "automatic_red",
     warningLabel: "BANNED / RESTRICTED INGREDIENT",
     userFacingReason:
-      "This ingredient is not permitted as a food additive in the European Union because regulators could not rule out genotoxicity concerns. InsideIt flags this as a serious safety concern. Avoid this ingredient where possible.",
+      "This ingredient is not permitted as a food additive in the European Union because regulators could not rule out genotoxicity concerns. Truthlabel flags this as a serious safety concern. Avoid this ingredient where possible.",
     codexNotes:
       "Do not say titanium dioxide is banned everywhere. Region wording is required.",
     sourceRefs: ["EFSA_E171_2021", "EU_E171_BAN_2022", "FSANZ_TIO2_REVIEW", "FDA_TIO2_STATUS"]
@@ -163,7 +163,7 @@ export const bannedRestrictedItems = [
     scoreImpact: "automatic_red",
     warningLabel: "BANNED / RESTRICTED INGREDIENT",
     userFacingReason:
-      "This ingredient was revoked for food use in the United States after regulatory safety review. InsideIt flags this as a serious safety concern. Avoid this ingredient where possible.",
+      "This ingredient was revoked for food use in the United States after regulatory safety review. Truthlabel flags this as a serious safety concern. Avoid this ingredient where possible.",
     codexNotes:
       "Commonly found historically in some citrus-flavoured drinks. Match BVO strongly.",
     sourceRefs: ["FDA_BVO_2024", "CALIFORNIA_AB_418"]
@@ -213,7 +213,7 @@ export const bannedRestrictedItems = [
     scoreImpact: "automatic_red",
     warningLabel: "BANNED / RESTRICTED INGREDIENT",
     userFacingReason:
-      "This ingredient is banned/restricted in major regions because it is a major source of industrial trans fats linked to heart-health risk. InsideIt flags this as a serious safety concern. Avoid this ingredient where possible.",
+      "This ingredient is banned/restricted in major regions because it is a major source of industrial trans fats linked to heart-health risk. Truthlabel flags this as a serious safety concern. Avoid this ingredient where possible.",
     codexNotes:
       "Also count under Hydrogenated / Partially Hydrogenated Oils and Seed Oils / Processed Oils.",
     sourceRefs: ["FDA_PHO_FINAL_DETERMINATION", "FDA_PHO_2023_FINAL_ACTION", "HEALTH_CANADA_PHO_BAN"]
@@ -259,7 +259,7 @@ export const bannedRestrictedItems = [
     scoreImpact: "automatic_red",
     warningLabel: "BANNED / RESTRICTED INGREDIENT",
     userFacingReason:
-      "This ingredient is banned/restricted in some regions because of cancer-related safety concerns around its use as a flour improver. InsideIt flags this as a serious safety concern. Avoid this ingredient where possible.",
+      "This ingredient is banned/restricted in some regions because of cancer-related safety concerns around its use as a flour improver. Truthlabel flags this as a serious safety concern. Avoid this ingredient where possible.",
     codexNotes:
       "Do not claim banned in all Western countries unless region-specific verification is added.",
     sourceRefs: ["UK_POTASSIUM_BROMATE_PROHIBITION", "CANADA_POTASSIUM_BROMATE_DELISTED", "CALIFORNIA_AB_418"]
@@ -302,7 +302,7 @@ export const bannedRestrictedItems = [
     scoreImpact: "automatic_red",
     warningLabel: "BANNED / RESTRICTED INGREDIENT",
     userFacingReason:
-      "This ingredient is illegal/not permitted as a dough improver in the European Union. InsideIt flags this as a serious safety concern. Avoid this ingredient where possible.",
+      "This ingredient is illegal/not permitted as a dough improver in the European Union. Truthlabel flags this as a serious safety concern. Avoid this ingredient where possible.",
     codexNotes:
       "Also count under Flour Treatment Agents and Ultra-Processed Indicators.",
     sourceRefs: ["EFSA_AZODICARBONAMIDE_SEM", "FDA_ADA_FAQ"]
@@ -350,7 +350,7 @@ export const bannedRestrictedItems = [
     scoreImpact: "automatic_red",
     warningLabel: "BANNED / RESTRICTED INGREDIENT",
     userFacingReason:
-      "This ingredient is banned/restricted in some regions because of reproductive or hormone-related safety concerns. InsideIt flags this as a serious safety concern. Avoid this ingredient where possible.",
+      "This ingredient is banned/restricted in some regions because of reproductive or hormone-related safety concerns. Truthlabel flags this as a serious safety concern. Avoid this ingredient where possible.",
     codexNotes:
       "Also count under Preservatives and Additives & Preservatives.",
     sourceRefs: ["EU_PROPYLPARABEN_WITHDRAWAL", "CALIFORNIA_AB_418"]
@@ -401,7 +401,7 @@ export const bannedRestrictedItems = [
     scoreImpact: "automatic_red",
     warningLabel: "BANNED / RESTRICTED INGREDIENT",
     userFacingReason:
-      "This sweetener is banned/restricted for food use in some regions. InsideIt flags this as a serious safety concern. Avoid this ingredient where possible.",
+      "This sweetener is banned/restricted for food use in some regions. Truthlabel flags this as a serious safety concern. Avoid this ingredient where possible.",
     codexNotes:
       "Do not mark as banned in every country. Region-specific display is required.",
     sourceRefs: ["FDA_21_CFR_189", "CANADA_CYCLAMATE_RULES", "FSANZ_CYCLAMATE_PERMISSION"]
@@ -439,7 +439,7 @@ export const bannedRestrictedItems = [
     scoreImpact: "automatic_red",
     warningLabel: "BANNED / RESTRICTED INGREDIENT",
     userFacingReason:
-      "This ingredient is prohibited/restricted for use in food in some regions. InsideIt flags this as a serious safety concern. Avoid this ingredient where possible.",
+      "This ingredient is prohibited/restricted for use in food in some regions. Truthlabel flags this as a serious safety concern. Avoid this ingredient where possible.",
     codexNotes:
       "Also count under Flavourings and Cancer-linked Watch if that category exists.",
     sourceRefs: ["FDA_21_CFR_189", "HEALTH_CANADA_ADULTERATING_SUBSTANCES"]
@@ -473,7 +473,7 @@ export const bannedRestrictedItems = [
     scoreImpact: "automatic_red",
     warningLabel: "BANNED / RESTRICTED INGREDIENT",
     userFacingReason:
-      "This ingredient is prohibited as an added food substance in the United States when added as coumarin or tonka bean extract. InsideIt flags this as a serious safety concern. Avoid this ingredient where possible.",
+      "This ingredient is prohibited as an added food substance in the United States when added as coumarin or tonka bean extract. Truthlabel flags this as a serious safety concern. Avoid this ingredient where possible.",
     codexNotes:
       "Do not flag natural trace coumarin in cinnamon from normal ingredient labels as the same thing unless rules are created for natural occurrence.",
     sourceRefs: ["FDA_21_CFR_189"]
@@ -518,7 +518,7 @@ export const bannedRestrictedItems = [
     scoreImpact: "automatic_red",
     warningLabel: "BANNED / RESTRICTED INGREDIENT",
     userFacingReason:
-      "This ingredient is prohibited/restricted for food use in some regions. InsideIt flags this as a serious safety concern. Avoid this ingredient where possible.",
+      "This ingredient is prohibited/restricted for food use in some regions. Truthlabel flags this as a serious safety concern. Avoid this ingredient where possible.",
     sourceRefs: ["FDA_21_CFR_189", "HEALTH_CANADA_ADULTERATING_SUBSTANCES"]
   },
 
@@ -546,7 +546,7 @@ export const bannedRestrictedItems = [
     scoreImpact: "automatic_red",
     warningLabel: "BANNED / RESTRICTED INGREDIENT",
     userFacingReason:
-      "This ingredient is prohibited from direct addition to human food in the United States. InsideIt flags this as a serious safety concern. Avoid this ingredient where possible.",
+      "This ingredient is prohibited from direct addition to human food in the United States. Truthlabel flags this as a serious safety concern. Avoid this ingredient where possible.",
     sourceRefs: ["FDA_21_CFR_189"]
   },
 
@@ -579,7 +579,7 @@ export const bannedRestrictedItems = [
     scoreImpact: "automatic_red",
     warningLabel: "BANNED / RESTRICTED INGREDIENT",
     userFacingReason:
-      "This ingredient is prohibited from direct addition to human food in the United States. InsideIt flags this as a serious safety concern. Avoid this ingredient where possible.",
+      "This ingredient is prohibited from direct addition to human food in the United States. Truthlabel flags this as a serious safety concern. Avoid this ingredient where possible.",
     sourceRefs: ["FDA_21_CFR_189"]
   },
 
@@ -608,7 +608,7 @@ export const bannedRestrictedItems = [
     scoreImpact: "automatic_red",
     warningLabel: "BANNED / RESTRICTED INGREDIENT",
     userFacingReason:
-      "This ingredient is prohibited from direct addition to human food in the United States. InsideIt flags this as a serious safety concern. Avoid this ingredient where possible.",
+      "This ingredient is prohibited from direct addition to human food in the United States. Truthlabel flags this as a serious safety concern. Avoid this ingredient where possible.",
     sourceRefs: ["FDA_21_CFR_189"]
   },
 
@@ -638,7 +638,7 @@ export const bannedRestrictedItems = [
     scoreImpact: "automatic_red",
     warningLabel: "BANNED / RESTRICTED INGREDIENT",
     userFacingReason:
-      "This sweetener is prohibited from direct addition to human food in the United States. InsideIt flags this as a serious safety concern. Avoid this ingredient where possible.",
+      "This sweetener is prohibited from direct addition to human food in the United States. Truthlabel flags this as a serious safety concern. Avoid this ingredient where possible.",
     sourceRefs: ["FDA_21_CFR_189"]
   },
 
@@ -667,7 +667,7 @@ export const bannedRestrictedItems = [
     scoreImpact: "automatic_red",
     warningLabel: "BANNED / RESTRICTED INGREDIENT",
     userFacingReason:
-      "This ingredient is prohibited from direct addition to human food in the United States. InsideIt flags this as a serious safety concern. Avoid this ingredient where possible.",
+      "This ingredient is prohibited from direct addition to human food in the United States. Truthlabel flags this as a serious safety concern. Avoid this ingredient where possible.",
     sourceRefs: ["FDA_21_CFR_189"]
   },
 
@@ -695,7 +695,7 @@ export const bannedRestrictedItems = [
     scoreImpact: "automatic_red",
     warningLabel: "BANNED / RESTRICTED INGREDIENT",
     userFacingReason:
-      "This ingredient is prohibited from direct addition to human food in the United States. InsideIt flags this as a serious safety concern. Avoid this ingredient where possible.",
+      "This ingredient is prohibited from direct addition to human food in the United States. Truthlabel flags this as a serious safety concern. Avoid this ingredient where possible.",
     sourceRefs: ["FDA_21_CFR_189"]
   },
 
@@ -724,7 +724,7 @@ export const bannedRestrictedItems = [
     scoreImpact: "automatic_red",
     warningLabel: "BANNED / RESTRICTED INGREDIENT",
     userFacingReason:
-      "This ingredient is prohibited from direct addition to human food in the United States. InsideIt flags this as a serious safety concern. Avoid this ingredient where possible.",
+      "This ingredient is prohibited from direct addition to human food in the United States. Truthlabel flags this as a serious safety concern. Avoid this ingredient where possible.",
     sourceRefs: ["FDA_21_CFR_189"]
   },
 
@@ -753,7 +753,7 @@ export const bannedRestrictedItems = [
     scoreImpact: "automatic_red",
     warningLabel: "BANNED / RESTRICTED INGREDIENT",
     userFacingReason:
-      "This ingredient is prohibited from direct addition to human food in the United States. InsideIt flags this as a serious safety concern. Avoid this ingredient where possible.",
+      "This ingredient is prohibited from direct addition to human food in the United States. Truthlabel flags this as a serious safety concern. Avoid this ingredient where possible.",
     sourceRefs: ["FDA_21_CFR_189"]
   },
 
@@ -782,7 +782,7 @@ export const bannedRestrictedItems = [
     scoreImpact: "automatic_red",
     warningLabel: "BANNED / RESTRICTED INGREDIENT",
     userFacingReason:
-      "This propellant is prohibited from use in human food in the United States. InsideIt flags this as a serious safety concern.",
+      "This propellant is prohibited from use in human food in the United States. Truthlabel flags this as a serious safety concern.",
     sourceRefs: ["FDA_21_CFR_189"]
   },
 
@@ -833,7 +833,7 @@ export const bannedRestrictedItems = [
     scoreImpact: "automatic_red",
     warningLabel: "ILLEGAL / RESTRICTED COLOUR",
     userFacingReason:
-      "This is an industrial dye that is illegal/not permitted for food use in major regions. InsideIt flags this as a serious safety concern. Avoid this product where possible.",
+      "This is an industrial dye that is illegal/not permitted for food use in major regions. Truthlabel flags this as a serious safety concern. Avoid this product where possible.",
     codexNotes:
       "Usually appears through adulteration/fraud, not honest labels. Still match label text and recall data.",
     sourceRefs: ["FDA_FOOD_FRAUD_SUDAN_DYES", "EU_SUDAN_DYES_CONTROL", "UK_FSA_SUDAN_IV_ALERT"]
@@ -872,7 +872,7 @@ export const bannedRestrictedItems = [
     scoreImpact: "automatic_red",
     warningLabel: "ILLEGAL / RESTRICTED COLOUR",
     userFacingReason:
-      "This is an illegal/non-food dye that may pose a health risk. InsideIt flags this as a serious safety concern. Avoid this product where possible.",
+      "This is an illegal/non-food dye that may pose a health risk. Truthlabel flags this as a serious safety concern. Avoid this product where possible.",
     codexNotes:
       "Usually detected through recalls or lab testing rather than normal ingredient labels.",
     sourceRefs: ["UK_FSA_ILLEGAL_DYES"]
@@ -917,7 +917,7 @@ export const bannedRestrictedItems = [
     scoreImpact: "automatic_red",
     warningLabel: "DELISTED / RESTRICTED COLOUR",
     userFacingReason:
-      "This colour additive is delisted/not permitted for use in the United States. InsideIt flags this as a serious safety concern. Avoid this ingredient where possible.",
+      "This colour additive is delisted/not permitted for use in the United States. Truthlabel flags this as a serious safety concern. Avoid this ingredient where possible.",
     sourceRefs: ["FDA_COLOR_ADDITIVE_STATUS"]
   },
 
@@ -947,7 +947,7 @@ export const bannedRestrictedItems = [
     scoreImpact: "automatic_red",
     warningLabel: "DELISTED / RESTRICTED COLOUR",
     userFacingReason:
-      "This colour additive is delisted/not permitted for use in the United States. InsideIt flags this as a serious safety concern. Avoid this ingredient where possible.",
+      "This colour additive is delisted/not permitted for use in the United States. Truthlabel flags this as a serious safety concern. Avoid this ingredient where possible.",
     sourceRefs: ["FDA_EAFUS_DELISTED_COLORS"]
   },
 
@@ -977,7 +977,7 @@ export const bannedRestrictedItems = [
     scoreImpact: "automatic_red",
     warningLabel: "DELISTED / RESTRICTED COLOUR",
     userFacingReason:
-      "This colour additive is delisted/not permitted for use in the United States. InsideIt flags this as a serious safety concern. Avoid this ingredient where possible.",
+      "This colour additive is delisted/not permitted for use in the United States. Truthlabel flags this as a serious safety concern. Avoid this ingredient where possible.",
     sourceRefs: ["FDA_EAFUS_DELISTED_COLORS"]
   },
 
@@ -1007,7 +1007,7 @@ export const bannedRestrictedItems = [
     scoreImpact: "automatic_red",
     warningLabel: "DELISTED / RESTRICTED COLOUR",
     userFacingReason:
-      "This colour additive is delisted/not permitted for use in the United States. InsideIt flags this as a serious safety concern. Avoid this ingredient where possible.",
+      "This colour additive is delisted/not permitted for use in the United States. Truthlabel flags this as a serious safety concern. Avoid this ingredient where possible.",
     sourceRefs: ["FDA_EAFUS_DELISTED_COLORS"]
   },
 
@@ -1034,7 +1034,7 @@ export const bannedRestrictedItems = [
     scoreImpact: "automatic_red",
     warningLabel: "RESTRICTED COLOUR ADDITIVE",
     userFacingReason:
-      "This colour additive is narrowly restricted and under regulatory removal action in the United States. InsideIt flags this as a serious safety concern. Avoid this ingredient where possible.",
+      "This colour additive is narrowly restricted and under regulatory removal action in the United States. Truthlabel flags this as a serious safety concern. Avoid this ingredient where possible.",
     codexNotes:
       "Do not say fully banned yet unless the final rule has been issued. Use restricted/removal-watch wording.",
     sourceRefs: ["FDA_COLOR_QA", "FDA_ORANGE_B_PROPOSED_REVOCATION"]
@@ -1067,7 +1067,7 @@ export const bannedRestrictedItems = [
     scoreImpact: "automatic_red",
     warningLabel: "RESTRICTED COLOUR ADDITIVE",
     userFacingReason:
-      "This colour additive is narrowly restricted and under regulatory removal action in the United States. InsideIt flags this as a serious safety concern. Avoid this ingredient where possible.",
+      "This colour additive is narrowly restricted and under regulatory removal action in the United States. Truthlabel flags this as a serious safety concern. Avoid this ingredient where possible.",
     codexNotes:
       "Do not say fully banned yet unless final revocation is confirmed. Use restricted/removal-watch wording.",
     sourceRefs: ["FDA_COLOR_QA", "FDA_SYNTHETIC_DYES_PHASEOUT"]
@@ -1097,7 +1097,7 @@ export const bannedRestrictedItems = [
     scoreImpact: "automatic_red",
     warningLabel: "BANNED / RESTRICTED INGREDIENT",
     userFacingReason:
-      "This ingredient is listed as an adulterating substance in foods in Canada. InsideIt flags this as a serious safety concern. Avoid this ingredient where possible.",
+      "This ingredient is listed as an adulterating substance in foods in Canada. Truthlabel flags this as a serious safety concern. Avoid this ingredient where possible.",
     sourceRefs: ["HEALTH_CANADA_ADULTERATING_SUBSTANCES"]
   },
 
@@ -1125,7 +1125,7 @@ export const bannedRestrictedItems = [
     scoreImpact: "automatic_red",
     warningLabel: "BANNED / RESTRICTED INGREDIENT",
     userFacingReason:
-      "This ingredient is listed as an adulterating substance in foods in Canada. InsideIt flags this as a serious safety concern. Avoid this ingredient where possible.",
+      "This ingredient is listed as an adulterating substance in foods in Canada. Truthlabel flags this as a serious safety concern. Avoid this ingredient where possible.",
     sourceRefs: ["HEALTH_CANADA_ADULTERATING_SUBSTANCES"]
   },
 
@@ -1153,7 +1153,7 @@ export const bannedRestrictedItems = [
     scoreImpact: "automatic_red",
     warningLabel: "RESTRICTED INGREDIENT",
     userFacingReason:
-      "This ingredient is restricted in Canada for foods, with a specific chewing gum exception. InsideIt flags this as a serious safety concern when found outside the allowed exception.",
+      "This ingredient is restricted in Canada for foods, with a specific chewing gum exception. Truthlabel flags this as a serious safety concern when found outside the allowed exception.",
     codexNotes:
       "Requires product-context logic. Do not flag chewing gum with paraffin wax base the same way without checking the exception.",
     sourceRefs: ["HEALTH_CANADA_ADULTERATING_SUBSTANCES"]
@@ -1211,5 +1211,5 @@ export const bannedRestrictedItems = [
  * unless an official source uses that exact claim.
  *
  * Use direct but accurate wording:
- * "InsideIt flags this as a serious safety concern. Avoid this ingredient where possible."
+ * "Truthlabel flags this as a serious safety concern. Avoid this ingredient where possible."
  */
