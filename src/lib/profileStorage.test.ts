@@ -64,3 +64,18 @@ test("loadProfile exposes the newer saved allergy settings in the legacy watch p
     Reflect.deleteProperty(globalThis, "document");
   }
 });
+
+test("loadProfile reuses its snapshot while browser storage is unchanged", () => {
+  const dom = createDom();
+
+  try {
+    const firstProfile = loadProfile();
+    const secondProfile = loadProfile();
+
+    assert.strictEqual(secondProfile, firstProfile);
+  } finally {
+    dom.window.close();
+    Reflect.deleteProperty(globalThis, "window");
+    Reflect.deleteProperty(globalThis, "document");
+  }
+});

@@ -17,7 +17,8 @@ const STORAGE_KEY = "insideit.user-settings";
 const SETTINGS_CHANGE_EVENT = "insideit.user-settings.changed";
 
 let cachedRawSettings: string | null | undefined;
-let cachedSettingsSnapshot: InsideItUserSettings = withUpdatedAt(defaultUserSettings);
+const defaultSettingsSnapshot = withUpdatedAt(defaultUserSettings);
+let cachedSettingsSnapshot: InsideItUserSettings = defaultSettingsSnapshot;
 
 function uniqueStrings(values: Array<string | undefined | null>) {
   const seen = new Set<string>();
@@ -171,7 +172,7 @@ function writeSettings(settings: InsideItUserSettings) {
 
 export function getUserSettings(): InsideItUserSettings {
   if (typeof window === "undefined") {
-    return withUpdatedAt(defaultUserSettings);
+    return defaultSettingsSnapshot;
   }
 
   return readCachedSettings(safeLocalStorageGetItem(STORAGE_KEY));
@@ -263,12 +264,12 @@ function subscribe(onStoreChange: () => void) {
 }
 
 function getServerSnapshot() {
-  return withUpdatedAt(defaultUserSettings);
+  return defaultSettingsSnapshot;
 }
 
 function getClientSnapshot() {
   if (typeof window === "undefined") {
-    return withUpdatedAt(defaultUserSettings);
+    return defaultSettingsSnapshot;
   }
 
   return readCachedSettings(safeLocalStorageGetItem(STORAGE_KEY));

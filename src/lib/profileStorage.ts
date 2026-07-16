@@ -99,12 +99,25 @@ function toLegacyAllergies() {
     .filter((value): value is AllergyConcern => Boolean(value));
 }
 
+function haveSameValues<T extends string>(left: T[], right: T[]) {
+  return (
+    left.length === right.length &&
+    left.every((value, index) => value === right[index])
+  );
+}
+
 function readCachedProfile(rawProfile: string | null): UserProfile {
+  const allergies = toLegacyAllergies();
+
   if (rawProfile === cachedRawProfile) {
-    return {
-      ...cachedProfileSnapshot,
-      allergies: toLegacyAllergies(),
-    };
+    if (!haveSameValues(cachedProfileSnapshot.allergies, allergies)) {
+      cachedProfileSnapshot = {
+        ...cachedProfileSnapshot,
+        allergies,
+      };
+    }
+
+    return cachedProfileSnapshot;
   }
 
   try {
@@ -112,7 +125,7 @@ function readCachedProfile(rawProfile: string | null): UserProfile {
 
     if (!rawProfile) {
       cachedProfileSnapshot = {
-        allergies: toLegacyAllergies(),
+        allergies,
         avoid: defaultProfile.avoid,
       };
       return cachedProfileSnapshot;
@@ -120,13 +133,13 @@ function readCachedProfile(rawProfile: string | null): UserProfile {
 
     const parsed = JSON.parse(rawProfile) as Partial<UserProfile>;
     cachedProfileSnapshot = {
-      allergies: toLegacyAllergies(),
+      allergies,
       avoid: normalizeProfile(parsed).avoid,
     };
     return cachedProfileSnapshot;
   } catch {
     cachedProfileSnapshot = {
-      allergies: toLegacyAllergies(),
+      allergies,
       avoid: defaultProfile.avoid,
     };
     return cachedProfileSnapshot;
