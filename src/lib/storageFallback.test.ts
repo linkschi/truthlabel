@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
+import { JSDOM } from "jsdom";
+
 import { getDemoScanResult } from "@/lib/getDemoScanResult";
 
 import {
@@ -30,6 +32,19 @@ function withNoWindow(callback: () => void) {
       });
     }
   }
+}
+
+function createDom() {
+  const dom = new JSDOM("<!doctype html><html><body></body></html>", {
+    url: "https://truthlabel.test",
+  });
+
+  Object.assign(globalThis, {
+    window: dom.window,
+    document: dom.window.document,
+  });
+
+  return dom;
 }
 
 test("manual scan storage keeps an in-memory fallback when localStorage is unavailable", () => {
@@ -81,4 +96,79 @@ test("barcode scan storage keeps an in-memory fallback when localStorage is unav
 
     assert.deepEqual(loadLatestBarcodeScan(), payload);
   });
+});
+
+test("manual scan storage reuses its parsed snapshot while localStorage is unchanged", () => {
+  const dom = createDom();
+
+  try {
+    const payload: StoredManualScan = {
+      input: {
+        productName: "Saved Manual Product",
+        ingredientText: "Water, sodium benzoate",
+        scanSource: "manual_paste",
+      },
+      result: getDemoScanResult("Drinks / Beverages", []),
+      savedAt: "2026-07-16T00:00:00.000Z",
+    };
+
+    dom.window.localStorage.setItem(
+      "insideit.manual-scan.latest",
+      JSON.stringify(payload),
+    );
+
+    const firstSnapshot = loadLatestManualScan();
+    const secondSnapshot = loadLatestManualScan();
+
+    assert.strictEqual(secondSnapshot, firstSnapshot);
+  } finally {
+    dom.window.close();
+    Reflect.deleteProperty(globalThis, "window");
+    Reflect.deleteProperty(globalThis, "document");
+  }
+});
+
+test("barcode scan storage reuses its parsed snapshot while localStorage is unchanged", () => {
+  const dom = createDom();
+
+  try {
+    const payload: StoredBarcodeScan = {
+      input: {
+        barcode: "5449000000996",
+        userAllergyProfile: [],
+      },
+      lookupStatus: "found",
+      productData: {
+        productName: "Saved Barcode Product",
+        brandName: "Truthlabel Test",
+        barcode: "5449000000996",
+        productCategory: "Drinks / Beverages",
+        ingredientText: "Water, Sugar",
+        ingredients: ["Water", "Sugar"],
+        allergenStatement: "",
+        packagingText: "Can",
+        scanSource: "barcode",
+        externalSignals: [],
+        dataQualityWarnings: [],
+      },
+      result: getDemoScanResult("Drinks / Beverages", []),
+      message: "Stored with browser localStorage.",
+      dataQualityWarnings: [],
+      savedAt: "2026-07-16T00:00:00.000Z",
+    };
+
+    dom.window.localStorage.setItem(
+      "insideit.barcode-scan.latest",
+      JSON.stringify(payload),
+    );
+
+    const firstSnapshot = loadLatestBarcodeScan();
+    const secondSnapshot = loadLatestBarcodeScan();
+
+    assert.strictEqual(secondSnapshot, firstSnapshot);
+  } finally {
+    dom.window.close();
+    Reflect.deleteProperty(globalThis, "window");
+    Reflect.deleteProperty(globalThis, "document");
+  }
 });

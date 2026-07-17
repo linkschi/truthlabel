@@ -11,6 +11,7 @@ import type {
 
 const BARCODE_SCAN_STORAGE_KEY = "insideit.barcode-scan.latest";
 let latestBarcodeScanFallback: StoredBarcodeScan | null = null;
+let latestBarcodeScanRawValue: string | null = null;
 
 export type StoredBarcodeScan = {
   input: BarcodeScanInput;
@@ -23,23 +24,33 @@ export type StoredBarcodeScan = {
 };
 
 export function saveLatestBarcodeScan(payload: StoredBarcodeScan) {
-  latestBarcodeScanFallback = payload;
+  const serializedPayload = JSON.stringify(payload);
 
-  safeLocalStorageSetItem(BARCODE_SCAN_STORAGE_KEY, JSON.stringify(payload));
+  latestBarcodeScanFallback = payload;
+  latestBarcodeScanRawValue = serializedPayload;
+
+  safeLocalStorageSetItem(BARCODE_SCAN_STORAGE_KEY, serializedPayload);
 }
 
 export function loadLatestBarcodeScan() {
   const rawValue = safeLocalStorageGetItem(BARCODE_SCAN_STORAGE_KEY);
 
   if (!rawValue) {
+    latestBarcodeScanRawValue = null;
+    return latestBarcodeScanFallback;
+  }
+
+  if (rawValue === latestBarcodeScanRawValue) {
     return latestBarcodeScanFallback;
   }
 
   try {
     const parsed = JSON.parse(rawValue) as StoredBarcodeScan;
+    latestBarcodeScanRawValue = rawValue;
     latestBarcodeScanFallback = parsed;
     return parsed;
   } catch {
+    latestBarcodeScanRawValue = rawValue;
     return latestBarcodeScanFallback;
   }
 }
