@@ -203,6 +203,13 @@ const externalCategoryIds = new Set([
   "brand_trust_safety",
 ]);
 
+const hiddenQuickOverviewCategoryIds = new Set([
+  "additives_and_preservatives",
+  "artificial_engineered_food_construction",
+  "artificial_colours",
+  "total_ingredients",
+]);
+
 const deepExposureCheckIds = [
   "banned_restricted_items",
   "cancer_linked_watch",
@@ -262,6 +269,12 @@ function uniqueStrings(values: Array<string | null | undefined>) {
   return result;
 }
 
+function countUniqueIngredients(ingredients: string[]) {
+  return new Set(
+    ingredients.map(normalizeIngredientIntelligenceText).filter(Boolean),
+  ).size;
+}
+
 function toCategoryMap(summaries: IngredientCategorySummary[]) {
   return new Map(summaries.map((summary) => [summary.categoryId, summary]));
 }
@@ -317,11 +330,24 @@ function getMatchedItemsPreview(matches: IngredientIntelligenceDuplicateSafeMatc
 }
 
 function toQuickOverviewRow(summary: IngredientCategorySummary, sortOrder: number): ScanResultOverviewRow {
+  const label =
+    summary.categoryId === "ultra_processed_indicators"
+      ? "Ultra-Processed"
+      : summary.categoryName;
+  const displayValue =
+    summary.categoryId === "ultra_processed_indicators"
+      ? summary.severity === "red"
+        ? "High"
+        : summary.severity === "yellow"
+          ? "Likely"
+          : "No major markers"
+      : summary.displayLabel;
+
   return {
     categoryId: summary.categoryId,
-    label: summary.categoryName,
+    label,
     severity: summary.severity,
-    displayValue: summary.displayLabel,
+    displayValue,
     shortMessage: summary.shortMessage,
     redReasonType: summary.redReasonType,
     matchCount: summary.matchCount,
@@ -486,7 +512,7 @@ function buildIngredientBreakdown(input: BuildScanResultInput): ScanResultIngred
   );
 
   return {
-    totalIngredients: input.ingredients.length,
+    totalIngredients: countUniqueIngredients(input.ingredients),
     naturalPositive: orderByIngredientList(naturalPositive, input.ingredients),
     processedArtificial: orderByIngredientList(
       processedArtificial,
@@ -704,9 +730,14 @@ function buildFinalVerdict(
 
 export function buildScanResult(input: BuildScanResultInput): ScanResult {
   const categoryMap = toCategoryMap(input.categorySummaries);
+  const ingredientCount = countUniqueIngredients(input.ingredients);
   const sortedSummaries = sortCategorySummaries(input.categorySummaries);
   const quickOverview = sortedSummaries
-    .filter((summary) => summary.displayAllowed)
+    .filter(
+      (summary) =>
+        summary.displayAllowed &&
+        !hiddenQuickOverviewCategoryIds.has(summary.categoryId),
+    )
     .map((summary, index) => toQuickOverviewRow(summary, index));
   const ingredientBreakdown = buildIngredientBreakdown(input);
   const deepExposureChecks = deepExposureCheckIds.map((categoryId) =>
@@ -732,7 +763,7 @@ export function buildScanResult(input: BuildScanResultInput): ScanResult {
       verdictLabel: input.exposureRiskResult.verdictLabel,
       verdictTone: input.exposureRiskResult.verdictTone,
       scanSource: input.scanSource,
-      ingredientCount: input.ingredients.length,
+      ingredientCount,
     },
     quickOverview,
     ingredientBreakdown,

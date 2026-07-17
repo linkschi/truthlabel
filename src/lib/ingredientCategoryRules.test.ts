@@ -154,6 +154,27 @@ test("natural positive ingredients do not cancel additive warnings", () => {
   assert.equal(sweetenerSummary.severity, "yellow");
 });
 
+test("ultra-processed indicators use simple green yellow red display labels", () => {
+  const greenOutput = runRules({
+    ingredients: ["Rolled oats"],
+  });
+  const redOutput = runRules({
+    ingredients: [
+      "Maltodextrin",
+      "Modified starch",
+      "Soy protein isolate",
+      "Natural flavour",
+    ],
+  });
+  const greenSummary = findSummary(greenOutput, "ultra_processed_indicators");
+  const redSummary = findSummary(redOutput, "ultra_processed_indicators");
+
+  assert.equal(greenSummary.displayLabel, "No major markers");
+  assert.equal(greenSummary.severity, "green");
+  assert.equal(redSummary.displayLabel, "High");
+  assert.equal(redSummary.severity, "red");
+});
+
 test("heavy metals stay yellow for rice baby-food review markers", () => {
   const output = runRules({
     ingredients: ["Rice flour"],

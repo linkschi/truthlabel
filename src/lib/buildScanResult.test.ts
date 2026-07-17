@@ -6,6 +6,7 @@ import { calculateExposureRisk } from "./calculateExposureRisk";
 import { applyIngredientCategoryRules } from "./ingredientCategoryRules";
 import {
   matchIngredientIntelligence,
+  normalizeIngredientIntelligenceText,
   type IngredientIntelligenceMatcherInput,
 } from "./ingredientIntelligenceMatcher";
 
@@ -21,20 +22,23 @@ function buildResult(input: ScanResultTestInput) {
   const matcherResult = matchIngredientIntelligence(input);
   const ingredientListAvailable =
     input.ingredientListAvailable ?? input.ingredients.length > 0;
+  const ingredientCount = new Set(
+    input.ingredients.map(normalizeIngredientIntelligenceText).filter(Boolean),
+  ).size;
   const categoryRules = applyIngredientCategoryRules({
     ...matcherResult,
     productCategory: input.productCategory,
     ingredientListAvailable,
     userAllergyProfile: input.userAllergyProfile,
     externalSignals: input.externalSignals,
-    ingredientCount: input.ingredients.length,
+    ingredientCount,
   });
   const exposureRiskResult = calculateExposureRisk({
     categorySummaries: categoryRules.categorySummaries,
     matchedIngredients: matcherResult.matchedIngredients,
     duplicateSafeMatches: matcherResult.duplicateSafeMatches,
     ingredientGroups: matcherResult.ingredientGroups,
-    ingredientCount: input.ingredients.length,
+    ingredientCount,
     productCategory: input.productCategory,
     userAllergyProfile: input.userAllergyProfile,
     externalSignals: input.externalSignals,
@@ -78,21 +82,73 @@ test("clean product builds a green hero and natural ingredient grouping", () => 
   assert.equal(result.ingredientBreakdown.unknownReview.length, 0);
 });
 
-test("Red No. 3 builds a red overview row and appears once with overlapping categories", () => {
+test("Red No. 3 keeps artificial-colour overlap internal and shows visible red warnings", () => {
   const result = buildResult({
     ingredients: ["Red No. 3"],
   });
 
   const bannedRow = findQuickOverviewRow(result, "banned_restricted_items");
+  const artificialColourRow = findQuickOverviewRow(result, "artificial_colours");
   const itemMatches = result.ingredientBreakdown.processedArtificial.filter(
     (item) => item.canonicalIngredientId === "erythrosine",
   );
 
   assert.equal(bannedRow?.severity, "red");
+  assert.equal(artificialColourRow, undefined);
   assert.equal(result.finalVerdict.verdictTone, "red");
   assert.equal(itemMatches.length, 1);
   assert.ok(itemMatches[0]?.matchedCategories.includes("Banned / Restricted Items"));
   assert.ok(itemMatches[0]?.matchedCategories.includes("Artificial Colours"));
+});
+
+test("technical rollup categories are hidden from Quick Overview", () => {
+  const result = buildResult({
+    ingredients: [
+      "Tartrazine",
+      "Textured vegetable protein",
+      "Natural flavour",
+      "Sodium benzoate",
+    ],
+  });
+  const quickOverviewIds = result.quickOverview.map((row) => row.categoryId);
+
+  assert.ok(!quickOverviewIds.includes("artificial_colours"));
+  assert.ok(!quickOverviewIds.includes("artificial_engineered_food_construction"));
+  assert.ok(!quickOverviewIds.includes("additives_and_preservatives"));
+});
+
+test("Total Ingredients stays out of Quick Overview while unique counts stay available internally", () => {
+  const result = buildResult({
+    ingredients: ["Water", "Water", "Sugar"],
+  });
+  const totalIngredientsRow = findQuickOverviewRow(result, "total_ingredients");
+
+  assert.equal(totalIngredientsRow, undefined);
+  assert.equal(result.productHero.ingredientCount, 2);
+  assert.equal(result.ingredientBreakdown.totalIngredients, 2);
+});
+
+test("Ultra-Processed overview uses the simplified display labels", () => {
+  const cleanResult = buildResult({
+    ingredients: ["Rolled oats"],
+  });
+  const redResult = buildResult({
+    ingredients: [
+      "Maltodextrin",
+      "Modified starch",
+      "Soy protein isolate",
+      "Natural flavour",
+    ],
+  });
+
+  assert.equal(
+    findQuickOverviewRow(cleanResult, "ultra_processed_indicators")?.displayValue,
+    "No major markers",
+  );
+  assert.equal(
+    findQuickOverviewRow(redResult, "ultra_processed_indicators")?.displayValue,
+    "High",
+  );
 });
 
 test("three preservatives make preservatives red by count overload and final verdict red", () => {

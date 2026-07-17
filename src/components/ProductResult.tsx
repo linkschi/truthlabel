@@ -14,7 +14,6 @@ import IssueBadge from "@/components/IssueBadge";
 import TestingFeedbackPanel from "@/components/TestingFeedbackPanel";
 import type {
   ScanResult,
-  ScanResultAdditiveGroup,
   ScanResultBrandTrustSafety,
   ScanResultDeepExposureCheck,
   ScanResultIngredientItem,
@@ -102,6 +101,10 @@ const chipToneClasses: Record<RowTone, string> = {
   neutral:
     "border-[var(--border-soft)] bg-[var(--bg-surface)] text-[var(--text-secondary)]",
 };
+
+const requiredOverviewCategoryIds = new Set([
+  "ultra_processed_indicators",
+]);
 
 const scoreLabelClasses: Record<Exclude<RowTone, "neutral">, string> = {
   green: "text-[var(--green-main)]",
@@ -646,27 +649,6 @@ function buildIngredientDetail(item: ScanResultIngredientItem) {
   } satisfies ResultDetail;
 }
 
-function buildAdditiveGroupDetail(group: ScanResultAdditiveGroup, summaryMessage: string) {
-  return {
-    title: group.label,
-    tone: group.severity === "green" ? "green" : group.severity,
-    status: group.matchCount > 0 ? `${group.matchCount} match${group.matchCount === 1 ? "" : "es"}` : "No",
-    sections: [
-      {
-        label: "What this means",
-        text:
-          group.matchCount > 0
-            ? summaryMessage
-            : "No additive match from this subgroup was found from available label data.",
-      },
-      {
-        label: "Matched items",
-        text: group.matchedItems.length > 0 ? group.matchedItems.join(", ") : "No matched items.",
-      },
-    ],
-  } satisfies ResultDetail;
-}
-
 function buildBrandTrustDetail(brandTrust: ScanResultBrandTrustSafety) {
   return {
     title: "Brand Trust / Safety",
@@ -846,48 +828,6 @@ function DeepCheckRow({
   );
 }
 
-function AdditivesBreakdownRow({
-  item,
-  onOpen,
-  summaryMessage,
-}: {
-  item: ScanResultAdditiveGroup;
-  onOpen: (detail: ResultDetail) => void;
-  summaryMessage: string;
-}) {
-  const tone = toRowTone(item.matchCount === 0 ? "green" : item.severity);
-  const badges: BadgeDescriptor[] =
-    item.matchCount > 0
-      ? buildIssueBadges({
-          value: String(item.matchCount),
-          tone,
-          badgeTone: tone,
-        })
-      : [{ color: "green", label: "No" }];
-
-  return (
-    <button
-      type="button"
-      onClick={() => onOpen(buildAdditiveGroupDetail(item, summaryMessage))}
-      className="grid min-h-[52px] w-full grid-cols-[auto_minmax(0,1fr)_auto_auto] items-start gap-3 py-2.5 text-left transition-colors active:bg-white/50"
-    >
-      <div className="pt-0.5">
-        <RowIcon tone={tone} />
-      </div>
-      <div className="min-w-0">
-        <p className="truncate text-[14px] font-medium text-[var(--text-main)]">{item.label}</p>
-        <p className="mt-1 text-[12px] leading-5 text-[var(--text-secondary)]">
-          {item.matchedItems.length > 0
-            ? item.matchedItems.join(", ")
-            : "No matched ingredients in this group."}
-        </p>
-      </div>
-      <IssueBadgeStack badges={badges} className="justify-self-end pt-0.5" />
-      <ChevronIcon className="mt-1 text-[var(--text-secondary)]" />
-    </button>
-  );
-}
-
 function ModalBody({ detail }: { detail: ResultDetail }) {
   return (
     <>
@@ -967,7 +907,6 @@ export default function ProductResult({
   const [saved, setSaved] = useState(false);
   const [isIngredientsOpen, setIsIngredientsOpen] = useState(false);
   const [isDeepChecksOpen, setIsDeepChecksOpen] = useState(false);
-  const [isAdditivesOpen, setIsAdditivesOpen] = useState(false);
   const [isConfidenceOpen, setIsConfidenceOpen] = useState(false);
   const [activeDetail, setActiveDetail] = useState<ResultDetail | null>(null);
   const ingredientSectionRef = useRef<HTMLElement | null>(null);
@@ -1007,12 +946,25 @@ export default function ProductResult({
     const calmRows = scanResult.quickOverview.filter(
       (row) => row.severity === "green" && !row.isInformational,
     );
+    const baseRows =
+      urgentRows.length >= 6
+        ? urgentRows.slice(0, 6)
+        : urgentRows.concat(calmRows.slice(0, Math.max(3, 6 - urgentRows.length)));
+    const byCategoryId = new Map(
+      scanResult.quickOverview.map((row) => [row.categoryId, row]),
+    );
+    const withRequiredRows = [
+      ...baseRows,
+      ...[...requiredOverviewCategoryIds]
+        .map((categoryId) => byCategoryId.get(categoryId))
+        .filter(
+          (row): row is ScanResultOverviewRow =>
+            row !== undefined &&
+            !baseRows.some((baseRow) => baseRow.categoryId === row.categoryId),
+        ),
+    ];
 
-    if (urgentRows.length >= 6) {
-      return urgentRows.slice(0, 6);
-    }
-
-    return urgentRows.concat(calmRows.slice(0, Math.max(3, 6 - urgentRows.length)));
+    return [...withRequiredRows].sort((left, right) => left.sortOrder - right.sortOrder);
   }, [scanResult.quickOverview]);
 
   const ingredientGroups = useMemo<IngredientGroupCard[]>(
@@ -1098,18 +1050,6 @@ export default function ProductResult({
       badgeTone: hasNeutral ? "neutral" : undefined,
     });
   }, [deepCheckRows]);
-
-  const additiveSectionBadges = useMemo(() => {
-    const severity = scanResult.additivesAndPreservatives.overallSeverity;
-    const total = scanResult.additivesAndPreservatives.totalAdditiveMatches;
-
-    return buildIssueBadges({
-      clearLabel: severity === "green" ? "No" : undefined,
-      value: severity !== "green" ? String(total) : undefined,
-      tone: toRowTone(severity),
-      badgeTone: toRowTone(severity),
-    });
-  }, [scanResult.additivesAndPreservatives]);
 
   const brandTrustBadges = useMemo(() => {
     const severity = scanResult.brandTrustSafety.severity;
@@ -1269,17 +1209,9 @@ export default function ProductResult({
                 <p className="mt-1 text-[13px] text-[var(--text-secondary)]">
                   {scanResult.productHero.brandName}
                 </p>
-                {scanResult.productHero.barcode ? (
-                  <p className="mt-1 text-[12px] text-[var(--text-muted)]">
-                    Barcode {scanResult.productHero.barcode}
-                  </p>
-                ) : null}
                 <div className="mt-3 flex flex-wrap items-center gap-2.5">
                   <TonePill tone={heroTone}>{scanResult.productHero.verdictLabel}</TonePill>
                   <TonePill tone="neutral">{scanSourceBadgeLabel}</TonePill>
-                  <span className="text-[12px] font-medium text-[var(--text-secondary)]">
-                    Exposure Risk {scanResult.productHero.exposureRisk} / 100
-                  </span>
                 </div>
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   {scanResult.productHero.productCategory ? (
@@ -1291,15 +1223,61 @@ export default function ProductResult({
                     </>
                   ) : null}
                 </div>
-                <p className="mt-2 text-[12px] font-medium text-[var(--text-secondary)]">
-                  Ingredient count: {scanResult.productHero.ingredientCount}
-                </p>
               </div>
               <ScoreRing
                 score={scanResult.productHero.exposureRisk}
                 scoreLabel={scanResult.productHero.verdictLabel}
                 riskBand={scanResult.productHero.riskBand}
               />
+            </div>
+          </section>
+
+          <section className="mt-6 border-t border-[var(--border-soft)] pt-5">
+            <button
+              type="button"
+              onClick={() => setIsDeepChecksOpen((current) => !current)}
+              className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-start gap-3 text-left"
+            >
+              <div>
+                <h2 className="text-[1.12rem] font-semibold tracking-[-0.01em] text-[var(--text-main)]">
+                  Deep Exposure Checks
+                </h2>
+                <p className="mt-1 text-[12px] leading-5 text-[var(--text-secondary)]">
+                  Label-based checks can clear green. External-data checks stay clearly marked when they were not checked.
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <IssueBadgeStack badges={deepCheckSectionBadges} />
+                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border-soft)] bg-[var(--bg-surface)] text-[var(--text-secondary)]">
+                  <svg
+                    aria-hidden="true"
+                    viewBox="0 0 16 16"
+                    className={`h-4 w-4 transition-transform ${isDeepChecksOpen ? "rotate-180" : ""}`}
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M4 6.5L8 10L12 6.5"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </span>
+              </div>
+            </button>
+
+            <div
+              className={`grid overflow-hidden transition-[grid-template-rows,opacity,margin] duration-300 ease-out ${
+                isDeepChecksOpen ? "mt-4 grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+              }`}
+            >
+              <div className="min-h-0 divide-y divide-[var(--border-soft)] border-y border-[var(--border-soft)] py-1">
+                {deepCheckRows.map((item) => (
+                  <DeepCheckRow key={item.categoryId} item={item} onOpen={setActiveDetail} />
+                ))}
+              </div>
             </div>
           </section>
 
@@ -1438,106 +1416,6 @@ export default function ProductResult({
                     </p>
                   </div>
                 )}
-              </div>
-            </div>
-          </section>
-
-          <section className="mt-6 border-t border-[var(--border-soft)] pt-5">
-            <button
-              type="button"
-              onClick={() => setIsDeepChecksOpen((current) => !current)}
-              className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-start gap-3 text-left"
-            >
-              <div>
-                <h2 className="text-[1.12rem] font-semibold tracking-[-0.01em] text-[var(--text-main)]">
-                  Deep Exposure Checks
-                </h2>
-                <p className="mt-1 text-[12px] leading-5 text-[var(--text-secondary)]">
-                  Label-based checks can clear green. External-data checks stay clearly marked when they were not checked.
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <IssueBadgeStack badges={deepCheckSectionBadges} />
-                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border-soft)] bg-[var(--bg-surface)] text-[var(--text-secondary)]">
-                  <svg
-                    aria-hidden="true"
-                    viewBox="0 0 16 16"
-                    className={`h-4 w-4 transition-transform ${isDeepChecksOpen ? "rotate-180" : ""}`}
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M4 6.5L8 10L12 6.5"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </span>
-              </div>
-            </button>
-
-            <div
-              className={`grid overflow-hidden transition-[grid-template-rows,opacity,margin] duration-300 ease-out ${
-                isDeepChecksOpen ? "mt-4 grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-              }`}
-            >
-              <div className="min-h-0 divide-y divide-[var(--border-soft)] border-y border-[var(--border-soft)] py-1">
-                {deepCheckRows.map((item) => (
-                  <DeepCheckRow key={item.categoryId} item={item} onOpen={setActiveDetail} />
-                ))}
-              </div>
-            </div>
-          </section>
-
-          <section className="mt-6 border-t border-[var(--border-soft)] pt-5">
-            <button
-              type="button"
-              onClick={() => setIsAdditivesOpen((current) => !current)}
-              className="grid w-full grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-3 text-left"
-            >
-              <RowIcon tone={toRowTone(scanResult.additivesAndPreservatives.overallSeverity)} />
-              <span className="truncate text-[15px] font-medium text-[var(--text-main)]">
-                Additives &amp; Preservatives
-              </span>
-              <IssueBadgeStack badges={additiveSectionBadges} className="justify-self-end" />
-              <ChevronIcon
-                className={`transition-transform ${isAdditivesOpen ? "rotate-90" : ""}`}
-              />
-            </button>
-
-            <div
-              className={`grid overflow-hidden transition-[grid-template-rows,opacity,margin] duration-300 ease-out ${
-                isAdditivesOpen ? "mt-3 grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-              }`}
-            >
-              <div className="min-h-0">
-                <div className="rounded-[20px] border border-[var(--border-soft)] bg-[var(--bg-soft)] px-4 py-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <p className="text-[15px] font-semibold text-[var(--text-main)]">
-                          Additives Breakdown
-                        </p>
-                        <IssueBadgeStack badges={additiveSectionBadges} />
-                      </div>
-                      <p className="mt-1 text-[12px] leading-5 text-[var(--text-secondary)]">
-                        {scanResult.additivesAndPreservatives.summaryMessage}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="mt-3 divide-y divide-[var(--border-soft)]">
-                    {scanResult.additivesAndPreservatives.groups.map((item) => (
-                      <AdditivesBreakdownRow
-                        key={item.groupId}
-                        item={item}
-                        summaryMessage={scanResult.additivesAndPreservatives.summaryMessage}
-                        onOpen={setActiveDetail}
-                      />
-                    ))}
-                  </div>
-                </div>
               </div>
             </div>
           </section>

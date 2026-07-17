@@ -3,7 +3,10 @@ import test from "node:test";
 
 import { calculateExposureRisk } from "./calculateExposureRisk";
 import { applyIngredientCategoryRules } from "./ingredientCategoryRules";
-import { matchIngredientIntelligence } from "./ingredientIntelligenceMatcher";
+import {
+  matchIngredientIntelligence,
+  normalizeIngredientIntelligenceText,
+} from "./ingredientIntelligenceMatcher";
 import {
   extractInlineAllergenStatement,
   parseIngredientInput,
@@ -60,6 +63,9 @@ function analyzeManualInput(input: ManualScanInput) {
     extractInlineAllergenStatement(input.ingredientText);
   const packagingText = input.packagingText?.trim() || undefined;
   const userAllergyProfile = input.userAllergyProfile ?? [];
+  const ingredientCount = new Set(
+    ingredients.map(normalizeIngredientIntelligenceText).filter(Boolean),
+  ).size;
 
   const matcherResult = matchIngredientIntelligence({
     ingredients,
@@ -78,7 +84,7 @@ function analyzeManualInput(input: ManualScanInput) {
     ingredientListAvailable: true,
     userAllergyProfile,
     externalSignals: [],
-    ingredientCount: ingredients.length,
+    ingredientCount,
   }).categorySummaries;
 
   const exposureRiskResult = calculateExposureRisk({
@@ -86,7 +92,7 @@ function analyzeManualInput(input: ManualScanInput) {
     matchedIngredients: matcherResult.matchedIngredients,
     duplicateSafeMatches: matcherResult.duplicateSafeMatches,
     ingredientGroups: matcherResult.ingredientGroups,
-    ingredientCount: ingredients.length,
+    ingredientCount,
     productCategory,
     userAllergyProfile,
     externalSignals: [],
@@ -124,6 +130,17 @@ test("runManualScan uses fallback product metadata and lets clean oats stay gree
   assert.equal(output.scanResult.productHero.scanSource, "manual_paste");
   assert.equal(output.scanResult.productHero.ingredientCount, 1);
   assert.equal(output.scanResult.finalVerdict.verdictTone, "green");
+});
+
+test("runManualScan counts unique parsed ingredients for Total Ingredients", () => {
+  const output = analyzeManualInput({
+    ingredientText: "Ingredients: Water, water, sugar",
+  });
+  const summary = findCategorySummary(output, "total_ingredients");
+
+  assert.equal(summary.displayLabel, "2");
+  assert.equal(output.scanResult.productHero.ingredientCount, 2);
+  assert.equal(output.scanResult.ingredientBreakdown.totalIngredients, 2);
 });
 
 test("runManualScan makes banned or restricted additives turn the manual result red", () => {

@@ -233,8 +233,6 @@ const additiveBreakdownDescriptors: AdditiveDescriptor[] = [
 
 const deepCheckOrder: ExposureCheckId[] = [
   "cancer_linked_watch",
-  "artificial_engineered_food_construction",
-  "artificial_colours",
   "artificial_sweeteners",
   "preservatives",
   "ingredient_count",

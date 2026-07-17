@@ -8,7 +8,10 @@ import {
 import { buildScanResult } from "./buildScanResult";
 import { calculateExposureRisk } from "./calculateExposureRisk";
 import { applyIngredientCategoryRules } from "./ingredientCategoryRules";
-import { matchIngredientIntelligence } from "./ingredientIntelligenceMatcher";
+import {
+  matchIngredientIntelligence,
+  normalizeIngredientIntelligenceText,
+} from "./ingredientIntelligenceMatcher";
 import {
   extractInlineAllergenStatement,
   parseIngredientInput,
@@ -57,6 +60,12 @@ function uniqueStrings(values: Array<string | undefined | null>) {
   return result;
 }
 
+function countUniqueParsedIngredients(ingredients: string[]) {
+  return new Set(
+    ingredients.map(normalizeIngredientIntelligenceText).filter(Boolean),
+  ).size;
+}
+
 export function runIngredientScan(input: IngredientScanInput): ScanResult {
   const ingredients = parseIngredientInput(input.ingredientText);
 
@@ -85,6 +94,7 @@ export function runIngredientScan(input: IngredientScanInput): ScanResult {
   const externalSignals = input.externalSignals ?? [];
   const scanSource = input.scanSource ?? "manual_paste";
   const additionalConfidenceNotes = input.additionalConfidenceNotes ?? [];
+  const ingredientCount = countUniqueParsedIngredients(ingredients);
 
   const matcherResult = matchIngredientIntelligence({
     ingredients,
@@ -103,7 +113,7 @@ export function runIngredientScan(input: IngredientScanInput): ScanResult {
     ingredientListAvailable: true,
     userAllergyProfile,
     externalSignals,
-    ingredientCount: ingredients.length,
+    ingredientCount,
   });
 
   const exposureRiskResult = calculateExposureRisk({
@@ -111,7 +121,7 @@ export function runIngredientScan(input: IngredientScanInput): ScanResult {
     matchedIngredients: matcherResult.matchedIngredients,
     duplicateSafeMatches: matcherResult.duplicateSafeMatches,
     ingredientGroups: matcherResult.ingredientGroups,
-    ingredientCount: ingredients.length,
+    ingredientCount,
     productCategory,
     userAllergyProfile,
     externalSignals,

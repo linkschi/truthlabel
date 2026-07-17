@@ -942,8 +942,7 @@ function buildTotalIngredientsSummary(
   }
 
   if (totalIngredientCount >= 15) {
-    const message =
-      "This product has a very long ingredient list. Truthlabel flags this as a high ingredient-count concern.";
+    const message = "This product has a very long ingredient list.";
     return buildBaseSummary("total_ingredients", matches, {
       severity: "red",
       matchCount: totalIngredientCount,
@@ -955,8 +954,7 @@ function buildTotalIngredientsSummary(
   }
 
   if (totalIngredientCount >= 8) {
-    const message =
-      "This product has a longer ingredient list. Truthlabel flags this for review.";
+    const message = "This product has a longer ingredient list worth reviewing.";
     return buildBaseSummary("total_ingredients", matches, {
       severity: "yellow",
       matchCount: totalIngredientCount,
@@ -1285,10 +1283,10 @@ function summarizeUltraProcessedCategory(
   const automaticRedMatch = matches.find((match) => getAutomaticRedReasonFromMatch(match));
   if (automaticRedMatch) {
     const message =
-      "This product contains multiple ultra-processed markers. Truthlabel flags this as a high processing-load concern.";
+      "This product contains multiple ultra-processed markers.";
     return buildBaseSummary("ultra_processed_indicators", matches, {
       severity: "red",
-      displayLabel: formatCountLabel(matches.length),
+      displayLabel: "High",
       shortMessage: message,
       userFacingReason: message,
       redReasonType: "category_combo_trigger",
@@ -1297,10 +1295,10 @@ function summarizeUltraProcessedCategory(
 
   if (matches.length >= 4) {
     const message =
-      "This product contains multiple ultra-processed markers. Truthlabel flags this as a high processing-load concern.";
+      "This product contains multiple ultra-processed markers.";
     return buildBaseSummary("ultra_processed_indicators", matches, {
       severity: "red",
-      displayLabel: formatCountLabel(matches.length),
+      displayLabel: "High",
       shortMessage: message,
       userFacingReason: message,
       redReasonType: "count_overload",
@@ -1309,10 +1307,10 @@ function summarizeUltraProcessedCategory(
 
   if (matches.length > 0) {
     const message =
-      "This product contains ultra-processed ingredient markers. Truthlabel flags this as a processing review item.";
+      "This product contains ultra-processed ingredient markers.";
     return buildBaseSummary("ultra_processed_indicators", matches, {
       severity: "yellow",
-      displayLabel: formatCountLabel(matches.length),
+      displayLabel: "Likely",
       shortMessage: message,
       userFacingReason: message,
     });
@@ -1320,9 +1318,11 @@ function summarizeUltraProcessedCategory(
 
   return buildBaseSummary("ultra_processed_indicators", matches, {
     severity: "green",
-    displayLabel: "No",
-    shortMessage: "No ultra-processed marker found from available label data.",
-    userFacingReason: "No ultra-processed marker found from available label data.",
+    displayLabel: "No major markers",
+    shortMessage:
+      "No major ultra-processed markers were found from the available ingredient list.",
+    userFacingReason:
+      "No major ultra-processed markers were found from the available ingredient list.",
   });
 }
 

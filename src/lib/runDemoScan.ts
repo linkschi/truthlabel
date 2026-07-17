@@ -9,6 +9,7 @@ import { calculateExposureRisk } from "./calculateExposureRisk";
 import { applyIngredientCategoryRules } from "./ingredientCategoryRules";
 import {
   matchIngredientIntelligence,
+  normalizeIngredientIntelligenceText,
   type IngredientIntelligenceMatcherInput,
 } from "./ingredientIntelligenceMatcher";
 
@@ -28,6 +29,12 @@ export type RunDemoScanResult = {
   scanResult: ReturnType<typeof buildScanResult>;
 };
 
+function countUniqueParsedIngredients(ingredients: string[]) {
+  return new Set(
+    ingredients.map(normalizeIngredientIntelligenceText).filter(Boolean),
+  ).size;
+}
+
 export function runDemoScan(
   demoProduct: DemoProduct,
   options: RunDemoScanOptions = {},
@@ -42,6 +49,7 @@ export function runDemoScan(
   const userAllergyProfile =
     options.userAllergyProfile ?? getSavedAllergyProfile(userSettings);
   const externalSignals = options.externalSignals ?? demoProduct.externalSignals;
+  const ingredientCount = countUniqueParsedIngredients(ingredients);
 
   const matcherResult = matchIngredientIntelligence({
     ingredients,
@@ -60,7 +68,7 @@ export function runDemoScan(
     ingredientListAvailable,
     userAllergyProfile,
     externalSignals,
-    ingredientCount: ingredients.length,
+    ingredientCount,
   });
 
   const exposureRiskResult = calculateExposureRisk({
@@ -68,7 +76,7 @@ export function runDemoScan(
     matchedIngredients: matcherResult.matchedIngredients,
     duplicateSafeMatches: matcherResult.duplicateSafeMatches,
     ingredientGroups: matcherResult.ingredientGroups,
-    ingredientCount: ingredients.length,
+    ingredientCount,
     productCategory,
     userAllergyProfile,
     externalSignals,

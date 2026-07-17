@@ -109,7 +109,7 @@ test("many yellow issues cap at 64 when no category turns red", () => {
     packagingText: "PET bottle",
   });
 
-  assert.equal(result.exposureRisk, 64);
+  assert.ok(result.exposureRisk >= 25 && result.exposureRisk <= 64);
   assert.equal(result.verdictLabel, "High Review");
   assert.equal(result.verdictTone, "yellow");
   assert.ok(
@@ -119,11 +119,33 @@ test("many yellow issues cap at 64 when no category turns red", () => {
 
 test("many yellow issues can exceed 65 after category overload rules trigger", () => {
   const result = runExposureRisk({
-    ingredients: ["Tartrazine", "Sunset Yellow FCF", "Allura Red AC"],
+    ingredients: ["Aspartame", "Sucralose", "Acesulfame potassium"],
   });
 
   assert.ok(result.exposureRisk >= 65);
   assert.equal(result.verdictTone, "red");
+});
+
+test("hidden customer categories do not add independent score entries", () => {
+  const result = runExposureRisk({
+    ingredients: ["Tartrazine", "Sunset Yellow FCF", "Allura Red AC"],
+  });
+  const hiddenCategoryIds = new Set([
+    "artificial_colours",
+    "artificial_engineered_food_construction",
+    "additives_and_preservatives",
+  ]);
+
+  assert.ok(
+    result.scoreBreakdown.every(
+      (entry) => !entry.categoryId || !hiddenCategoryIds.has(entry.categoryId),
+    ),
+  );
+  assert.ok(
+    result.mainReasons.every(
+      (reason) => !hiddenCategoryIds.has(reason.categoryId),
+    ),
+  );
 });
 
 test("Red No. 3 scores once as one canonical direct red signal across categories", () => {

@@ -8,10 +8,6 @@ import { microplasticsDataPack } from "@/data/ingredientIntelligence/microplasti
 import { preservativesShelfLifeSystemsDataPack } from "@/data/ingredientIntelligence/preservativesShelfLifeSystems";
 import type { AdditiveBreakdownResult, ExposureCheckResult, IngredientClassification } from "@/types/exposure";
 import type { ArtificialEngineeredFoodConstructionSummary } from "@/lib/ingredientIntelligence/artificialEngineeredFoodConstruction";
-import {
-  mergedArtificialColours,
-  type MergedArtificialColour,
-} from "@/lib/ingredientIntelligence/artificialColours";
 
 import type {
   IngredientCategorySummary,
@@ -195,19 +191,22 @@ const mainReasonPriority: Record<string, number> = {
   yellow_category: 11,
 };
 
+const scoreExcludedCategoryIds = new Set([
+  "additives_and_preservatives",
+  "artificial_engineered_food_construction",
+  "artificial_colours",
+]);
+
 const countOverloadRedScores: Partial<Record<string, number>> = {
-  artificial_colours: 20,
   artificial_sweeteners_sugar_substitutes: 20,
   preservatives_shelf_life_systems: 20,
   emulsifiers_stabilisers_thickeners_gums: 18,
   flavour_enhancers_flavourings: 18,
   seed_oils_processed_oils: 18,
   ultra_processed_indicators: 22,
-  artificial_engineered_food_construction: 25,
   unknown_review: 15,
   meat_specific_concerns: 18,
   fry_oil_fast_food_oil: 18,
-  additives_and_preservatives: 22,
   cancer_linked_watch: 25,
 };
 
@@ -217,14 +216,12 @@ const specialRedScores: Partial<Record<string, number>> = {
 };
 
 const yellowPerMatchScores: Partial<Record<string, number>> = {
-  artificial_colours: 6,
   artificial_sweeteners_sugar_substitutes: 6,
   preservatives_shelf_life_systems: 6,
   emulsifiers_stabilisers_thickeners_gums: 5,
   flavour_enhancers_flavourings: 5,
   seed_oils_processed_oils: 8,
   ultra_processed_indicators: 5,
-  artificial_engineered_food_construction: 6,
   harmful_additives: 8,
   cancer_linked_watch: 10,
   unknown_review: 3,
@@ -301,16 +298,6 @@ const hydrogenatedRedIds = new Set(
     .map((item) => item.id),
 );
 
-const artificialColourRedIds = new Set(
-  mergedArtificialColours
-    .filter((item) => item.severity === "red")
-    .map((item) => getArtificialColourLookupId(item)),
-);
-
-function getArtificialColourLookupId(item: MergedArtificialColour) {
-  return ((item as { duplicateGroupId?: string }).duplicateGroupId ?? item.id);
-}
-
 function uniqueStrings(values: string[]) {
   return [...new Set(values.filter(Boolean))];
 }
@@ -351,6 +338,10 @@ function addBreakdown(
   }
 
   breakdown.push(entry);
+}
+
+function isScoreExcludedCategory(categoryId: string) {
+  return scoreExcludedCategoryIds.has(categoryId);
 }
 
 function buildDirectScoreCandidates(
@@ -485,22 +476,6 @@ function buildDirectScoreCandidates(
     }
 
     if (
-      match.sourcePacks.includes("artificial_colours") &&
-      isDirectRedIdMatch(match, artificialColourRedIds)
-    ) {
-      candidates.push({
-        scoreEntityId: match.canonicalIngredientId,
-        categoryId: "artificial_colours",
-        categoryName: "Artificial Colours",
-        points: 25,
-        reasonType: "direct_red_ingredient",
-        message:
-          "A red artificial-colour item was found, which adds a serious colour-additive score.",
-        matchedItem: match,
-      });
-    }
-
-    if (
       match.sourcePacks.includes("artificial_sweeteners_sugar_substitutes") &&
       isDirectRedIdMatch(match, artificialSweetenerRedIds)
     ) {
@@ -573,9 +548,7 @@ function getCountOverloadPoints(summary: IngredientCategorySummary) {
   }
 
   if (summary.redReasonType === "category_combo_trigger") {
-    return summary.categoryId === "artificial_engineered_food_construction"
-      ? countOverloadRedScores[summary.categoryId] ?? 0
-      : 0;
+    return 0;
   }
 
   if (
@@ -610,10 +583,13 @@ function getYellowCategoryPoints(summary: IngredientCategorySummary) {
 
 function getFloorRules(categorySummaries: IngredientCategorySummary[]) {
   const rules: FloorRule[] = [];
-  const hasYellowCategory = categorySummaries.some(
+  const scorableSummaries = categorySummaries.filter(
+    (summary) => !isScoreExcludedCategory(summary.categoryId),
+  );
+  const hasYellowCategory = scorableSummaries.some(
     (summary) => summary.displayAllowed && summary.severity === "yellow",
   );
-  const redSummaries = categorySummaries.filter(
+  const redSummaries = scorableSummaries.filter(
     (summary) => summary.displayAllowed && summary.severity === "red",
   );
 
@@ -862,6 +838,7 @@ function buildMainReasons(categorySummaries: IngredientCategorySummary[]) {
   return categorySummaries
     .filter(
       (summary) =>
+        !isScoreExcludedCategory(summary.categoryId) &&
         summary.displayAllowed &&
         (summary.severity === "red" || summary.severity === "yellow"),
     )
@@ -993,6 +970,9 @@ function calculatePhase4ExposureRisk(
 ): ExposureRiskResult {
   const scoreBreakdown: ExposureRiskScoreBreakdown[] = [];
   let score = 0;
+  const scorableCategorySummaries = input.categorySummaries.filter(
+    (summary) => !isScoreExcludedCategory(summary.categoryId),
+  );
 
   const directCandidates = collapseDirectScoreCandidates(
     buildDirectScoreCandidates(input.duplicateSafeMatches),
@@ -1011,7 +991,7 @@ function calculatePhase4ExposureRisk(
     });
   });
 
-  input.categorySummaries.forEach((summary) => {
+  scorableCategorySummaries.forEach((summary) => {
     const redPoints = getCountOverloadPoints(summary);
     if (redPoints > 0) {
       score += redPoints;
@@ -1039,11 +1019,11 @@ function calculatePhase4ExposureRisk(
     }
   });
 
-  const hasRedCategory = input.categorySummaries.some(
+  const hasRedCategory = scorableCategorySummaries.some(
     (summary) => summary.displayAllowed && summary.severity === "red",
   );
   const hasDirectRedSignal = directCandidates.length > 0;
-  const floorRules = getFloorRules(input.categorySummaries);
+  const floorRules = getFloorRules(scorableCategorySummaries);
   const appliedFloor = floorRules
     .sort((left, right) => {
       if (left.minimumScore !== right.minimumScore) {
@@ -1085,7 +1065,7 @@ function calculatePhase4ExposureRisk(
   const finalScore = Math.max(0, Math.min(100, Math.round(score)));
   const verdict = toVerdict(finalScore);
   const redReasonTypes = uniqueStrings(
-    input.categorySummaries
+    scorableCategorySummaries
       .filter((summary) => summary.severity === "red")
       .map((summary) => summary.redReasonType)
       .filter((value): value is RedReasonType => typeof value === "string"),
@@ -1097,16 +1077,16 @@ function calculatePhase4ExposureRisk(
     verdictLabel: verdict.verdictLabel,
     verdictMessage: verdict.verdictMessage,
     verdictTone: verdict.verdictTone,
-    mainReasons: buildMainReasons(input.categorySummaries),
+    mainReasons: buildMainReasons(scorableCategorySummaries),
     scoreBreakdown,
     redReasonTypes,
     confidenceNotes: buildConfidenceNotes(input),
     duplicateSafeScoring: true,
     hasRedIssue: hasRedCategory,
-    hasSeriousRedIssue: input.categorySummaries.some((summary) =>
+    hasSeriousRedIssue: scorableCategorySummaries.some((summary) =>
       isSeriousRedSummary(summary),
     ),
-    hasAllergyRisk: input.categorySummaries.some(
+    hasAllergyRisk: scorableCategorySummaries.some(
       (summary) =>
         summary.categoryId === "allergy_risk" &&
         summary.redReasonType === "allergy_profile_match",
@@ -1150,10 +1130,6 @@ function calculateLegacyExposureRisk(
   "exposureRisk" | "hasRedIssue" | "hasSeriousRedIssue" | "hasAllergyRisk"
 > {
   const harmfulAdditives = findCheck(input.checkResults, "harmful_additives");
-  const construction = findCheck(
-    input.checkResults,
-    "artificial_engineered_food_construction",
-  );
   const bannedRestricted = findCheck(
     input.checkResults,
     "banned_restricted_items",
@@ -1163,10 +1139,6 @@ function calculateLegacyExposureRisk(
   const heavyMetals = findCheck(input.checkResults, "heavy_metals");
   const brandTrustSafety = findCheck(input.checkResults, "brand_trust_safety");
   const lawsuitsRecalls = findCheck(input.checkResults, "lawsuits_recalls");
-  const additivesPreservatives = findCheck(
-    input.checkResults,
-    "additives_preservatives",
-  );
   const ingredientCount = findCheck(input.checkResults, "ingredient_count");
   const allergyRisk = findCheck(input.checkResults, "allergy_risk");
   const seedOil = findCheck(input.checkResults, "seed_oil");
@@ -1201,9 +1173,6 @@ function calculateLegacyExposureRisk(
     lawsuitsRecalls?.severity === "red";
   const countBasedRedIssue =
     harmfulAdditiveCount >= 3 ||
-    input.constructionSummary?.categorySeverity === "red" ||
-    construction?.severity === "red" ||
-    additivesPreservatives?.severity === "red" ||
     artificialSweeteners?.severity === "red" ||
     textureAdditiveCount >= 3 ||
     flavourSystemCount >= 3 ||
@@ -1249,24 +1218,12 @@ function calculateLegacyExposureRisk(
     risk += 8;
   }
 
-  if (input.constructionSummary) {
-    risk += input.constructionSummary.scoreContribution;
-  } else if (construction?.severity === "red") {
-    risk += 25;
-  } else if (construction?.severity === "yellow") {
-    risk += 10;
-  }
-
   if (input.ingredientClassification.totalCount >= 15) {
     risk += 15;
   }
 
   if (input.ingredientClassification.processedPercent >= 60) {
     risk += 20;
-  }
-
-  if (additivesPreservatives?.severity === "red") {
-    risk += 18;
   }
 
   if (ingredientCount?.severity === "red") {

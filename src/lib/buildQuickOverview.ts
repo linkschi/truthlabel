@@ -21,12 +21,26 @@ function getPriority(severity: Severity) {
   return 3;
 }
 
+const hiddenQuickOverviewIds = new Set<ExposureCheckResult["id"]>([
+  "additives_preservatives",
+  "artificial_engineered_food_construction",
+  "artificial_colours",
+  "total_ingredients",
+]);
+
+const requiredIngredientOverviewIds: ExposureCheckResult["id"][] = [
+  "ultra_processed",
+];
+
 export function buildQuickOverview(
   productCategory: ProductCategory,
   allCheckResults: ExposureCheckResult[],
 ) {
   const profile = getCategoryProfile(productCategory);
-  const normalIds = profile.quickOverviewIds;
+  const normalIds = [
+    ...profile.quickOverviewIds,
+    ...requiredIngredientOverviewIds,
+  ].filter((id, index, ids) => !hiddenQuickOverviewIds.has(id) && ids.indexOf(id) === index);
   const allById = new Map(allCheckResults.map((row) => [row.id, row]));
 
   const normalRows = normalIds
@@ -40,6 +54,7 @@ export function buildQuickOverview(
   const seriousRows = allCheckResults
     .filter(
       (row) =>
+        !hiddenQuickOverviewIds.has(row.id) &&
         row.isAutomaticSeriousOverride &&
         row.hasMeaningfulValue &&
         row.severity === "red",

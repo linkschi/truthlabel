@@ -48,7 +48,6 @@ export const categoryProfiles: CategoryProfile[] = [
     description: "Default row set for shelf foods, bars, snacks, and heavily packaged items.",
     quickOverviewIds: [
       "harmful_additives",
-      "artificial_engineered_food_construction",
       "banned_restricted_items",
       "seed_oil",
       "total_ingredients",
@@ -64,7 +63,6 @@ export const categoryProfiles: CategoryProfile[] = [
     description: "Default row set for takeaway-style products, prepared meats, and sandwiches.",
     quickOverviewIds: [
       "harmful_additives",
-      "artificial_engineered_food_construction",
       "seed_oil",
       "total_ingredients",
       "ultra_processed",
@@ -80,11 +78,11 @@ export const categoryProfiles: CategoryProfile[] = [
     description: "Default row set for bottled drinks, sweetened beverages, and functional drinks.",
     quickOverviewIds: [
       "harmful_additives",
-      "artificial_engineered_food_construction",
       "banned_restricted_items",
       "artificial_sweeteners",
-      "artificial_colours",
       "preservatives",
+      "total_ingredients",
+      "ultra_processed",
       "microplastics",
       "allergy_risk",
     ],
@@ -96,10 +94,9 @@ export const categoryProfiles: CategoryProfile[] = [
     description: "Default row set for child-focused foods where stricter warning thresholds matter more.",
     quickOverviewIds: [
       "harmful_additives",
-      "artificial_engineered_food_construction",
       "banned_restricted_items",
-      "artificial_colours",
       "artificial_sweeteners",
+      "total_ingredients",
       "ultra_processed",
       "heavy_metals",
       "allergy_risk",
@@ -113,7 +110,6 @@ export const categoryProfiles: CategoryProfile[] = [
     quickOverviewIds: [
       "heavy_metals",
       "microplastics",
-      "artificial_engineered_food_construction",
       "banned_restricted_items",
       "allergy_risk",
       "total_ingredients",
@@ -129,12 +125,10 @@ export const categoryProfiles: CategoryProfile[] = [
     quickOverviewIds: [
       "allergy_risk",
       "harmful_additives",
-      "artificial_engineered_food_construction",
       "banned_restricted_items",
       "total_ingredients",
       "ultra_processed",
       "natural_vs_processed",
-      "additives_preservatives",
     ],
   },
   {
@@ -143,7 +137,6 @@ export const categoryProfiles: CategoryProfile[] = [
     label: "Fresh / Simple Foods",
     description: "Default row set for simpler foods where the main question is whether the label stays clean.",
     quickOverviewIds: [
-      "artificial_engineered_food_construction",
       "total_ingredients",
       "ultra_processed",
       "natural_vs_processed",
@@ -159,7 +152,6 @@ export const categoryProfiles: CategoryProfile[] = [
     description: "Fallback row set when the product category is broad or not clearly identified yet.",
     quickOverviewIds: [
       "harmful_additives",
-      "artificial_engineered_food_construction",
       "banned_restricted_items",
       "total_ingredients",
       "ultra_processed",

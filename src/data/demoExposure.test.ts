@@ -63,17 +63,17 @@ test("Microplastics detected appears in Quick Overview for packaged processed fo
   assert.ok(getQuickOverviewIds(report).includes("microplastics"));
 });
 
-test("Artificial / Engineered Food Construction appears in Quick Overview with a red count for the demo product", () => {
+test("technical construction and additive rollup categories stay out of Quick Overview", () => {
   const report = getDemoExposureReport("packaged-processed-foods", neutralProfile, {
     checkOverrides: quietAutomaticOverrides,
   });
-  const row = report.quickOverviewRows.find(
-    (item) => item.id === "artificial_engineered_food_construction",
-  );
+  const quickOverviewIds = getQuickOverviewIds(report);
 
-  assert.ok(row);
-  assert.equal(row?.tone, "red");
-  assert.ok((row?.redCount ?? 0) >= 4);
+  assert.ok(!quickOverviewIds.includes("artificial_engineered_food_construction"));
+  assert.ok(!quickOverviewIds.includes("artificial_colours"));
+  assert.ok(!quickOverviewIds.includes("additives_preservatives"));
+  assert.ok(!quickOverviewIds.includes("total_ingredients"));
+  assert.ok(quickOverviewIds.includes("ultra_processed"));
 });
 
 test("Heavy Metals likely appears in Quick Overview for drinks beverages", () => {
