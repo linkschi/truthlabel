@@ -6,6 +6,7 @@ import { lookupMockProduct } from "@/lib/productDatabase/mockProductDatabaseClie
 
 import {
   BarcodeValidationError,
+  isLikelySouthAfricanBarcode,
   runBarcodeScan,
   validateBarcode,
 } from "./runBarcodeScan";
@@ -120,6 +121,30 @@ test("product not found returns manual fallback", async () => {
   assert.equal(output.lookupStatus, "not_found");
   assert.equal(output.manualInputNeeded, true);
   assert.equal(output.scanResult, undefined);
+});
+
+test("South African barcode not found returns regional manual fallback guidance", async () => {
+  const output = await runBarcodeScan(
+    { barcode: "6003678052405" },
+    {
+      lookupProduct: async (input) => ({
+        found: false,
+        provider: "open_food_facts",
+        barcode: input.barcode,
+        dataQualityWarnings: ["product not found"],
+      }),
+    },
+  );
+
+  assert.equal(isLikelySouthAfricanBarcode("6003678052405"), true);
+  assert.equal(output.lookupStatus, "not_found");
+  assert.equal(output.manualInputNeeded, true);
+  assert.match(output.message, /South African product not found/i);
+  assert.ok(
+    output.dataQualityWarnings.some((warning) =>
+      /South African barcode prefix detected/i.test(warning),
+    ),
+  );
 });
 
 test("network error returns manual fallback", async () => {

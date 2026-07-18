@@ -94,6 +94,37 @@ function hasMeaningfulText(value: string | undefined) {
   return Boolean(value?.trim());
 }
 
+export function isLikelySouthAfricanBarcode(barcode: string) {
+  return /^60[01]/.test(barcode);
+}
+
+function buildRegionalProductDataWarnings(barcode: string) {
+  if (!isLikelySouthAfricanBarcode(barcode)) {
+    return [];
+  }
+
+  return [
+    "South African barcode prefix detected. Connected open product databases may have limited coverage for some local products.",
+    "South Africa sources such as FoodSwitch, GS1 South Africa, and GDSN/Trusted Source may need access approval before Truthlabel can use them for live ingredient lookup.",
+  ];
+}
+
+function buildProductNotFoundMessage(barcode: string) {
+  if (isLikelySouthAfricanBarcode(barcode)) {
+    return "South African product not found in the connected product database. Scan or paste the ingredient list from the package to continue.";
+  }
+
+  return "Product not found in the product database. You can still paste the ingredient list manually.";
+}
+
+function buildMissingIngredientsMessage(barcode: string) {
+  if (isLikelySouthAfricanBarcode(barcode)) {
+    return "South African product found, but the ingredient list was missing. Scan or paste the ingredient list from the package to complete the result.";
+  }
+
+  return "Product found, but the ingredient list was missing. Paste the ingredient list to complete the scan.";
+}
+
 function hasKeyword(value: string | undefined, pattern: RegExp) {
   return pattern.test(value ?? "");
 }
@@ -328,9 +359,11 @@ export async function runBarcodeScan(
         lookupStatus: "not_found",
         productData: null,
         manualInputNeeded: true,
-        message:
-          "Product not found in the product database. You can still paste the ingredient list manually.",
-        dataQualityWarnings: lookupResult.dataQualityWarnings,
+        message: buildProductNotFoundMessage(barcode),
+        dataQualityWarnings: uniqueStrings([
+          ...lookupResult.dataQualityWarnings,
+          ...buildRegionalProductDataWarnings(barcode),
+        ]),
       };
     }
 
@@ -341,9 +374,11 @@ export async function runBarcodeScan(
         lookupStatus: "found_missing_ingredients",
         productData,
         manualInputNeeded: true,
-        message:
-          "Product found, but the ingredient list was missing. Paste the ingredient list to complete the scan.",
-        dataQualityWarnings: productData.dataQualityWarnings,
+        message: buildMissingIngredientsMessage(productData.barcode),
+        dataQualityWarnings: uniqueStrings([
+          ...productData.dataQualityWarnings,
+          ...buildRegionalProductDataWarnings(productData.barcode),
+        ]),
       };
     }
 
