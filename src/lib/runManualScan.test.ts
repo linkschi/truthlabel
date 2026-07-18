@@ -196,7 +196,7 @@ test("runManualScan upgrades inline allergen statements to red when they match t
   assert.equal(summary.severity, "red");
   assert.equal(summary.redReasonType, "allergy_profile_match");
   assert.ok(output.scanResult.productHero.exposureRisk >= 90);
-  assert.equal(output.scanResult.finalVerdict.headline, "Strong Warning");
+  assert.equal(output.scanResult.finalVerdict.headline, "Do not consume");
 });
 
 test("runManualScan keeps OCR scanSource and confidence notes in the final result", () => {

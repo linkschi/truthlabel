@@ -76,7 +76,11 @@ test("clean product builds a green hero and natural ingredient grouping", () => 
   });
 
   assert.equal(result.productHero.verdictTone, "green");
-  assert.equal(result.finalVerdict.headline, "Clean Pass");
+  assert.equal(result.finalVerdict.headline, "No major concerns");
+  assert.equal(result.ingredientLoad.rawLoad, 3);
+  assert.equal(result.ingredientLoad.score, 5);
+  assert.equal(result.ingredientLoad.level, "Low Ingredient Load");
+  assert.equal(result.productHero.ingredientLoadScore, 5);
   assert.equal(result.ingredientBreakdown.naturalPositive.length, 3);
   assert.equal(result.ingredientBreakdown.processedArtificial.length, 0);
   assert.equal(result.ingredientBreakdown.unknownReview.length, 0);
@@ -187,6 +191,8 @@ test("four preservatives make preservatives red by count overload and final verd
     "count_overload",
   );
   assert.equal(result.finalVerdict.verdictTone, "red");
+  assert.equal(result.finalVerdict.verdictCode, "limit");
+  assert.equal(result.finalVerdict.headline, "Limit consumption");
 });
 
 test("texture additive category stays out of Deep Exposure", () => {
@@ -221,7 +227,7 @@ test("meat-specific concerns appear in meat product contexts", () => {
   assert.ok(findDeepCheck(result, "meat_specific_concerns"));
 });
 
-test("milk allergy profile match creates a red allergy check and strong warning verdict", () => {
+test("milk allergy profile match creates a red allergy check and do-not-consume verdict", () => {
   const result = buildResult({
     ingredients: ["Milk powder"],
     userAllergyProfile: ["milk"],
@@ -231,7 +237,10 @@ test("milk allergy profile match creates a red allergy check and strong warning 
 
   assert.equal(allergyRow?.severity, "red");
   assert.ok(result.productHero.exposureRisk >= 90);
-  assert.equal(result.finalVerdict.headline, "Strong Warning");
+  assert.equal(result.finalVerdict.headline, "Do not consume");
+  assert.equal(result.finalVerdict.immediateStopReason, "selected_allergen");
+  assert.equal(result.ingredientLoad.rawLoad, 2);
+  assert.equal(result.ingredientLoad.score, 3);
 });
 
 test("milk without a matching allergy profile stays yellow but hides from Deep Exposure", () => {
@@ -308,6 +317,9 @@ test("active official recall creates a red brand-trust section and red final ver
   assert.equal(result.brandTrustSafety.status, "red_warning");
   assert.equal(result.brandTrustSafety.severity, "red");
   assert.equal(result.finalVerdict.verdictTone, "red");
+  assert.equal(result.finalVerdict.headline, "Do not consume");
+  assert.equal(result.finalVerdict.immediateStopReason, "active_safety_alert");
+  assert.equal(result.ingredientLoad.score, 0);
 });
 
 test("Cancer-linked Watch keeps careful wording and avoids unsafe claims", () => {

@@ -14,6 +14,15 @@ import type {
   IngredientIntelligenceMatcherOutput,
 } from "@/lib/ingredientIntelligenceMatcher";
 import { normalizeIngredientIntelligenceText } from "@/lib/ingredientIntelligenceMatcher";
+import {
+  buildEvidenceAwareFinalVerdict,
+  type TruthlabelFinalVerdictCode,
+  type TruthlabelImmediateStopReason,
+} from "@/lib/buildEvidenceAwareFinalVerdict";
+import {
+  calculateIngredientLoad,
+  type IngredientLoadResult,
+} from "@/lib/calculateIngredientLoad";
 
 type Severity = "green" | "yellow" | "red";
 type IngredientGroup =
@@ -56,6 +65,10 @@ export type ScanResultProductHero = {
   verdictTone: Severity;
   scanSource: ScanSource;
   ingredientCount: number;
+  ingredientLoadScore: number;
+  ingredientLoadLevel: IngredientLoadResult["level"];
+  ingredientLoadTone: IngredientLoadResult["tone"];
+  ingredientLoadRawPoints: number;
 };
 
 export type ScanResultOverviewRow = {
@@ -150,8 +163,15 @@ export type ScanResultFinalVerdict = {
   riskBand: string;
   verdictLabel: string;
   verdictTone: Severity;
+  verdictCode: TruthlabelFinalVerdictCode;
   headline: string;
+  opening: string;
   summary: string;
+  totalRedCount: number;
+  seriousRedCount: number;
+  overloadRedCount: number;
+  yellowCount: number;
+  immediateStopReason?: TruthlabelImmediateStopReason;
   mainReasons: ExposureRiskMainReason[];
   avoidWording: string[];
   confidenceNotes: string[];
@@ -159,6 +179,7 @@ export type ScanResultFinalVerdict = {
 
 export type ScanResult = {
   productHero: ScanResultProductHero;
+  ingredientLoad: IngredientLoadResult;
   quickOverview: ScanResultOverviewRow[];
   ingredientBreakdown: ScanResultIngredientBreakdown;
   deepExposureChecks: ScanResultDeepExposureCheck[];
@@ -1001,13 +1022,25 @@ function buildFinalVerdict(
   input: BuildScanResultInput,
   confidenceNotes: string[],
 ): ScanResultFinalVerdict {
+  const evidenceAwareVerdict = buildEvidenceAwareFinalVerdict({
+    mainReasons: input.exposureRiskResult.mainReasons,
+    externalSignals: input.externalSignals,
+  });
+
   return {
     exposureRisk: input.exposureRiskResult.exposureRisk,
     riskBand: input.exposureRiskResult.riskBand,
-    verdictLabel: input.exposureRiskResult.verdictLabel,
-    verdictTone: input.exposureRiskResult.verdictTone,
-    headline: input.exposureRiskResult.verdictLabel,
-    summary: input.exposureRiskResult.verdictMessage,
+    verdictLabel: evidenceAwareVerdict.verdictLabel,
+    verdictTone: evidenceAwareVerdict.verdictTone,
+    verdictCode: evidenceAwareVerdict.verdictCode,
+    headline: evidenceAwareVerdict.verdictLabel,
+    opening: evidenceAwareVerdict.opening,
+    summary: evidenceAwareVerdict.summary,
+    totalRedCount: evidenceAwareVerdict.totalRedCount,
+    seriousRedCount: evidenceAwareVerdict.seriousRedCount,
+    overloadRedCount: evidenceAwareVerdict.overloadRedCount,
+    yellowCount: evidenceAwareVerdict.yellowCount,
+    immediateStopReason: evidenceAwareVerdict.immediateStopReason,
     mainReasons: input.exposureRiskResult.mainReasons,
     avoidWording: [...avoidWording],
     confidenceNotes,
@@ -1028,6 +1061,11 @@ export function buildScanResult(input: BuildScanResultInput): ScanResult {
   )
     .map((summary, index) => toQuickOverviewRow(summary, index));
   const ingredientBreakdown = buildIngredientBreakdown(input);
+  const ingredientLoad = calculateIngredientLoad({
+    ingredients: input.ingredients,
+    duplicateSafeMatches: input.matcherResult.duplicateSafeMatches,
+    categorySummaries: input.categorySummaries,
+  });
   const deepExposureChecks = sortedSummaries
     .filter((summary) => shouldShowAsDeepExposure(summary, input))
     .map((summary) => toDeepExposureCheck(summary.categoryId, summary));
@@ -1052,7 +1090,12 @@ export function buildScanResult(input: BuildScanResultInput): ScanResult {
       verdictTone: input.exposureRiskResult.verdictTone,
       scanSource: input.scanSource,
       ingredientCount,
+      ingredientLoadScore: ingredientLoad.score,
+      ingredientLoadLevel: ingredientLoad.level,
+      ingredientLoadTone: ingredientLoad.tone,
+      ingredientLoadRawPoints: ingredientLoad.rawLoad,
     },
+    ingredientLoad,
     quickOverview,
     ingredientBreakdown,
     deepExposureChecks,

@@ -11,6 +11,7 @@ import {
 } from "@/data/demoProducts";
 import { publicAppConfig } from "@/lib/appConfig";
 import { saveProfile, useStoredProfile } from "@/lib/profileStorage";
+import PwaInstallPrompt from "@/components/PwaInstallPrompt";
 
 type HomeIconName =
   | "activity"
@@ -1008,6 +1009,7 @@ export default function HomeScreen() {
           watchItems={watchItems}
           onNavigate={handleNavigate}
         />
+        <PwaInstallPrompt />
         <TrustNote />
       </div>
       <BottomNavigation />

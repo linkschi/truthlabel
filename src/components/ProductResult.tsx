@@ -338,7 +338,7 @@ function BrandMark() {
           Truthlabel
         </p>
         <p className="mt-1 text-[11px] font-medium text-[var(--text-secondary)]">
-          Exposure report
+          Ingredient report
         </p>
       </div>
     </div>
@@ -475,28 +475,15 @@ function getManualScanStoreServerSnapshot() {
   return null;
 }
 
-function getScoreTone(score: number): Exclude<RowTone, "neutral"> {
-  if (score >= 65) {
-    return "red";
-  }
-
-  if (score >= 25) {
-    return "yellow";
-  }
-
-  return "green";
-}
-
 function ScoreRing({
   score,
   scoreLabel,
-  riskBand,
+  tone,
 }: {
   score: number;
   scoreLabel: string;
-  riskBand: string;
+  tone: Exclude<RowTone, "neutral">;
 }) {
-  const tone = getScoreTone(score);
   const progress = Math.max(0, Math.min(1, score / 100));
   const degrees = progress * 360;
   const ringColor =
@@ -517,7 +504,7 @@ function ScoreRing({
       <div className="absolute inset-[9px] rounded-full bg-[var(--bg-page)]" />
       <div className="relative text-center">
         <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--text-secondary)]">
-          Exposure
+          Ingredient load
         </p>
         <p className="mt-1 font-heading text-[2.15rem] font-semibold leading-none text-[var(--text-main)]">
           {score}
@@ -527,9 +514,6 @@ function ScoreRing({
           className={`mt-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] ${scoreLabelClasses[tone]}`}
         >
           {scoreLabel}
-        </p>
-        <p className="mt-1 text-[9px] font-medium uppercase tracking-[0.08em] text-[var(--text-muted)]">
-          {riskBand}
         </p>
       </div>
     </div>
@@ -978,30 +962,7 @@ function uniqueLabels(values: Array<string | undefined | null>) {
 }
 
 function getFinalVerdictOpening(scanResult: ScanResult) {
-  const hasAllergyMatch = scanResult.finalVerdict.mainReasons.some(
-    (reason) => reason.reasonType === "allergy_profile_match",
-  );
-  const hasExternalSafetySignal = scanResult.finalVerdict.mainReasons.some(
-    (reason) => reason.reasonType === "verified_external_signal",
-  );
-
-  if (hasAllergyMatch) {
-    return "This product matches your allergy profile.";
-  }
-
-  if (hasExternalSafetySignal) {
-    return "This product has an external safety warning.";
-  }
-
-  if (scanResult.finalVerdict.verdictTone === "red") {
-    return "This product has strong warning signals.";
-  }
-
-  if (scanResult.finalVerdict.verdictTone === "yellow") {
-    return "This product has ingredients worth reviewing.";
-  }
-
-  return "This product looks simple from the available label data.";
+  return scanResult.finalVerdict.opening;
 }
 
 function getFinalWarningReasonLabel(reason: ScanResult["finalVerdict"]["mainReasons"][number]) {
@@ -1083,34 +1044,7 @@ function getFinalReasonHeading(scanResult: ScanResult) {
 }
 
 function getFinalVerdictClosing(scanResult: ScanResult) {
-  const reasonTypes = new Set(
-    scanResult.finalVerdict.mainReasons.map((reason) => reason.reasonType),
-  );
-  const categoryIds = new Set(
-    scanResult.finalVerdict.mainReasons.map((reason) => reason.categoryId),
-  );
-
-  if (reasonTypes.has("allergy_profile_match")) {
-    return "Avoid this product if you are allergic to the matched ingredient. Always check the package label and follow medical advice for known allergies.";
-  }
-
-  if (reasonTypes.has("verified_external_signal")) {
-    return "Truthlabel flags this as a serious external safety concern. Check the affected lot, date, region, and official source before buying or consuming.";
-  }
-
-  if (categoryIds.has("cancer_linked_watch")) {
-    return "Truthlabel flags this for review because cancer-related or regulatory concern signals were found. This is not proof of harm from one product.";
-  }
-
-  if (scanResult.finalVerdict.verdictTone === "red") {
-    return "Truthlabel flags this product strongly because serious warning categories or high-load patterns were found. This does not mean every ingredient is automatically dangerous.";
-  }
-
-  if (scanResult.finalVerdict.verdictTone === "yellow") {
-    return "Truthlabel flags this product for review because some label signals need a closer look, but no automatic serious warning was found from the available data.";
-  }
-
-  return "Truthlabel did not find major label-based warning signals, but missing data is not proof of absence. Always check the package label.";
+  return scanResult.finalVerdict.summary;
 }
 
 function getSimpleIngredientSummary(scanResult: ScanResult) {
@@ -1685,9 +1619,9 @@ export default function ProductResult({
                 </p>
               </div>
               <ScoreRing
-                score={scanResult.productHero.exposureRisk}
-                scoreLabel={scanResult.productHero.verdictLabel}
-                riskBand={scanResult.productHero.riskBand}
+                score={scanResult.ingredientLoad.score}
+                scoreLabel={scanResult.ingredientLoad.level}
+                tone={scanResult.ingredientLoad.tone}
               />
             </div>
           </section>
@@ -1921,10 +1855,10 @@ export default function ProductResult({
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--text-secondary)]">
-                    Final score
+                    Ingredient load score
                   </p>
                   <h3 className="mt-1 font-heading text-[1.45rem] font-semibold leading-none text-[var(--text-main)]">
-                    {scanResult.finalVerdict.exposureRisk} / 100
+                    {scanResult.ingredientLoad.score} / 100
                   </h3>
                   <p className="mt-1 text-[12px] font-semibold text-[var(--text-secondary)]">
                     {scanResult.finalVerdict.headline}
@@ -1986,7 +1920,7 @@ export default function ProductResult({
                     {scanResult.finalVerdict.headline}
                   </h3>
                   <p className="mt-1 text-[12px] font-medium uppercase tracking-[0.12em] text-[var(--text-secondary)]">
-                    {scanResult.finalVerdict.exposureRisk} / 100 • {scanResult.finalVerdict.riskBand}
+                    {scanResult.ingredientLoad.score} / 100 • {scanResult.ingredientLoad.level}
                   </p>
                 </div>
                 <TonePill tone={heroTone}>{finalVerdictBadgeLabel}</TonePill>

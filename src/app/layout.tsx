@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import PwaServiceWorkerRegistration from "@/components/PwaServiceWorkerRegistration";
 import "./globals.css";
 
 const deploymentUrl = process.env.NEXT_PUBLIC_DEPLOYMENT_URL?.trim();
@@ -18,7 +19,21 @@ export const metadata: Metadata = {
       { url: "/favicon.ico" },
       { url: "/icon.svg", type: "image/svg+xml" },
     ],
-    apple: [{ url: "/apple-icon.svg", type: "image/svg+xml" }],
+    apple: [
+      {
+        url: "/apple-touch-icon.png",
+        sizes: "180x180",
+        type: "image/png",
+      },
+    ],
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Truthlabel",
+  },
+  formatDetection: {
+    telephone: false,
   },
 };
 
@@ -34,6 +49,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full antialiased">
       <body suppressHydrationWarning className="min-h-full">
+        <PwaServiceWorkerRegistration />
         {children}
       </body>
     </html>

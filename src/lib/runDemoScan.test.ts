@@ -29,7 +29,7 @@ test("Clean Simple Oats stays a low-concern demo result", () => {
 
   assert.equal(output.scanResult.productHero.productName, "Simple Rolled Oats");
   assert.equal(output.scanResult.productHero.verdictTone, "green");
-  assert.equal(output.scanResult.finalVerdict.headline, "Clean Pass");
+  assert.equal(output.scanResult.finalVerdict.headline, "No major concerns");
   assert.ok(output.scanResult.ingredientBreakdown.naturalPositive.length >= 1);
 });
 
@@ -88,7 +88,7 @@ test("Chocolate Milk Drink becomes red for Allergy Risk with a milk profile matc
   assert.equal(allergySummary.severity, "red");
   assert.equal(allergySummary.redReasonType, "allergy_profile_match");
   assert.ok(output.scanResult.productHero.exposureRisk >= 90);
-  assert.equal(output.scanResult.finalVerdict.headline, "Strong Warning");
+  assert.equal(output.scanResult.finalVerdict.headline, "Do not consume");
 });
 
 test("Baby Rice Puffs keep Heavy Metals at yellow review, not red", () => {

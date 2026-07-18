@@ -15,7 +15,7 @@ test("default demo result preserves the approved red-warning sample feel", () =>
 
   assert.equal(result.productHero.productName, "Chocolate Cereal Bar");
   assert.equal(result.productHero.verdictTone, "red");
-  assert.equal(result.finalVerdict.headline, "Strong Warning");
+  assert.equal(result.finalVerdict.headline, "Do not consume");
   assert.ok(
     result.quickOverview.some(
       (row) => row.categoryId === "allergy_risk" && row.severity === "red",
@@ -33,7 +33,7 @@ test("explicit demo product selection loads the requested realistic demo label",
   assert.equal(result.productHero.productName, "Simple Rolled Oats");
   assert.equal(result.productHero.productCategory, "Fresh / Simple Foods");
   assert.equal(result.productHero.verdictTone, "green");
-  assert.equal(result.finalVerdict.headline, "Clean Pass");
+  assert.equal(result.finalVerdict.headline, "No major concerns");
 });
 
 test("baby category demo surfaces heavy-metals review markers", () => {

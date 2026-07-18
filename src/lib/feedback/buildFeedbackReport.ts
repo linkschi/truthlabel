@@ -151,10 +151,10 @@ export function buildFeedbackReport(input: BuildFeedbackReportInput) {
     cleanValue(input.browserDeviceInfo) || getFeedbackEnvironmentSummary();
   const reportCreatedAt =
     cleanValue(input.reportCreatedAt) || new Date().toISOString();
-  const exposureRisk =
+  const ingredientLoad =
     typeof input.exposureRisk === "number"
       ? input.exposureRisk
-      : scanResult?.productHero.exposureRisk;
+      : scanResult?.ingredientLoad.score;
   const topWarnings = uniqueStrings(
     input.topWarnings && input.topWarnings.length > 0
       ? input.topWarnings
@@ -172,8 +172,8 @@ export function buildFeedbackReport(input: BuildFeedbackReportInput) {
     `Brand name: ${brandName}`,
     `Barcode: ${barcode || "Not provided"}`,
     `Scan method: ${scanMethod}`,
-    `Exposure Risk: ${
-      typeof exposureRisk === "number" ? `${exposureRisk} / 100` : "Not available"
+    `Ingredient Load: ${
+      typeof ingredientLoad === "number" ? `${ingredientLoad} / 100` : "Not available"
     }`,
     `App version: ${publicAppConfig.appVersion || "Not set"}`,
     `Build date: ${publicAppConfig.buildDate || "Not set"}`,
