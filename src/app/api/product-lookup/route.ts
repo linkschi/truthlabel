@@ -53,6 +53,18 @@ export async function GET(request: Request) {
       signal: controller.signal,
     });
 
+    if (response.status === 404) {
+      try {
+        const payload = await response.json();
+        return Response.json(payload);
+      } catch {
+        return Response.json({
+          status: 0,
+          status_verbose: "Product was not found in Open Food Facts.",
+        });
+      }
+    }
+
     if (!response.ok) {
       return Response.json(
         {

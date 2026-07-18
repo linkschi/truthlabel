@@ -225,6 +225,17 @@ async function readOpenFoodFactsPayload(
     signal,
   });
 
+  if (response.status === 404) {
+    try {
+      return (await response.json()) as OpenFoodFactsResponse;
+    } catch {
+      return {
+        status: 0,
+        status_verbose: "Product was not found in Open Food Facts.",
+      };
+    }
+  }
+
   if (!response.ok) {
     throw new ProductDatabaseLookupError(
       "network",

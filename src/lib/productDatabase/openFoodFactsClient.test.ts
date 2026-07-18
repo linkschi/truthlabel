@@ -97,3 +97,28 @@ test("lookupOpenFoodFactsProduct uses the same-origin proxy in browsers", async 
     restoreWindow();
   }
 });
+
+test("lookupOpenFoodFactsProduct treats Open Food Facts 404 as product not found", async () => {
+  const restoreFetch = installMockFetch(async () =>
+    Response.json(
+      {
+        code: "6003678052405",
+        status: 0,
+        status_verbose: "product not found",
+      },
+      { status: 404 },
+    ),
+  );
+
+  try {
+    const result = await lookupOpenFoodFactsProduct({
+      barcode: "6003678052405",
+    });
+
+    assert.equal(result.found, false);
+    assert.equal(result.barcode, "6003678052405");
+    assert.deepEqual(result.dataQualityWarnings, ["product not found"]);
+  } finally {
+    restoreFetch();
+  }
+});
