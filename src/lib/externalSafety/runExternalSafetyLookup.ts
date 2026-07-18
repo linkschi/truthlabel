@@ -11,6 +11,7 @@ type RunExternalSafetyLookupOptions = {
 };
 
 const defaultCacheTtlMs = 10 * 60 * 1000;
+const externalSafetyRouteTimeoutMs = 6000;
 const clientLookupCache = new Map<
   string,
   { expiresAt: number; result: ExternalSafetyLookupResult }
@@ -35,14 +36,26 @@ function cloneLookupResult(result: ExternalSafetyLookupResult): ExternalSafetyLo
 async function runViaInternalRoute(
   input: ExternalSafetyLookupInput,
 ): Promise<ExternalSafetyLookupResult> {
-  const response = await fetch(publicAppConfig.externalSafetyRoutePath, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-    body: JSON.stringify(input),
-  });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(
+    () => controller.abort("timeout"),
+    externalSafetyRouteTimeoutMs,
+  );
+  let response: Response;
+
+  try {
+    response = await fetch(publicAppConfig.externalSafetyRoutePath, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify(input),
+      signal: controller.signal,
+    });
+  } finally {
+    clearTimeout(timeoutId);
+  }
 
   if (!response.ok) {
     throw new Error(`External safety route failed with ${response.status}.`);

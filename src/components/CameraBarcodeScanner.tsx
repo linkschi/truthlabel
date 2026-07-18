@@ -133,7 +133,37 @@ type CameraBarcodeScannerProps = {
   initialMode?: CameraScannerMode;
   ocrRunner?: IngredientOcrRunner;
   debugDiagnostics?: boolean;
+  barcodeLookupTimeoutMs?: number;
 };
+
+const DEFAULT_BARCODE_LOOKUP_TIMEOUT_MS = 20000;
+
+class BarcodeLookupTimeoutError extends Error {
+  constructor() {
+    super("Barcode lookup timed out.");
+    this.name = "BarcodeLookupTimeoutError";
+  }
+}
+
+function runWithTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timeoutId = window.setTimeout(
+      () => reject(new BarcodeLookupTimeoutError()),
+      timeoutMs,
+    );
+
+    promise.then(
+      (value) => {
+        window.clearTimeout(timeoutId);
+        resolve(value);
+      },
+      (error: unknown) => {
+        window.clearTimeout(timeoutId);
+        reject(error);
+      },
+    );
+  });
+}
 
 const zxingFormatNames = [
   "EAN_13",
@@ -826,6 +856,7 @@ export default function CameraBarcodeScanner({
   initialMode = "barcode",
   ocrRunner = extractIngredientTextFromImage,
   debugDiagnostics = false,
+  barcodeLookupTimeoutMs = DEFAULT_BARCODE_LOOKUP_TIMEOUT_MS,
 }: CameraBarcodeScannerProps) {
   const [mode, setMode] = useState<CameraScannerMode>(initialMode);
   const [phase, setPhase] = useState<ScannerPhase>("initializing");
@@ -897,6 +928,14 @@ export default function CameraBarcodeScanner({
     firstSeenAt: number;
     count: number;
   } | null>(null);
+  const onBarcodeDetectedRef = useRef(onBarcodeDetected);
+  const barcodeLookupTimeoutMsRef = useRef(barcodeLookupTimeoutMs);
+
+  useEffect(() => {
+    // Parent loading state must not restart the active camera session.
+    onBarcodeDetectedRef.current = onBarcodeDetected;
+    barcodeLookupTimeoutMsRef.current = barcodeLookupTimeoutMs;
+  }, [barcodeLookupTimeoutMs, onBarcodeDetected]);
 
   useEffect(() => {
     modeRef.current = mode;
@@ -1028,7 +1067,10 @@ export default function CameraBarcodeScanner({
       setPhase("looking_up");
 
       try {
-        const outcome = await Promise.resolve(onBarcodeDetected(barcode));
+        const outcome = await runWithTimeout(
+          Promise.resolve(onBarcodeDetectedRef.current(barcode)),
+          barcodeLookupTimeoutMsRef.current,
+        );
         const status = getOutcomeStatus(outcome);
 
         if (
@@ -1050,14 +1092,16 @@ export default function CameraBarcodeScanner({
           setPhase("barcode_not_found");
           return;
         }
-      } catch {
+      } catch (error) {
         if (!isStoppedRef.current && sessionToken === sessionTokenRef.current) {
-          setBarcodeLookupStatus("error");
+          setBarcodeLookupStatus(
+            error instanceof BarcodeLookupTimeoutError ? "timeout" : "error",
+          );
           setPhase("barcode_not_found");
         }
       }
     },
-    [onBarcodeDetected, stopActiveCameraStream, stopBarcodeScanner],
+    [stopActiveCameraStream, stopBarcodeScanner],
   );
 
   const reportDetectedBarcode = useCallback(
@@ -2110,12 +2154,16 @@ export default function CameraBarcodeScanner({
   const barcodeNotFoundTitle =
     barcodeLookupStatus === "found_missing_ingredients"
       ? "Ingredients needed"
+      : barcodeLookupStatus === "timeout"
+        ? "Lookup took too long"
       : barcodeLookupStatus === "error"
         ? "Lookup failed"
         : "Product not found";
   const barcodeNotFoundMessage =
     barcodeLookupStatus === "found_missing_ingredients"
       ? "Truthlabel found the product, but the product data does not include ingredients yet. Scan the ingredients to analyse it."
+      : barcodeLookupStatus === "timeout"
+        ? "The product lookup took too long. Check your connection, try again, or scan the ingredients instead."
       : barcodeLookupStatus === "error"
         ? "The product lookup did not complete. You can try again, scan the ingredients, or enter the details manually."
         : "This barcode is not in the product data yet. Scan the ingredients to analyse the product another way.";

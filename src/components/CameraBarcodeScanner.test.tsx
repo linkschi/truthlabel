@@ -361,6 +361,112 @@ test("CameraBarcodeScanner detects a barcode and stops the stream", async () => 
   }
 });
 
+test("CameraBarcodeScanner keeps a pending lookup alive when its parent callback changes", async () => {
+  const { stream } = createMockStream();
+  let resolveLookup!: (value: { lookupStatus: string }) => void;
+  const pendingLookup = new Promise<{ lookupStatus: string }>((resolve) => {
+    resolveLookup = resolve;
+  });
+  const rendered = await renderScanner(
+    {
+      onBarcodeDetected() {
+        return pendingLookup;
+      },
+    },
+    {
+      configureDom() {
+        Object.defineProperty(globalThis.navigator, "mediaDevices", {
+          configurable: true,
+          value: {
+            getUserMedia: async () => stream,
+          },
+        });
+        Object.defineProperty(globalThis, "BarcodeDetector", {
+          configurable: true,
+          value: class MockBarcodeDetector {
+            static async getSupportedFormats() {
+              return ["ean_13"];
+            }
+
+            async detect() {
+              return [{ rawValue: "0123456789012" }];
+            }
+          },
+        });
+      },
+    },
+  );
+
+  try {
+    await waitFor(() => {
+      assert.match(rendered.container.textContent ?? "", /Finding product/i);
+    });
+
+    await act(async () => {
+      rendered.root.render(
+        <CameraBarcodeScanner
+          onBarcodeDetected={() => ({ lookupStatus: "found" })}
+          onClose={() => undefined}
+        />,
+      );
+    });
+
+    await act(async () => {
+      resolveLookup({ lookupStatus: "not_found" });
+      await pendingLookup;
+    });
+
+    await waitFor(() => {
+      assert.match(rendered.container.textContent ?? "", /Product not found/i);
+    });
+  } finally {
+    await rendered.cleanup();
+  }
+});
+
+test("CameraBarcodeScanner recovers when product lookup times out", async () => {
+  const { stream } = createMockStream();
+  const rendered = await renderScanner(
+    {
+      barcodeLookupTimeoutMs: 25,
+      onBarcodeDetected() {
+        return new Promise(() => undefined);
+      },
+    },
+    {
+      configureDom() {
+        Object.defineProperty(globalThis.navigator, "mediaDevices", {
+          configurable: true,
+          value: {
+            getUserMedia: async () => stream,
+          },
+        });
+        Object.defineProperty(globalThis, "BarcodeDetector", {
+          configurable: true,
+          value: class MockBarcodeDetector {
+            static async getSupportedFormats() {
+              return ["ean_13"];
+            }
+
+            async detect() {
+              return [{ rawValue: "0123456789012" }];
+            }
+          },
+        });
+      },
+    },
+  );
+
+  try {
+    await waitFor(() => {
+      assert.match(rendered.container.textContent ?? "", /Lookup took too long/i);
+      assert.match(rendered.container.textContent ?? "", /scan the ingredients instead/i);
+    });
+  } finally {
+    await rendered.cleanup();
+  }
+});
+
 test("CameraBarcodeScanner close button cleans up the stream", async () => {
   const { stream, getStopCount } = createMockStream();
   let closeCount = 0;
