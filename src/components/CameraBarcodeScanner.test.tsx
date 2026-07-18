@@ -79,6 +79,18 @@ function createDom() {
       return 4;
     },
   });
+  Object.defineProperty(dom.window.HTMLVideoElement.prototype, "videoWidth", {
+    configurable: true,
+    get() {
+      return 1280;
+    },
+  });
+  Object.defineProperty(dom.window.HTMLVideoElement.prototype, "videoHeight", {
+    configurable: true,
+    get() {
+      return 720;
+    },
+  });
   Object.defineProperty(dom.window.HTMLVideoElement.prototype, "srcObject", {
     configurable: true,
     get() {

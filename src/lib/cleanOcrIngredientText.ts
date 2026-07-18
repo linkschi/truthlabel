@@ -70,7 +70,11 @@ function softenExcessiveUppercase(value: string) {
 
 function normalizeRawText(value: string) {
   return value
-    .replace(/\r/g, "\n")
+    .replace(/\r\n?/g, "\n")
+    .replace(
+      /[.;]\s*(?=(?:contains|may contain|allergen(?: statement| information| advice)?)\s*:)/gi,
+      "\n",
+    )
     .replace(/[|]/g, " ")
     .replace(/[\u2022\u00b7\u25cf\u25aa\u25e6]/g, "\n")
     .replace(/[;\u2022]/g, ",")

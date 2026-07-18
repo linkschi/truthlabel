@@ -28,6 +28,9 @@ function trimTrailingSlash(value: string) {
   return value.replace(/\/+$/, "");
 }
 
+export const DEFAULT_OPEN_FOOD_FACTS_API_BASE_URL =
+  "https://world.openfoodfacts.org/api/v2";
+
 export const publicAppConfig = {
   deploymentUrl: trimTrailingSlash(
     readStringEnv("NEXT_PUBLIC_DEPLOYMENT_URL", ""),
@@ -39,7 +42,7 @@ export const publicAppConfig = {
   openFoodFactsApiBaseUrl: trimTrailingSlash(
     readStringEnv(
       "NEXT_PUBLIC_OPEN_FOOD_FACTS_API_BASE_URL",
-      "https://world.openfoodfacts.net/api/v2",
+      DEFAULT_OPEN_FOOD_FACTS_API_BASE_URL,
     ),
   ),
   externalSafetyRoutePath: readStringEnv(

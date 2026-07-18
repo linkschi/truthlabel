@@ -10,11 +10,15 @@ import {
 } from "react";
 import {
   classifyCameraAccessError,
+  expandSourceRegion,
+  getSourceRegionFromViewfinder,
   stopMediaStream,
 } from "@/lib/cameraBarcodeScanner";
 import {
   extractIngredientTextFromImage,
-  type OcrExtractionResult,
+  IngredientOcrTimeoutError,
+  type IngredientOcrRunner,
+  type OcrProgressUpdate,
 } from "@/lib/localIngredientOcr";
 
 type OcrCameraState =
@@ -24,6 +28,18 @@ type OcrCameraState =
   | "permission_denied"
   | "no_camera"
   | "error";
+
+type OcrImageCaptureLike = {
+  getPhotoCapabilities?: () => Promise<{
+    imageWidth?: { max?: number };
+    imageHeight?: { max?: number };
+  }>;
+  takePhoto?: (settings?: Record<string, unknown>) => Promise<Blob>;
+};
+
+type OcrImageCaptureConstructor = new (
+  track: MediaStreamTrack,
+) => OcrImageCaptureLike;
 
 export type OcrConfirmedDetails = {
   possibleAllergenStatement?: string;
@@ -36,7 +52,7 @@ type OcrIngredientScannerProps = {
     details?: OcrConfirmedDetails,
   ) => void | Promise<void>;
   onClose: () => void;
-  ocrRunner?: (image: Blob | File) => Promise<OcrExtractionResult>;
+  ocrRunner?: IngredientOcrRunner;
   mediaDevices?: Pick<MediaDevices, "getUserMedia">;
 };
 
@@ -91,6 +107,127 @@ function revokePreviewUrl(value: string) {
   URL.revokeObjectURL(value);
 }
 
+function cameraDelay(ms: number) {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+async function waitForVideoReady(video: HTMLVideoElement) {
+  const deadline = Date.now() + 3_500;
+
+  while (Date.now() < deadline) {
+    if (video.videoWidth > 0 && video.videoHeight > 0 && video.readyState >= 2) {
+      return true;
+    }
+
+    try {
+      await video.play();
+    } catch {
+      // Mobile Safari may allow playback after its metadata event fires.
+    }
+
+    await cameraDelay(90);
+  }
+
+  return video.videoWidth > 0 && video.videoHeight > 0;
+}
+
+function captureLabelRegion(
+  video: HTMLVideoElement,
+  frame: HTMLDivElement | null,
+) {
+  const videoWidth = video.videoWidth || 1280;
+  const videoHeight = video.videoHeight || 720;
+  let region = {
+    x: 0,
+    y: 0,
+    width: videoWidth,
+    height: videoHeight,
+  };
+
+  if (frame) {
+    const videoRect = video.getBoundingClientRect();
+    const frameRect = frame.getBoundingClientRect();
+
+    if (videoRect.width && videoRect.height && frameRect.width && frameRect.height) {
+      region = expandSourceRegion(
+        getSourceRegionFromViewfinder({
+          videoWidth,
+          videoHeight,
+          renderedWidth: videoRect.width,
+          renderedHeight: videoRect.height,
+          objectFit: "cover",
+          viewfinderRect: {
+            x: frameRect.left - videoRect.left,
+            y: frameRect.top - videoRect.top,
+            width: frameRect.width,
+            height: frameRect.height,
+          },
+        }),
+        1.08,
+        videoWidth,
+        videoHeight,
+      );
+    }
+  }
+
+  const canvas = document.createElement("canvas");
+  canvas.width = region.width;
+  canvas.height = region.height;
+  const context = canvas.getContext("2d", { alpha: false });
+
+  if (!context) {
+    return null;
+  }
+
+  try {
+    context.drawImage(
+      video,
+      region.x,
+      region.y,
+      region.width,
+      region.height,
+      0,
+      0,
+      region.width,
+      region.height,
+    );
+    return canvas;
+  } catch {
+    return null;
+  }
+}
+
+async function captureHighResolutionPhoto(stream: MediaStream | null) {
+  const track = stream?.getVideoTracks?.()[0] ?? stream?.getTracks?.()[0];
+  const ImageCaptureConstructor = (
+    window as typeof window & {
+      ImageCapture?: OcrImageCaptureConstructor;
+    }
+  ).ImageCapture;
+
+  if (!track || !ImageCaptureConstructor) {
+    return null;
+  }
+
+  try {
+    const imageCapture = new ImageCaptureConstructor(track);
+    const capabilities = await imageCapture.getPhotoCapabilities?.();
+    const settings: Record<string, unknown> = {};
+
+    if (capabilities?.imageWidth?.max) {
+      settings.imageWidth = capabilities.imageWidth.max;
+    }
+
+    if (capabilities?.imageHeight?.max) {
+      settings.imageHeight = capabilities.imageHeight.max;
+    }
+
+    return (await imageCapture.takePhoto?.(settings)) ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export default function OcrIngredientScanner({
   onTextConfirmed,
   onClose,
@@ -106,10 +243,22 @@ export default function OcrIngredientScanner({
   const [confidenceWarnings, setConfidenceWarnings] = useState<string[]>([]);
   const [isReviewReady, setIsReviewReady] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
+  const [ocrProgress, setOcrProgress] = useState<OcrProgressUpdate>({
+    progress: 0,
+    status: "Preparing photo...",
+  });
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const labelFrameRef = useRef<HTMLDivElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const previewUrlRef = useRef("");
+  const processingTokenRef = useRef(0);
+  const cameraStateRef = useRef<OcrCameraState>("idle");
+  const resumeCameraOnVisibleRef = useRef(false);
+
+  useEffect(() => {
+    cameraStateRef.current = cameraState;
+  }, [cameraState]);
 
   const stopCamera = useCallback(() => {
     stopMediaStream(streamRef.current);
@@ -147,6 +296,7 @@ export default function OcrIngredientScanner({
   }, []);
 
   const handleClose = useCallback(() => {
+    processingTokenRef.current += 1;
     stopCamera();
     replacePreviewUrl("");
     onClose();
@@ -154,12 +304,25 @@ export default function OcrIngredientScanner({
 
   const processImage = useCallback(
     async (image: Blob | File) => {
+      const processingToken = processingTokenRef.current + 1;
+      processingTokenRef.current = processingToken;
       setIsProcessing(true);
+      setOcrProgress({ progress: 0, status: "Preparing photo..." });
       setIsReviewReady(false);
       setOcrErrorMessage("");
 
       try {
-        const result = await ocrRunner(image);
+        const result = await ocrRunner(image, {
+          onProgress(update) {
+            if (processingToken === processingTokenRef.current) {
+              setOcrProgress(update);
+            }
+          },
+        });
+
+        if (processingToken !== processingTokenRef.current) {
+          return;
+        }
 
         if (!result.ingredientText.trim()) {
           setOcrErrorMessage(
@@ -178,12 +341,20 @@ export default function OcrIngredientScanner({
         setEditableAllergenStatement(result.possibleAllergenStatement);
         setConfidenceWarnings(result.confidenceWarnings);
         setIsReviewReady(true);
-      } catch {
+      } catch (error) {
+        if (processingToken !== processingTokenRef.current) {
+          return;
+        }
+
         setOcrErrorMessage(
-          "Ingredient label scan failed. You can paste the ingredient list manually.",
+          error instanceof IngredientOcrTimeoutError
+            ? "Reading the label took too long on this device. Try a closer photo or paste the ingredients manually."
+            : "Ingredient label scan failed. You can paste the ingredients manually.",
         );
       } finally {
-        setIsProcessing(false);
+        if (processingToken === processingTokenRef.current) {
+          setIsProcessing(false);
+        }
       }
     },
     [ocrRunner],
@@ -209,6 +380,9 @@ export default function OcrIngredientScanner({
           facingMode: {
             ideal: "environment",
           },
+          width: { ideal: 1920 },
+          height: { ideal: 1440 },
+          aspectRatio: { ideal: 4 / 3 },
         },
       });
 
@@ -234,6 +408,15 @@ export default function OcrIngredientScanner({
         // Some browsers resolve preview after metadata is ready.
       }
 
+      const videoReady = await waitForVideoReady(video);
+
+      if (!videoReady) {
+        stopMediaStream(stream);
+        streamRef.current = null;
+        setCameraState("error");
+        return;
+      }
+
       setCameraState("ready");
     } catch (error) {
       const reason = classifyCameraAccessError(error);
@@ -251,21 +434,24 @@ export default function OcrIngredientScanner({
       return;
     }
 
-    const width = video.videoWidth || 1280;
-    const height = video.videoHeight || 720;
-    const canvas = document.createElement("canvas");
-    canvas.width = width;
-    canvas.height = height;
+    const highResolutionPhoto = await captureHighResolutionPhoto(
+      streamRef.current,
+    );
+    if (highResolutionPhoto) {
+      stopCamera();
+      setCameraState("idle");
+      replacePreviewUrl(createPreviewUrl(highResolutionPhoto));
+      await processImage(highResolutionPhoto);
+      return;
+    }
 
-    const context = canvas.getContext("2d");
-    if (!context) {
+    const canvas = captureLabelRegion(video, labelFrameRef.current);
+    if (!canvas) {
       setOcrErrorMessage(
         "Ingredient label scan failed. You can paste the ingredient list manually.",
       );
       return;
     }
-
-    context.drawImage(video, 0, 0, width, height);
     stopCamera();
     setCameraState("idle");
 
@@ -317,6 +503,7 @@ export default function OcrIngredientScanner({
   );
 
   const handleRetake = useCallback(() => {
+    processingTokenRef.current += 1;
     stopCamera();
     setCameraState("idle");
     replacePreviewUrl("");
@@ -354,11 +541,28 @@ export default function OcrIngredientScanner({
   ]);
 
   useEffect(() => {
+    function handleVisibilityChange() {
+      if (document.hidden) {
+        resumeCameraOnVisibleRef.current =
+          cameraStateRef.current === "ready" && Boolean(streamRef.current);
+        stopCamera();
+        return;
+      }
+
+      if (resumeCameraOnVisibleRef.current) {
+        resumeCameraOnVisibleRef.current = false;
+        void startCamera();
+      }
+    }
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
     return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
       stopCamera();
       revokePreviewUrl(previewUrlRef.current);
     };
-  }, [stopCamera]);
+  }, [startCamera, stopCamera]);
 
   const cameraMessage = getOcrCameraMessage(cameraState);
 
@@ -430,7 +634,9 @@ export default function OcrIngredientScanner({
                 </span>
                 <textarea
                   value={editableIngredientText}
-                  onChange={(event) => setEditableIngredientText(event.target.value)}
+                  onInput={(event) =>
+                    setEditableIngredientText(event.currentTarget.value)
+                  }
                   className="mt-2 min-h-[150px] w-full resize-y rounded-[18px] border border-white/14 bg-white/92 px-4 py-3 text-[14px] text-[#1f2d26] outline-none transition placeholder:text-[#8b8378] focus:border-[#d6c8af] focus:bg-white"
                   data-testid="ocr-ingredient-textarea"
                 />
@@ -443,8 +649,8 @@ export default function OcrIngredientScanner({
                   </span>
                   <input
                     value={editableAllergenStatement}
-                    onChange={(event) =>
-                      setEditableAllergenStatement(event.target.value)
+                    onInput={(event) =>
+                      setEditableAllergenStatement(event.currentTarget.value)
                     }
                     className="mt-2 w-full rounded-[18px] border border-white/14 bg-white/92 px-4 py-3 text-[14px] text-[#1f2d26] outline-none transition placeholder:text-[#8b8378] focus:border-[#d6c8af] focus:bg-white"
                   />
@@ -492,22 +698,26 @@ export default function OcrIngredientScanner({
           ) : (
             <div className="space-y-4">
               <div className="relative overflow-hidden rounded-[22px] border border-white/14 bg-[#08100c]">
-                {cameraState === "ready" ? (
+                {!previewUrl ? (
                   <video
                     ref={videoRef}
                     autoPlay
                     muted
                     playsInline
-                    className="h-[280px] w-full object-cover"
+                    className={`h-[340px] w-full object-cover transition-opacity duration-200 ${
+                      cameraState === "ready" ? "opacity-100" : "opacity-0"
+                    }`}
                   />
-                ) : previewUrl ? (
+                ) : (
                   <img
                     src={previewUrl}
                     alt="Ingredient label preview"
-                    className="h-[280px] w-full object-cover"
+                    className="h-[340px] w-full object-cover"
                   />
-                ) : (
-                  <div className="flex h-[280px] items-center justify-center px-6 text-center">
+                )}
+
+                {cameraState !== "ready" && !previewUrl ? (
+                  <div className="absolute inset-0 flex items-center justify-center px-6 text-center">
                     <div className="max-w-[280px] rounded-[24px] border border-white/14 bg-[rgba(7,12,9,0.72)] px-5 py-5">
                       <p className="text-[13px] font-semibold uppercase tracking-[0.14em] text-white/74">
                         Ingredient label
@@ -517,22 +727,38 @@ export default function OcrIngredientScanner({
                       </p>
                     </div>
                   </div>
-                )}
+                ) : null}
 
                 {cameraState === "ready" ? (
                   <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                    <div className="h-[170px] w-[82%] max-w-[300px] rounded-[24px] border-2 border-white/88 shadow-[0_0_0_999px_rgba(8,16,12,0.18)]" />
+                    <div
+                      ref={labelFrameRef}
+                      className="h-[230px] w-[88%] max-w-[340px] rounded-[24px] border-2 border-white/88 shadow-[0_0_0_999px_rgba(8,16,12,0.18)]"
+                    />
                   </div>
                 ) : null}
 
                 {isProcessing ? (
-                  <div className="absolute inset-0 flex items-center justify-center bg-[rgba(8,16,12,0.72)] px-6 text-center">
+                  <div
+                    className="absolute inset-0 flex items-center justify-center bg-[rgba(8,16,12,0.78)] px-6 text-center"
+                    role="status"
+                    aria-live="polite"
+                  >
                     <div className="max-w-[280px] rounded-[24px] border border-white/14 bg-[rgba(7,12,9,0.78)] px-5 py-5">
                       <p className="text-[13px] font-semibold uppercase tracking-[0.14em] text-white/74">
                         Reading label
                       </p>
                       <p className="mt-2 text-[14px] leading-6 text-white/88">
-                        Extracting ingredient text from the photo...
+                        {ocrProgress.status}
+                      </p>
+                      <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/16">
+                        <span
+                          className="block h-full rounded-full bg-white transition-[width] duration-300 ease-out"
+                          style={{ width: `${Math.max(4, Math.round(ocrProgress.progress * 100))}%` }}
+                        />
+                      </div>
+                      <p className="mt-2 text-[11px] leading-4 text-white/64">
+                        The first scan may take longer while the on-device reader loads.
                       </p>
                     </div>
                   </div>

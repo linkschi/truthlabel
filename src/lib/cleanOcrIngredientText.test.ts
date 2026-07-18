@@ -31,6 +31,15 @@ test("cleanOcrIngredientText preserves uncertain OCR text when it is not clearly
   assert.match(result.ingredientText, /natural flavour/i);
 });
 
+test("cleanOcrIngredientText separates an inline allergen statement", () => {
+  const result = cleanOcrIngredientText(
+    "Ingredients: water, sugar, cocoa. Contains: milk, soy.",
+  );
+
+  assert.equal(result.ingredientText, "water, sugar, cocoa");
+  assert.equal(result.possibleAllergenStatement, "Contains: milk, soy");
+});
+
 test("cleanOcrIngredientText adds a low-confidence warning when OCR confidence is weak", () => {
   const result = cleanOcrIngredientText("Ingredients: water", {
     averageConfidence: 58,

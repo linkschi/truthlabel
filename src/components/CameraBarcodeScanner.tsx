@@ -17,7 +17,7 @@ import {
   expandSourceRegion,
   getScannerDiagnostics,
   getSourceRegionFromViewfinder,
-  normalizeDetectedBarcode,
+  normalizeProductBarcode,
   stopMediaStream,
   type CameraScannerState,
   type CameraTrackCapabilities,
@@ -28,7 +28,9 @@ import {
 } from "@/lib/cameraBarcodeScanner";
 import {
   extractIngredientTextFromImage,
-  type OcrExtractionResult,
+  IngredientOcrTimeoutError,
+  type IngredientOcrRunner,
+  type OcrProgressUpdate,
 } from "@/lib/localIngredientOcr";
 
 export type CameraScannerMode = "barcode" | "ingredients";
@@ -100,6 +102,17 @@ type ZxingReaderLike = {
     getText: () => string;
     getBarcodeFormat?: () => unknown;
   };
+  scan?: (
+    video: HTMLVideoElement,
+    callback: (
+      result:
+        | {
+            getText: () => string;
+            getBarcodeFormat?: () => unknown;
+          }
+        | undefined,
+    ) => void,
+  ) => { stop: () => void };
 };
 
 type BarcodeDecodeResult = {
@@ -118,7 +131,7 @@ type CameraBarcodeScannerProps = {
   onClose: () => void;
   onManualEntry?: () => void;
   initialMode?: CameraScannerMode;
-  ocrRunner?: (image: Blob | File) => Promise<OcrExtractionResult>;
+  ocrRunner?: IngredientOcrRunner;
   debugDiagnostics?: boolean;
 };
 
@@ -387,10 +400,17 @@ function BarcodeViewfinder({
   );
 }
 
-function IngredientViewfinder() {
+function IngredientViewfinder({
+  frameRef,
+}: {
+  frameRef: Ref<HTMLDivElement>;
+}) {
   return (
     <div className="pointer-events-none absolute inset-0 flex items-center justify-center px-4 pb-8 pt-28">
-      <div className="relative h-[min(56vh,520px)] min-h-[330px] w-[min(88vw,430px)] rounded-[24px] shadow-[0_0_0_999px_rgba(0,0,0,0.42)]">
+      <div
+        ref={frameRef}
+        className="relative h-[min(56vh,520px)] min-h-[330px] w-[min(88vw,430px)] rounded-[24px] shadow-[0_0_0_999px_rgba(0,0,0,0.42)]"
+      >
         <span className="absolute left-0 top-0 h-12 w-12 rounded-tl-[24px] border-l-[3px] border-t-[3px] border-white" />
         <span className="absolute right-0 top-0 h-12 w-12 rounded-tr-[24px] border-r-[3px] border-t-[3px] border-white" />
         <span className="absolute bottom-0 left-0 h-12 w-12 rounded-bl-[24px] border-b-[3px] border-l-[3px] border-white" />
@@ -515,19 +535,23 @@ function delay(ms: number) {
 }
 
 async function waitForLoadedMetadata(video: HTMLVideoElement) {
-  if (video.readyState >= 1 && video.videoWidth > 0 && video.videoHeight > 0) {
-    return;
+  const deadline = Date.now() + 3_500;
+
+  while (Date.now() < deadline) {
+    if (video.videoWidth > 0 && video.videoHeight > 0 && video.readyState >= 2) {
+      return true;
+    }
+
+    try {
+      await video.play();
+    } catch {
+      // A later metadata/canplay event may make playback available on mobile Safari.
+    }
+
+    await delay(90);
   }
 
-  await new Promise<void>((resolve) => {
-    const timer = window.setTimeout(resolve, 1200);
-    const handleMetadata = () => {
-      window.clearTimeout(timer);
-      resolve();
-    };
-
-    video.addEventListener("loadedmetadata", handleMetadata, { once: true });
-  });
+  return video.videoWidth > 0 && video.videoHeight > 0;
 }
 
 async function openCameraWithProfiles(
@@ -825,12 +849,16 @@ export default function CameraBarcodeScanner({
   const [ocrErrorMessage, setOcrErrorMessage] = useState("");
   const [barcodeLookupStatus, setBarcodeLookupStatus] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [ocrProgress, setOcrProgress] = useState<OcrProgressUpdate>({
+    progress: 0,
+    status: "Preparing photo...",
+  });
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const barcodeFrameRef = useRef<HTMLDivElement | null>(null);
+  const ingredientFrameRef = useRef<HTMLDivElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const scanTimerRef = useRef<number | null>(null);
   const scanHintTimerRef = useRef<number | null>(null);
-  const candidateAcceptTimerRef = useRef<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const previewUrlRef = useRef("");
   const isStoppedRef = useRef(false);
@@ -838,6 +866,8 @@ export default function CameraBarcodeScanner({
   const processingFrameRef = useRef(false);
   const nativeDetectorRef = useRef<NativeBarcodeDetector | null>(null);
   const zxingReaderRef = useRef<ZxingReaderLike | null>(null);
+  const zxingControlsRef = useRef<{ stop: () => void } | null>(null);
+  const zxingFallbackTimerRef = useRef<number | null>(null);
   const selectedDeviceIdRef = useRef<string | null>(null);
   const cameraCandidatesRef = useRef<VideoDeviceCandidate[]>([]);
   const selectedCameraLabelRef = useRef("");
@@ -858,7 +888,10 @@ export default function CameraBarcodeScanner({
     lastHighQualityScanAt: 0,
   });
   const sessionTokenRef = useRef(0);
+  const ocrSessionTokenRef = useRef(0);
   const modeRef = useRef<CameraScannerMode>(initialMode);
+  const phaseRef = useRef<ScannerPhase>("initializing");
+  const resumeCameraOnVisibleRef = useRef(false);
   const barcodeCandidateRef = useRef<{
     value: string;
     firstSeenAt: number;
@@ -868,6 +901,10 @@ export default function CameraBarcodeScanner({
   useEffect(() => {
     modeRef.current = mode;
   }, [mode]);
+
+  useEffect(() => {
+    phaseRef.current = phase;
+  }, [phase]);
 
   const replacePreviewUrl = useCallback((nextUrl: string) => {
     revokePreviewUrl(previewUrlRef.current);
@@ -915,10 +952,17 @@ export default function CameraBarcodeScanner({
       scanHintTimerRef.current = null;
     }
 
-    if (candidateAcceptTimerRef.current !== null) {
-      window.clearTimeout(candidateAcceptTimerRef.current);
-      candidateAcceptTimerRef.current = null;
+    if (zxingFallbackTimerRef.current !== null) {
+      window.clearTimeout(zxingFallbackTimerRef.current);
+      zxingFallbackTimerRef.current = null;
     }
+
+    try {
+      zxingControlsRef.current?.stop();
+    } catch {
+      // ZXing cleanup is best effort when a browser has already stopped video.
+    }
+    zxingControlsRef.current = null;
 
     processingFrameRef.current = false;
     decodeStatsRef.current.activeLoops = 0;
@@ -932,12 +976,14 @@ export default function CameraBarcodeScanner({
   }, [stopActiveCameraStream, stopBarcodeScanner]);
 
   const handleClose = useCallback(() => {
+    ocrSessionTokenRef.current += 1;
     stopScannerResources();
     replacePreviewUrl("");
     onClose();
   }, [onClose, replacePreviewUrl, stopScannerResources]);
 
   const handleManualEntry = useCallback(() => {
+    ocrSessionTokenRef.current += 1;
     stopScannerResources();
     replacePreviewUrl("");
     if (onManualEntry) {
@@ -952,10 +998,6 @@ export default function CameraBarcodeScanner({
     sessionTokenRef.current += 1;
     hasLockedBarcodeRef.current = false;
     barcodeCandidateRef.current = null;
-    if (candidateAcceptTimerRef.current !== null) {
-      window.clearTimeout(candidateAcceptTimerRef.current);
-      candidateAcceptTimerRef.current = null;
-    }
     setHintVisible(false);
     setBarcodeLookupStatus("");
     setPhase(streamRef.current ? "detecting" : "initializing");
@@ -1020,7 +1062,7 @@ export default function CameraBarcodeScanner({
 
   const reportDetectedBarcode = useCallback(
     (rawValue: string | undefined, sessionToken: number) => {
-      const barcode = normalizeDetectedBarcode(rawValue);
+      const barcode = normalizeProductBarcode(rawValue);
 
       if (
         !barcode ||
@@ -1035,7 +1077,7 @@ export default function CameraBarcodeScanner({
       const now = Date.now();
       const previous = barcodeCandidateRef.current;
 
-      if (previous?.value === barcode && now - previous.firstSeenAt <= 900) {
+      if (previous?.value === barcode && now - previous.firstSeenAt <= 1_200) {
         const nextCandidate = {
           value: barcode,
           firstSeenAt: previous.firstSeenAt,
@@ -1043,7 +1085,7 @@ export default function CameraBarcodeScanner({
         };
         barcodeCandidateRef.current = nextCandidate;
 
-        if (nextCandidate.count >= 2 || now - nextCandidate.firstSeenAt >= 240) {
+        if (nextCandidate.count >= 2) {
           void acceptBarcode(barcode, sessionToken);
         }
         return;
@@ -1054,22 +1096,6 @@ export default function CameraBarcodeScanner({
         firstSeenAt: now,
         count: 1,
       };
-      if (candidateAcceptTimerRef.current !== null) {
-        window.clearTimeout(candidateAcceptTimerRef.current);
-      }
-      candidateAcceptTimerRef.current = window.setTimeout(() => {
-        const candidate = barcodeCandidateRef.current;
-
-        if (
-          candidate?.value === barcode &&
-          !hasLockedBarcodeRef.current &&
-          !isStoppedRef.current &&
-          sessionToken === sessionTokenRef.current &&
-          modeRef.current === "barcode"
-        ) {
-          void acceptBarcode(barcode, sessionToken);
-        }
-      }, 280);
     },
     [acceptBarcode],
   );
@@ -1083,7 +1109,11 @@ export default function CameraBarcodeScanner({
       const { BarcodeFormat, BrowserMultiFormatReader } = await import(
         "@zxing/browser"
       );
-      const reader = new BrowserMultiFormatReader() as ZxingReaderLike;
+      const reader = new BrowserMultiFormatReader(undefined, {
+        delayBetweenScanAttempts: 120,
+        delayBetweenScanSuccess: 500,
+        tryPlayVideoTimeout: 3_000,
+      }) as ZxingReaderLike;
       reader.possibleFormats = zxingFormatNames.map(
         (formatName) => BarcodeFormat[formatName],
       );
@@ -1151,83 +1181,60 @@ export default function CameraBarcodeScanner({
     [debugDiagnostics],
   );
 
-  const decodeCanvasForBarcode = useCallback(
-    async (
-      canvas: HTMLCanvasElement,
-      detector: NativeBarcodeDetector | null,
-    ): Promise<BarcodeDecodeResult | null> => {
-      if (detector) {
-        try {
-          const barcodes = await detector.detect(canvas);
-          const detected = barcodes.find((result) =>
-            Boolean(normalizeDetectedBarcode(result.rawValue)),
-          );
-
-          if (detected?.rawValue) {
-            return {
-              rawValue: detected.rawValue,
-              format: (detected as { format?: string }).format,
-            };
-          }
-        } catch {
-          // Fall through to ZXing. Some browsers expose BarcodeDetector but fail
-          // on canvas crops from live video.
-        }
+  const startZxingContinuousDetection = useCallback(
+    async (video: HTMLVideoElement, sessionToken: number) => {
+      if (zxingControlsRef.current) {
+        return true;
       }
 
       const reader = await loadZxingReader();
 
-      if (!reader) {
-        return null;
+      if (
+        !reader?.scan ||
+        isStoppedRef.current ||
+        hasLockedBarcodeRef.current ||
+        modeRef.current !== "barcode" ||
+        sessionToken !== sessionTokenRef.current
+      ) {
+        return false;
       }
 
       try {
-        const result = reader.decodeFromCanvas(canvas);
+        zxingControlsRef.current = reader.scan(video, (result) => {
+          if (
+            isStoppedRef.current ||
+            hasLockedBarcodeRef.current ||
+            modeRef.current !== "barcode" ||
+            sessionToken !== sessionTokenRef.current
+          ) {
+            return;
+          }
 
-        return {
-          rawValue: result.getText(),
-          format: String(result.getBarcodeFormat?.() ?? ""),
-        };
-      } catch {
-        return null;
-      }
-    },
-    [loadZxingReader],
-  );
-
-  const decodeVideoRegion = useCallback(
-    async (
-      video: HTMLVideoElement,
-      region: SourceRegion,
-      detector: NativeBarcodeDetector | null,
-    ) => {
-      const startedAt = performance.now();
-      const canvas = drawVideoRegionToCanvas(video, region);
-      let result: BarcodeDecodeResult | null = null;
-
-      if (canvas) {
-        result = await decodeCanvasForBarcode(canvas, detector);
-      } else if (detector) {
-        try {
-          const barcodes = await detector.detect(video);
-          const detected = barcodes.find((entry) =>
-            Boolean(normalizeDetectedBarcode(entry.rawValue)),
-          );
-          result = detected?.rawValue
+          const decoded = result?.getText()
             ? {
-                rawValue: detected.rawValue,
-                format: (detected as { format?: string }).format,
+                rawValue: result.getText(),
+                format: String(result.getBarcodeFormat?.() ?? ""),
               }
             : null;
-        } catch {
-          result = null;
-        }
-      }
+          const width = video.videoWidth || 0;
+          const height = video.videoHeight || 0;
+          recordDecodeAttempt(
+            performance.now(),
+            width && height ? { x: 0, y: 0, width, height } : null,
+            decoded,
+          );
 
-      recordDecodeAttempt(startedAt, region, result);
-      return result;
+          if (decoded?.rawValue) {
+            reportDetectedBarcode(decoded.rawValue, sessionToken);
+          }
+        });
+        return true;
+      } catch {
+        zxingControlsRef.current = null;
+        return false;
+      }
     },
-    [decodeCanvasForBarcode, recordDecodeAttempt],
+    [loadZxingReader, recordDecodeAttempt, reportDetectedBarcode],
   );
 
   const startBarcodeDetection = useCallback(async () => {
@@ -1265,8 +1272,14 @@ export default function CameraBarcodeScanner({
     }
 
     if (!nativeDetector) {
-      await loadZxingReader();
+      await startZxingContinuousDetection(video, sessionToken);
+      return;
     }
+
+    zxingFallbackTimerRef.current = window.setTimeout(() => {
+      zxingFallbackTimerRef.current = null;
+      void startZxingContinuousDetection(video, sessionToken);
+    }, 1_300);
 
     const detectLoop = async () => {
       if (
@@ -1287,28 +1300,6 @@ export default function CameraBarcodeScanner({
       const sourceHeight = video.videoHeight || 0;
 
       if (!sourceWidth || !sourceHeight) {
-        if (nativeDetectorRef.current) {
-          const startedAt = performance.now();
-          try {
-            const barcodes = await nativeDetectorRef.current.detect(video);
-            const detected = barcodes.find((entry) =>
-              Boolean(normalizeDetectedBarcode(entry.rawValue)),
-            );
-            const result = detected?.rawValue
-              ? {
-                  rawValue: detected.rawValue,
-                  format: (detected as { format?: string }).format,
-                }
-              : null;
-            recordDecodeAttempt(startedAt, null, result);
-
-            if (result?.rawValue) {
-              reportDetectedBarcode(result.rawValue, sessionToken);
-            }
-          } catch {
-            recordDecodeAttempt(startedAt, null, null);
-          }
-        }
         scanTimerRef.current = window.setTimeout(detectLoop, 160);
         return;
       }
@@ -1317,40 +1308,30 @@ export default function CameraBarcodeScanner({
       decodeStatsRef.current.activeLoops = 1;
 
       try {
-        const now = Date.now();
-        const centralRegion = getSourceRegionFromDom(
-          video,
-          barcodeFrameRef.current,
+        const startedAt = performance.now();
+        const barcodes = await nativeDetectorRef.current?.detect(video);
+        const detected = barcodes?.find((entry) =>
+          Boolean(normalizeProductBarcode(entry.rawValue)),
         );
-        const regions = [centralRegion];
+        const result = detected?.rawValue
+          ? {
+              rawValue: detected.rawValue,
+              format: (detected as { format?: string }).format,
+            }
+          : null;
+        const fullRegion = {
+          x: 0,
+          y: 0,
+          width: sourceWidth,
+          height: sourceHeight,
+        };
+        recordDecodeAttempt(startedAt, fullRegion, result);
 
-        if (now - decodeStatsRef.current.lastBroadScanAt >= 560) {
-          decodeStatsRef.current.lastBroadScanAt = now;
-          regions.push(expandSourceRegion(centralRegion, 1.75, sourceWidth, sourceHeight));
+        if (result?.rawValue) {
+          reportDetectedBarcode(result.rawValue, sessionToken);
         }
-
-        if (now - decodeStatsRef.current.lastHighQualityScanAt >= 2600) {
-          decodeStatsRef.current.lastHighQualityScanAt = now;
-          regions.push({
-            x: 0,
-            y: 0,
-            width: sourceWidth,
-            height: sourceHeight,
-          });
-        }
-
-        for (const region of regions) {
-          const result = await decodeVideoRegion(
-            video,
-            region,
-            nativeDetectorRef.current,
-          );
-
-          if (result?.rawValue) {
-            reportDetectedBarcode(result.rawValue, sessionToken);
-            break;
-          }
-        }
+      } catch {
+        void startZxingContinuousDetection(video, sessionToken);
       } finally {
         processingFrameRef.current = false;
         decodeStatsRef.current.activeLoops = 0;
@@ -1361,10 +1342,9 @@ export default function CameraBarcodeScanner({
 
     void detectLoop();
   }, [
-    decodeVideoRegion,
-    loadZxingReader,
     recordDecodeAttempt,
     reportDetectedBarcode,
+    startZxingContinuousDetection,
     stopBarcodeScanner,
   ]);
 
@@ -1466,7 +1446,16 @@ export default function CameraBarcodeScanner({
         // Some browsers start playback after metadata is ready.
       }
 
-      await waitForLoadedMetadata(video);
+      const videoReady = await waitForLoadedMetadata(video);
+
+      if (!videoReady || isStoppedRef.current) {
+        stopMediaStream(stream);
+        if (!isStoppedRef.current) {
+          setPhase("error");
+        }
+        return;
+      }
+
       await updateCameraCapabilities(stream);
       setPhase(modeRef.current === "barcode" ? "detecting" : "ready");
 
@@ -1603,6 +1592,7 @@ export default function CameraBarcodeScanner({
   );
 
   const handleTryAgain = useCallback(() => {
+    ocrSessionTokenRef.current += 1;
     stopScannerResources();
     replacePreviewUrl("");
     setEditableIngredientText("");
@@ -1623,66 +1613,27 @@ export default function CameraBarcodeScanner({
     void startCamera();
   }, [resetBarcodeSession, startBarcodeDetection, startCamera]);
 
-  const detectBarcodeFromImage = useCallback(
-    async (image: Blob | File) => {
-      if (typeof createImageBitmap !== "function") {
-        return null;
-      }
-
-      try {
-        const [nativeDetector, bitmap] = await Promise.all([
-          createNativeBarcodeDetector(),
-          createImageBitmap(image),
-        ]);
-        const canvas = drawImageBitmapToCanvas(bitmap);
-        bitmap.close?.();
-
-        if (!canvas) {
-          return null;
-        }
-
-        const result = await decodeCanvasForBarcode(
-          canvas,
-          nativeDetector?.detector ?? null,
-        );
-
-        return normalizeDetectedBarcode(result?.rawValue);
-      } catch {
-        return null;
-      }
-    },
-    [decodeCanvasForBarcode],
-  );
-
   const processImage = useCallback(
     async (image: Blob | File) => {
+      const ocrSessionToken = ocrSessionTokenRef.current + 1;
+      ocrSessionTokenRef.current = ocrSessionToken;
       setPhase("ocr_processing");
+      setOcrProgress({ progress: 0, status: "Preparing photo..." });
       setOcrErrorMessage("");
       setEditableIngredientText("");
       setEditableAllergenStatement("");
       setConfidenceWarnings([]);
 
       try {
-        const barcodeLookupPromise = detectBarcodeFromImage(image).then(
-          async (barcode) => {
-            if (!barcode) {
-              return null;
-            }
-
-            try {
-              return await Promise.resolve(onBarcodeDetected(barcode));
-            } catch {
-              return null;
+        const result = await ocrRunner(image, {
+          onProgress(update) {
+            if (ocrSessionToken === ocrSessionTokenRef.current) {
+              setOcrProgress(update);
             }
           },
-        );
-        const [result, barcodeOutcome] = await Promise.all([
-          ocrRunner(image),
-          barcodeLookupPromise,
-        ]);
-        const barcodeStatus = getOutcomeStatus(barcodeOutcome);
+        });
 
-        if (barcodeStatus === "found") {
+        if (ocrSessionToken !== ocrSessionTokenRef.current) {
           return;
         }
 
@@ -1710,14 +1661,20 @@ export default function CameraBarcodeScanner({
           ]),
         );
         setPhase("ocr_review");
-      } catch {
+      } catch (error) {
+        if (ocrSessionToken !== ocrSessionTokenRef.current) {
+          return;
+        }
+
         setOcrErrorMessage(
-          "Ingredient label scan failed. You can paste the ingredient list manually.",
+          error instanceof IngredientOcrTimeoutError
+            ? "Reading the label took too long on this device. Retake a closer photo or enter the ingredients manually."
+            : "Ingredient label scan failed. You can paste the ingredient list manually.",
         );
         setPhase("capture_review");
       }
     },
-    [detectBarcodeFromImage, ocrRunner, onBarcodeDetected],
+    [ocrRunner],
   );
 
   const captureIngredients = useCallback(async () => {
@@ -1768,17 +1725,20 @@ export default function CameraBarcodeScanner({
 
     const width = video.videoWidth || 1280;
     const height = video.videoHeight || 720;
-    const canvas = createCanvas(width, height);
+    const labelRegion = expandSourceRegion(
+      getSourceRegionFromDom(video, ingredientFrameRef.current),
+      1.08,
+      width,
+      height,
+    );
+    const canvas = drawVideoRegionToCanvas(video, labelRegion);
 
-    const context = canvas.getContext("2d");
-
-    if (!context) {
+    if (!canvas) {
       setOcrErrorMessage("Ingredient label scan failed. You can paste the ingredient list manually.");
       setPhase("ready");
       return;
     }
 
-    context.drawImage(video, 0, 0, width, height);
     imageQualityWarningsRef.current = estimateCanvasQuality(canvas);
     stopScannerResources();
 
@@ -1795,6 +1755,7 @@ export default function CameraBarcodeScanner({
   }, [processImage, replacePreviewUrl, stopScannerResources]);
 
   const handleChoosePhoto = useCallback(() => {
+    ocrSessionTokenRef.current += 1;
     stopScannerResources();
     setMode("ingredients");
     modeRef.current = "ingredients";
@@ -1825,6 +1786,7 @@ export default function CameraBarcodeScanner({
   );
 
   const handleRetake = useCallback(() => {
+    ocrSessionTokenRef.current += 1;
     replacePreviewUrl("");
     setEditableIngredientText("");
     setEditableAllergenStatement("");
@@ -1901,7 +1863,17 @@ export default function CameraBarcodeScanner({
   useEffect(() => {
     function handleVisibilityChange() {
       if (document.hidden) {
+        resumeCameraOnVisibleRef.current =
+          Boolean(streamRef.current) &&
+          ["ready", "detecting", "capturing"].includes(phaseRef.current);
         stopScannerResources();
+        return;
+      }
+
+      if (resumeCameraOnVisibleRef.current) {
+        resumeCameraOnVisibleRef.current = false;
+        setPhase("initializing");
+        void startCamera();
       }
     }
 
@@ -1910,7 +1882,7 @@ export default function CameraBarcodeScanner({
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, [stopScannerResources]);
+  }, [startCamera, stopScannerResources]);
 
   const isReviewPhase = [
     "capture_review",
@@ -2009,9 +1981,28 @@ export default function CameraBarcodeScanner({
             </section>
 
             {phase === "ocr_processing" ? (
-              <div className="mt-5 rounded-[20px] border border-[#E2E8E4] bg-[#F6F8F7] px-4 py-5 text-center">
+              <div
+                className="mt-5 rounded-[20px] border border-[#E2E8E4] bg-[#F6F8F7] px-4 py-5 text-center"
+                role="status"
+                aria-live="polite"
+              >
                 <span className="mx-auto inline-flex h-9 w-9 animate-spin rounded-full border-2 border-[#12583D]/25 border-t-[#12583D] motion-reduce:animate-none" />
                 <p className="mt-3 text-[14px] font-bold">Reading the label...</p>
+                <p className="mt-1.5 text-[12px] leading-5 text-[#66716B]">
+                  {ocrProgress.status}
+                </p>
+                <div
+                  className="mt-3 h-2 overflow-hidden rounded-full bg-[#DDE8E1]"
+                  aria-label="Ingredient text extraction progress"
+                >
+                  <span
+                    className="block h-full rounded-full bg-[#12583D] transition-[width] duration-300 ease-out"
+                    style={{ width: `${Math.max(4, Math.round(ocrProgress.progress * 100))}%` }}
+                  />
+                </div>
+                <p className="mt-2 text-[11px] leading-4 text-[#78827D]">
+                  The first scan may take longer while the on-device reader loads.
+                </p>
               </div>
             ) : null}
 
@@ -2029,7 +2020,9 @@ export default function CameraBarcodeScanner({
                   </span>
                   <textarea
                     value={editableIngredientText}
-                    onChange={(event) => setEditableIngredientText(event.target.value)}
+                    onInput={(event) =>
+                      setEditableIngredientText(event.currentTarget.value)
+                    }
                     className="mt-2 min-h-[190px] w-full resize-y rounded-[18px] border border-[#D6DED9] bg-white px-4 py-3 text-[14px] leading-6 text-[#101613] outline-none focus:border-[#12583D] focus:ring-2 focus:ring-[#E8F6EF]"
                     data-testid="camera-ingredient-textarea"
                   />
@@ -2042,8 +2035,8 @@ export default function CameraBarcodeScanner({
                     </span>
                     <input
                       value={editableAllergenStatement}
-                      onChange={(event) =>
-                        setEditableAllergenStatement(event.target.value)
+                      onInput={(event) =>
+                        setEditableAllergenStatement(event.currentTarget.value)
                       }
                       className="mt-2 w-full rounded-[18px] border border-[#D6DED9] bg-white px-4 py-3 text-[14px] text-[#101613] outline-none focus:border-[#12583D] focus:ring-2 focus:ring-[#E8F6EF]"
                     />
@@ -2177,7 +2170,7 @@ export default function CameraBarcodeScanner({
       {mode === "barcode" ? (
         <BarcodeViewfinder detected={isBarcodeDetected} frameRef={barcodeFrameRef} />
       ) : (
-        <IngredientViewfinder />
+        <IngredientViewfinder frameRef={ingredientFrameRef} />
       )}
 
       <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/72 to-transparent" />

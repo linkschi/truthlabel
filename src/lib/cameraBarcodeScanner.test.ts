@@ -6,6 +6,8 @@ import {
   chooseBestVideoInputDevice,
   getScannerDiagnostics,
   getSourceRegionFromViewfinder,
+  hasValidGtinCheckDigit,
+  normalizeProductBarcode,
   scoreVideoInputDevice,
 } from "./cameraBarcodeScanner";
 
@@ -45,20 +47,36 @@ test("chooseBestVideoInputDevice selects a plausible non-front rear camera", () 
   assert.equal(selected.candidates.length, 3);
 });
 
-test("buildCameraConstraintProfiles progressively falls back from 1080p to looser rear constraints", () => {
+test("buildCameraConstraintProfiles progressively falls back from high resolution to looser rear constraints", () => {
   const profiles = buildCameraConstraintProfiles("camera-main");
 
-  assert.equal(profiles.length, 3);
+  assert.equal(profiles.length, 4);
   assert.deepEqual((profiles[0].video as MediaTrackConstraints).deviceId, {
     exact: "camera-main",
   });
   assert.deepEqual((profiles[0].video as MediaTrackConstraints).width, {
     ideal: 1920,
   });
-  assert.deepEqual((profiles[1].video as MediaTrackConstraints).width, {
+  assert.deepEqual((profiles[0].video as MediaTrackConstraints).height, {
+    ideal: 1440,
+  });
+  assert.deepEqual((profiles[2].video as MediaTrackConstraints).width, {
     ideal: 1280,
   });
-  assert.equal((profiles[2].video as MediaTrackConstraints).width, undefined);
+  assert.equal((profiles[3].video as MediaTrackConstraints).width, undefined);
+});
+
+test("normalizeProductBarcode keeps supported numeric product codes and rejects text false positives", () => {
+  assert.equal(normalizeProductBarcode(" 0123 4567 8901 2 "), "0123456789012");
+  assert.equal(normalizeProductBarcode("0123-4567-8901-2"), "0123456789012");
+  assert.equal(normalizeProductBarcode("LOT-ABC-123"), "");
+  assert.equal(normalizeProductBarcode("123456"), "");
+});
+
+test("hasValidGtinCheckDigit validates common EAN and UPC product barcodes", () => {
+  assert.equal(hasValidGtinCheckDigit("3017624010701"), true);
+  assert.equal(hasValidGtinCheckDigit("012345678905"), true);
+  assert.equal(hasValidGtinCheckDigit("3017624010702"), false);
 });
 
 test("getSourceRegionFromViewfinder maps a visible cover-cropped frame into source coordinates", () => {

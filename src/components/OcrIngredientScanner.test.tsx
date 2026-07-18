@@ -110,6 +110,12 @@ function createDom() {
       return 800;
     },
   });
+  Object.defineProperty(dom.window.HTMLVideoElement.prototype, "readyState", {
+    configurable: true,
+    get() {
+      return 4;
+    },
+  });
   Object.defineProperty(dom.window.HTMLVideoElement.prototype, "srcObject", {
     configurable: true,
     get() {
@@ -203,6 +209,18 @@ function setInputFiles(
   });
 }
 
+function setTextareaValue(textarea: HTMLTextAreaElement, value: string) {
+  const valueSetter = Object.getOwnPropertyDescriptor(
+    textarea.ownerDocument.defaultView?.HTMLTextAreaElement.prototype,
+    "value",
+  )?.set;
+
+  valueSetter?.call(textarea, value);
+  textarea.dispatchEvent(new textarea.ownerDocument.defaultView!.Event("input", {
+    bubbles: true,
+  }));
+}
+
 async function uploadImage(rendered: RenderedScanner, fileName = "label.jpg") {
   const uploadInput = rendered.container.querySelector(
     '[data-testid="ocr-upload-input"]',
@@ -274,7 +292,11 @@ test("OcrIngredientScanner upload flow shows extracted text in an editable revie
 
       assert.ok(textarea);
       assert.equal(textarea.value, "Sugar, Red No. 3");
-      assert.match(rendered.container.textContent ?? "", /Contains: milk/i);
+      const allergenInput = rendered.container.querySelector(
+        'input[value="Contains: milk"]',
+      ) as HTMLInputElement | null;
+      assert.ok(allergenInput);
+      assert.equal(allergenInput.value, "Contains: milk");
     });
   } finally {
     await rendered.cleanup();
@@ -385,10 +407,7 @@ test("OcrIngredientScanner lets the user edit OCR text before confirming and can
       '[data-testid="ocr-ingredient-textarea"]',
     ) as HTMLTextAreaElement;
     await act(async () => {
-      textarea.value = "Water, sugar, Red No. 3, milk powder";
-      textarea.dispatchEvent(
-        new rendered.dom.window.Event("input", { bubbles: true }),
-      );
+      setTextareaValue(textarea, "Water, sugar, Red No. 3, milk powder");
     });
 
     const confirmButton = findButtonByLabel(

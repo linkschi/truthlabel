@@ -178,6 +178,40 @@ export function normalizeDetectedBarcode(value: string | undefined) {
   return value?.replace(/\s+/g, "").trim() || "";
 }
 
+export function normalizeProductBarcode(value: string | undefined) {
+  const normalized = normalizeDetectedBarcode(value).replace(/[-_]/g, "");
+
+  if (!/^(?:\d{8}|\d{12}|\d{13}|\d{14})$/.test(normalized)) {
+    return "";
+  }
+
+  return normalized;
+}
+
+export function hasValidGtinCheckDigit(value: string) {
+  const barcode = normalizeProductBarcode(value);
+
+  if (!barcode) {
+    return false;
+  }
+
+  const digits = barcode.split("").map(Number);
+  const checkDigit = digits.pop();
+
+  if (checkDigit === undefined) {
+    return false;
+  }
+
+  const weightedSum = digits
+    .reverse()
+    .reduce(
+      (sum, digit, index) => sum + digit * (index % 2 === 0 ? 3 : 1),
+      0,
+    );
+
+  return (10 - (weightedSum % 10)) % 10 === checkDigit;
+}
+
 function normalizeDeviceLabel(value: string) {
   return value
     .toLowerCase()
@@ -290,9 +324,20 @@ export function buildCameraConstraintProfiles(deviceId?: string | null) {
       video: withVideoDevice(
         {
           width: { ideal: 1920 },
+          height: { ideal: 1440 },
+          frameRate: { ideal: 30, max: 30 },
+          aspectRatio: { ideal: 4 / 3 },
+        },
+        deviceId,
+      ),
+    },
+    {
+      audio: false,
+      video: withVideoDevice(
+        {
+          width: { ideal: 1920 },
           height: { ideal: 1080 },
           frameRate: { ideal: 30, max: 30 },
-          aspectRatio: { ideal: 16 / 9 },
         },
         deviceId,
       ),
@@ -304,7 +349,6 @@ export function buildCameraConstraintProfiles(deviceId?: string | null) {
           width: { ideal: 1280 },
           height: { ideal: 720 },
           frameRate: { ideal: 24, max: 30 },
-          aspectRatio: { ideal: 16 / 9 },
         },
         deviceId,
       ),
