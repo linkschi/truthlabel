@@ -4,7 +4,7 @@ import type {
 } from "@/lib/productDatabase/productDatabaseTypes";
 import { publicAppConfig } from "@/lib/appConfig";
 
-const OPEN_FOOD_FACTS_FIELDS = [
+export const OPEN_FOOD_FACTS_FIELDS = [
   "code",
   "product_name",
   "product_name_en",
@@ -26,8 +26,9 @@ const OPEN_FOOD_FACTS_FIELDS = [
   "image_ingredients_url",
 ] as const;
 
-const OPEN_FOOD_FACTS_TIMEOUT_MS = 10000;
+const OPEN_FOOD_FACTS_TIMEOUT_MS = 20000;
 const OPEN_FOOD_FACTS_CACHE_TTL_MS = 10 * 60 * 1000;
+const PRODUCT_LOOKUP_PROXY_PATH = "/api/product-lookup";
 const openFoodFactsCache = new Map<
   string,
   { expiresAt: number; result: ExternalProductLookupResult }
@@ -77,6 +78,20 @@ export class ProductDatabaseLookupError extends Error {
     this.name = "ProductDatabaseLookupError";
     this.code = code;
   }
+}
+
+function isBrowserRuntime() {
+  return typeof window !== "undefined";
+}
+
+export function buildOpenFoodFactsProductUrl(baseUrl: string, barcode: string) {
+  return `${baseUrl}/product/${encodeURIComponent(barcode)}.json`;
+}
+
+function buildProductLookupProxyUrl(barcode: string) {
+  const url = new URL(PRODUCT_LOOKUP_PROXY_PATH, window.location.origin);
+  url.searchParams.set("barcode", barcode);
+  return url.toString();
 }
 
 function readString(value: unknown) {
@@ -198,6 +213,61 @@ function cloneLookupResult(
   };
 }
 
+async function readOpenFoodFactsPayload(
+  url: string,
+  signal: AbortSignal,
+): Promise<OpenFoodFactsResponse> {
+  const response = await fetch(url, {
+    cache: "no-store",
+    headers: {
+      accept: "application/json",
+    },
+    signal,
+  });
+
+  if (!response.ok) {
+    throw new ProductDatabaseLookupError(
+      "network",
+      "Product lookup failed. Check your connection and try again.",
+    );
+  }
+
+  try {
+    return (await response.json()) as OpenFoodFactsResponse;
+  } catch {
+    throw new ProductDatabaseLookupError(
+      "unknown",
+      "Product lookup returned unreadable data.",
+    );
+  }
+}
+
+async function fetchOpenFoodFactsPayload(
+  barcode: string,
+  signal: AbortSignal,
+): Promise<OpenFoodFactsResponse> {
+  const directUrl = new URL(
+    buildOpenFoodFactsProductUrl(
+      publicAppConfig.openFoodFactsApiBaseUrl,
+      barcode,
+    ),
+  );
+  directUrl.searchParams.set("fields", OPEN_FOOD_FACTS_FIELDS.join(","));
+
+  if (isBrowserRuntime()) {
+    try {
+      return await readOpenFoodFactsPayload(
+        buildProductLookupProxyUrl(barcode),
+        signal,
+      );
+    } catch {
+      return readOpenFoodFactsPayload(directUrl.toString(), signal);
+    }
+  }
+
+  return readOpenFoodFactsPayload(directUrl.toString(), signal);
+}
+
 export async function lookupOpenFoodFactsProduct(
   input: ExternalProductLookupInput,
 ): Promise<ExternalProductLookupResult> {
@@ -215,22 +285,10 @@ export async function lookupOpenFoodFactsProduct(
     () => controller.abort("timeout"),
     OPEN_FOOD_FACTS_TIMEOUT_MS,
   );
-  const url = new URL(
-    `${publicAppConfig.openFoodFactsApiBaseUrl}/product/${encodeURIComponent(barcode)}`,
-  );
-
-  url.searchParams.set("fields", OPEN_FOOD_FACTS_FIELDS.join(","));
-
-  let response: Response;
+  let payload: OpenFoodFactsResponse;
 
   try {
-    response = await fetch(url.toString(), {
-      cache: "no-store",
-      headers: {
-        accept: "application/json",
-      },
-      signal: controller.signal,
-    });
+    payload = await fetchOpenFoodFactsPayload(barcode, controller.signal);
   } catch (error) {
     clearTimeout(timeoutId);
 
@@ -251,24 +309,6 @@ export async function lookupOpenFoodFactsProduct(
   }
 
   clearTimeout(timeoutId);
-
-  if (!response.ok) {
-    throw new ProductDatabaseLookupError(
-      "network",
-      "Product lookup failed. Check your connection and try again.",
-    );
-  }
-
-  let payload: OpenFoodFactsResponse;
-
-  try {
-    payload = (await response.json()) as OpenFoodFactsResponse;
-  } catch {
-    throw new ProductDatabaseLookupError(
-      "unknown",
-      "Product lookup returned unreadable data.",
-    );
-  }
 
   if (payload.status !== 1 || !payload.product) {
     const result: ExternalProductLookupResult = {
