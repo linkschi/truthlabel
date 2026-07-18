@@ -7,6 +7,21 @@ export const metadata: Metadata = {
     "Paste an ingredient label, scan a barcode, or use OCR and camera tools in Truthlabel.",
 };
 
-export default function ManualScanPage() {
-  return <ManualScanScreen />;
+function firstSearchParamValue(value?: string | string[]) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+export default async function ManualScanPage({
+  searchParams,
+}: {
+  searchParams: Promise<{
+    mode?: string | string[];
+    scan?: string | string[];
+  }>;
+}) {
+  const params = await searchParams;
+  const initialScanMode =
+    firstSearchParamValue(params.mode) ?? firstSearchParamValue(params.scan);
+
+  return <ManualScanScreen initialScanMode={initialScanMode} />;
 }

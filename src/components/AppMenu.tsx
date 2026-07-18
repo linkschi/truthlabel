@@ -34,6 +34,11 @@ const navItems = [
     label: "Settings",
     detail: "Edit allergy, region, and scan preferences on this device.",
   },
+  {
+    href: "/account",
+    label: "Account",
+    detail: "Open account, saved-scan, and preference information.",
+  },
 ] as const;
 
 function toggleSelection<T extends string>(values: T[], value: T) {
@@ -42,7 +47,11 @@ function toggleSelection<T extends string>(values: T[], value: T) {
     : [...values, value];
 }
 
-export default function AppMenu() {
+export default function AppMenu({
+  variant = "header",
+}: {
+  variant?: "header" | "bottomNav";
+}) {
   const pathname = usePathname();
   const profile = useStoredProfile();
   const [isOpen, setIsOpen] = useState(false);
@@ -85,18 +94,36 @@ export default function AppMenu() {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setIsOpen(true)}
-        className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#ddd4c2] bg-white/88 text-[#33443c] transition hover:bg-[#f8f3ea] active:scale-[0.98]"
-        aria-label="Open navigation"
-      >
-        <span className="flex flex-col gap-1">
-          <span className="h-[1.5px] w-4 rounded-full bg-current" />
-          <span className="h-[1.5px] w-4 rounded-full bg-current" />
-          <span className="h-[1.5px] w-4 rounded-full bg-current" />
-        </span>
-      </button>
+      {variant === "bottomNav" ? (
+        <button
+          type="button"
+          onClick={() => setIsOpen(true)}
+          className="flex min-h-11 w-full flex-col items-center justify-center gap-1 rounded-[12px] text-[11px] font-semibold text-[#849089] outline-none transition hover:text-[#65706A] focus-visible:ring-2 focus-visible:ring-[#12583D] focus-visible:ring-offset-2"
+          aria-label="Open menu"
+        >
+          <span className="inline-flex h-[30px] w-9 items-center justify-center rounded-[12px]">
+            <span className="flex flex-col gap-1">
+              <span className="h-[1.5px] w-5 rounded-full bg-current" />
+              <span className="h-[1.5px] w-5 rounded-full bg-current" />
+              <span className="h-[1.5px] w-5 rounded-full bg-current" />
+            </span>
+          </span>
+          <span>Menu</span>
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setIsOpen(true)}
+          className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#ddd4c2] bg-white/88 text-[#33443c] transition hover:bg-[#f8f3ea] active:scale-[0.98]"
+          aria-label="Open navigation"
+        >
+          <span className="flex flex-col gap-1">
+            <span className="h-[1.5px] w-4 rounded-full bg-current" />
+            <span className="h-[1.5px] w-4 rounded-full bg-current" />
+            <span className="h-[1.5px] w-4 rounded-full bg-current" />
+          </span>
+        </button>
+      )}
 
       {isOpen ? (
         <div
@@ -115,7 +142,7 @@ export default function AppMenu() {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#7c6d4f]">
-                  inside it
+                  Truthlabel
                 </p>
                 <h2
                   id="app-menu-title"

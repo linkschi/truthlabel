@@ -75,7 +75,7 @@ This checklist is for real-device MVP validation after local build, lint, typech
 
 - [ ] Quick Overview makes sense on first read
 - [ ] Ingredient Breakdown stays readable on mobile
-- [ ] Deep Exposure Checks do not falsely look green when not checked
+- [ ] Deep Exposure Checks do not falsely look green when not found
 - [ ] Confidence notes stay visible when needed
 - [ ] Feedback panel does not overwhelm the result page
 

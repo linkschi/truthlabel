@@ -21,14 +21,23 @@ function getPriority(severity: Severity) {
   return 3;
 }
 
-const hiddenQuickOverviewIds = new Set<ExposureCheckResult["id"]>([
+const hiddenQuickOverviewIds = new Set<string>([
   "additives_preservatives",
   "artificial_engineered_food_construction",
   "artificial_colours",
-  "total_ingredients",
+  "artificial_sweeteners",
+  "emulsifiers",
+  "flavour_enhancers",
+  "hydrogenated_partially_hydrogenated_oils",
+  "natural_positive",
+  "natural_vs_processed",
+  "preservatives",
+  "stabilisers_thickeners",
+  "unknown_review",
 ]);
 
 const requiredIngredientOverviewIds: ExposureCheckResult["id"][] = [
+  "total_ingredients",
   "ultra_processed",
 ];
 
@@ -77,6 +86,13 @@ export function buildQuickOverview(
       return true;
     })
     .sort((a, b) => {
+      const leftIsTotalIngredients = a.row.id === "total_ingredients";
+      const rightIsTotalIngredients = b.row.id === "total_ingredients";
+
+      if (leftIsTotalIngredients !== rightIsTotalIngredients) {
+        return leftIsTotalIngredients ? 1 : -1;
+      }
+
       const priorityDelta = getPriority(a.row.severity) - getPriority(b.row.severity);
       if (priorityDelta !== 0) {
         return priorityDelta;

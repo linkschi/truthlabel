@@ -72,8 +72,9 @@ test("technical construction and additive rollup categories stay out of Quick Ov
   assert.ok(!quickOverviewIds.includes("artificial_engineered_food_construction"));
   assert.ok(!quickOverviewIds.includes("artificial_colours"));
   assert.ok(!quickOverviewIds.includes("additives_preservatives"));
-  assert.ok(!quickOverviewIds.includes("total_ingredients"));
+  assert.ok(quickOverviewIds.includes("total_ingredients"));
   assert.ok(quickOverviewIds.includes("ultra_processed"));
+  assert.equal(quickOverviewIds.at(-1), "total_ingredients");
 });
 
 test("Heavy Metals likely appears in Quick Overview for drinks beverages", () => {

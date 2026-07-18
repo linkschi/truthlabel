@@ -22,6 +22,7 @@ import {
   getSavedAllergyProfile,
   useUserSettings,
 } from "@/lib/userSettings/userSettingsStorage";
+import type { CameraScannerMode } from "./CameraBarcodeScanner";
 import type { OcrConfirmedDetails } from "./OcrIngredientScanner";
 
 const CameraBarcodeScanner = dynamic(
@@ -145,7 +146,7 @@ function ScannerOverlayLoading({
       <div className="mx-auto flex h-full w-full max-w-[440px] flex-col justify-center rounded-[30px] border border-white/14 bg-[#102019] p-5 text-white shadow-[0_28px_60px_rgba(0,0,0,0.38)]">
         <div className="rounded-[24px] border border-white/14 bg-[rgba(255,255,255,0.06)] px-5 py-6 text-center">
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/66">
-            inside it
+            Truthlabel
           </p>
           <h2 className="mt-2 font-heading text-[1.3rem] font-semibold text-white">
             {title}
@@ -224,16 +225,91 @@ function buildManualScanInput(args: {
   };
 }
 
-export default function ManualScanScreen() {
+function normalizeInitialScanMode(initialScanMode?: string) {
+  return initialScanMode?.trim().toLowerCase() ?? "";
+}
+
+function isBarcodeCameraRequest(initialScanMode?: string) {
+  const requestedMode = normalizeInitialScanMode(initialScanMode);
+
+  return (
+    requestedMode === "camera" ||
+    requestedMode === "barcode" ||
+    requestedMode === "barcode-camera"
+  );
+}
+
+function isIngredientsCameraRequest(initialScanMode?: string) {
+  const requestedMode = normalizeInitialScanMode(initialScanMode);
+
+  return (
+    requestedMode === "ingredients" ||
+    requestedMode === "ingredient" ||
+    requestedMode === "ocr" ||
+    requestedMode === "label"
+  );
+}
+
+function getInitialCameraScannerMode(
+  initialScanMode?: string,
+): CameraScannerMode {
+  return isIngredientsCameraRequest(initialScanMode) ? "ingredients" : "barcode";
+}
+
+function shouldAutoOpenCameraScanner(initialScanMode?: string) {
+  if (isBarcodeCameraRequest(initialScanMode)) {
+    return cameraBarcodeEnabled;
+  }
+
+  if (isIngredientsCameraRequest(initialScanMode)) {
+    return ocrEnabled;
+  }
+
+  return false;
+}
+
+function buildInitialBarcodeFeedback(
+  initialScanMode?: string,
+): BarcodeFeedbackState | null {
+  if (isBarcodeCameraRequest(initialScanMode) && !cameraBarcodeEnabled) {
+    return {
+      status: "error",
+      message:
+        "Camera barcode scanning is unavailable in this build. Type the barcode or paste the ingredient list manually instead.",
+      dataQualityWarnings: [],
+      productData: null,
+    };
+  }
+
+  return null;
+}
+
+function buildInitialErrorMessage(initialScanMode?: string) {
+  if (isIngredientsCameraRequest(initialScanMode) && !ocrEnabled) {
+    return "Ingredient label scanning is unavailable in this build. Paste the ingredient list manually instead.";
+  }
+
+  return "";
+}
+
+export default function ManualScanScreen({
+  initialScanMode,
+}: {
+  initialScanMode?: string;
+}) {
   const router = useRouter();
   const userSettings = useUserSettings();
   const [isPending, startTransition] = useTransition();
-  const [isCameraScannerOpen, setIsCameraScannerOpen] = useState(false);
+  const [isCameraScannerOpen, setIsCameraScannerOpen] = useState(
+    () => shouldAutoOpenCameraScanner(initialScanMode),
+  );
   const [isOcrScannerOpen, setIsOcrScannerOpen] = useState(false);
   const [isLookingUpBarcode, setIsLookingUpBarcode] = useState(false);
   const [barcodeInput, setBarcodeInput] = useState("");
   const [barcodeFeedback, setBarcodeFeedback] =
-    useState<BarcodeFeedbackState | null>(null);
+    useState<BarcodeFeedbackState | null>(() =>
+      buildInitialBarcodeFeedback(initialScanMode),
+    );
   const [productName, setProductName] = useState("");
   const [brandName, setBrandName] = useState("");
   const [productCategoryOverride, setProductCategoryOverride] =
@@ -245,7 +321,9 @@ export default function ManualScanScreen() {
     useState<string[] | null>(null);
   const [customAllergiesTextOverride, setCustomAllergiesTextOverride] =
     useState<string | null>(null);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState(() =>
+    buildInitialErrorMessage(initialScanMode),
+  );
   const savedAllergyDefaults = useMemo(
     () => splitSavedAllergyProfile(getSavedAllergyProfile(userSettings)),
     [userSettings],
@@ -386,9 +464,14 @@ export default function ManualScanScreen() {
   }
 
   async function handleCameraBarcodeDetected(barcode: string) {
-    setIsCameraScannerOpen(false);
     setBarcodeInput(barcode);
-    await lookupBarcodeValue(barcode);
+    const result = await lookupBarcodeValue(barcode);
+
+    if (result?.lookupStatus === "found") {
+      setIsCameraScannerOpen(false);
+    }
+
+    return result;
   }
 
   async function runConfirmedIngredientScan(options?: {
@@ -517,6 +600,7 @@ export default function ManualScanScreen() {
         additionalConfidenceNotes: buildOcrConfidenceNotes(details),
       });
       setIsOcrScannerOpen(false);
+      setIsCameraScannerOpen(false);
     } catch (error) {
       if (hasErrorName(error, "ManualScanValidationError")) {
         setErrorMessage(
@@ -535,7 +619,10 @@ export default function ManualScanScreen() {
     <main className="min-h-screen px-4 py-5 sm:px-5 sm:py-6">
       {isCameraScannerOpen ? (
         <CameraBarcodeScanner
+          initialMode={getInitialCameraScannerMode(initialScanMode)}
           onBarcodeDetected={handleCameraBarcodeDetected}
+          onTextConfirmed={ocrEnabled ? handleOcrTextConfirmed : undefined}
+          onManualEntry={() => setIsCameraScannerOpen(false)}
           onClose={() => setIsCameraScannerOpen(false)}
         />
       ) : null}
@@ -550,7 +637,7 @@ export default function ManualScanScreen() {
         <header className="flex items-start justify-between gap-4 px-1 py-1">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#7c6d4f]">
-              inside it
+              Truthlabel
             </p>
             <h1 className="mt-1 font-heading text-[1.7rem] font-semibold text-[#17251f]">
               Scan

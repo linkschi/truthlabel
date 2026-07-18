@@ -3,12 +3,12 @@
 import Link from "next/link";
 import {
   type ReactNode,
+  useEffect,
   useMemo,
   useRef,
   useState,
   useSyncExternalStore,
 } from "react";
-import ConcernDot from "@/components/ConcernDot";
 import InfoModal from "@/components/InfoModal";
 import IssueBadge from "@/components/IssueBadge";
 import TestingFeedbackPanel from "@/components/TestingFeedbackPanel";
@@ -27,12 +27,35 @@ import {
   useUserSettings,
 } from "@/lib/userSettings/userSettingsStorage";
 import {
-  getVisibleConfidenceNotes,
   getVisibleDeepExposureChecks,
   shouldShowBrandTrustSafety,
 } from "@/lib/userSettings/scanDisplayPreferences";
 
 type RowTone = "green" | "yellow" | "red" | "neutral";
+
+type CategoryIconName =
+  | "additive"
+  | "allergy"
+  | "ban"
+  | "barcode"
+  | "beaker"
+  | "candy"
+  | "colour"
+  | "drop"
+  | "eye"
+  | "factory"
+  | "flame"
+  | "leaf"
+  | "list"
+  | "meat"
+  | "metal"
+  | "micro"
+  | "oil"
+  | "question"
+  | "scale"
+  | "shield"
+  | "spark"
+  | "texture";
 
 type BadgeDescriptor = {
   color: RowTone;
@@ -56,7 +79,6 @@ type IngredientGroupCard = {
   id: string;
   label: string;
   tone: RowTone;
-  helperText: string;
   items: ScanResultIngredientItem[];
 };
 
@@ -76,6 +98,13 @@ const iconWrapClasses: Record<RowTone, string> = {
   yellow: "border border-[var(--amber-border)] bg-[var(--amber-bg)]",
   red: "border border-[var(--red-border)] bg-[var(--red-bg)]",
   neutral: "border border-[var(--border-soft)] bg-[var(--neutral-bg)]",
+};
+
+const categoryIconColorClasses: Record<RowTone, string> = {
+  green: "text-[var(--green-main)]",
+  yellow: "text-[var(--amber-main)]",
+  red: "text-[var(--red-main)]",
+  neutral: "text-[var(--neutral-text)]",
 };
 
 const groupSurfaceClasses: Record<RowTone, string> = {
@@ -102,7 +131,26 @@ const chipToneClasses: Record<RowTone, string> = {
     "border-[var(--border-soft)] bg-[var(--bg-surface)] text-[var(--text-secondary)]",
 };
 
+const deepDetailCardClasses: Record<RowTone, string> = {
+  green:
+    "border-[var(--green-border)] bg-[linear-gradient(180deg,var(--bg-surface)_0%,var(--green-bg)_100%)]",
+  yellow:
+    "border-[var(--amber-border)] bg-[linear-gradient(180deg,var(--bg-surface)_0%,var(--amber-bg)_100%)]",
+  red:
+    "border-[var(--red-border)] bg-[linear-gradient(180deg,var(--bg-surface)_0%,var(--red-bg)_100%)]",
+  neutral:
+    "border-[var(--border-soft)] bg-[linear-gradient(180deg,var(--bg-surface)_0%,var(--bg-soft)_100%)]",
+};
+
+const deepDetailAccentClasses: Record<RowTone, string> = {
+  green: "bg-[var(--green-main)]",
+  yellow: "bg-[var(--amber-main)]",
+  red: "bg-[var(--red-main)]",
+  neutral: "bg-[var(--neutral-text)]",
+};
+
 const requiredOverviewCategoryIds = new Set([
+  "total_ingredients",
   "ultra_processed_indicators",
 ]);
 
@@ -258,6 +306,24 @@ function getIngredientGroupBadges(group: IngredientGroupCard): BadgeDescriptor[]
   });
 }
 
+function getDeepCheckStatusBadges(item: ScanResultDeepExposureCheck): BadgeDescriptor[] {
+  const tone = toRowTone(item.severity);
+  const statusBadge =
+    item.status === "not_checked"
+      ? ({ color: "neutral", label: "Not found" } satisfies BadgeDescriptor)
+      : item.severity === "red"
+        ? ({ color: "red", label: "High" } satisfies BadgeDescriptor)
+        : item.severity === "yellow"
+          ? ({ color: "yellow", label: "Detected" } satisfies BadgeDescriptor)
+          : ({ color: tone, label: "Minimum" } satisfies BadgeDescriptor);
+
+  if (item.status === "not_checked" || item.matchCount <= 1) {
+    return [statusBadge];
+  }
+
+  return [statusBadge, { color: statusBadge.color, count: item.matchCount }];
+}
+
 function BrandMark() {
   return (
     <div className="mt-4 flex flex-col items-center gap-1.5">
@@ -270,7 +336,7 @@ function BrandMark() {
       </span>
       <div className="text-center">
         <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--text-main)]">
-          Inside It
+          Truthlabel
         </p>
         <p className="mt-1 text-[11px] font-medium text-[var(--text-secondary)]">
           Exposure report
@@ -292,10 +358,6 @@ function getScanSourceBadgeLabel(scanSource: ScanSourceLabel) {
     default:
       return "Demo";
   }
-}
-
-function getScanCategoryLabel(scanSource: ScanSourceLabel) {
-  return scanSource === "demo" ? "Demo category" : "Product category";
 }
 
 function ProductVisual({
@@ -493,16 +555,240 @@ function TonePill({
   );
 }
 
-function RowIcon({ tone }: { tone: RowTone }) {
+function getCategoryIconName(categoryId?: string): CategoryIconName {
+  switch (categoryId) {
+    case "additives_preservatives":
+      return "beaker";
+    case "allergy_risk":
+      return "allergy";
+    case "artificial_colours":
+      return "colour";
+    case "artificial_engineered_food_construction":
+      return "factory";
+    case "artificial_sweeteners_sugar_substitutes":
+      return "candy";
+    case "banned_restricted_items":
+      return "ban";
+    case "brand_trust_safety":
+      return "shield";
+    case "cancer_linked_watch":
+      return "eye";
+    case "emulsifiers_stabilisers_thickeners_gums":
+      return "texture";
+    case "flavour_enhancers_flavourings":
+      return "spark";
+    case "fry_oil_fast_food_oil":
+      return "flame";
+    case "harmful_additives":
+      return "additive";
+    case "heavy_metals":
+      return "metal";
+    case "hydrogenated_partially_hydrogenated_oils":
+      return "oil";
+    case "meat_specific_concerns":
+      return "meat";
+    case "microplastics":
+      return "micro";
+    case "natural_positive":
+      return "leaf";
+    case "natural_vs_processed":
+      return "scale";
+    case "preservatives_shelf_life_systems":
+      return "barcode";
+    case "seed_oils_processed_oils":
+      return "drop";
+    case "total_ingredients":
+      return "list";
+    case "ultra_processed_indicators":
+      return "factory";
+    case "unknown_review":
+      return "question";
+    default:
+      return "list";
+  }
+}
+
+function CategoryGlyph({
+  name,
+  className = "",
+}: {
+  name: CategoryIconName;
+  className?: string;
+}) {
+  const commonProps = {
+    "aria-hidden": true,
+    className: `h-3.5 w-3.5 ${className}`,
+    fill: "none",
+    viewBox: "0 0 24 24",
+    xmlns: "http://www.w3.org/2000/svg",
+  };
+
+  switch (name) {
+    case "additive":
+      return (
+        <svg {...commonProps}>
+          <path d="M9 3v5l-4.5 8.2A3.2 3.2 0 0 0 7.3 21h9.4a3.2 3.2 0 0 0 2.8-4.8L15 8V3" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
+          <path d="M8 8h8M7 16h10" stroke="currentColor" strokeLinecap="round" strokeWidth="1.7" />
+        </svg>
+      );
+    case "allergy":
+      return (
+        <svg {...commonProps}>
+          <path d="M12 3.5 20 7v5.4c0 4.8-3.3 7.3-8 8.6-4.7-1.3-8-3.8-8-8.6V7l8-3.5Z" stroke="currentColor" strokeLinejoin="round" strokeWidth="1.7" />
+          <path d="M12 8v4.5M12 16h.01" stroke="currentColor" strokeLinecap="round" strokeWidth="2" />
+        </svg>
+      );
+    case "ban":
+      return (
+        <svg {...commonProps}>
+          <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z" stroke="currentColor" strokeWidth="1.8" />
+          <path d="M6.8 6.8 17.2 17.2" stroke="currentColor" strokeLinecap="round" strokeWidth="1.8" />
+        </svg>
+      );
+    case "barcode":
+      return (
+        <svg {...commonProps}>
+          <path d="M5 5v14M8 5v14M12 5v14M16 5v14M19 5v14" stroke="currentColor" strokeLinecap="round" strokeWidth="1.8" />
+        </svg>
+      );
+    case "beaker":
+      return (
+        <svg {...commonProps}>
+          <path d="M9 3h6M10 3v6.2l-4.1 7.1A3.1 3.1 0 0 0 8.6 21h6.8a3.1 3.1 0 0 0 2.7-4.7L14 9.2V3" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.7" />
+          <path d="M8 15h8" stroke="currentColor" strokeLinecap="round" strokeWidth="1.7" />
+        </svg>
+      );
+    case "candy":
+      return (
+        <svg {...commonProps}>
+          <path d="M8.5 8.5h7v7h-7z" stroke="currentColor" strokeLinejoin="round" strokeWidth="1.7" />
+          <path d="M8.5 10 4 7v10l4.5-3M15.5 10 20 7v10l-4.5-3" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.7" />
+        </svg>
+      );
+    case "colour":
+      return (
+        <svg {...commonProps}>
+          <path d="M12 21a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17Z" stroke="currentColor" strokeWidth="1.7" />
+          <path d="M8 9h.01M12 7h.01M16 9h.01M9.5 14h.01M14.5 14h.01" stroke="currentColor" strokeLinecap="round" strokeWidth="2.4" />
+        </svg>
+      );
+    case "drop":
+      return (
+        <svg {...commonProps}>
+          <path d="M12 3.5s6 6.5 6 11A6 6 0 0 1 6 14.5c0-4.5 6-11 6-11Z" stroke="currentColor" strokeLinejoin="round" strokeWidth="1.8" />
+        </svg>
+      );
+    case "eye":
+      return (
+        <svg {...commonProps}>
+          <path d="M3.5 12s3.2-5.2 8.5-5.2 8.5 5.2 8.5 5.2-3.2 5.2-8.5 5.2S3.5 12 3.5 12Z" stroke="currentColor" strokeLinejoin="round" strokeWidth="1.7" />
+          <path d="M12 14.8a2.8 2.8 0 1 0 0-5.6 2.8 2.8 0 0 0 0 5.6Z" stroke="currentColor" strokeWidth="1.7" />
+        </svg>
+      );
+    case "factory":
+      return (
+        <svg {...commonProps}>
+          <path d="M4 20V9.5l5 3V9.5l5 3V6h6v14H4Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.7" />
+          <path d="M8 16h.01M12 16h.01M16 16h.01" stroke="currentColor" strokeLinecap="round" strokeWidth="2.2" />
+        </svg>
+      );
+    case "flame":
+      return (
+        <svg {...commonProps}>
+          <path d="M12 21c4 0 6.5-2.6 6.5-6.2 0-3-1.7-5-4.8-8.2-.1 2-1 3.3-2.4 4.4.1-2.9-1.3-5.1-3.1-7C7.9 7 5.5 9.8 5.5 14.8 5.5 18.4 8 21 12 21Z" stroke="currentColor" strokeLinejoin="round" strokeWidth="1.7" />
+        </svg>
+      );
+    case "leaf":
+      return (
+        <svg {...commonProps}>
+          <path d="M5 19c9.5 0 14-5.2 14-14-8.8 0-14 5.1-14 14Z" stroke="currentColor" strokeLinejoin="round" strokeWidth="1.7" />
+          <path d="M5 19 15 9" stroke="currentColor" strokeLinecap="round" strokeWidth="1.7" />
+        </svg>
+      );
+    case "list":
+      return (
+        <svg {...commonProps}>
+          <path d="M8 7h11M8 12h11M8 17h11" stroke="currentColor" strokeLinecap="round" strokeWidth="1.8" />
+          <path d="M4.5 7h.01M4.5 12h.01M4.5 17h.01" stroke="currentColor" strokeLinecap="round" strokeWidth="2.6" />
+        </svg>
+      );
+    case "meat":
+      return (
+        <svg {...commonProps}>
+          <path d="M9.5 20c3.6 0 7.5-3.9 7.5-7.5 0-3-2.4-5.5-5.5-5.5C7.9 7 4 10.9 4 14.5 4 17.6 6.4 20 9.5 20Z" stroke="currentColor" strokeLinejoin="round" strokeWidth="1.7" />
+          <path d="M16 8 20 4M18 6l2 2" stroke="currentColor" strokeLinecap="round" strokeWidth="1.7" />
+        </svg>
+      );
+    case "metal":
+      return (
+        <svg {...commonProps}>
+          <path d="M12 3.5 19.4 8v8L12 20.5 4.6 16V8L12 3.5Z" stroke="currentColor" strokeLinejoin="round" strokeWidth="1.7" />
+          <path d="M12 8v8M8.5 10l7 4M15.5 10l-7 4" stroke="currentColor" strokeLinecap="round" strokeWidth="1.5" />
+        </svg>
+      );
+    case "micro":
+      return (
+        <svg {...commonProps}>
+          <path d="M8 8.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM16.5 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM9.5 20.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" stroke="currentColor" strokeWidth="1.7" />
+          <path d="M11 8.5 13.8 9.6M10.8 15l2.8-2.6" stroke="currentColor" strokeLinecap="round" strokeWidth="1.5" />
+        </svg>
+      );
+    case "oil":
+      return (
+        <svg {...commonProps}>
+          <path d="M8 5h8l-1 4.5 3 4.5v3.5A2.5 2.5 0 0 1 15.5 20h-7A2.5 2.5 0 0 1 6 17.5V14l3-4.5L8 5Z" stroke="currentColor" strokeLinejoin="round" strokeWidth="1.7" />
+          <path d="M9 10h6" stroke="currentColor" strokeLinecap="round" strokeWidth="1.7" />
+        </svg>
+      );
+    case "question":
+      return (
+        <svg {...commonProps}>
+          <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z" stroke="currentColor" strokeWidth="1.7" />
+          <path d="M9.8 9.2a2.4 2.4 0 0 1 4.6 1.1c0 2.2-2.4 2.1-2.4 4M12 17.5h.01" stroke="currentColor" strokeLinecap="round" strokeWidth="1.8" />
+        </svg>
+      );
+    case "scale":
+      return (
+        <svg {...commonProps}>
+          <path d="M12 4v16M6 7h12M8 7l-4 7h8L8 7ZM16 7l-4 7h8l-4-7Z" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.7" />
+        </svg>
+      );
+    case "shield":
+      return (
+        <svg {...commonProps}>
+          <path d="M12 21s7-3.4 7-10.2V5.4L12 3 5 5.4v5.4C5 17.6 12 21 12 21Z" stroke="currentColor" strokeLinejoin="round" strokeWidth="1.7" />
+          <path d="m8.8 12 2 2 4.4-4.5" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.7" />
+        </svg>
+      );
+    case "spark":
+      return (
+        <svg {...commonProps}>
+          <path d="M12 3.5 13.4 9l5.1 1.5-5.1 1.5L12 17.5 10.6 12l-5.1-1.5L10.6 9 12 3.5Z" stroke="currentColor" strokeLinejoin="round" strokeWidth="1.7" />
+        </svg>
+      );
+    case "texture":
+      return (
+        <svg {...commonProps}>
+          <path d="M5 8c2.2-2.2 4.5-2.2 6.8 0s4.6 2.2 7.2 0M5 13c2.2-2.2 4.5-2.2 6.8 0s4.6 2.2 7.2 0M5 18c2.2-2.2 4.5-2.2 6.8 0s4.6 2.2 7.2 0" stroke="currentColor" strokeLinecap="round" strokeWidth="1.7" />
+        </svg>
+      );
+  }
+}
+
+function RowIcon({
+  tone,
+  categoryId,
+}: {
+  tone: RowTone;
+  categoryId?: string;
+}) {
+  const iconName = getCategoryIconName(categoryId);
+
   return (
     <span
-      className={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${iconWrapClasses[tone]}`}
+      className={`inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${iconWrapClasses[tone]} ${categoryIconColorClasses[tone]}`}
     >
-      {tone === "neutral" ? (
-        <span className="h-1.5 w-1.5 rounded-full bg-[var(--neutral-text)]" />
-      ) : (
-        <ConcernDot level={tone} className="h-2 w-2" />
-      )}
+      <CategoryGlyph name={iconName} />
     </span>
   );
 }
@@ -523,7 +809,7 @@ function SectionHeading({
           {title}
         </h2>
         {subtitle ? (
-          <p className="mt-1 text-[12px] leading-5 text-[var(--text-secondary)]">
+          <p className="mt-1.5 text-[13px] font-semibold leading-5 text-[var(--text-main)]">
             {subtitle}
           </p>
         ) : null}
@@ -655,7 +941,7 @@ function buildBrandTrustDetail(brandTrust: ScanResultBrandTrustSafety) {
     tone: toModalTone(brandTrust.severity),
     status:
       brandTrust.status === "not_checked"
-        ? "Not checked"
+        ? "Not found"
         : brandTrust.status === "clear_checked"
           ? "Clear checked"
           : brandTrust.status === "yellow_review"
@@ -684,55 +970,193 @@ function buildBrandTrustDetail(brandTrust: ScanResultBrandTrustSafety) {
   } satisfies ResultDetail;
 }
 
+function uniqueLabels(values: Array<string | undefined | null>) {
+  const labels = values
+    .map((value) => value?.trim())
+    .filter((value): value is string => Boolean(value));
+
+  return [...new Set(labels)];
+}
+
+function getFinalVerdictOpening(scanResult: ScanResult) {
+  const hasAllergyMatch = scanResult.finalVerdict.mainReasons.some(
+    (reason) => reason.reasonType === "allergy_profile_match",
+  );
+  const hasExternalSafetySignal = scanResult.finalVerdict.mainReasons.some(
+    (reason) => reason.reasonType === "verified_external_signal",
+  );
+
+  if (hasAllergyMatch) {
+    return "This product matches your allergy profile.";
+  }
+
+  if (hasExternalSafetySignal) {
+    return "This product has an external safety warning.";
+  }
+
+  if (scanResult.finalVerdict.verdictTone === "red") {
+    return "This product has strong warning signals.";
+  }
+
+  if (scanResult.finalVerdict.verdictTone === "yellow") {
+    return "This product has ingredients worth reviewing.";
+  }
+
+  return "This product looks simple from the available label data.";
+}
+
+function getFinalWarningReasonLabel(reason: ScanResult["finalVerdict"]["mainReasons"][number]) {
+  if (reason.reasonType === "allergy_profile_match") {
+    return `Matches your allergy profile: ${reason.matchedItems[0] ?? reason.categoryName}`;
+  }
+
+  if (reason.reasonType === "banned_restricted") {
+    return "Banned, restricted, or not-permitted ingredient found";
+  }
+
+  if (reason.reasonType === "verified_external_signal") {
+    return "Official safety or recall signal found";
+  }
+
+  if (reason.reasonType === "count_overload") {
+    return `High ${reason.categoryName.toLowerCase()} load`;
+  }
+
+  if (reason.reasonType === "long_ingredient_list") {
+    return "Very long ingredient list";
+  }
+
+  if (reason.reasonType === "high_processed_share") {
+    return "High processed ingredient share";
+  }
+
+  if (reason.reasonType === "category_combo_trigger") {
+    return `${reason.categoryName} combination trigger`;
+  }
+
+  if (reason.categoryId === "cancer_linked_watch") {
+    return "Cancer-linked Watch review signal found";
+  }
+
+  if (reason.categoryId === "ultra_processed_indicators") {
+    return "Ultra-processed markers found";
+  }
+
+  if (reason.categoryId === "unknown_review") {
+    return "Low-transparency label terms found";
+  }
+
+  if (reason.categoryId === "preservatives_shelf_life_systems") {
+    return "Preservatives or shelf-life additives found";
+  }
+
+  if (reason.categoryId === "artificial_sweeteners_sugar_substitutes") {
+    return "Artificial or non-sugar sweeteners found";
+  }
+
+  return reason.categoryName;
+}
+
+function getFinalWarningReasons(scanResult: ScanResult) {
+  const reasons = scanResult.finalVerdict.mainReasons.map(getFinalWarningReasonLabel);
+
+  if (reasons.length > 0) {
+    return uniqueLabels(reasons).slice(0, 5);
+  }
+
+  if (scanResult.finalVerdict.verdictTone === "green") {
+    return ["No major warning categories found from available label data"];
+  }
+
+  return ["Review signals found in the ingredient scan"];
+}
+
+function getFinalReasonHeading(scanResult: ScanResult) {
+  if (scanResult.finalVerdict.verdictTone === "green") {
+    return "What Truthlabel found";
+  }
+
+  if (scanResult.finalVerdict.verdictTone === "yellow") {
+    return "This product has review notes because";
+  }
+
+  return "This product has warnings because";
+}
+
+function getFinalVerdictClosing(scanResult: ScanResult) {
+  const reasonTypes = new Set(
+    scanResult.finalVerdict.mainReasons.map((reason) => reason.reasonType),
+  );
+  const categoryIds = new Set(
+    scanResult.finalVerdict.mainReasons.map((reason) => reason.categoryId),
+  );
+
+  if (reasonTypes.has("allergy_profile_match")) {
+    return "Avoid this product if you are allergic to the matched ingredient. Always check the package label and follow medical advice for known allergies.";
+  }
+
+  if (reasonTypes.has("verified_external_signal")) {
+    return "Truthlabel flags this as a serious external safety concern. Check the affected lot, date, region, and official source before buying or consuming.";
+  }
+
+  if (categoryIds.has("cancer_linked_watch")) {
+    return "Truthlabel flags this for review because cancer-watch or regulatory concern signals were found. This is not proof that the product causes cancer.";
+  }
+
+  if (scanResult.finalVerdict.verdictTone === "red") {
+    return "Truthlabel flags this product strongly because serious warning categories or high-load patterns were found. This does not mean every ingredient is automatically dangerous.";
+  }
+
+  if (scanResult.finalVerdict.verdictTone === "yellow") {
+    return "Truthlabel flags this product for review because some label signals need a closer look, but no automatic serious warning was found from the available data.";
+  }
+
+  return "Truthlabel did not find major label-based warning signals, but missing data is not proof of absence. Always check the package label.";
+}
+
+function getSimpleIngredientSummary(scanResult: ScanResult) {
+  const simpleIngredients = uniqueLabels(
+    scanResult.ingredientBreakdown.naturalPositive.map((item) => item.displayName),
+  );
+
+  return {
+    count: simpleIngredients.length,
+    preview: simpleIngredients.slice(0, 5),
+  };
+}
+
 function OverviewRow({
   item,
-  onOpen,
 }: {
   item: ScanResultOverviewRow;
-  onOpen: (detail: ResultDetail) => void;
 }) {
   const tone = toRowTone(item.severity);
+  const overviewValue =
+    item.categoryId === "total_ingredients"
+      ? item.displayValue
+      : item.matchCount > 0
+        ? String(item.matchCount)
+        : item.severity === "green"
+          ? "No"
+          : item.displayValue;
   const badges = buildIssueBadges({
-    clearLabel: item.severity === "green" ? item.displayValue : undefined,
-    value: item.severity !== "green" ? item.displayValue : undefined,
+    value: overviewValue,
     tone,
     badgeTone: tone,
   });
-  const previewText =
-    formatMatchSummary(item.matchCount, item.matchedItemsPreview) || item.shortMessage;
 
   return (
-    <button
-      type="button"
-      onClick={() =>
-        onOpen(
-          buildCategoryDetail({
-            title: item.label,
-            tone: toModalTone(item.severity),
-            status: item.displayValue,
-            shortMessage: item.shortMessage,
-            matchedItemsPreview: item.matchedItemsPreview,
-            matchCount: item.matchCount,
-            redReasonType: item.redReasonType,
-          }),
-        )
-      }
-      className="grid min-h-[56px] w-full grid-cols-[auto_minmax(0,1fr)_auto_auto] items-start gap-3 py-3 text-left transition-colors active:bg-[var(--bg-soft)]"
+    <div
+      className="grid min-h-[48px] w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 py-2.5"
     >
-      <div className="pt-0.5">
-        <RowIcon tone={tone} />
-      </div>
+      <RowIcon tone={tone} categoryId={item.categoryId} />
       <div className="min-w-0">
         <p className="truncate text-[15px] font-medium text-[var(--text-main)]">
           {item.label}
         </p>
-        <p className="mt-1 text-[12px] leading-5 text-[var(--text-secondary)]">
-          {previewText}
-        </p>
       </div>
-      <IssueBadgeStack badges={badges} className="justify-self-end pt-0.5" />
-      <ChevronIcon className="mt-1 text-[var(--text-secondary)]" />
-    </button>
+      <IssueBadgeStack badges={badges} className="justify-self-end" />
+    </div>
   );
 }
 
@@ -770,61 +1194,180 @@ function IngredientChip({
   );
 }
 
+function formatRegionList(regions: string[]) {
+  if (regions.length === 0) {
+    return "at least one region";
+  }
+
+  if (regions.length === 1) {
+    return regions[0];
+  }
+
+  if (regions.length === 2) {
+    return `${regions[0]} and ${regions[1]}`;
+  }
+
+  return `${regions.slice(0, -1).join(", ")}, and ${regions.at(-1)}`;
+}
+
+function formatCompactRegionList(regions: string[]) {
+  if (regions.length <= 3) {
+    return formatRegionList(regions);
+  }
+
+  return `multiple regions including ${formatRegionList(regions.slice(0, 3))}`;
+}
+
+function getDeepCheckReasonText(item: ScanResultDeepExposureCheck) {
+  if (item.status === "not_checked") {
+    return "Missing data is not proof of absence.";
+  }
+
+  if (item.categoryId !== "banned_restricted_items") {
+    return item.shortMessage;
+  }
+
+  const matchedNames = uniqueLabels(
+    item.matchedItemDetails.map((detail) => detail.displayName),
+  );
+  const regions = uniqueLabels(
+    item.matchedItemDetails.flatMap((detail) => detail.restrictionRegions),
+  );
+  const reasons = uniqueLabels(
+    item.matchedItemDetails.flatMap((detail) => detail.restrictionReasons),
+  );
+  const regionText = formatCompactRegionList(regions);
+
+  if (matchedNames.length > 1) {
+    return `This product was flagged because it contains multiple banned or restricted items. These items are banned, restricted, revoked, or not permitted in ${regionText}. Truthlabel treats this as a serious regulatory and safety concern based on available database signals.`;
+  }
+
+  const itemText = matchedNames[0] ?? "a banned or restricted item";
+
+  if (reasons.length === 1) {
+    return `This product was flagged because it contains ${itemText}, which is banned, restricted, revoked, or not permitted in ${regionText}. Reason: ${reasons[0]}`;
+  }
+
+  return `This product was flagged because it contains ${itemText}, which is banned, restricted, revoked, or not permitted in ${regionText}. Truthlabel treats this as a serious regulatory and safety concern based on available database signals.`;
+}
+
 function DeepCheckRow({
   item,
-  onOpen,
+  isExpanded,
+  onToggle,
 }: {
   item: ScanResultDeepExposureCheck;
-  onOpen: (detail: ResultDetail) => void;
+  isExpanded: boolean;
+  onToggle: (categoryId: string) => void;
 }) {
   const tone = toRowTone(item.severity);
-  const badges = buildIssueBadges({
-    clearLabel:
-      item.status === "checked" && item.severity === "green" ? item.displayValue : undefined,
-    value: item.status === "not_checked" ? "Not checked" : item.displayValue,
-    tone,
-    badgeTone: tone,
-  });
-  const previewText =
-    item.status === "not_checked"
-      ? "External lookup was not attached here."
-      : formatMatchSummary(item.matchCount, item.matchedItemsPreview) || item.shortMessage;
+  const badges = getDeepCheckStatusBadges(item);
+  const detailId = `deep-check-detail-${item.categoryId}`;
+  const isBannedRestrictedRow = item.categoryId === "banned_restricted_items";
+  const reasonText = getDeepCheckReasonText(item);
+  const matchedItems = uniqueLabels(
+    item.matchedItemDetails.map((detail) => detail.displayName),
+  ).slice(0, 6);
+  const matchedItemsText =
+    item.matchCount > 0
+      ? `${item.matchCount} match${item.matchCount === 1 ? "" : "es"} found`
+      : "No matched item shown";
 
   return (
-    <button
-      type="button"
-      onClick={() =>
-        onOpen(
-          buildCategoryDetail({
-            title: item.label,
-            tone: toModalTone(item.severity),
-            status: item.status === "not_checked" ? "Not checked" : item.displayValue,
-            shortMessage:
-              item.status === "not_checked"
-                ? "Missing data is not proof of absence."
-                : item.shortMessage,
-            matchedItemsPreview: item.matchedItemsPreview,
-            matchCount: item.matchCount,
-            redReasonType: item.redReasonType,
-          }),
-        )
-      }
-      className="grid min-h-[56px] w-full grid-cols-[auto_minmax(0,1fr)_auto_auto] items-start gap-3 py-3 text-left transition-colors active:bg-[var(--bg-soft)]"
-    >
-      <div className="pt-0.5">
-        <RowIcon tone={tone} />
+    <div>
+      <button
+        type="button"
+        aria-expanded={isExpanded}
+        aria-controls={detailId}
+        onClick={() => onToggle(item.categoryId)}
+        className="grid min-h-[52px] w-full grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-3 py-3 text-left transition-colors active:bg-[var(--bg-soft)]"
+      >
+        <div>
+          <RowIcon tone={tone} categoryId={item.categoryId} />
+        </div>
+        <div className="min-w-0">
+          <span className="block truncate text-[15px] font-medium text-[var(--text-main)]">
+            {item.label}
+          </span>
+        </div>
+        <IssueBadgeStack badges={badges} className="justify-self-end" />
+        <ChevronIcon
+          className={`text-[var(--text-secondary)] transition-transform ${
+            isExpanded ? "-rotate-90" : "rotate-90"
+          }`}
+        />
+      </button>
+
+      <div
+        id={detailId}
+        className={`grid overflow-hidden transition-[grid-template-rows,opacity,padding] duration-300 ease-out ${
+          isExpanded ? "grid-rows-[1fr] pb-3 opacity-100" : "grid-rows-[0fr] pb-0 opacity-0"
+        }`}
+      >
+        <div className="min-h-0 overflow-hidden">
+          <div
+            className={`relative overflow-hidden rounded-[20px] border px-3.5 py-3.5 shadow-[0_14px_26px_rgba(23,20,18,0.06)] ${deepDetailCardClasses[tone]}`}
+          >
+            <span
+              aria-hidden="true"
+              className={`absolute inset-y-3 left-0 w-1 rounded-r-full ${deepDetailAccentClasses[tone]}`}
+            />
+            <div className="pl-2">
+              {isBannedRestrictedRow && matchedItems.length > 0 ? (
+                <div className="mb-3 rounded-[16px] border border-[var(--red-border)] bg-white/72 px-3 py-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--red-dark)]">
+                    Flagged banned/restricted item
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {matchedItems.map((matchedItem) => (
+                      <span
+                        key={`${item.categoryId}-flagged-${matchedItem}`}
+                        className="rounded-full border border-[var(--red-border)] bg-[var(--red-main)] px-2.5 py-1 text-[11px] font-semibold text-white shadow-[0_8px_16px_rgba(200,30,30,0.14)]"
+                      >
+                        {matchedItem}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--text-secondary)]">
+                  Reason
+                </p>
+                <p className="mt-1.5 text-[12px] leading-5 text-[var(--text-main)]">
+                  {reasonText}
+                </p>
+              </div>
+
+              <div className="mt-3 rounded-[16px] border border-white/70 bg-white/62 px-3 py-2.5">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--text-secondary)]">
+                    Matched items
+                  </p>
+                  <span className="text-[11px] font-semibold text-[var(--text-secondary)]">
+                    {matchedItemsText}
+                  </span>
+                </div>
+
+                {matchedItems.length > 0 ? (
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {matchedItems.map((matchedItem) => (
+                      <span
+                        key={`${item.categoryId}-${matchedItem}`}
+                        className={`rounded-full border px-2 py-1 text-[11px] font-medium ${chipToneClasses[tone]}`}
+                      >
+                        {matchedItem}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div className="min-w-0">
-        <span className="truncate text-[15px] font-medium text-[var(--text-main)]">
-          {item.label}
-        </span>
-        <p className="mt-1 text-[12px] leading-5 text-[var(--text-secondary)]">
-          {previewText}
-        </p>
-      </div>
-      <IssueBadgeStack badges={badges} className="justify-self-end pt-0.5" />
-      <ChevronIcon className="mt-1 text-[var(--text-secondary)]" />
-    </button>
+    </div>
   );
 }
 
@@ -906,8 +1449,10 @@ export default function ProductResult({
   const userSettings = useUserSettings();
   const [saved, setSaved] = useState(false);
   const [isIngredientsOpen, setIsIngredientsOpen] = useState(false);
-  const [isDeepChecksOpen, setIsDeepChecksOpen] = useState(false);
-  const [isConfidenceOpen, setIsConfidenceOpen] = useState(false);
+  const [isDeepChecksExpanded, setIsDeepChecksExpanded] = useState(false);
+  const [expandedDeepCheckId, setExpandedDeepCheckId] = useState<string | null>(
+    null,
+  );
   const [activeDetail, setActiveDetail] = useState<ResultDetail | null>(null);
   const ingredientSectionRef = useRef<HTMLElement | null>(null);
   const latestBarcodeScan = useSyncExternalStore(
@@ -940,27 +1485,19 @@ export default function ProductResult({
   const scanResult = barcodeScanResult ?? manualScanResult ?? fallbackScanResult;
 
   const overviewRows = useMemo(() => {
-    const urgentRows = scanResult.quickOverview.filter(
-      (row) => row.severity !== "green" || row.isInformational,
-    );
-    const calmRows = scanResult.quickOverview.filter(
-      (row) => row.severity === "green" && !row.isInformational,
-    );
-    const baseRows =
-      urgentRows.length >= 6
-        ? urgentRows.slice(0, 6)
-        : urgentRows.concat(calmRows.slice(0, Math.max(3, 6 - urgentRows.length)));
     const byCategoryId = new Map(
       scanResult.quickOverview.map((row) => [row.categoryId, row]),
     );
     const withRequiredRows = [
-      ...baseRows,
+      ...scanResult.quickOverview,
       ...[...requiredOverviewCategoryIds]
         .map((categoryId) => byCategoryId.get(categoryId))
         .filter(
           (row): row is ScanResultOverviewRow =>
             row !== undefined &&
-            !baseRows.some((baseRow) => baseRow.categoryId === row.categoryId),
+            !scanResult.quickOverview.some(
+              (baseRow) => baseRow.categoryId === row.categoryId,
+            ),
         ),
     ];
 
@@ -970,69 +1507,35 @@ export default function ProductResult({
   const ingredientGroups = useMemo<IngredientGroupCard[]>(
     () => [
       {
+        id: "natural",
+        label: "Natural",
+        tone: getIngredientGroupTone(scanResult.ingredientBreakdown.naturalPositive, "green"),
+        items: scanResult.ingredientBreakdown.naturalPositive,
+      },
+      {
         id: "processed",
-        label: "Processed / Artificial",
+        label: "Processed",
         tone: getIngredientGroupTone(
           scanResult.ingredientBreakdown.processedArtificial,
           "yellow",
         ),
-        helperText:
-          "These ingredients are carrying most of the formulation, additive, or warning pressure.",
         items: scanResult.ingredientBreakdown.processedArtificial,
-      },
-      {
-        id: "unknown",
-        label: "Unknown / Review",
-        tone: getIngredientGroupTone(scanResult.ingredientBreakdown.unknownReview, "neutral"),
-        helperText:
-          "These label terms are vague, broad, or not fully transparent.",
-        items: scanResult.ingredientBreakdown.unknownReview,
-      },
-      {
-        id: "natural",
-        label: "Natural / Positive",
-        tone: getIngredientGroupTone(scanResult.ingredientBreakdown.naturalPositive, "green"),
-        helperText:
-          "Recognizable ingredients stay visible here, but they do not cancel warnings elsewhere.",
-        items: scanResult.ingredientBreakdown.naturalPositive,
-      },
-      {
-        id: "unmatched",
-        label: "Unmatched",
-        tone: getIngredientGroupTone(scanResult.ingredientBreakdown.unmatchedIngredients, "neutral"),
-        helperText:
-          "Unmatched ingredients were not found in the current Truthlabel database.",
-        items: scanResult.ingredientBreakdown.unmatchedIngredients,
       },
     ].filter((group) => group.items.length > 0),
     [scanResult.ingredientBreakdown],
   );
 
-  const ingredientSummary = useMemo(
-    () =>
-      ingredientGroups
-        .map((group) => `${group.label.split(" / ")[0]} ${group.items.length}`)
-        .join(" | "),
-    [ingredientGroups],
-  );
-
-  const ingredientSectionBadges = useMemo(() => {
-    const allItems = ingredientGroups.flatMap((group) => group.items);
-    const counts = countSeverity(allItems);
-
-    return buildIssueBadges({
-      redCount: counts.red,
-      yellowCount: counts.yellow,
-      tone: counts.red > 0 ? "red" : counts.yellow > 0 ? "yellow" : "green",
-      clearLabel:
-        counts.red === 0 && counts.yellow === 0 && allItems.length > 0 ? "Clear" : undefined,
-    });
-  }, [ingredientGroups]);
-
   const deepCheckRows = useMemo(
-    () => getVisibleDeepExposureChecks(scanResult, userSettings),
-    [scanResult, userSettings],
+    () => getVisibleDeepExposureChecks(scanResult),
+    [scanResult],
   );
+  const hasDeepCheckOverflow = deepCheckRows.length > 4;
+  const deepCheckPreviewHeightClass =
+    hasDeepCheckOverflow && !isDeepChecksExpanded
+      ? expandedDeepCheckId
+        ? "max-h-[520px]"
+        : "max-h-[332px]"
+      : "max-h-[1400px]";
 
   const deepCheckSectionBadges = useMemo(() => {
     const redCount = deepCheckRows.filter((row) => row.severity === "red").length;
@@ -1046,7 +1549,7 @@ export default function ProductResult({
       clearLabel:
         redCount === 0 && yellowCount === 0 && !hasNeutral ? "Clear" : undefined,
       value:
-        redCount === 0 && yellowCount === 0 && hasNeutral ? "Not checked" : undefined,
+        redCount === 0 && yellowCount === 0 && hasNeutral ? "Not found" : undefined,
       badgeTone: hasNeutral ? "neutral" : undefined,
     });
   }, [deepCheckRows]);
@@ -1055,7 +1558,7 @@ export default function ProductResult({
     const severity = scanResult.brandTrustSafety.severity;
 
     if (scanResult.brandTrustSafety.status === "not_checked") {
-      return [{ color: "neutral", label: "Not checked" }] satisfies BadgeDescriptor[];
+      return [{ color: "neutral", label: "Not found" }] satisfies BadgeDescriptor[];
     }
 
     return buildIssueBadges({
@@ -1087,9 +1590,25 @@ export default function ProductResult({
     };
   }, [scanResult.ingredientBreakdown]);
 
-  const confidenceNotes = useMemo(
-    () => getVisibleConfidenceNotes(scanResult, userSettings),
-    [scanResult, userSettings],
+  const finalWarningReasons = useMemo(
+    () => getFinalWarningReasons(scanResult),
+    [scanResult],
+  );
+  const finalReasonHeading = useMemo(
+    () => getFinalReasonHeading(scanResult),
+    [scanResult],
+  );
+  const finalVerdictOpening = useMemo(
+    () => getFinalVerdictOpening(scanResult),
+    [scanResult],
+  );
+  const finalVerdictClosing = useMemo(
+    () => getFinalVerdictClosing(scanResult),
+    [scanResult],
+  );
+  const simpleIngredientSummary = useMemo(
+    () => getSimpleIngredientSummary(scanResult),
+    [scanResult],
   );
   const finalVerdictBadgeLabel =
     scanResult.finalVerdict.verdictTone === "red"
@@ -1099,7 +1618,12 @@ export default function ProductResult({
         : "Clear";
 
   function handleViewIngredients() {
-    setIsIngredientsOpen(true);
+    const nextOpenState = !isIngredientsOpen;
+    setIsIngredientsOpen(nextOpenState);
+
+    if (!nextOpenState) {
+      return;
+    }
 
     window.setTimeout(() => {
       ingredientSectionRef.current?.scrollIntoView({
@@ -1117,12 +1641,39 @@ export default function ProductResult({
     scanResult.productHero.scanSource === "barcode"
       ? "/manual"
       : "/";
-  const scanSourceBadgeLabel = getScanSourceBadgeLabel(scanResult.productHero.scanSource);
-  const scanCategoryLabel = getScanCategoryLabel(scanResult.productHero.scanSource);
   const feedbackIngredientText =
     latestManualScan?.input.ingredientText ??
     latestBarcodeScan?.productData.ingredientText ??
     "";
+
+  useEffect(() => {
+    if (!expandedDeepCheckId || typeof window === "undefined") {
+      return undefined;
+    }
+
+    let animationFrameId: number | null = null;
+
+    const closeExpandedDeepCheck = () => {
+      if (animationFrameId !== null) {
+        return;
+      }
+
+      animationFrameId = window.requestAnimationFrame(() => {
+        animationFrameId = null;
+        setExpandedDeepCheckId(null);
+      });
+    };
+
+    window.addEventListener("scroll", closeExpandedDeepCheck, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", closeExpandedDeepCheck);
+
+      if (animationFrameId !== null) {
+        window.cancelAnimationFrame(animationFrameId);
+      }
+    };
+  }, [expandedDeepCheckId]);
 
   if (barcodeScanKey && !barcodeScanResolved) {
     return (
@@ -1209,20 +1760,6 @@ export default function ProductResult({
                 <p className="mt-1 text-[13px] text-[var(--text-secondary)]">
                   {scanResult.productHero.brandName}
                 </p>
-                <div className="mt-3 flex flex-wrap items-center gap-2.5">
-                  <TonePill tone={heroTone}>{scanResult.productHero.verdictLabel}</TonePill>
-                  <TonePill tone="neutral">{scanSourceBadgeLabel}</TonePill>
-                </div>
-                <div className="mt-2 flex flex-wrap items-center gap-2">
-                  {scanResult.productHero.productCategory ? (
-                    <>
-                      <TonePill tone="neutral">{scanCategoryLabel}</TonePill>
-                      <span className="text-[12px] font-medium text-[var(--text-secondary)]">
-                        {scanResult.productHero.productCategory}
-                      </span>
-                    </>
-                  ) : null}
-                </div>
               </div>
               <ScoreRing
                 score={scanResult.productHero.exposureRisk}
@@ -1233,66 +1770,87 @@ export default function ProductResult({
           </section>
 
           <section className="mt-6 border-t border-[var(--border-soft)] pt-5">
-            <button
-              type="button"
-              onClick={() => setIsDeepChecksOpen((current) => !current)}
-              className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-start gap-3 text-left"
-            >
-              <div>
-                <h2 className="text-[1.12rem] font-semibold tracking-[-0.01em] text-[var(--text-main)]">
-                  Deep Exposure Checks
-                </h2>
-                <p className="mt-1 text-[12px] leading-5 text-[var(--text-secondary)]">
-                  Label-based checks can clear green. External-data checks stay clearly marked when they were not checked.
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <IssueBadgeStack badges={deepCheckSectionBadges} />
-                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border-soft)] bg-[var(--bg-surface)] text-[var(--text-secondary)]">
-                  <svg
-                    aria-hidden="true"
-                    viewBox="0 0 16 16"
-                    className={`h-4 w-4 transition-transform ${isDeepChecksOpen ? "rotate-180" : ""}`}
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M4 6.5L8 10L12 6.5"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </span>
-              </div>
-            </button>
-
-            <div
-              className={`grid overflow-hidden transition-[grid-template-rows,opacity,margin] duration-300 ease-out ${
-                isDeepChecksOpen ? "mt-4 grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-              }`}
-            >
-              <div className="min-h-0 divide-y divide-[var(--border-soft)] border-y border-[var(--border-soft)] py-1">
-                {deepCheckRows.map((item) => (
-                  <DeepCheckRow key={item.categoryId} item={item} onOpen={setActiveDetail} />
-                ))}
-              </div>
+            <SectionHeading
+              title="Quick Overview"
+              subtitle="Compact checklist of the checks applied to this product."
+            />
+            <div className="mt-3 divide-y divide-[var(--border-soft)]">
+              {overviewRows.map((item) => (
+                <OverviewRow key={item.categoryId} item={item} />
+              ))}
             </div>
           </section>
 
           <section className="mt-6 border-t border-[var(--border-soft)] pt-5">
             <SectionHeading
-              title="Quick Overview"
-              subtitle="The strongest category signals rise to the top so the warning story stays clear on mobile."
+              title="Deep Exposure Checks"
+              subtitle="Deep analysis of flagged items."
+              extra={<IssueBadgeStack badges={deepCheckSectionBadges} />}
             />
-            <div className="mt-3 divide-y divide-[var(--border-soft)]">
-              {overviewRows.map((item) => (
-                <OverviewRow key={item.categoryId} item={item} onOpen={setActiveDetail} />
-              ))}
-            </div>
 
-            <div className="mt-4 rounded-[18px] border border-[var(--border-soft)] bg-[var(--bg-soft)] px-3.5 py-3">
+            <div className="mt-4">
+              <div
+                className={`relative border-y border-[var(--border-soft)] py-1 transition-[max-height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                  hasDeepCheckOverflow && !isDeepChecksExpanded
+                    ? `${deepCheckPreviewHeightClass} overflow-hidden`
+                    : `${deepCheckPreviewHeightClass} overflow-hidden`
+                }`}
+              >
+                {deepCheckRows.length > 0 ? (
+                  <div className="divide-y divide-[var(--border-soft)]">
+                    {deepCheckRows.map((item) => (
+                      <DeepCheckRow
+                        key={item.categoryId}
+                        item={item}
+                        isExpanded={expandedDeepCheckId === item.categoryId}
+                        onToggle={(categoryId) =>
+                          setExpandedDeepCheckId((current) =>
+                            current === categoryId ? null : categoryId,
+                          )
+                        }
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="rounded-[18px] bg-[var(--bg-soft)] px-4 py-3.5">
+                    <p className="text-[13px] font-semibold text-[var(--text-main)]">
+                      No yellow or red issue categories found.
+                    </p>
+                    <p className="mt-1.5 text-[13px] leading-5 text-[var(--text-secondary)]">
+                      This does not guarantee the product is risk-free; it only reflects the current label data.
+                    </p>
+                  </div>
+                )}
+                {hasDeepCheckOverflow && !isDeepChecksExpanded ? (
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-[linear-gradient(180deg,rgba(255,255,255,0)_0%,var(--bg-surface)_82%)]" />
+                ) : null}
+              </div>
+
+              {hasDeepCheckOverflow ? (
+                <button
+                  type="button"
+                  onClick={() => setIsDeepChecksExpanded((current) => !current)}
+                  className="mx-auto mt-3 flex items-center gap-2 rounded-full border border-[var(--border-soft)] bg-[var(--bg-surface)] px-4 py-2 text-[12px] font-semibold text-[var(--text-main)] shadow-[0_12px_24px_rgba(23,20,18,0.06)] transition-[transform,box-shadow,background-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-[var(--bg-soft)] hover:shadow-[0_16px_30px_rgba(23,20,18,0.08)] active:scale-[0.98]"
+                >
+                  {isDeepChecksExpanded ? "Show less" : "Show more"}
+                  <ChevronIcon
+                    className={`text-[var(--text-secondary)] transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                      isDeepChecksExpanded ? "-rotate-90" : "rotate-90"
+                    }`}
+                  />
+                </button>
+              ) : null}
+              </div>
+          </section>
+
+          <section
+            ref={ingredientSectionRef}
+            className="mt-6 border-t border-[var(--border-soft)] pt-5"
+          >
+            <div className="rounded-[18px] border border-[var(--border-soft)] bg-[var(--bg-soft)] px-3.5 py-3">
+              <p className="mb-3 text-[13px] font-semibold text-[var(--text-main)]">
+                Natural vs Processed
+              </p>
               <div className="overflow-hidden rounded-full bg-[var(--border-soft)]">
                 <div className="flex h-2">
                   <div
@@ -1320,102 +1878,66 @@ export default function ProductResult({
                 <button
                   type="button"
                   onClick={handleViewIngredients}
-                  className="text-[12px] font-semibold text-[var(--text-main)]"
+                  className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[var(--green-border)] bg-[var(--green-bg)] px-3 py-1.5 text-[11px] font-semibold text-[var(--green-dark)] shadow-[0_10px_20px_rgba(21,128,61,0.08)] transition-[transform,box-shadow,background-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:shadow-[0_14px_26px_rgba(21,128,61,0.12)] active:scale-[0.98]"
                 >
-                  View ingredients
+                  {isIngredientsOpen ? "Hide ingredients" : "View ingredients"}
+                  <ChevronIcon
+                    className={`transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                      isIngredientsOpen ? "-rotate-90" : "rotate-90"
+                    }`}
+                  />
                 </button>
               </div>
-            </div>
-          </section>
 
-          <section
-            ref={ingredientSectionRef}
-            className="mt-6 border-t border-[var(--border-soft)] pt-5"
-          >
-            <button
-              type="button"
-              onClick={() => setIsIngredientsOpen((current) => !current)}
-              className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-start gap-3 text-left"
-            >
-              <div>
-                <h2 className="text-[1.12rem] font-semibold tracking-[-0.01em] text-[var(--text-main)]">
-                  Ingredient Breakdown
-                </h2>
-                <p className="mt-1 text-[12px] leading-5 text-[var(--text-secondary)]">
-                  {ingredientSummary || "Ingredient-based warnings require a readable ingredient list."}
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <IssueBadgeStack badges={ingredientSectionBadges} />
-                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[var(--border-soft)] bg-[var(--bg-surface)] text-[var(--text-secondary)]">
-                  <svg
-                    aria-hidden="true"
-                    viewBox="0 0 16 16"
-                    className={`h-4 w-4 transition-transform ${isIngredientsOpen ? "rotate-180" : ""}`}
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M4 6.5L8 10L12 6.5"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </span>
-              </div>
-            </button>
-
-            <div
-              className={`grid overflow-hidden transition-[grid-template-rows,opacity,margin] duration-300 ease-out ${
-                isIngredientsOpen ? "mt-4 grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-              }`}
-            >
-              <div className="min-h-0 border-y border-[var(--border-soft)] py-3">
-                {ingredientGroups.length > 0 ? (
-                  <div className="space-y-3">
-                    {ingredientGroups.map((group) => (
-                      <div
-                        key={group.id}
-                        className={`rounded-[22px] border px-4 py-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.45)] ${groupSurfaceClasses[group.tone]}`}
-                      >
-                        <div className="flex items-center justify-between gap-3">
-                          <div>
-                            <p
-                              className={`text-[14px] font-semibold tracking-[-0.01em] ${groupTitleClasses[group.tone]}`}
-                            >
-                              {group.label}
-                            </p>
-                            <p className="mt-1 text-[12px] leading-5 text-[var(--text-secondary)]">
-                              {group.helperText}
-                            </p>
+              <div
+                className={`grid overflow-hidden transition-[grid-template-rows,opacity,margin] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                  isIngredientsOpen
+                    ? "mt-4 grid-rows-[1fr] opacity-100"
+                    : "grid-rows-[0fr] opacity-0"
+                }`}
+              >
+                <div className="min-h-0 overflow-hidden">
+                  {ingredientGroups.length > 0 ? (
+                    <div className="space-y-3">
+                      {ingredientGroups.map((group) => (
+                        <div
+                          key={group.id}
+                          className={`rounded-[22px] border px-4 py-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.45)] ${groupSurfaceClasses[group.tone]}`}
+                        >
+                          <div className="flex items-center justify-between gap-3">
+                            <div>
+                              <p
+                                className={`text-[14px] font-semibold tracking-[-0.01em] ${groupTitleClasses[group.tone]}`}
+                              >
+                                {group.label}
+                              </p>
+                            </div>
+                            <IssueBadgeStack badges={getIngredientGroupBadges(group)} />
                           </div>
-                          <IssueBadgeStack badges={getIngredientGroupBadges(group)} />
+                          <div className="mt-3 flex flex-wrap gap-x-2 gap-y-2">
+                            {group.items.map((item) => (
+                              <IngredientChip
+                                key={`${group.id}-${item.canonicalIngredientId}-${item.originalText}`}
+                                item={item}
+                                groupTone={group.tone}
+                                onOpen={setActiveDetail}
+                              />
+                            ))}
+                          </div>
                         </div>
-                        <div className="mt-3 flex flex-wrap gap-x-2 gap-y-2">
-                          {group.items.map((item) => (
-                            <IngredientChip
-                              key={`${group.id}-${item.canonicalIngredientId}-${item.originalText}`}
-                              item={item}
-                              groupTone={group.tone}
-                              onOpen={setActiveDetail}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="rounded-[18px] border border-[var(--border-soft)] bg-[var(--bg-soft)] px-4 py-3.5">
-                    <p className="text-[13px] font-semibold text-[var(--text-main)]">
-                      Ingredient data missing
-                    </p>
-                    <p className="mt-1.5 text-[13px] leading-5 text-[var(--text-secondary)]">
-                      Ingredient-based warnings require a readable ingredient list.
-                    </p>
-                  </div>
-                )}
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="rounded-[18px] border border-[var(--border-soft)] bg-[var(--bg-surface)] px-4 py-3.5">
+                      <p className="text-[13px] font-semibold text-[var(--text-main)]">
+                        Ingredient data missing
+                      </p>
+                      <p className="mt-1.5 text-[13px] leading-5 text-[var(--text-secondary)]">
+                        Ingredient-based warnings require a readable ingredient list.
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </section>
@@ -1469,11 +1991,72 @@ export default function ProductResult({
           <section className="mt-6 border-t border-[var(--border-soft)] pt-5">
             <SectionHeading
               title="Final Verdict"
-              subtitle="The closing view combines the score, strongest reasons, and confidence notes without overstating certainty."
             />
             <div
               className={`mt-3 rounded-[24px] border px-4 py-4 ${finalVerdictCardClasses[scanResult.finalVerdict.verdictTone]}`}
             >
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--text-secondary)]">
+                    Final score
+                  </p>
+                  <h3 className="mt-1 font-heading text-[1.45rem] font-semibold leading-none text-[var(--text-main)]">
+                    {scanResult.finalVerdict.exposureRisk} / 100
+                  </h3>
+                  <p className="mt-1 text-[12px] font-semibold text-[var(--text-secondary)]">
+                    {scanResult.finalVerdict.headline}
+                  </p>
+                </div>
+                <TonePill tone={heroTone}>{finalVerdictBadgeLabel}</TonePill>
+              </div>
+
+              <p className="mt-3 text-[14px] font-medium leading-6 text-[var(--text-main)]">
+                {finalVerdictOpening}
+              </p>
+
+              <div className="mt-4 rounded-[18px] border border-white/60 bg-white/65 px-3.5 py-3">
+                <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--text-secondary)]">
+                  {finalReasonHeading}
+                </p>
+                <ul className="mt-2.5 space-y-2">
+                  {finalWarningReasons.map((reason) => (
+                    <li
+                      key={reason}
+                      className="flex gap-2 text-[13px] leading-5 text-[var(--text-main)]"
+                    >
+                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-current opacity-55" />
+                      <span>{reason}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <p className="mt-3 rounded-[18px] border border-white/60 bg-white/65 px-3.5 py-3 text-[13px] leading-6 text-[var(--text-secondary)]">
+                {finalVerdictClosing}
+              </p>
+
+              <div className="mt-3 rounded-[18px] border border-white/60 bg-white/65 px-3.5 py-3">
+                <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--text-secondary)]">
+                  Good / simple ingredients found
+                </p>
+                <p className="mt-2 text-[13px] leading-5 text-[var(--text-main)]">
+                  Simple recognizable ingredients found: {simpleIngredientSummary.count}
+                </p>
+                {simpleIngredientSummary.preview.length > 0 ? (
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {simpleIngredientSummary.preview.map((ingredient) => (
+                      <span
+                        key={ingredient}
+                        className="rounded-full border border-white/70 bg-white/70 px-2 py-1 text-[11px] font-medium text-[var(--text-secondary)]"
+                      >
+                        {ingredient}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+
+              <div className="hidden">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <h3 className="font-heading text-[1.3rem] font-semibold text-[var(--text-main)]">
@@ -1511,7 +2094,10 @@ export default function ProductResult({
                       className="grid w-full grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-3 rounded-[18px] border border-white/60 bg-white/65 px-3.5 py-3 text-left transition active:scale-[0.99]"
                     >
                       <div className="pt-0.5">
-                        <RowIcon tone={toRowTone(reason.severity)} />
+                        <RowIcon
+                          tone={toRowTone(reason.severity)}
+                          categoryId={reason.categoryId}
+                        />
                       </div>
                       <div className="min-w-0">
                         <p className="text-[13px] font-semibold text-[var(--text-main)]">
@@ -1526,46 +2112,7 @@ export default function ProductResult({
                   ))}
                 </div>
               ) : null}
-
-              {confidenceNotes.length > 0 ? (
-                <div className="mt-4 rounded-[18px] border border-white/60 bg-white/65 px-3.5 py-3">
-                  <button
-                    type="button"
-                    onClick={() => setIsConfidenceOpen((current) => !current)}
-                    className="flex w-full items-center justify-between gap-3 text-left"
-                  >
-                    <div>
-                      <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--text-secondary)]">
-                        Confidence notes
-                      </p>
-                      <p className="mt-1 text-[12px] leading-5 text-[var(--text-secondary)]">
-                        Keep these notes in view before treating missing data as a clear pass.
-                      </p>
-                    </div>
-                    <ChevronIcon
-                      className={`text-[var(--text-secondary)] transition-transform ${isConfidenceOpen ? "rotate-90" : ""}`}
-                    />
-                  </button>
-                  <div
-                    className={`grid overflow-hidden transition-[grid-template-rows,opacity,margin] duration-300 ease-out ${
-                      isConfidenceOpen ? "mt-3 grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-                    }`}
-                  >
-                    <div className="min-h-0">
-                      <ul className="space-y-2">
-                        {confidenceNotes.map((note) => (
-                          <li
-                            key={note}
-                            className="rounded-[14px] border border-[var(--border-soft)] bg-[var(--bg-surface)] px-3 py-2.5 text-[12px] leading-5 text-[var(--text-secondary)]"
-                          >
-                            {note}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              ) : null}
+              </div>
 
               <p className="mt-4 text-[11px] leading-5 text-[var(--text-secondary)]">
                 Truthlabel helps explain ingredient labels and safety signals. It is not medical advice. Always check the package label, especially for allergies.

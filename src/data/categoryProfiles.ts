@@ -10,7 +10,7 @@ export const exposureCheckLabels: Record<ExposureCheckId, string> = {
     "Artificial / Engineered Food Construction",
   banned_restricted_items: "Banned / Restricted Items",
   seed_oil: "Seed oil / processed oils",
-  total_ingredients: "Total Ingredients",
+  total_ingredients: "Ingredient Count",
   ultra_processed: "Ultra Processed",
   natural_vs_processed: "Natural vs Processed",
   allergy_risk: "Allergy Risk",

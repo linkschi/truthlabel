@@ -587,7 +587,7 @@ export const brandTrustSafetyRecallsLawsuitsDataPack = {
   displayRulesForLater: {
     notChecked: {
       severity: "yellow",
-      display: "Not checked",
+      display: "Not found",
     },
     noSignalFound: {
       severity: "green",

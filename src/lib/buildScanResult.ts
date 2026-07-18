@@ -1,4 +1,5 @@
 import type { ExposureRiskMainReason, ExposureRiskResult } from "@/lib/calculateExposureRisk";
+import { bannedRestrictedItems } from "@/data/ingredientIntelligence/bannedRestrictedItems";
 import { publicAppConfig } from "@/lib/appConfig";
 import type { RedReasonType, IngredientCategorySummary } from "@/lib/ingredientCategoryRules";
 import type {
@@ -95,8 +96,17 @@ export type ScanResultDeepExposureCheck = {
   redReasonType?: RedReasonType;
   matchCount: number;
   matchedItemsPreview: string[];
+  matchedItemDetails: ScanResultMatchedItemDetail[];
   displayAllowed: boolean;
   status: DeepCheckStatus;
+};
+
+export type ScanResultMatchedItemDetail = {
+  displayName: string;
+  canonicalIngredientId: string;
+  userFacingReason: string;
+  restrictionRegions: string[];
+  restrictionReasons: string[];
 };
 
 export type ScanResultAdditiveGroup = {
@@ -181,7 +191,7 @@ const categoryLabels: Record<string, string> = {
   heavy_metals: "Heavy Metals",
   microplastics: "Microplastics",
   brand_trust_safety: "Brand Trust / Safety / Recalls / Lawsuits",
-  total_ingredients: "Total Ingredients",
+  total_ingredients: "Ingredient Count",
   natural_vs_processed: "Natural vs Processed",
   additives_and_preservatives: "Additives & Preservatives",
 };
@@ -207,19 +217,94 @@ const hiddenQuickOverviewCategoryIds = new Set([
   "additives_and_preservatives",
   "artificial_engineered_food_construction",
   "artificial_colours",
-  "total_ingredients",
+  "artificial_sweeteners_sugar_substitutes",
+  "emulsifiers_stabilisers_thickeners_gums",
+  "flavour_enhancers_flavourings",
+  "hydrogenated_partially_hydrogenated_oils",
+  "natural_positive",
+  "natural_vs_processed",
+  "preservatives_shelf_life_systems",
+  "brand_trust_safety",
+  "unknown_review",
 ]);
 
-const deepExposureCheckIds = [
-  "banned_restricted_items",
-  "cancer_linked_watch",
-  "allergy_risk",
-  "heavy_metals",
-  "microplastics",
+const hiddenDeepExposureCategoryIds = new Set([
+  "additives_and_preservatives",
+  "artificial_engineered_food_construction",
+  "artificial_colours",
+  "emulsifiers_stabilisers_thickeners_gums",
+  "natural_positive",
+  "natural_vs_processed",
   "brand_trust_safety",
-  "meat_specific_concerns",
-  "fry_oil_fast_food_oil",
-] as const;
+  "unknown_review",
+]);
+
+const meatContextTerms = [
+  "meat",
+  "fast food",
+  "poultry",
+  "chicken",
+  "beef",
+  "pork",
+  "ham",
+  "bacon",
+  "sausage",
+  "deli",
+  "burger",
+  "patty",
+  "nugget",
+  "turkey",
+  "seafood",
+  "fish",
+];
+
+const fryContextTerms = [
+  "fast food",
+  "fried",
+  "deep fried",
+  "fries",
+  "chips",
+  "crisps",
+  "nugget",
+  "onion rings",
+  "fried chicken",
+  "fried fish",
+  "hash browns",
+];
+
+const heavyMetalContextTerms = [
+  "baby",
+  "kids",
+  "infant",
+  "toddler",
+  "seafood",
+  "fish",
+  "rice",
+  "cereal",
+  "cocoa",
+  "cacao",
+  "chocolate",
+  "spice",
+  "cinnamon",
+  "seaweed",
+  "juice",
+  "drink",
+  "beverage",
+];
+
+const microplasticContextTerms = [
+  "drink",
+  "beverage",
+  "bottle",
+  "bottled",
+  "water",
+  "seafood",
+  "fish",
+  "shellfish",
+  "salt",
+  "chewing gum",
+  "tea bag",
+];
 
 const additiveGroupDefinitions = [
   { id: "artificial_colours", label: "Artificial Colours" },
@@ -327,6 +412,42 @@ function sortCategorySummaries(summaries: IngredientCategorySummary[]) {
 
 function getMatchedItemsPreview(matches: IngredientIntelligenceDuplicateSafeMatch[]) {
   return uniqueStrings(matches.map((match) => match.displayName)).slice(0, 3);
+}
+
+function getBannedRestrictedRecord(
+  match: IngredientIntelligenceDuplicateSafeMatch,
+) {
+  return bannedRestrictedItems.find(
+    (item) =>
+      item.canonicalIngredientId === match.canonicalIngredientId ||
+      item.id === match.canonicalIngredientId,
+  );
+}
+
+function toMatchedItemDetail(
+  match: IngredientIntelligenceDuplicateSafeMatch,
+): ScanResultMatchedItemDetail {
+  const bannedRestrictedRecord = getBannedRestrictedRecord(match);
+  const restrictions =
+    bannedRestrictedRecord?.countriesRestrictedOrBannedIn ?? [];
+
+  return {
+    displayName: match.displayName,
+    canonicalIngredientId: match.canonicalIngredientId,
+    userFacingReason: match.userFacingReason,
+    restrictionRegions: uniqueStrings(
+      restrictions.map((restriction) => restriction.region),
+    ),
+    restrictionReasons: uniqueStrings(
+      restrictions.map((restriction) => restriction.reason),
+    ),
+  };
+}
+
+function getMatchedItemDetails(
+  matches: IngredientIntelligenceDuplicateSafeMatch[],
+) {
+  return matches.map(toMatchedItemDetail);
 }
 
 function toQuickOverviewRow(summary: IngredientCategorySummary, sortOrder: number): ScanResultOverviewRow {
@@ -535,10 +656,11 @@ function toDeepExposureCheck(
       categoryId,
       label,
       severity: null,
-      displayValue: "Not checked",
-      shortMessage: "Not checked.",
+      displayValue: "Not found",
+      shortMessage: "Not found.",
       matchCount: summary?.matchCount ?? 0,
       matchedItemsPreview: summary ? getMatchedItemsPreview(summary.matchedItems) : [],
+      matchedItemDetails: summary ? getMatchedItemDetails(summary.matchedItems) : [],
       displayAllowed: false,
       status: "not_checked",
     };
@@ -553,9 +675,116 @@ function toDeepExposureCheck(
     redReasonType: summary.redReasonType,
     matchCount: summary.matchCount,
     matchedItemsPreview: getMatchedItemsPreview(summary.matchedItems),
+    matchedItemDetails: getMatchedItemDetails(summary.matchedItems),
     displayAllowed: true,
     status: "checked",
   };
+}
+
+function shouldShowAsDeepExposure(
+  summary: IngredientCategorySummary,
+  input: BuildScanResultInput,
+) {
+  if (
+    summary.categoryId === "allergy_risk" &&
+    summary.redReasonType !== "allergy_profile_match"
+  ) {
+    return false;
+  }
+
+  return (
+    summary.displayAllowed &&
+    (summary.severity === "yellow" || summary.severity === "red") &&
+    !hiddenDeepExposureCategoryIds.has(summary.categoryId) &&
+    isSummaryAllowedForProductContext(summary, input)
+  );
+}
+
+function hasContextTerm(context: string, terms: string[]) {
+  return terms.some((term) => context.includes(term));
+}
+
+function getProductTypeContext(input: BuildScanResultInput) {
+  return normalizeIngredientIntelligenceText(
+    [input.productCategory, input.productName].filter(Boolean).join(" "),
+  );
+}
+
+function hasIngredientListEvidence(
+  summary: IngredientCategorySummary,
+  input: BuildScanResultInput,
+) {
+  const normalizedIngredients = new Set(
+    input.ingredients.map(normalizeIngredientIntelligenceText).filter(Boolean),
+  );
+
+  if (normalizedIngredients.size === 0) {
+    return false;
+  }
+
+  return summary.matchedItems.some((match) => {
+    const normalizedMatchedTexts = uniqueStrings([
+      match.originalIngredientText,
+      ...match.originalIngredientTexts,
+    ])
+      .map(normalizeIngredientIntelligenceText)
+      .filter(Boolean);
+
+    return normalizedMatchedTexts.some((text) => normalizedIngredients.has(text));
+  });
+}
+
+function hasExplicitSafetyEvidence(summary: IngredientCategorySummary) {
+  return summary.matchedItems.some(
+    (match) =>
+      match.evidenceType === "external_dataset" ||
+      match.evidenceType === "packaging_marker" ||
+      match.evidenceType === "user_profile",
+  );
+}
+
+function isSummaryAllowedForProductContext(
+  summary: IngredientCategorySummary,
+  input: BuildScanResultInput,
+) {
+  if (hasIngredientListEvidence(summary, input) || hasExplicitSafetyEvidence(summary)) {
+    return true;
+  }
+
+  const context = getProductTypeContext(input);
+
+  if (summary.categoryId === "meat_specific_concerns") {
+    return hasContextTerm(context, meatContextTerms);
+  }
+
+  if (summary.categoryId === "fry_oil_fast_food_oil") {
+    return hasContextTerm(context, fryContextTerms);
+  }
+
+  if (summary.categoryId === "heavy_metals") {
+    return hasContextTerm(context, heavyMetalContextTerms);
+  }
+
+  if (summary.categoryId === "microplastics") {
+    return hasContextTerm(context, microplasticContextTerms);
+  }
+
+  return true;
+}
+
+function sortQuickOverviewSummaries(
+  summaries: IngredientCategorySummary[],
+) {
+  return [...summaries].sort((left, right) => {
+    const leftIsTotalIngredients = left.categoryId === "total_ingredients";
+    const rightIsTotalIngredients = right.categoryId === "total_ingredients";
+
+    if (leftIsTotalIngredients !== rightIsTotalIngredients) {
+      return leftIsTotalIngredients ? 1 : -1;
+    }
+
+    return 0;
+  });
 }
 
 function toAdditiveGroup(summary: IngredientCategorySummary | undefined, label: string, groupId: string): ScanResultAdditiveGroup {
@@ -612,7 +841,7 @@ function buildBrandTrustSafety(
       status: "not_checked",
       severity: null,
       message:
-        "Brand safety and recall status were not checked in live official sources.",
+        "No live brand safety or recall signal was found for this scan. Missing data is not proof of absence.",
       signals,
       lookupPerformed: false,
     };
@@ -658,7 +887,7 @@ function buildConfidenceNotes(
       ![
         "Heavy metals require external testing or official data. Missing data is not proof of absence.",
         "Microplastic review depends on product type, packaging, or external testing data.",
-        "Brand safety and recall status were not checked in live official sources.",
+        "No live brand safety or recall signal was found for this scan. Missing data is not proof of absence.",
       ].includes(note),
   );
   const allergyRiskSummary = categoryMap.get("allergy_risk");
@@ -732,17 +961,19 @@ export function buildScanResult(input: BuildScanResultInput): ScanResult {
   const categoryMap = toCategoryMap(input.categorySummaries);
   const ingredientCount = countUniqueIngredients(input.ingredients);
   const sortedSummaries = sortCategorySummaries(input.categorySummaries);
-  const quickOverview = sortedSummaries
-    .filter(
+  const quickOverview = sortQuickOverviewSummaries(
+    sortedSummaries.filter(
       (summary) =>
         summary.displayAllowed &&
-        !hiddenQuickOverviewCategoryIds.has(summary.categoryId),
-    )
+        !hiddenQuickOverviewCategoryIds.has(summary.categoryId) &&
+        isSummaryAllowedForProductContext(summary, input),
+    ),
+  )
     .map((summary, index) => toQuickOverviewRow(summary, index));
   const ingredientBreakdown = buildIngredientBreakdown(input);
-  const deepExposureChecks = deepExposureCheckIds.map((categoryId) =>
-    toDeepExposureCheck(categoryId, categoryMap.get(categoryId)),
-  );
+  const deepExposureChecks = sortedSummaries
+    .filter((summary) => shouldShowAsDeepExposure(summary, input))
+    .map((summary) => toDeepExposureCheck(summary.categoryId, summary));
   const additivesAndPreservatives = buildAdditivesAndPreservatives(categoryMap);
   const brandTrustSafety = buildBrandTrustSafety(categoryMap);
   const confidenceNotes = buildConfidenceNotes(

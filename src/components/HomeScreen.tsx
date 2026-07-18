@@ -1,236 +1,1006 @@
 "use client";
 
+import type { ReactNode } from "react";
 import Link from "next/link";
-import AppMenu from "@/components/AppMenu";
-import { SectionLabel } from "@/components/ResultUi";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
 import {
   defaultDemoProductId,
+  demoProducts,
   getDemoProductById,
-  getPrimaryDemoProducts,
 } from "@/data/demoProducts";
 import { publicAppConfig } from "@/lib/appConfig";
 import { saveProfile, useStoredProfile } from "@/lib/profileStorage";
 
+type HomeIconName =
+  | "activity"
+  | "arrow"
+  | "barcode"
+  | "camera"
+  | "chevron"
+  | "clipboard"
+  | "code"
+  | "file"
+  | "home"
+  | "list"
+  | "search"
+  | "settings"
+  | "shield"
+  | "spark"
+  | "user";
+
+type AccordionId = "demo" | "how" | "watch" | "developer";
+type Tint = "green" | "yellow" | "red" | "neutral";
+
 const defaultProductHref = `/product?category=packaged-processed-foods&demo=${defaultDemoProductId}`;
 const defaultDemoProduct = getDemoProductById(defaultDemoProductId);
-const primaryDemoProducts = getPrimaryDemoProducts();
 const featureFlags = publicAppConfig.flags;
 
-const steps = [
-  "Open the sample result or paste a real ingredient list.",
-  "See the exposure score, quick overview, and deeper scanner checks.",
-  "Tap flagged items and check rows to see why they were highlighted.",
+const capabilityPills = [
+  { label: "Barcode", icon: "barcode" as const },
+  { label: "Ingredients", icon: "list" as const },
+  { label: "OCR", icon: "camera" as const },
+];
+
+const valuePreviewItems = [
+  {
+    icon: "search" as const,
+    label: "Ingredient flags",
+    tint: "red" as const,
+  },
+  {
+    icon: "activity" as const,
+    label: "Exposure score",
+    tint: "yellow" as const,
+  },
+  {
+    icon: "shield" as const,
+    label: "Clear verdict",
+    tint: "green" as const,
+  },
+];
+
+const howItWorksSteps = [
+  "Scan or enter the ingredient list.",
+  "Truthlabel analyses ingredients and exposure checks.",
+  "Review highlighted concerns, explanations, and the final verdict.",
 ] as const;
+
+function Icon({ name, className = "" }: { name: HomeIconName; className?: string }) {
+  const commonProps = {
+    "aria-hidden": true,
+    className: `h-5 w-5 ${className}`,
+    fill: "none",
+    viewBox: "0 0 24 24",
+    xmlns: "http://www.w3.org/2000/svg",
+  };
+
+  switch (name) {
+    case "activity":
+      return (
+        <svg {...commonProps}>
+          <path
+            d="M4 13h3l2-6 4 11 3-8h4"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.8"
+          />
+        </svg>
+      );
+    case "arrow":
+      return (
+        <svg {...commonProps}>
+          <path
+            d="M7 17 17 7M9 7h8v8"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.8"
+          />
+        </svg>
+      );
+    case "barcode":
+      return (
+        <svg {...commonProps}>
+          <path
+            d="M5 6v12M8 6v12M12 6v12M16 6v12M19 6v12"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeWidth="1.8"
+          />
+          <path
+            d="M3 5V3h3M18 3h3v2M21 19v2h-3M6 21H3v-2"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.7"
+          />
+        </svg>
+      );
+    case "camera":
+      return (
+        <svg {...commonProps}>
+          <path
+            d="M5 8.5h3l1.4-2h5.2l1.4 2h3A1.8 1.8 0 0 1 20.8 10v7A1.8 1.8 0 0 1 19 18.8H5A1.8 1.8 0 0 1 3.2 17v-7A1.8 1.8 0 0 1 5 8.5Z"
+            stroke="currentColor"
+            strokeLinejoin="round"
+            strokeWidth="1.7"
+          />
+          <path
+            d="M12 16a3.1 3.1 0 1 0 0-6.2 3.1 3.1 0 0 0 0 6.2Z"
+            stroke="currentColor"
+            strokeWidth="1.7"
+          />
+        </svg>
+      );
+    case "chevron":
+      return (
+        <svg {...commonProps}>
+          <path
+            d="m7.5 9 4.5 4.5L16.5 9"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.8"
+          />
+        </svg>
+      );
+    case "clipboard":
+      return (
+        <svg {...commonProps}>
+          <path
+            d="M9 5h6M9 9h6M8 13h8M8 17h5"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeWidth="1.7"
+          />
+          <path
+            d="M8.5 3.8h7A2.5 2.5 0 0 1 18 6.3v12.2A2.5 2.5 0 0 1 15.5 21h-7A2.5 2.5 0 0 1 6 18.5V6.3a2.5 2.5 0 0 1 2.5-2.5Z"
+            stroke="currentColor"
+            strokeWidth="1.7"
+          />
+        </svg>
+      );
+    case "code":
+      return (
+        <svg {...commonProps}>
+          <path
+            d="m8 8-4 4 4 4M16 8l4 4-4 4M13.5 5.5l-3 13"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.8"
+          />
+        </svg>
+      );
+    case "file":
+      return (
+        <svg {...commonProps}>
+          <path
+            d="M7 3.5h6l4 4V19a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 6 19V5A1.5 1.5 0 0 1 7.5 3.5Z"
+            stroke="currentColor"
+            strokeLinejoin="round"
+            strokeWidth="1.7"
+          />
+          <path
+            d="M13 3.8V8h4M8.5 12h7M8.5 15.5h5"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.7"
+          />
+        </svg>
+      );
+    case "home":
+      return (
+        <svg {...commonProps}>
+          <path
+            d="M4 10.8 12 4l8 6.8V20a1 1 0 0 1-1 1h-4.2v-5.6H9.2V21H5a1 1 0 0 1-1-1v-9.2Z"
+            stroke="currentColor"
+            strokeLinejoin="round"
+            strokeWidth="1.7"
+          />
+        </svg>
+      );
+    case "list":
+      return (
+        <svg {...commonProps}>
+          <path
+            d="M8 7h11M8 12h11M8 17h11"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeWidth="1.8"
+          />
+          <path
+            d="M4.5 7h.01M4.5 12h.01M4.5 17h.01"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeWidth="3"
+          />
+        </svg>
+      );
+    case "search":
+      return (
+        <svg {...commonProps}>
+          <path
+            d="M11 17a6 6 0 1 0 0-12 6 6 0 0 0 0 12ZM16 16l3.5 3.5"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeWidth="1.8"
+          />
+          <path
+            d="m8.5 11.5 1.7 1.7 3.4-4"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.7"
+          />
+        </svg>
+      );
+    case "settings":
+      return (
+        <svg {...commonProps}>
+          <path
+            d="M12 15.3a3.3 3.3 0 1 0 0-6.6 3.3 3.3 0 0 0 0 6.6Z"
+            stroke="currentColor"
+            strokeWidth="1.7"
+          />
+          <path
+            d="M19.2 13.6v-3.2l-2-.5a6.6 6.6 0 0 0-.7-1.6l1.1-1.7-2.2-2.2-1.7 1.1a6.6 6.6 0 0 0-1.6-.7l-.5-2H10.4l-.5 2a6.6 6.6 0 0 0-1.6.7L6.6 4.4 4.4 6.6l1.1 1.7a6.6 6.6 0 0 0-.7 1.6l-2 .5v3.2l2 .5c.2.6.4 1.1.7 1.6l-1.1 1.7 2.2 2.2 1.7-1.1c.5.3 1 .5 1.6.7l.5 2h3.2l.5-2c.6-.2 1.1-.4 1.6-.7l1.7 1.1 2.2-2.2-1.1-1.7c.3-.5.5-1 .7-1.6l2-.5Z"
+            stroke="currentColor"
+            strokeLinejoin="round"
+            strokeWidth="1.45"
+          />
+        </svg>
+      );
+    case "shield":
+      return (
+        <svg {...commonProps}>
+          <path
+            d="M12 21s7-3.4 7-10.2V5.4L12 3 5 5.4v5.4C5 17.6 12 21 12 21Z"
+            stroke="currentColor"
+            strokeLinejoin="round"
+            strokeWidth="1.7"
+          />
+          <path
+            d="m8.8 12 2 2 4.4-4.5"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.7"
+          />
+        </svg>
+      );
+    case "spark":
+      return (
+        <svg {...commonProps}>
+          <path
+            d="M12 3.5 13.4 9l5.1 1.5-5.1 1.5L12 17.5 10.6 12l-5.1-1.5L10.6 9 12 3.5ZM18 15l.6 2.1 1.9.6-1.9.6L18 20.5l-.6-2.2-1.9-.6 1.9-.6L18 15Z"
+            stroke="currentColor"
+            strokeLinejoin="round"
+            strokeWidth="1.6"
+          />
+        </svg>
+      );
+    case "user":
+      return (
+        <svg {...commonProps}>
+          <path
+            d="M12 12.2a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4.8 20.2c.7-3.6 3.4-5.7 7.2-5.7s6.5 2.1 7.2 5.7"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.7"
+          />
+        </svg>
+      );
+  }
+}
+
+function tintClasses(tint: Tint) {
+  switch (tint) {
+    case "yellow":
+      return "bg-[#FFF6D8] text-[#8A6500]";
+    case "red":
+      return "bg-[#FDEDEE] text-[#A33A3F]";
+    case "neutral":
+      return "bg-[#F6F8F7] text-[#66716B]";
+    case "green":
+    default:
+      return "bg-[#E8F6EF] text-[#0E5A3F]";
+  }
+}
+
+function TruthlabelMark() {
+  return (
+    <span className="inline-flex h-[34px] w-[34px] items-center justify-center rounded-[11px] bg-[#0E4C37] shadow-[0_7px_18px_rgba(14,76,55,0.18)]">
+      <span className="grid gap-[3px]">
+        <span className="h-[3px] w-[18px] rounded-full bg-[#E64B4F]" />
+        <span className="h-[3px] w-[18px] rounded-full bg-[#F5C542]" />
+        <span className="h-[3px] w-[18px] rounded-full bg-[#32A66A]" />
+      </span>
+    </span>
+  );
+}
+
+function HomeHeader() {
+  return (
+    <header className="flex min-h-[58px] items-center justify-between gap-4">
+      <Link
+        href="/"
+        className="flex items-center gap-2.5 rounded-[14px] outline-none transition focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2"
+        aria-label="Truthlabel home"
+      >
+        <TruthlabelMark />
+        <span className="text-[20px] font-extrabold tracking-[-0.02em] text-[#101613]">
+          Truth<span className="text-[#0E5A3F]">label</span>
+        </span>
+      </Link>
+
+      <Link
+        href="/account"
+        aria-label="Open Truthlabel account"
+        className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#D7E7DD] bg-[#E8F6EF] text-[#0E5A3F] transition hover:bg-[#DDF0E7] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
+      >
+        <Icon name="user" className="h-[21px] w-[21px]" />
+      </Link>
+    </header>
+  );
+}
+
+function HeroSection() {
+  return (
+    <section className="mt-3">
+      <h1 className="max-w-[330px] text-[32px] font-black leading-[1.05] tracking-[-0.025em] text-[#101613] min-[390px]:text-[34px]">
+        Scan before you{" "}
+        <span className="text-[#0E5A3F]">trust it.</span>
+      </h1>
+      <p className="mt-3 max-w-[360px] text-[14.5px] leading-[1.5] text-[#66716B]">
+        Truthlabel scans barcodes and ingredient labels to help you understand what a food product contains.
+      </p>
+      <div className="mt-4 flex flex-wrap gap-2">
+        {capabilityPills.map((pill) => (
+          <span
+            key={pill.label}
+            className="inline-flex h-[30px] items-center gap-1.5 rounded-full bg-[#F3FAF6] px-3 text-[12px] font-semibold text-[#0E5A3F]"
+          >
+            <Icon name={pill.icon} className="h-3.5 w-3.5" />
+            {pill.label}
+          </span>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function SectionHeading({ children }: { children: ReactNode }) {
+  return (
+    <h2 className="text-[14px] font-bold leading-none text-[#101613]">
+      {children}
+    </h2>
+  );
+}
+
+function ScanActionCard({
+  href,
+  icon,
+  title,
+  description,
+  capabilities,
+  variant,
+  onClick,
+}: {
+  href: string;
+  icon: HomeIconName;
+  title: string;
+  description: string;
+  capabilities: string;
+  variant: "manual" | "camera";
+  onClick: () => void;
+}) {
+  const isCamera = variant === "camera";
+  const cardClasses = isCamera
+    ? "border-transparent bg-[linear-gradient(145deg,#0E5A3F_0%,#16815D_100%)] text-white shadow-[0_9px_24px_rgba(14,90,63,0.18)] hover:shadow-[0_11px_28px_rgba(14,90,63,0.22)] focus-visible:ring-white"
+    : "border-[#CFE5D8] bg-[#F3FAF6] text-[#101613] shadow-[0_5px_18px_rgba(15,40,28,0.07)] hover:border-[#9CCCB5] hover:shadow-[0_8px_22px_rgba(15,40,28,0.09)] focus-visible:ring-[#0E5A3F]";
+  const iconClasses = isCamera
+    ? "bg-white/15 text-white ring-1 ring-white/22"
+    : "bg-[#E8F6EF] text-[#0E5A3F]";
+  const arrowClasses = isCamera
+    ? "bg-white/92 text-[#0E5A3F]"
+    : "bg-white text-[#0E5A3F]";
+  const mutedText = isCamera ? "text-white/78" : "text-[#66716B]";
+  const capabilityText = isCamera ? "text-white/86" : "text-[#0E5A3F]";
+
+  return (
+    <Link
+      href={href}
+      onClick={onClick}
+      className={`group flex min-h-[176px] flex-col rounded-[18px] border p-4 outline-none transition duration-200 ease-out hover:-translate-y-px focus-visible:ring-2 focus-visible:ring-offset-2 active:scale-[0.985] ${cardClasses}`}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <span
+          className={`inline-flex h-11 w-11 items-center justify-center rounded-[14px] ${iconClasses}`}
+        >
+          <Icon name={icon} className="h-[22px] w-[22px]" />
+        </span>
+        <span
+          className={`inline-flex h-8 w-8 items-center justify-center rounded-full transition group-hover:scale-105 ${arrowClasses}`}
+        >
+          <Icon name="arrow" className="h-4 w-4" />
+        </span>
+      </div>
+      <div className="mt-auto pt-7">
+        <h3 className="text-[17px] font-extrabold tracking-[-0.01em]">{title}</h3>
+        <p className={`mt-1.5 text-[13px] leading-[1.45] ${mutedText}`}>
+          {description}
+        </p>
+        <p className={`mt-3 text-[12px] font-semibold ${capabilityText}`}>
+          {capabilities}
+        </p>
+      </div>
+    </Link>
+  );
+}
+
+function ScanActionGrid({ onNavigate }: { onNavigate: () => void }) {
+  return (
+    <section className="mt-6">
+      <SectionHeading>Start a scan</SectionHeading>
+      <div className="mt-3 grid grid-cols-2 gap-3 max-[349px]:grid-cols-1">
+        <ScanActionCard
+          href="/manual?mode=camera"
+          icon="camera"
+          title="Camera Scan"
+          description="Scan a barcode or photograph an ingredient label."
+          capabilities="Barcode / Camera / OCR"
+          variant="camera"
+          onClick={onNavigate}
+        />
+        <ScanActionCard
+          href="/manual"
+          icon="clipboard"
+          title="Manual Scan"
+          description="Enter a barcode or paste an ingredient list."
+          capabilities="Barcode / Ingredient text"
+          variant="manual"
+          onClick={onNavigate}
+        />
+      </div>
+    </section>
+  );
+}
+
+function SampleResultCard({ onNavigate }: { onNavigate: () => void }) {
+  return (
+    <Link
+      href={defaultProductHref}
+      onClick={onNavigate}
+      className="mt-4 flex min-h-[92px] flex-wrap items-center gap-3 rounded-[18px] border border-[#E2E8E4] bg-white px-4 py-3.5 shadow-[0_5px_18px_rgba(15,40,28,0.055)] outline-none transition duration-200 ease-out hover:border-[#BFD3C7] hover:shadow-[0_8px_22px_rgba(15,40,28,0.075)] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.99]"
+    >
+      <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] bg-[#FFF6D8] text-[#8A6500]">
+        <Icon name="file" className="h-[21px] w-[21px]" />
+      </span>
+      <span className="min-w-[170px] flex-1">
+        <span className="block text-[15px] font-extrabold text-[#101613]">
+          Explore a Sample Result
+        </span>
+        <span className="mt-1 block text-[12.5px] leading-[1.42] text-[#66716B]">
+          See how Truthlabel explains ingredients, exposure checks, and concerns.
+        </span>
+      </span>
+      <span className="inline-flex h-9 items-center gap-1 rounded-full bg-[#FFF6D8] px-3 text-[12px] font-bold text-[#8A6500]">
+        Open Sample
+        <Icon name="arrow" className="h-3.5 w-3.5" />
+      </span>
+    </Link>
+  );
+}
+
+function AccountPrompt() {
+  return (
+    <section className="mt-4 rounded-[18px] border border-[#F3E4A9] bg-[#FFFBEA] px-4 py-4">
+      <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-3">
+        <span className="inline-flex h-11 w-11 items-center justify-center rounded-[14px] bg-[#FFF6D8] text-[#8A6500]">
+          <Icon name="user" className="h-[21px] w-[21px]" />
+        </span>
+        <div className="min-w-0">
+          <h2 className="text-[15px] font-extrabold text-[#101613]">
+            Save your scans
+          </h2>
+          <p className="mt-1 text-[13px] leading-[1.45] text-[#66716B]">
+            Create a Truthlabel account to keep your results and Watch List across devices.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Link
+              href="/account"
+              className="inline-flex h-9 items-center rounded-full bg-[#0E5A3F] px-4 text-[12px] font-bold text-white transition hover:bg-[#0E4C37] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
+            >
+              Sign in
+            </Link>
+            <Link
+              href="/account"
+              className="inline-flex h-9 items-center rounded-full border border-[#C9DBD1] bg-white px-4 text-[12px] font-bold text-[#0E5A3F] transition hover:bg-[#F3FAF6] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
+            >
+              Create account
+            </Link>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ValuePreview() {
+  return (
+    <section className="mt-6">
+      <h2 className="text-[18px] font-extrabold text-[#101613]">
+        What you&apos;ll see
+      </h2>
+      <div className="mt-3 grid grid-cols-3 gap-2.5">
+        {valuePreviewItems.map((item) => (
+          <div
+            key={item.label}
+            className={`min-h-[96px] rounded-[16px] px-2.5 py-3 text-center ${tintClasses(item.tint)}`}
+          >
+            <span className="mx-auto flex h-9 w-9 items-center justify-center rounded-[12px] bg-white/72">
+              <Icon name={item.icon} className="h-[18px] w-[18px]" />
+            </span>
+            <p className="mt-2.5 text-[12px] font-extrabold leading-[1.2] text-[#101613]">
+              {item.label}
+            </p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function AccordionCard({
+  id,
+  icon,
+  tint,
+  title,
+  summary,
+  activeAccordion,
+  onToggle,
+  children,
+}: {
+  id: AccordionId;
+  icon: HomeIconName;
+  tint: Tint;
+  title: string;
+  summary: string;
+  activeAccordion: AccordionId | null;
+  onToggle: (id: AccordionId) => void;
+  children: ReactNode;
+}) {
+  const isOpen = activeAccordion === id;
+  const contentId = `home-accordion-${id}`;
+
+  return (
+    <div className="rounded-[16px] border border-[#E2E8E4] bg-white shadow-[0_3px_12px_rgba(15,40,28,0.035)]">
+      <button
+        type="button"
+        aria-controls={contentId}
+        aria-expanded={isOpen}
+        onClick={() => onToggle(id)}
+        className="grid min-h-[62px] w-full grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-3 rounded-[16px] px-3.5 py-3 text-left outline-none transition duration-200 hover:bg-[#F6F8F7] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2"
+      >
+        <span
+          className={`inline-flex h-10 w-10 items-center justify-center rounded-[13px] ${tintClasses(tint)}`}
+        >
+          <Icon name={icon} className="h-[19px] w-[19px]" />
+        </span>
+        <span className="min-w-0">
+          <span className="block truncate text-[15px] font-extrabold text-[#101613]">
+            {title}
+          </span>
+        </span>
+        <span className="whitespace-nowrap text-[12px] font-semibold text-[#879089]">
+          {summary}
+        </span>
+        <Icon
+          name="chevron"
+          className={`h-4 w-4 text-[#66716B] transition-transform duration-200 motion-reduce:transition-none ${
+            isOpen ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+      <div
+        id={contentId}
+        className={`grid overflow-hidden transition-[grid-template-rows,opacity] duration-200 ease-out motion-reduce:transition-none ${
+          isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+        }`}
+      >
+        <div className="min-h-0 overflow-hidden">
+          <div className="border-t border-[#EEF1EF] px-3.5 py-3">{children}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ProductIcon({ category }: { category: string }) {
+  const normalized = category.toLowerCase();
+  const icon: HomeIconName =
+    normalized.includes("drink") || normalized.includes("beverage")
+      ? "activity"
+      : normalized.includes("meat") ||
+          normalized.includes("seafood") ||
+          normalized.includes("baby")
+        ? "shield"
+        : "list";
+
+  return (
+    <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[12px] bg-[#F3FAF6] text-[#0E5A3F]">
+      <Icon name={icon} className="h-[18px] w-[18px]" />
+    </span>
+  );
+}
+
+function DemoLabelList({ onNavigate }: { onNavigate: () => void }) {
+  return (
+    <div className="divide-y divide-[#EEF1EF]">
+      {demoProducts.map((product) => (
+        <Link
+          key={product.id}
+          href={`/product?demo=${product.id}`}
+          onClick={onNavigate}
+          className="grid min-h-[58px] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 py-2.5 outline-none transition hover:bg-[#F6F8F7] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.99]"
+        >
+          <ProductIcon category={product.productCategory} />
+          <span className="min-w-0">
+            <span className="block truncate text-[13.5px] font-bold text-[#101613]">
+              {product.productName}
+            </span>
+            <span className="mt-0.5 block truncate text-[12px] text-[#66716B]">
+              {product.productCategory}
+            </span>
+          </span>
+          <Icon name="arrow" className="h-4 w-4 text-[#879089]" />
+        </Link>
+      ))}
+    </div>
+  );
+}
+
+function HowItWorksSteps() {
+  return (
+    <ol className="space-y-0">
+      {howItWorksSteps.map((step, index) => (
+        <li key={step} className="grid grid-cols-[28px_minmax(0,1fr)] gap-3">
+          <div className="flex flex-col items-center">
+            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#FFF6D8] text-[12px] font-bold text-[#8A6500]">
+              {index + 1}
+            </span>
+            {index < howItWorksSteps.length - 1 ? (
+              <span className="my-1 h-7 w-px bg-[#F3E4A9]" />
+            ) : null}
+          </div>
+          <p className="pb-4 pt-1 text-[13.5px] leading-[1.45] text-[#101613]">
+            {step}
+          </p>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+function WatchListPreview({ watchItems }: { watchItems: string[] }) {
+  return (
+    <div>
+      {watchItems.length > 0 ? (
+        <div className="flex flex-wrap gap-1.5">
+          {watchItems.map((item) => (
+            <span
+              key={item}
+              className="inline-flex rounded-full border border-[#F3D2D4] bg-[#FDEDEE] px-3 py-1.5 text-[12px] font-semibold text-[#A33A3F]"
+            >
+              {item}
+            </span>
+          ))}
+        </div>
+      ) : (
+        <p className="rounded-[14px] bg-[#F6F8F7] px-3 py-3 text-[13px] text-[#66716B]">
+          No watch-list items selected.
+        </p>
+      )}
+
+      <Link
+        href="/settings"
+        className="mt-3 flex min-h-[42px] w-full items-center justify-center rounded-[12px] border border-[#D7E7DD] bg-white px-4 text-[13px] font-bold text-[#0E5A3F] transition hover:bg-[#F3FAF6] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.99]"
+      >
+        {watchItems.length > 0 ? "Edit Watch List" : "Set Up Watch List"}
+      </Link>
+    </div>
+  );
+}
+
+function ToolRow({
+  href,
+  title,
+  detail,
+  meta,
+  icon,
+  onNavigate,
+}: {
+  href: string;
+  title: string;
+  detail: string;
+  meta: string;
+  icon: HomeIconName;
+  onNavigate: () => void;
+}) {
+  return (
+    <Link
+      href={href}
+      onClick={onNavigate}
+      className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-[14px] px-2 py-2.5 outline-none transition hover:bg-[#F6F8F7] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.99]"
+    >
+      <span className="inline-flex h-9 w-9 items-center justify-center rounded-[12px] bg-[#F6F8F7] text-[#66716B]">
+        <Icon name={icon} className="h-[18px] w-[18px]" />
+      </span>
+      <span className="min-w-0">
+        <span className="block text-[13px] font-bold text-[#101613]">{title}</span>
+        <span className="mt-0.5 block text-[12px] leading-[1.35] text-[#66716B]">
+          {detail}
+        </span>
+      </span>
+      <span className="rounded-full bg-[#F6F8F7] px-2 py-1 text-[9px] font-bold uppercase tracking-[0.1em] text-[#879089]">
+        {meta}
+      </span>
+    </Link>
+  );
+}
+
+function DeveloperDemoTools({ onNavigate }: { onNavigate: () => void }) {
+  const manualDetail = featureFlags.enableBarcodeLookup
+    ? "Type a barcode or paste a real ingredient list and run it through the current Truthlabel engine."
+    : "Paste a real ingredient list and run it through the current Truthlabel engine.";
+
+  return (
+    <div className="space-y-1.5">
+      {featureFlags.enableDemoProducts ? (
+        <ToolRow
+          href={defaultProductHref}
+          title="Open Sample"
+          detail="Open the demo scanner report for this design pass."
+          meta="Design preview"
+          icon="file"
+          onNavigate={onNavigate}
+        />
+      ) : null}
+      <ToolRow
+        href="/manual"
+        title="Manual Scan"
+        detail={manualDetail}
+        meta="Live input"
+        icon="clipboard"
+        onNavigate={onNavigate}
+      />
+      <ToolRow
+        href="/manual"
+        title="Paste Real Label"
+        detail="Add product name, brand, category, allergens, and packaging text if you have them."
+        meta="Manual flow"
+        icon="list"
+        onNavigate={onNavigate}
+      />
+      {featureFlags.enableDemoProducts ? (
+        <>
+          <ToolRow
+            href={defaultProductHref}
+            title={defaultDemoProduct.productName}
+            detail={`Default demo category: ${defaultDemoProduct.productCategory}`}
+            meta="Demo scanner result"
+            icon="spark"
+            onNavigate={onNavigate}
+          />
+          <div className="rounded-[14px] border border-[#EEF1EF] bg-[#FAFBFA] px-2 py-2">
+            <p className="px-1 pb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-[#879089]">
+              Try Demo Labels
+            </p>
+            <div className="divide-y divide-[#EEF1EF]">
+              {demoProducts.map((product) => (
+                <ToolRow
+                  key={`developer-${product.id}`}
+                  href={`/product?demo=${product.id}`}
+                  title={product.productName}
+                  detail={product.productCategory}
+                  meta="Quick testing"
+                  icon="code"
+                  onNavigate={onNavigate}
+                />
+              ))}
+            </div>
+          </div>
+        </>
+      ) : null}
+    </div>
+  );
+}
+
+function ExploreMore({
+  activeAccordion,
+  onToggle,
+  watchItems,
+  onNavigate,
+}: {
+  activeAccordion: AccordionId | null;
+  onToggle: (id: AccordionId) => void;
+  watchItems: string[];
+  onNavigate: () => void;
+}) {
+  return (
+    <section className="mt-6">
+      <h2 className="text-[18px] font-extrabold text-[#101613]">Explore more</h2>
+      <div className="mt-3 space-y-3">
+        {featureFlags.enableDemoProducts ? (
+          <AccordionCard
+            id="demo"
+            icon="spark"
+            tint="green"
+            title="Try Demo Labels"
+            summary={`${demoProducts.length} examples`}
+            activeAccordion={activeAccordion}
+            onToggle={onToggle}
+          >
+            <DemoLabelList onNavigate={onNavigate} />
+          </AccordionCard>
+        ) : null}
+
+        <AccordionCard
+          id="how"
+          icon="list"
+          tint="yellow"
+          title="How It Works"
+          summary="3 steps"
+          activeAccordion={activeAccordion}
+          onToggle={onToggle}
+        >
+          <HowItWorksSteps />
+        </AccordionCard>
+
+        <AccordionCard
+          id="watch"
+          icon="settings"
+          tint="red"
+          title="Watch List"
+          summary={watchItems.length > 0 ? `${watchItems.length} active` : "Not set"}
+          activeAccordion={activeAccordion}
+          onToggle={onToggle}
+        >
+          <WatchListPreview watchItems={watchItems} />
+        </AccordionCard>
+
+        <AccordionCard
+          id="developer"
+          icon="code"
+          tint="neutral"
+          title="Developer & Demo Tools"
+          summary="Internal tools"
+          activeAccordion={activeAccordion}
+          onToggle={onToggle}
+        >
+          <DeveloperDemoTools onNavigate={onNavigate} />
+        </AccordionCard>
+      </div>
+    </section>
+  );
+}
+
+function TrustNote() {
+  return (
+    <section className="mt-6 rounded-[16px] border border-[#E9E1D2] bg-[#FBF8F1] px-4 py-3.5">
+      <div className="flex items-start gap-3">
+        <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[12px] bg-white text-[#0E5A3F]">
+          <Icon name="shield" className="h-[19px] w-[19px]" />
+        </span>
+        <div>
+          <h2 className="text-[14px] font-extrabold text-[#101613]">Trust Note</h2>
+          <p className="mt-1 text-[13px] leading-[1.48] text-[#66716B]">
+            Truthlabel helps explain ingredient labels and safety signals. It is not medical advice. Always check the product label, especially for allergies.
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function BottomNavigation() {
+  const pathname = usePathname();
+  const items = [
+    { href: "/", label: "Home", icon: "home" as const, active: pathname === "/" },
+    {
+      href: "/manual",
+      label: "Manual",
+      icon: "clipboard" as const,
+      active: pathname === "/manual",
+    },
+    {
+      href: "/manual?mode=camera",
+      label: "Camera",
+      icon: "camera" as const,
+      active: false,
+    },
+    {
+      href: "/product",
+      label: "Results",
+      icon: "file" as const,
+      active: pathname === "/product",
+    },
+    {
+      href: "/account",
+      label: "Account",
+      icon: "user" as const,
+      active: pathname === "/account",
+    },
+  ];
+
+  return (
+    <nav
+      aria-label="Primary navigation"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-[#E2E8E4] bg-white/96 shadow-[0_-8px_22px_rgba(15,40,28,0.06)] backdrop-blur"
+    >
+      <div className="mx-auto grid h-[66px] max-w-[480px] grid-cols-5 px-2 pb-[env(safe-area-inset-bottom)]">
+        {items.map((item) => (
+          <Link
+            key={`${item.label}-${item.href}`}
+            href={item.href}
+            aria-current={item.active ? "page" : undefined}
+            className={`flex min-h-11 flex-col items-center justify-center gap-1 rounded-[12px] text-[11px] font-semibold outline-none transition focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 ${
+              item.active ? "text-[#0E5A3F]" : "text-[#5F6C65] hover:text-[#0E5A3F]"
+            }`}
+          >
+            <span
+              className={`inline-flex h-[30px] w-9 items-center justify-center rounded-[12px] ${
+                item.active ? "bg-[#E8F6EF]" : ""
+              }`}
+            >
+              <Icon name={item.icon} className="h-[20px] w-[20px]" />
+            </span>
+            <span>{item.label}</span>
+          </Link>
+        ))}
+      </div>
+    </nav>
+  );
+}
 
 export default function HomeScreen() {
   const profile = useStoredProfile();
+  const [activeAccordion, setActiveAccordion] = useState<AccordionId | null>(null);
   const watchItems = [...profile.allergies, ...profile.avoid];
-  const actions = [
-    ...(featureFlags.enableDemoProducts
-      ? [
-          {
-            href: defaultProductHref,
-            label: "Open Sample",
-            detail: "Open the demo scanner report for this design pass.",
-            meta: "Design preview",
-            style:
-              "border-transparent bg-[#182b22] text-white shadow-[0_22px_52px_rgba(24,43,34,0.18)]",
-            detailStyle: "text-white/76",
-            metaStyle: "text-white/64",
-          },
-        ]
-      : []),
-    {
-      href: "/manual",
-      label: "Manual Scan",
-      detail: featureFlags.enableBarcodeLookup
-        ? "Type a barcode or paste a real ingredient list and run it through the current Truthlabel engine."
-        : "Paste a real ingredient list and run it through the current Truthlabel engine.",
-      meta: "Live input",
-      style: "border-[#ddd4c3] bg-white/82 text-[#22342c]",
-      detailStyle: "text-[#5a6960]",
-      metaStyle: "text-[#7a705c]",
-    },
-    {
-      href: "/manual",
-      label: "Paste Real Label",
-      detail: "Add product name, brand, category, allergens, and packaging text if you have them.",
-      meta: "Manual flow",
-      style: "border-[#ddd4c3] bg-white/82 text-[#22342c]",
-      detailStyle: "text-[#5a6960]",
-      metaStyle: "text-[#7a705c]",
-    },
-  ] as const;
+
+  function handleNavigate() {
+    saveProfile(profile);
+  }
+
+  function handleToggleAccordion(id: AccordionId) {
+    setActiveAccordion((current) => (current === id ? null : id));
+  }
 
   return (
-    <main className="min-h-screen px-4 py-5 sm:px-5 sm:py-6">
-      <div className="mx-auto max-w-[440px] space-y-4">
-        <header className="flex items-start justify-between gap-4 px-1 py-1">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#7c6d4f]">
-              inside it
-            </p>
-            <h1 className="mt-1 font-heading text-[1.7rem] font-semibold text-[#17251f]">
-              Home
-            </h1>
-            <p className="mt-2 max-w-sm text-[14px] leading-5 text-[#58665e]">
-              Scan food products and expose what the label really contains.
-            </p>
-            <p className="mt-1 text-[13px] font-medium text-[#7a705c]">
-              Scan before you trust it.
-            </p>
-          </div>
-          <AppMenu />
-        </header>
-
-        <section className="rounded-[28px] border border-white/75 bg-[var(--surface-strong)] px-4 py-4 shadow-[var(--shadow)]">
-          <SectionLabel>Start a scan</SectionLabel>
-          <p className="mt-1.5 text-[14px] leading-5 text-[#55645c]">
-            {featureFlags.enableBarcodeLookup
-              ? "Typed barcode lookup is live. The demo result is still available for quick testing."
-              : "Manual ingredient scans are active. Demo results are still available for quick testing."}
-          </p>
-
-          <div className="mt-3 grid gap-2.5">
-            {actions.map((action) => (
-              <Link
-                key={action.label}
-                href={action.href}
-                onClick={() => saveProfile(profile)}
-                className={`rounded-[22px] border px-4 py-3.5 transition active:scale-[0.99] ${action.style}`}
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-[15px] font-semibold">{action.label}</span>
-                  <span
-                    className={`text-[10px] font-semibold uppercase tracking-[0.14em] ${action.metaStyle}`}
-                  >
-                    {action.meta}
-                  </span>
-                </div>
-                <p className={`mt-1.5 text-[13px] leading-5 ${action.detailStyle}`}>
-                  {action.detail}
-                </p>
-              </Link>
-            ))}
-          </div>
-
-          <p className="mt-3 text-[12px] leading-5 text-[#6a776f]">
-            {featureFlags.enableCameraBarcodeScan || featureFlags.enableOcrScan
-              ? "Camera barcode scan and OCR ingredient scan are available from the scan page when you need them."
-              : "Manual label entry stays available even when camera or OCR tools are unavailable on the device."}
-          </p>
-        </section>
-
-        <section className="rounded-[24px] border border-white/72 bg-[var(--surface-strong)] px-4 py-4 shadow-[var(--shadow)]">
-          <SectionLabel>Trust note</SectionLabel>
-          <p className="mt-1.5 text-[13px] leading-5 text-[#55645c]">
-            Truthlabel helps explain ingredient labels and safety signals. It is not medical advice. Always check the product label, especially for allergies.
-          </p>
-        </section>
-
-        <section className="rounded-[24px] border border-white/72 bg-[var(--surface-strong)] px-4 py-4 shadow-[var(--shadow)]">
-          <div className="flex items-center justify-between gap-3">
-            <SectionLabel>Watch list</SectionLabel>
-            <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-[#66756d]">
-              Open menu to edit
-            </p>
-          </div>
-          {watchItems.length > 0 ? (
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              {watchItems.map((item) => (
-                <span
-                  key={item}
-                  className="inline-flex rounded-full border border-[#e1d8ca] bg-[#faf7f0] px-3 py-1 text-[12px] font-medium text-[#445249]"
-                >
-                  {item}
-                </span>
-              ))}
-            </div>
-          ) : (
-            <p className="mt-3 text-[13px] leading-5 text-[#55645c]">
-              No watch settings selected yet. Open the menu to choose allergies and
-              food concerns.
-            </p>
-          )}
-        </section>
-
-        <section className="rounded-[24px] border border-white/72 bg-[var(--surface-strong)] px-4 py-4 shadow-[var(--shadow)]">
-          <SectionLabel>How it works</SectionLabel>
-          <ol className="mt-3 space-y-2.5">
-            {steps.map((step, index) => (
-              <li
-                key={step}
-                className="flex items-start gap-3 rounded-[18px] border border-[#ebe3d7] bg-white/76 px-3.5 py-3"
-              >
-                <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[#ddd2bf] bg-[#f8f3ea] text-[11px] font-semibold text-[#5d685f]">
-                  {index + 1}
-                </span>
-                <p className="pt-0.5 text-[13px] leading-5 text-[#49584f]">{step}</p>
-              </li>
-            ))}
-          </ol>
-        </section>
-
+    <main className="min-h-screen overflow-x-hidden bg-white px-[18px] pt-[calc(12px+env(safe-area-inset-top))] text-[#101613] sm:px-5">
+      <div className="mx-auto w-full max-w-[480px] pb-[calc(100px+env(safe-area-inset-bottom))]">
+        <HomeHeader />
+        <HeroSection />
+        <ScanActionGrid onNavigate={handleNavigate} />
         {featureFlags.enableDemoProducts ? (
-        <section className="rounded-[24px] border border-white/72 bg-[var(--surface-strong)] px-4 py-4 shadow-[var(--shadow)]">
-          <SectionLabel>Sample product</SectionLabel>
-          <div className="mt-3 rounded-[20px] border border-[#e7decf] bg-white/76 p-4">
-            <h2 className="font-heading text-[1.1rem] font-semibold text-[#17251f]">
-              {defaultDemoProduct.productName}
-            </h2>
-            <p className="mt-1.5 text-[13px] leading-5 text-[#55645c]">
-              Open the redesigned sample result page and review the rule-driven
-              exposure layout powered by demo ingredient data.
-            </p>
-            <p className="mt-2 text-[12px] font-medium text-[#7a705c]">
-              Default demo category: {defaultDemoProduct.productCategory}
-            </p>
-            <Link
-              href={defaultProductHref}
-              onClick={() => saveProfile(profile)}
-              className="mt-3 inline-flex rounded-full border border-[#ddd4c3] bg-[#faf7f0] px-4 py-2 text-[12px] font-semibold uppercase tracking-[0.14em] text-[#33443c] transition hover:bg-white active:scale-[0.99]"
-            >
-              Open sample result
-            </Link>
-          </div>
-        </section>
+          <SampleResultCard onNavigate={handleNavigate} />
         ) : null}
-
-        {featureFlags.enableDemoProducts ? (
-        <section className="rounded-[24px] border border-white/72 bg-[var(--surface-strong)] px-4 py-4 shadow-[var(--shadow)]">
-          <div className="flex items-center justify-between gap-3">
-            <SectionLabel>Try demo labels</SectionLabel>
-            <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-[#66756d]">
-              Realistic test cases
-            </p>
-          </div>
-          <div className="mt-3 grid gap-2.5">
-            {primaryDemoProducts.map((product) => (
-              <Link
-                key={product.id}
-                href={`/product?demo=${product.id}`}
-                onClick={() => saveProfile(profile)}
-                className="rounded-[18px] border border-[#e7decf] bg-white/78 px-3.5 py-3 transition hover:bg-white active:scale-[0.99]"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-[14px] font-semibold text-[#1d2b24]">
-                      {product.productName}
-                    </p>
-                    <p className="mt-1 text-[12px] leading-5 text-[#596860]">
-                      {product.productCategory}
-                    </p>
-                  </div>
-                  <span className="rounded-full border border-[#ddd4c3] bg-[#faf7f0] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#33443c]">
-                    Open
-                  </span>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
-        ) : null}
+        <AccountPrompt />
+        <ValuePreview />
+        <ExploreMore
+          activeAccordion={activeAccordion}
+          onToggle={handleToggleAccordion}
+          watchItems={watchItems}
+          onNavigate={handleNavigate}
+        />
+        <TrustNote />
       </div>
+      <BottomNavigation />
     </main>
   );
 }

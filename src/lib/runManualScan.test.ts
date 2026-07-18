@@ -132,7 +132,7 @@ test("runManualScan uses fallback product metadata and lets clean oats stay gree
   assert.equal(output.scanResult.finalVerdict.verdictTone, "green");
 });
 
-test("runManualScan counts unique parsed ingredients for Total Ingredients", () => {
+test("runManualScan counts unique parsed ingredients for Ingredient Count", () => {
   const output = analyzeManualInput({
     ingredientText: "Ingredients: Water, water, sugar",
   });

@@ -8,8 +8,8 @@ export default function manifest(): MetadataRoute.Manifest {
       "Truthlabel scans ingredient labels, barcodes, and safety signals before you trust the product.",
     start_url: "/",
     display: "standalone",
-    background_color: "#f5efe6",
-    theme_color: "#182b22",
+    background_color: "#FFFFFF",
+    theme_color: "#0E4C37",
     icons: [
       {
         src: "/icon.svg",

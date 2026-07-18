@@ -29,7 +29,7 @@ function buildSettings(overrides?: Partial<typeof defaultUserSettings>) {
   };
 }
 
-test("display preferences keep not-checked external rows visible when enabled", () => {
+test("display preferences keep Deep Exposure focused on yellow and red issue rows", () => {
   const result = getDemoScanResult("general-unknown", ["milk"]);
   const settings = buildSettings({
     scanPreferences: {
@@ -38,12 +38,15 @@ test("display preferences keep not-checked external rows visible when enabled", 
     },
   });
 
-  const deepChecks = getVisibleDeepExposureChecks(result, settings);
+  const deepChecks = getVisibleDeepExposureChecks(result);
 
+  assert.ok(deepChecks.length > 0);
   assert.ok(
-    deepChecks.some((row) => row.categoryId === "brand_trust_safety"),
+    deepChecks.every(
+      (row) => row.severity === "yellow" || row.severity === "red",
+    ),
   );
-  assert.equal(shouldShowBrandTrustSafety(result, settings), true);
+  assert.equal(shouldShowBrandTrustSafety(result, settings), false);
 });
 
 test("display preferences hide not-checked external rows and brand trust when disabled", () => {
@@ -55,7 +58,7 @@ test("display preferences hide not-checked external rows and brand trust when di
     },
   });
 
-  const deepChecks = getVisibleDeepExposureChecks(result, settings);
+  const deepChecks = getVisibleDeepExposureChecks(result);
 
   assert.equal(
     deepChecks.some((row) => row.categoryId === "brand_trust_safety"),

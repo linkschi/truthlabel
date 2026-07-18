@@ -32,6 +32,7 @@ yarn-error.log*
 .pnpm-debug.log*
 .next-dev.log
 .codex-next-dev*.log
+.truthlabel-dev*.log
 
 # OpenNext / Wrangler
 .open-next

@@ -33,7 +33,7 @@ export default function SettingsPage() {
         <header className="flex items-start justify-between gap-4 px-1 py-1">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#7c6d4f]">
-              inside it
+              Truthlabel
             </p>
             <h1 className="mt-1 font-heading text-[1.7rem] font-semibold text-[#17251f]">
               Settings

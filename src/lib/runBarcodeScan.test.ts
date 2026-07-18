@@ -58,6 +58,18 @@ function findQuickOverviewRow(
   return row;
 }
 
+function findDeepExposureRow(
+  output: Awaited<ReturnType<typeof runBarcodeScan>>,
+  categoryId: string,
+) {
+  const row = output.scanResult?.deepExposureChecks.find(
+    (entry) => entry.categoryId === categoryId,
+  );
+
+  assert.ok(row, `Expected deep exposure row for ${categoryId}`);
+  return row;
+}
+
 test("valid barcode passes validation", () => {
   assert.equal(validateBarcode(" 1000000000002 "), "1000000000002");
 });
@@ -137,13 +149,17 @@ test("Zero Sugar Drink from barcode returns sweetener count overload", async () 
     { barcode: "1000000000003" },
     { lookupProduct: lookupMockProduct },
   );
-  const sweetenerRow = findQuickOverviewRow(
+  const sweetenerOverviewRow = output.scanResult?.quickOverview.find(
+    (entry) => entry.categoryId === "artificial_sweeteners_sugar_substitutes",
+  );
+  const sweetenerDeepRow = findDeepExposureRow(
     output,
     "artificial_sweeteners_sugar_substitutes",
   );
 
-  assert.equal(sweetenerRow.severity, "red");
-  assert.equal(sweetenerRow.redReasonType, "count_overload");
+  assert.equal(sweetenerOverviewRow, undefined);
+  assert.equal(sweetenerDeepRow.severity, "red");
+  assert.equal(sweetenerDeepRow.redReasonType, "count_overload");
 });
 
 test("Chocolate Milk with milk allergy profile returns Allergy Risk red", async () => {

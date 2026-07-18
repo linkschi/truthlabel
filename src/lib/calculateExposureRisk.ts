@@ -940,7 +940,7 @@ function buildConfidenceNotes(input: ExposureRiskScoringInput) {
 
   if (!byCategoryId.get("brand_trust_safety")?.displayAllowed) {
     notes.push(
-      "Brand safety and recall status were not checked in live official sources.",
+      "No live brand safety or recall signal was found for this scan. Missing data is not proof of absence.",
     );
   }
 

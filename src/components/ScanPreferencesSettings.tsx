@@ -86,7 +86,7 @@ export default function ScanPreferencesSettings({
       <div className="mt-4 space-y-3">
         <ToggleRow
           checked={draft.showNotCheckedExternalSections}
-          label="Show external sections when not checked"
+          label="Show external sections when not found"
           description="Keep recall and external-safety sections visible even when no live check ran."
           onChange={(checked) =>
             setDraft((current) => ({

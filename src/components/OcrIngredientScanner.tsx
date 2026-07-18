@@ -371,7 +371,7 @@ export default function OcrIngredientScanner({
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/66">
-              inside it
+              Truthlabel
             </p>
             <h2 className="mt-1 font-heading text-[1.45rem] font-semibold text-white">
               Scan Ingredient Label

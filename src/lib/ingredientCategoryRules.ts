@@ -95,7 +95,7 @@ const categoryNames = {
   heavy_metals: "Heavy Metals",
   microplastics: "Microplastics",
   brand_trust_safety: "Brand Trust / Safety / Recalls / Lawsuits",
-  total_ingredients: "Total Ingredients",
+  total_ingredients: "Ingredient Count",
   natural_vs_processed: "Natural vs Processed",
   additives_and_preservatives: "Additives & Preservatives",
 } as const;
@@ -554,9 +554,9 @@ function buildCountCategorySummary(params: {
   if (!ingredientListAvailable && matches.length === 0) {
     return buildBaseSummary(categoryId, matches, {
       displayAllowed: false,
-      displayLabel: "Not checked",
-      shortMessage: "Not checked.",
-      userFacingReason: "This category was not checked because ingredient data was not available.",
+      displayLabel: "Not found",
+      shortMessage: "Not found.",
+      userFacingReason: "No readable ingredient data was found for this category.",
     });
   }
 
@@ -608,9 +608,9 @@ function buildBannedRestrictedSummary(
   if (!ingredientListAvailable && matches.length === 0) {
     return buildBaseSummary("banned_restricted_items", matches, {
       displayAllowed: false,
-      displayLabel: "Not checked",
-      shortMessage: "Not checked.",
-      userFacingReason: "This category was not checked because ingredient data was not available.",
+      displayLabel: "Not found",
+      shortMessage: "Not found.",
+      userFacingReason: "No readable ingredient data was found for this category.",
     });
   }
 
@@ -642,9 +642,9 @@ function buildAllergyRiskSummary(
   if (!ingredientListAvailable && matches.length === 0) {
     return buildBaseSummary("allergy_risk", matches, {
       displayAllowed: false,
-      displayLabel: "Not checked",
-      shortMessage: "Not checked.",
-      userFacingReason: "This category was not checked because ingredient data was not available.",
+      displayLabel: "Not found",
+      shortMessage: "Not found.",
+      userFacingReason: "No readable ingredient data was found for this category.",
     });
   }
 
@@ -727,8 +727,8 @@ function buildNaturalPositiveSummary(
   if (!ingredientListAvailable) {
     return buildBaseSummary("natural_positive", matches, {
       displayAllowed: false,
-      displayLabel: "Not checked",
-      shortMessage: "Not checked.",
+      displayLabel: "Not found",
+      shortMessage: "Not found.",
       userFacingReason: "Recognizable ingredient share cannot be calculated without ingredient data.",
       isInformational: true,
     });
@@ -787,8 +787,8 @@ function buildHeavyMetalsSummary(
 
   return buildBaseSummary("heavy_metals", matches, {
     displayAllowed: false,
-    displayLabel: lookupState.lookupPerformed ? "Not checked" : "Not checked",
-    shortMessage: "Not checked.",
+    displayLabel: "Not found",
+    shortMessage: "Not found.",
     userFacingReason:
       "Heavy-metal lookup data was not available. Missing data is not proof of absence.",
   });
@@ -837,8 +837,8 @@ function buildMicroplasticsSummary(
 
   return buildBaseSummary("microplastics", matches, {
     displayAllowed: false,
-    displayLabel: "Not checked",
-    shortMessage: "Not checked.",
+    displayLabel: "Not found",
+    shortMessage: "Not found.",
     userFacingReason:
       "Microplastic lookup data was not available. Missing data is not proof of absence.",
   });
@@ -919,8 +919,8 @@ function buildBrandTrustSummary(
 
   return buildBaseSummary("brand_trust_safety", matches, {
     displayAllowed: false,
-    displayLabel: "Not checked",
-    shortMessage: "Not checked.",
+    displayLabel: "Not found",
+    shortMessage: "Not found.",
     userFacingReason:
       "Brand-trust lookup data was not available. Missing data is not proof of safety or danger.",
   });
@@ -935,8 +935,8 @@ function buildTotalIngredientsSummary(
   if (!ingredientListAvailable) {
     return buildBaseSummary("total_ingredients", matches, {
       displayAllowed: false,
-      displayLabel: "Not checked",
-      shortMessage: "Not checked.",
+      displayLabel: "Not found",
+      shortMessage: "Not found.",
       userFacingReason: "Total ingredient count cannot be calculated without ingredient data.",
     });
   }
@@ -989,8 +989,8 @@ function buildNaturalVsProcessedSummary(
   if (!input.ingredientListAvailable || totalClassified === 0) {
     return buildBaseSummary("natural_vs_processed", matches, {
       displayAllowed: false,
-      displayLabel: "Not checked",
-      shortMessage: "Not checked.",
+      displayLabel: "Not found",
+      shortMessage: "Not found.",
       userFacingReason:
         "Natural versus processed share cannot be calculated without ingredient data.",
     });
@@ -1050,9 +1050,9 @@ function buildAdditivesAndPreservativesSummary(
   if (!ingredientListAvailable && matches.length === 0) {
     return buildBaseSummary("additives_and_preservatives", matches, {
       displayAllowed: false,
-      displayLabel: "Not checked",
-      shortMessage: "Not checked.",
-      userFacingReason: "This category was not checked because ingredient data was not available.",
+      displayLabel: "Not found",
+      shortMessage: "Not found.",
+      userFacingReason: "No readable ingredient data was found for this category.",
     });
   }
 
@@ -1193,9 +1193,9 @@ function summarizeConstructionCategory(
   if (!ingredientListAvailable && matches.length === 0) {
     return buildBaseSummary("artificial_engineered_food_construction", matches, {
       displayAllowed: false,
-      displayLabel: "Not checked",
-      shortMessage: "Not checked.",
-      userFacingReason: "This category was not checked because ingredient data was not available.",
+      displayLabel: "Not found",
+      shortMessage: "Not found.",
+      userFacingReason: "No readable ingredient data was found for this category.",
     });
   }
 
@@ -1274,9 +1274,9 @@ function summarizeUltraProcessedCategory(
   if (!ingredientListAvailable && matches.length === 0) {
     return buildBaseSummary("ultra_processed_indicators", matches, {
       displayAllowed: false,
-      displayLabel: "Not checked",
-      shortMessage: "Not checked.",
-      userFacingReason: "This category was not checked because ingredient data was not available.",
+      displayLabel: "Not found",
+      shortMessage: "Not found.",
+      userFacingReason: "No readable ingredient data was found for this category.",
     });
   }
 
@@ -1333,9 +1333,9 @@ function summarizeMeatSpecificCategory(
   if (!ingredientListAvailable && matches.length === 0) {
     return buildBaseSummary("meat_specific_concerns", matches, {
       displayAllowed: false,
-      displayLabel: "Not checked",
-      shortMessage: "Not checked.",
-      userFacingReason: "This category was not checked because ingredient data was not available.",
+      displayLabel: "Not found",
+      shortMessage: "Not found.",
+      userFacingReason: "No readable ingredient data was found for this category.",
     });
   }
 

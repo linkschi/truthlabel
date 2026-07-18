@@ -24,7 +24,7 @@
 - Severity: Medium
 - Affected flow: Brand Trust / Safety, Heavy Metals, Microplastics
 - Status: Expected limitation
-- Workaround: Treat missing data as not checked or clear checked only for the exact sources queried.
+- Workaround: Treat missing data as not found or clear checked only for the exact sources queried.
 - Planned fix phase: Source expansion and matching improvements
 
 ## 4. Camera barcode scan depends on browser and device support

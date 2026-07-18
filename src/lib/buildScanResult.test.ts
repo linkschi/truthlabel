@@ -101,7 +101,7 @@ test("Red No. 3 keeps artificial-colour overlap internal and shows visible red w
   assert.ok(itemMatches[0]?.matchedCategories.includes("Artificial Colours"));
 });
 
-test("technical rollup categories are hidden from Quick Overview", () => {
+test("detailed ingredient-system categories are hidden from Quick Overview", () => {
   const result = buildResult({
     ingredients: [
       "Tartrazine",
@@ -113,17 +113,26 @@ test("technical rollup categories are hidden from Quick Overview", () => {
   const quickOverviewIds = result.quickOverview.map((row) => row.categoryId);
 
   assert.ok(!quickOverviewIds.includes("artificial_colours"));
+  assert.ok(!quickOverviewIds.includes("artificial_sweeteners_sugar_substitutes"));
   assert.ok(!quickOverviewIds.includes("artificial_engineered_food_construction"));
   assert.ok(!quickOverviewIds.includes("additives_and_preservatives"));
+  assert.ok(!quickOverviewIds.includes("emulsifiers_stabilisers_thickeners_gums"));
+  assert.ok(!quickOverviewIds.includes("flavour_enhancers_flavourings"));
+  assert.ok(!quickOverviewIds.includes("hydrogenated_partially_hydrogenated_oils"));
+  assert.ok(!quickOverviewIds.includes("natural_positive"));
+  assert.ok(!quickOverviewIds.includes("preservatives_shelf_life_systems"));
+  assert.ok(!quickOverviewIds.includes("unknown_review"));
 });
 
-test("Total Ingredients stays out of Quick Overview while unique counts stay available internally", () => {
+test("Ingredient Count appears in Quick Overview while unique counts stay available internally", () => {
   const result = buildResult({
     ingredients: ["Water", "Water", "Sugar"],
   });
   const totalIngredientsRow = findQuickOverviewRow(result, "total_ingredients");
 
-  assert.equal(totalIngredientsRow, undefined);
+  assert.equal(totalIngredientsRow?.displayValue, "2");
+  assert.equal(totalIngredientsRow?.severity, "green");
+  assert.equal(result.quickOverview.at(-1)?.categoryId, "total_ingredients");
   assert.equal(result.productHero.ingredientCount, 2);
   assert.equal(result.ingredientBreakdown.totalIngredients, 2);
 });
@@ -156,14 +165,53 @@ test("three preservatives make preservatives red by count overload and final ver
     ingredients: ["Sodium benzoate", "Potassium sorbate", "Calcium propionate"],
   });
 
-  const preservativeRow = findQuickOverviewRow(
+  const preservativeOverviewRow = findQuickOverviewRow(
     result,
     "preservatives_shelf_life_systems",
   );
 
-  assert.equal(preservativeRow?.severity, "red");
-  assert.equal(preservativeRow?.redReasonType, "count_overload");
+  assert.equal(preservativeOverviewRow, undefined);
+  assert.equal(
+    findDeepCheck(result, "preservatives_shelf_life_systems")?.severity,
+    "red",
+  );
+  assert.equal(
+    findDeepCheck(result, "preservatives_shelf_life_systems")?.redReasonType,
+    "count_overload",
+  );
   assert.equal(result.finalVerdict.verdictTone, "red");
+});
+
+test("texture additive category stays out of Deep Exposure", () => {
+  const result = buildResult({
+    ingredients: ["Xanthan gum"],
+  });
+
+  assert.equal(
+    findDeepCheck(result, "emulsifiers_stabilisers_thickeners_gums"),
+    undefined,
+  );
+});
+
+test("explicit meat-specific ingredient matches still appear in unrelated product contexts", () => {
+  const result = buildResult({
+    productName: "Chocolate cereal",
+    productCategory: "Packaged / Processed Foods",
+    ingredients: ["Mechanically separated chicken"],
+  });
+
+  assert.equal(findQuickOverviewRow(result, "meat_specific_concerns")?.severity, "yellow");
+  assert.equal(findDeepCheck(result, "meat_specific_concerns")?.severity, "yellow");
+});
+
+test("meat-specific concerns appear in meat product contexts", () => {
+  const result = buildResult({
+    productName: "Chicken sausage",
+    productCategory: "Meat / Fast Food",
+    ingredients: ["Mechanically separated chicken"],
+  });
+
+  assert.ok(findDeepCheck(result, "meat_specific_concerns"));
 });
 
 test("milk allergy profile match creates a red allergy check and strong warning verdict", () => {
@@ -179,14 +227,16 @@ test("milk allergy profile match creates a red allergy check and strong warning 
   assert.equal(result.finalVerdict.headline, "Strong Warning");
 });
 
-test("milk without a matching allergy profile stays yellow", () => {
+test("milk without a matching allergy profile stays yellow but hides from Deep Exposure", () => {
   const result = buildResult({
     ingredients: ["Milk powder"],
   });
 
-  const allergyRow = findDeepCheck(result, "allergy_risk");
+  const allergyOverviewRow = findQuickOverviewRow(result, "allergy_risk");
+  const allergyDeepRow = findDeepCheck(result, "allergy_risk");
 
-  assert.equal(allergyRow?.severity, "yellow");
+  assert.equal(allergyOverviewRow?.severity, "yellow");
+  assert.equal(allergyDeepRow, undefined);
 });
 
 test("natural flavour stays out of natural ingredients and lands in unknown review", () => {
@@ -227,7 +277,7 @@ test("vegetable oil lands in unknown review and not natural positive", () => {
   );
 });
 
-test("unchecked heavy metals and brand safety do not appear green", () => {
+test("unchecked heavy metals and brand safety stay out of Deep Exposure issues", () => {
   const result = buildResult({
     ingredients: ["Water", "Apple"],
   });
@@ -235,9 +285,8 @@ test("unchecked heavy metals and brand safety do not appear green", () => {
   const heavyMetalsRow = findDeepCheck(result, "heavy_metals");
   const brandTrustRow = findDeepCheck(result, "brand_trust_safety");
 
-  assert.equal(heavyMetalsRow?.status, "not_checked");
-  assert.equal(heavyMetalsRow?.severity, null);
-  assert.equal(brandTrustRow?.status, "not_checked");
+  assert.equal(heavyMetalsRow, undefined);
+  assert.equal(brandTrustRow, undefined);
   assert.equal(result.brandTrustSafety.status, "not_checked");
   assert.equal(result.brandTrustSafety.severity, null);
 });

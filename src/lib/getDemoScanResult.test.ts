@@ -58,7 +58,7 @@ test("drinks category demo surfaces microplastic review markers", () => {
   assert.equal(microplasticsRow?.status, "checked");
 });
 
-test("demo result keeps external brand-trust lookup clearly not checked without live data", () => {
+test("demo result keeps external brand-trust lookup clearly not found without live data", () => {
   const result = getDemoScanResult("general-unknown", buildAllergyProfile());
 
   assert.equal(result.brandTrustSafety.status, "not_checked");

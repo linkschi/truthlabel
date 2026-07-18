@@ -112,6 +112,7 @@ async function renderScanner(
   await act(async () => {
     root.render(
       <CameraBarcodeScanner
+        {...props}
         onBarcodeDetected={props?.onBarcodeDetected ?? (() => undefined)}
         onClose={props?.onClose ?? (() => undefined)}
       />,
@@ -136,14 +137,13 @@ async function renderScanner(
   } satisfies RenderedScanner;
 }
 
-async function waitFor(assertion: () => void, timeoutMs = 2000) {
+async function waitFor<T>(assertion: () => T, timeoutMs = 2000): Promise<T> {
   const start = Date.now();
   let lastError: unknown;
 
   while (Date.now() - start < timeoutMs) {
     try {
-      assertion();
-      return;
+      return assertion();
     } catch (error) {
       lastError = error;
       await new Promise((resolve) => setTimeout(resolve, 20));
@@ -221,6 +221,86 @@ test("CameraBarcodeScanner shows no camera message", async () => {
     await waitFor(() => {
       assert.match(rendered.container.textContent ?? "", /No camera was found/i);
     });
+  } finally {
+    await rendered.cleanup();
+  }
+});
+
+test("CameraBarcodeScanner supports ingredient photo upload and editable OCR review", async () => {
+  const confirmedTexts: string[] = [];
+  const rendered = await renderScanner(
+    {
+      initialMode: "ingredients",
+      ocrRunner: async () => ({
+        rawText: "Ingredients: Water, Red No. 3",
+        ingredientText: "Water, Red No. 3",
+        possibleAllergenStatement: "Contains milk",
+        averageConfidence: 88,
+        confidenceWarnings: [
+          "OCR may have misread some words. Please review before scanning.",
+        ],
+      }),
+      onTextConfirmed(ingredientText) {
+        confirmedTexts.push(ingredientText);
+      },
+    },
+    {
+      configureDom() {
+        Object.defineProperty(globalThis.navigator, "mediaDevices", {
+          configurable: true,
+          value: {
+            getUserMedia: () => new Promise(() => undefined),
+          },
+        });
+      },
+    },
+  );
+
+  try {
+    const fileInput = rendered.container.querySelector<HTMLInputElement>(
+      '[data-testid="camera-ingredient-upload-input"]',
+    );
+    assert.ok(fileInput);
+
+    Object.defineProperty(fileInput, "files", {
+      configurable: true,
+      value: [
+        new rendered.dom.window.File(["label"], "label.jpg", {
+          type: "image/jpeg",
+        }),
+      ],
+    });
+
+    await act(async () => {
+      fileInput.dispatchEvent(
+        new rendered.dom.window.Event("change", { bubbles: true }),
+      );
+    });
+
+    const textarea = await waitFor(() => {
+      const node = rendered.container.querySelector<HTMLTextAreaElement>(
+        '[data-testid="camera-ingredient-textarea"]',
+      );
+      assert.ok(node);
+      assert.equal(node.value, "Water, Red No. 3");
+      return node;
+    });
+
+    assert.equal(textarea.disabled, false);
+    assert.equal(textarea.readOnly, false);
+
+    const analyseButton = Array.from(
+      rendered.container.querySelectorAll("button"),
+    ).find((button) => /Analyse ingredients/i.test(button.textContent ?? ""));
+    assert.ok(analyseButton);
+
+    await act(async () => {
+      analyseButton.dispatchEvent(
+        new rendered.dom.window.MouseEvent("click", { bubbles: true }),
+      );
+    });
+
+    assert.deepEqual(confirmedTexts, ["Water, Red No. 3"]);
   } finally {
     await rendered.cleanup();
   }

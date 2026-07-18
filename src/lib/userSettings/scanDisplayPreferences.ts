@@ -4,13 +4,11 @@ import type { InsideItUserSettings } from "./userSettingsTypes";
 
 export function getVisibleDeepExposureChecks(
   scanResult: ScanResult,
-  settings: InsideItUserSettings,
 ) {
   return scanResult.deepExposureChecks.filter(
     (row) =>
-      row.displayAllowed ||
-      (settings.scanPreferences.showNotCheckedExternalSections &&
-        row.status === "not_checked"),
+      row.displayAllowed &&
+      (row.severity === "yellow" || row.severity === "red"),
   );
 }
 
@@ -27,8 +25,9 @@ export function shouldShowBrandTrustSafety(
   scanResult: ScanResult,
   settings: InsideItUserSettings,
 ) {
-  return (
-    scanResult.brandTrustSafety.status !== "not_checked" ||
-    settings.scanPreferences.showNotCheckedExternalSections
-  );
+  void scanResult;
+  void settings;
+
+  // TODO: Re-enable Brand Trust / Safety on the result page after the MVP layout is ready for it.
+  return false;
 }
