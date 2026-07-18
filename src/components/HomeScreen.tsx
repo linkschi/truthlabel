@@ -787,6 +787,16 @@ function DeveloperDemoTools({ onNavigate }: { onNavigate: () => void }) {
         icon="list"
         onNavigate={onNavigate}
       />
+      {process.env.NODE_ENV !== "production" ? (
+        <ToolRow
+          href="/manual?mode=camera&scannerDebug=1"
+          title="Scanner Diagnostics"
+          detail="Open the real camera scanner with safe stream, lens, focus, zoom, and decoder diagnostics."
+          meta="Development only"
+          icon="settings"
+          onNavigate={onNavigate}
+        />
+      ) : null}
       {featureFlags.enableDemoProducts ? (
         <>
           <ToolRow

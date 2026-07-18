@@ -17,11 +17,18 @@ export default async function ManualScanPage({
   searchParams: Promise<{
     mode?: string | string[];
     scan?: string | string[];
+    scannerDebug?: string | string[];
   }>;
 }) {
   const params = await searchParams;
   const initialScanMode =
     firstSearchParamValue(params.mode) ?? firstSearchParamValue(params.scan);
+  const scannerDebug = firstSearchParamValue(params.scannerDebug) === "1";
 
-  return <ManualScanScreen initialScanMode={initialScanMode} />;
+  return (
+    <ManualScanScreen
+      initialScanMode={initialScanMode}
+      scannerDebug={scannerDebug}
+    />
+  );
 }

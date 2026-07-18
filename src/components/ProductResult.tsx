@@ -3,7 +3,6 @@
 import Link from "next/link";
 import {
   type ReactNode,
-  useEffect,
   useMemo,
   useRef,
   useState,
@@ -1529,12 +1528,12 @@ export default function ProductResult({
     () => getVisibleDeepExposureChecks(scanResult),
     [scanResult],
   );
-  const hasDeepCheckOverflow = deepCheckRows.length > 4;
+  const hasDeepCheckOverflow = deepCheckRows.length > 10;
   const deepCheckPreviewHeightClass =
     hasDeepCheckOverflow && !isDeepChecksExpanded
       ? expandedDeepCheckId
-        ? "max-h-[520px]"
-        : "max-h-[332px]"
+        ? "max-h-[900px]"
+        : "max-h-[760px]"
       : "max-h-[1400px]";
 
   const deepCheckSectionBadges = useMemo(() => {
@@ -1645,35 +1644,6 @@ export default function ProductResult({
     latestManualScan?.input.ingredientText ??
     latestBarcodeScan?.productData.ingredientText ??
     "";
-
-  useEffect(() => {
-    if (!expandedDeepCheckId || typeof window === "undefined") {
-      return undefined;
-    }
-
-    let animationFrameId: number | null = null;
-
-    const closeExpandedDeepCheck = () => {
-      if (animationFrameId !== null) {
-        return;
-      }
-
-      animationFrameId = window.requestAnimationFrame(() => {
-        animationFrameId = null;
-        setExpandedDeepCheckId(null);
-      });
-    };
-
-    window.addEventListener("scroll", closeExpandedDeepCheck, { passive: true });
-
-    return () => {
-      window.removeEventListener("scroll", closeExpandedDeepCheck);
-
-      if (animationFrameId !== null) {
-        window.cancelAnimationFrame(animationFrameId);
-      }
-    };
-  }, [expandedDeepCheckId]);
 
   if (barcodeScanKey && !barcodeScanResolved) {
     return (

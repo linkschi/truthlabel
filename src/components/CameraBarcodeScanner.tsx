@@ -1,22 +1,30 @@
 "use client";
 /* eslint-disable @next/next/no-img-element */
-
-import type { IScannerControls } from "@zxing/browser";
 import {
   useCallback,
   useEffect,
   useRef,
   useState,
   type ChangeEvent,
+  type Ref,
   type ReactNode,
 } from "react";
 import {
+  buildCameraConstraintProfiles,
+  chooseBestVideoInputDevice,
   classifyCameraAccessError,
   createNativeBarcodeDetector,
+  expandSourceRegion,
+  getScannerDiagnostics,
+  getSourceRegionFromViewfinder,
   normalizeDetectedBarcode,
   stopMediaStream,
   type CameraScannerState,
+  type CameraTrackCapabilities,
+  type CameraTrackSettings,
   type NativeBarcodeDetector,
+  type SourceRegion,
+  type VideoDeviceCandidate,
 } from "@/lib/cameraBarcodeScanner";
 import {
   extractIngredientTextFromImage,
@@ -56,13 +64,47 @@ type ScannerPhase =
   | "unsupported"
   | "error";
 
-type TorchCapableTrack = MediaStreamTrack & {
-  getCapabilities?: () => MediaTrackCapabilities & { torch?: boolean };
+type CameraControlTrack = MediaStreamTrack & {
+  getCapabilities?: () => CameraTrackCapabilities;
+  getSettings?: () => CameraTrackSettings;
   applyConstraints: (
     constraints: MediaTrackConstraints & {
-      advanced?: Array<MediaTrackConstraintSet & { torch?: boolean }>;
+      advanced?: Array<
+        MediaTrackConstraintSet & {
+          torch?: boolean;
+          focusMode?: string;
+          zoom?: number;
+          pointsOfInterest?: Array<{ x: number; y: number }>;
+        }
+      >;
     },
   ) => Promise<void>;
+};
+
+type ImageCaptureLike = {
+  takePhoto?: (settings?: Record<string, unknown>) => Promise<Blob>;
+  grabFrame?: () => Promise<ImageBitmap>;
+  getPhotoCapabilities?: () => Promise<{
+    imageWidth?: { min?: number; max?: number; step?: number };
+    imageHeight?: { min?: number; max?: number; step?: number };
+  }>;
+};
+
+type ImageCaptureConstructorLike = new (
+  track: MediaStreamTrack,
+) => ImageCaptureLike;
+
+type ZxingReaderLike = {
+  possibleFormats?: unknown[];
+  decodeFromCanvas: (canvas: HTMLCanvasElement) => {
+    getText: () => string;
+    getBarcodeFormat?: () => unknown;
+  };
+};
+
+type BarcodeDecodeResult = {
+  rawValue: string;
+  format?: string;
 };
 
 type CameraBarcodeScannerProps = {
@@ -77,6 +119,7 @@ type CameraBarcodeScannerProps = {
   onManualEntry?: () => void;
   initialMode?: CameraScannerMode;
   ocrRunner?: (image: Blob | File) => Promise<OcrExtractionResult>;
+  debugDiagnostics?: boolean;
 };
 
 const zxingFormatNames = [
@@ -245,6 +288,24 @@ function FlashGlyph() {
   );
 }
 
+function SwitchCameraGlyph() {
+  return (
+    <svg aria-hidden className="h-5 w-5" fill="none" viewBox="0 0 24 24">
+      <path d="M8 7h7.5a4 4 0 0 1 0 8H15" stroke="currentColor" strokeLinecap="round" strokeWidth="1.8" />
+      <path d="m10 4-3 3 3 3M16 20l3-3-3-3" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
+    </svg>
+  );
+}
+
+function FocusGlyph() {
+  return (
+    <svg aria-hidden className="h-5 w-5" fill="none" viewBox="0 0 24 24">
+      <path d="M4 9V5.8A1.8 1.8 0 0 1 5.8 4H9M15 4h3.2A1.8 1.8 0 0 1 20 5.8V9M20 15v3.2a1.8 1.8 0 0 1-1.8 1.8H15M9 20H5.8A1.8 1.8 0 0 1 4 18.2V15" stroke="currentColor" strokeLinecap="round" strokeWidth="1.8" />
+      <path d="M12 14.3a2.3 2.3 0 1 0 0-4.6 2.3 2.3 0 0 0 0 4.6Z" stroke="currentColor" strokeWidth="1.8" />
+    </svg>
+  );
+}
+
 function TextGlyph() {
   return (
     <svg aria-hidden className="h-5 w-5" fill="none" viewBox="0 0 24 24">
@@ -302,12 +363,21 @@ function ModeSwitch({
   );
 }
 
-function BarcodeViewfinder({ detected }: { detected: boolean }) {
+function BarcodeViewfinder({
+  detected,
+  frameRef,
+}: {
+  detected: boolean;
+  frameRef: Ref<HTMLDivElement>;
+}) {
   const cornerColor = detected ? "border-[#1F8A58]" : "border-white";
 
   return (
     <div className="pointer-events-none absolute inset-0 flex items-center justify-center px-5">
-      <div className="relative aspect-[3/1] w-[min(84vw,380px)] max-h-[150px] min-h-[120px] rounded-[24px] shadow-[0_0_0_999px_rgba(0,0,0,0.42)]">
+      <div
+        ref={frameRef}
+        className="relative aspect-[3/1] w-[min(84vw,380px)] max-h-[150px] min-h-[120px] rounded-[24px] shadow-[0_0_0_999px_rgba(0,0,0,0.42)]"
+      >
         <span className={`absolute left-0 top-0 h-9 w-9 rounded-tl-[24px] border-l-[3px] border-t-[3px] ${cornerColor}`} />
         <span className={`absolute right-0 top-0 h-9 w-9 rounded-tr-[24px] border-r-[3px] border-t-[3px] ${cornerColor}`} />
         <span className={`absolute bottom-0 left-0 h-9 w-9 rounded-bl-[24px] border-b-[3px] border-l-[3px] ${cornerColor}`} />
@@ -440,6 +510,290 @@ function getFirstVideoTrack(stream: MediaStream | null | undefined) {
   return stream.getTracks()[0];
 }
 
+function delay(ms: number) {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+async function waitForLoadedMetadata(video: HTMLVideoElement) {
+  if (video.readyState >= 1 && video.videoWidth > 0 && video.videoHeight > 0) {
+    return;
+  }
+
+  await new Promise<void>((resolve) => {
+    const timer = window.setTimeout(resolve, 1200);
+    const handleMetadata = () => {
+      window.clearTimeout(timer);
+      resolve();
+    };
+
+    video.addEventListener("loadedmetadata", handleMetadata, { once: true });
+  });
+}
+
+async function openCameraWithProfiles(
+  deviceId?: string | null,
+): Promise<{
+  stream: MediaStream;
+  requestedConstraints: MediaStreamConstraints;
+}> {
+  let lastError: unknown;
+
+  for (const constraints of buildCameraConstraintProfiles(deviceId)) {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+
+      return {
+        stream,
+        requestedConstraints: constraints,
+      };
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  throw lastError ?? new Error("Camera unavailable");
+}
+
+async function enumerateVideoDevices() {
+  if (!navigator.mediaDevices?.enumerateDevices) {
+    return [] as MediaDeviceInfo[];
+  }
+
+  try {
+    return (await navigator.mediaDevices.enumerateDevices()).filter(
+      (device) => device.kind === "videoinput",
+    );
+  } catch {
+    return [];
+  }
+}
+
+function getTrackCapabilities(track?: MediaStreamTrack | null) {
+  return (
+    track as
+      | {
+          getCapabilities?: () => CameraTrackCapabilities;
+        }
+      | undefined
+  )?.getCapabilities?.() ?? null;
+}
+
+function getTrackSettings(track?: MediaStreamTrack | null) {
+  return (
+    track as
+      | {
+          getSettings?: () => CameraTrackSettings;
+        }
+      | undefined
+  )?.getSettings?.() ?? null;
+}
+
+async function applyContinuousFocus(track?: MediaStreamTrack | null) {
+  const controlTrack = track as CameraControlTrack | undefined;
+  const capabilities = getTrackCapabilities(track);
+
+  if (!controlTrack || !capabilities?.focusMode?.includes("continuous")) {
+    return false;
+  }
+
+  try {
+    await controlTrack.applyConstraints({
+      advanced: [{ focusMode: "continuous" }],
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function getZoomRange(capabilities?: CameraTrackCapabilities | null) {
+  const zoom = capabilities?.zoom;
+
+  if (!zoom || typeof zoom === "number") {
+    return null;
+  }
+
+  const min = typeof zoom.min === "number" ? zoom.min : 1;
+  const max = typeof zoom.max === "number" ? zoom.max : min;
+  const step = typeof zoom.step === "number" && zoom.step > 0 ? zoom.step : 0.1;
+
+  if (max <= min) {
+    return null;
+  }
+
+  return { min, max, step };
+}
+
+function clampZoom(value: number, range: { min: number; max: number; step: number }) {
+  const clamped = Math.min(range.max, Math.max(range.min, value));
+  const steps = Math.round((clamped - range.min) / range.step);
+
+  return Number((range.min + steps * range.step).toFixed(2));
+}
+
+function getImageCaptureConstructor() {
+  return (
+    window as typeof window & {
+      ImageCapture?: ImageCaptureConstructorLike;
+    }
+  ).ImageCapture;
+}
+
+function canvasToBlob(canvas: HTMLCanvasElement, type = "image/jpeg", quality = 0.96) {
+  return new Promise<Blob | null>((resolve) => {
+    try {
+      canvas.toBlob((blob) => resolve(blob), type, quality);
+    } catch {
+      resolve(null);
+    }
+  });
+}
+
+function createCanvas(width: number, height: number) {
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.max(1, Math.round(width));
+  canvas.height = Math.max(1, Math.round(height));
+
+  return canvas;
+}
+
+function drawVideoRegionToCanvas(video: HTMLVideoElement, region: SourceRegion) {
+  const canvas = createCanvas(region.width, region.height);
+  const context = canvas.getContext("2d", { alpha: false });
+
+  if (!context) {
+    return null;
+  }
+
+  try {
+    context.imageSmoothingEnabled = false;
+    context.drawImage(
+      video,
+      region.x,
+      region.y,
+      region.width,
+      region.height,
+      0,
+      0,
+      region.width,
+      region.height,
+    );
+    return canvas;
+  } catch {
+    return null;
+  }
+}
+
+function drawImageBitmapToCanvas(image: ImageBitmap) {
+  const canvas = createCanvas(image.width, image.height);
+  const context = canvas.getContext("2d", { alpha: false });
+
+  if (!context) {
+    return null;
+  }
+
+  context.drawImage(image, 0, 0);
+  return canvas;
+}
+
+function getDefaultSourceRegion(video: HTMLVideoElement): SourceRegion {
+  const width = video.videoWidth || 1280;
+  const height = video.videoHeight || 720;
+  const cropHeight = Math.max(220, Math.round(height * 0.34));
+
+  return {
+    x: Math.round(width * 0.08),
+    y: Math.round((height - cropHeight) / 2),
+    width: Math.round(width * 0.84),
+    height: cropHeight,
+  };
+}
+
+function getSourceRegionFromDom(
+  video: HTMLVideoElement,
+  viewfinder: HTMLDivElement | null,
+) {
+  const videoWidth = video.videoWidth || 0;
+  const videoHeight = video.videoHeight || 0;
+
+  if (!videoWidth || !videoHeight || !viewfinder) {
+    return getDefaultSourceRegion(video);
+  }
+
+  const videoRect = video.getBoundingClientRect();
+  const frameRect = viewfinder.getBoundingClientRect();
+
+  if (!videoRect.width || !videoRect.height || !frameRect.width || !frameRect.height) {
+    return getDefaultSourceRegion(video);
+  }
+
+  return getSourceRegionFromViewfinder({
+    videoWidth,
+    videoHeight,
+    renderedWidth: videoRect.width,
+    renderedHeight: videoRect.height,
+    objectFit: "cover",
+    viewfinderRect: {
+      x: frameRect.left - videoRect.left,
+      y: frameRect.top - videoRect.top,
+      width: frameRect.width,
+      height: frameRect.height,
+    },
+  });
+}
+
+function estimateCanvasQuality(canvas: HTMLCanvasElement) {
+  const warnings: string[] = [];
+  const context = canvas.getContext("2d", { willReadFrequently: true });
+
+  if (!context) {
+    return warnings;
+  }
+
+  if (canvas.width < 1000 || canvas.height < 700) {
+    warnings.push("The captured label image may be low resolution. Retake closer if the text looks soft.");
+  }
+
+  try {
+    const sampleWidth = Math.min(160, canvas.width);
+    const sampleHeight = Math.min(160, canvas.height);
+    const sample = context.getImageData(0, 0, sampleWidth, sampleHeight).data;
+    let brightness = 0;
+
+    for (let index = 0; index < sample.length; index += 4) {
+      brightness += (sample[index] + sample[index + 1] + sample[index + 2]) / 3;
+    }
+
+    brightness /= sample.length / 4;
+
+    if (brightness < 45) {
+      warnings.push("More light may help OCR read the label.");
+    } else if (brightness > 235) {
+      warnings.push("The label may have glare. Retake at a slight angle if text is washed out.");
+    }
+  } catch {
+    // Canvas pixel reads can be unavailable for some image sources. Keep the photo usable.
+  }
+
+  return warnings;
+}
+
+async function estimateBlobQuality(blob: Blob) {
+  if (typeof createImageBitmap !== "function") {
+    return [] as string[];
+  }
+
+  try {
+    const bitmap = await createImageBitmap(blob);
+    const canvas = drawImageBitmapToCanvas(bitmap);
+    bitmap.close?.();
+
+    return canvas ? estimateCanvasQuality(canvas) : [];
+  } catch {
+    return [];
+  }
+}
+
 export default function CameraBarcodeScanner({
   onBarcodeDetected,
   onTextConfirmed,
@@ -447,12 +801,23 @@ export default function CameraBarcodeScanner({
   onManualEntry,
   initialMode = "barcode",
   ocrRunner = extractIngredientTextFromImage,
+  debugDiagnostics = false,
 }: CameraBarcodeScannerProps) {
   const [mode, setMode] = useState<CameraScannerMode>(initialMode);
   const [phase, setPhase] = useState<ScannerPhase>("initializing");
   const [hintVisible, setHintVisible] = useState(false);
   const [torchSupported, setTorchSupported] = useState(false);
   const [torchEnabled, setTorchEnabled] = useState(false);
+  const [cameraCandidates, setCameraCandidates] = useState<VideoDeviceCandidate[]>([]);
+  const [selectedCameraLabel, setSelectedCameraLabel] = useState("");
+  const [focusNotice, setFocusNotice] = useState("");
+  const [zoomRange, setZoomRange] = useState<{
+    min: number;
+    max: number;
+    step: number;
+  } | null>(null);
+  const [currentZoom, setCurrentZoom] = useState<number | null>(null);
+  const [diagnosticsText, setDiagnosticsText] = useState("");
   const [previewUrl, setPreviewUrl] = useState("");
   const [editableIngredientText, setEditableIngredientText] = useState("");
   const [editableAllergenStatement, setEditableAllergenStatement] = useState("");
@@ -461,15 +826,37 @@ export default function CameraBarcodeScanner({
   const [barcodeLookupStatus, setBarcodeLookupStatus] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const barcodeFrameRef = useRef<HTMLDivElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const scanTimerRef = useRef<number | null>(null);
+  const scanHintTimerRef = useRef<number | null>(null);
   const candidateAcceptTimerRef = useRef<number | null>(null);
-  const scannerControlsRef = useRef<IScannerControls | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const previewUrlRef = useRef("");
   const isStoppedRef = useRef(false);
   const hasLockedBarcodeRef = useRef(false);
   const processingFrameRef = useRef(false);
+  const nativeDetectorRef = useRef<NativeBarcodeDetector | null>(null);
+  const zxingReaderRef = useRef<ZxingReaderLike | null>(null);
+  const selectedDeviceIdRef = useRef<string | null>(null);
+  const cameraCandidatesRef = useRef<VideoDeviceCandidate[]>([]);
+  const selectedCameraLabelRef = useRef("");
+  const requestedConstraintsRef = useRef<MediaStreamConstraints | null>(null);
+  const trackCapabilitiesRef = useRef<CameraTrackCapabilities | null>(null);
+  const trackSettingsRef = useRef<CameraTrackSettings | null>(null);
+  const imageQualityWarningsRef = useRef<string[]>([]);
+  const decodeStatsRef = useRef({
+    attempts: 0,
+    successes: 0,
+    totalDurationMs: 0,
+    inputWidth: 0,
+    inputHeight: 0,
+    region: null as SourceRegion | null,
+    lastFormat: "",
+    activeLoops: 0,
+    lastBroadScanAt: 0,
+    lastHighQualityScanAt: 0,
+  });
   const sessionTokenRef = useRef(0);
   const modeRef = useRef<CameraScannerMode>(initialMode);
   const barcodeCandidateRef = useRef<{
@@ -493,6 +880,10 @@ export default function CameraBarcodeScanner({
     streamRef.current = null;
     setTorchSupported(false);
     setTorchEnabled(false);
+    setZoomRange(null);
+    setCurrentZoom(null);
+    trackCapabilitiesRef.current = null;
+    trackSettingsRef.current = null;
 
     const video = videoRef.current;
 
@@ -519,14 +910,18 @@ export default function CameraBarcodeScanner({
       scanTimerRef.current = null;
     }
 
+    if (scanHintTimerRef.current !== null) {
+      window.clearTimeout(scanHintTimerRef.current);
+      scanHintTimerRef.current = null;
+    }
+
     if (candidateAcceptTimerRef.current !== null) {
       window.clearTimeout(candidateAcceptTimerRef.current);
       candidateAcceptTimerRef.current = null;
     }
 
-    scannerControlsRef.current?.stop();
-    scannerControlsRef.current = null;
     processingFrameRef.current = false;
+    decodeStatsRef.current.activeLoops = 0;
   }, []);
 
   const stopScannerResources = useCallback(() => {
@@ -679,125 +1074,160 @@ export default function CameraBarcodeScanner({
     [acceptBarcode],
   );
 
-  const startNativeScanner = useCallback(
-    (video: HTMLVideoElement, detector: NativeBarcodeDetector, sessionToken: number) => {
-      const detectLoop = async () => {
-        if (
-          isStoppedRef.current ||
-          hasLockedBarcodeRef.current ||
-          modeRef.current !== "barcode" ||
-          sessionToken !== sessionTokenRef.current
-        ) {
-          return;
-        }
+  const loadZxingReader = useCallback(async () => {
+    if (zxingReaderRef.current) {
+      return zxingReaderRef.current;
+    }
 
-        if (processingFrameRef.current) {
-          scanTimerRef.current = window.setTimeout(detectLoop, 120);
-          return;
-        }
+    try {
+      const { BarcodeFormat, BrowserMultiFormatReader } = await import(
+        "@zxing/browser"
+      );
+      const reader = new BrowserMultiFormatReader() as ZxingReaderLike;
+      reader.possibleFormats = zxingFormatNames.map(
+        (formatName) => BarcodeFormat[formatName],
+      );
+      zxingReaderRef.current = reader;
+      return reader;
+    } catch {
+      return null;
+    }
+  }, []);
 
-        processingFrameRef.current = true;
+  const recordDecodeAttempt = useCallback(
+    (startedAt: number, region: SourceRegion | null, result?: BarcodeDecodeResult | null) => {
+      const duration = performance.now() - startedAt;
+      const stats = decodeStatsRef.current;
+      stats.attempts += 1;
+      stats.totalDurationMs += duration;
+      stats.region = region;
+      stats.inputWidth = region?.width ?? stats.inputWidth;
+      stats.inputHeight = region?.height ?? stats.inputHeight;
 
-        try {
-          const hasAttachedStream = Boolean(
-            (
-              video as HTMLVideoElement & {
-                srcObject?: MediaStream | null;
-              }
-            ).srcObject,
-          );
+      if (result?.rawValue) {
+        stats.successes += 1;
+        stats.lastFormat = result.format ?? stats.lastFormat;
+      }
 
-          if (video.readyState >= 2 || hasAttachedStream) {
-            const barcodes = await detector.detect(video);
-            const detected = barcodes.find((result) =>
-              Boolean(normalizeDetectedBarcode(result.rawValue)),
-            );
-
-            if (detected?.rawValue) {
-              reportDetectedBarcode(detected.rawValue, sessionToken);
-            }
-          }
-        } catch {
-          if (!isStoppedRef.current && sessionToken === sessionTokenRef.current) {
-            setPhase("error");
-          }
-          return;
-        } finally {
-          processingFrameRef.current = false;
-        }
-
-        scanTimerRef.current = window.setTimeout(detectLoop, 160);
-      };
-
-      void detectLoop();
-    },
-    [reportDetectedBarcode],
-  );
-
-  const startZxingScanner = useCallback(
-    async (video: HTMLVideoElement, sessionToken: number) => {
-      try {
-        const { BarcodeFormat, BrowserMultiFormatReader } = await import(
-          "@zxing/browser"
+      if (debugDiagnostics) {
+        setDiagnosticsText(
+          JSON.stringify(
+            getScannerDiagnostics({
+              browser: {
+                userAgent: navigator.userAgent,
+                platform: navigator.platform,
+              },
+              devices: cameraCandidatesRef.current,
+              selectedDeviceId: selectedDeviceIdRef.current ?? undefined,
+              selectedDeviceLabel: selectedCameraLabelRef.current,
+              trackLabel: getFirstVideoTrack(streamRef.current)?.label,
+              requestedConstraints: requestedConstraintsRef.current,
+              settings: trackSettingsRef.current,
+              capabilities: trackCapabilitiesRef.current,
+              video: {
+                videoWidth: videoRef.current?.videoWidth ?? 0,
+                videoHeight: videoRef.current?.videoHeight ?? 0,
+              },
+              decoder: {
+                inputWidth: stats.inputWidth,
+                inputHeight: stats.inputHeight,
+                region: stats.region,
+                attempts: stats.attempts,
+                successes: stats.successes,
+                averageDecodeDurationMs:
+                  stats.attempts > 0
+                    ? Math.round(stats.totalDurationMs / stats.attempts)
+                    : 0,
+                lastFormat: stats.lastFormat,
+                activeLoops: stats.activeLoops,
+              },
+            }),
+            null,
+            2,
+          ),
         );
-
-        if (
-          isStoppedRef.current ||
-          hasLockedBarcodeRef.current ||
-          modeRef.current !== "barcode" ||
-          sessionToken !== sessionTokenRef.current
-        ) {
-          return;
-        }
-
-        const reader = new BrowserMultiFormatReader();
-        reader.possibleFormats = zxingFormatNames.map(
-          (formatName) => BarcodeFormat[formatName],
-        );
-
-        const controls = await reader.decodeFromVideoElement(
-          video,
-          (result, error, callbackControls) => {
-            scannerControlsRef.current = callbackControls;
-
-            if (
-              isStoppedRef.current ||
-              hasLockedBarcodeRef.current ||
-              modeRef.current !== "barcode" ||
-              sessionToken !== sessionTokenRef.current
-            ) {
-              return;
-            }
-
-            if (result?.getText()) {
-              reportDetectedBarcode(result.getText(), sessionToken);
-              return;
-            }
-
-            if (!error) {
-              return;
-            }
-
-            if (
-              ["NotFoundException", "ChecksumException", "FormatException"].includes(
-                error.name,
-              )
-            ) {
-              return;
-            }
-
-            setPhase("error");
-          },
-        );
-
-        scannerControlsRef.current = controls;
-      } catch {
-        if (!isStoppedRef.current && sessionToken === sessionTokenRef.current) {
-          setPhase("error");
-        }
       }
     },
-    [reportDetectedBarcode],
+    [debugDiagnostics],
+  );
+
+  const decodeCanvasForBarcode = useCallback(
+    async (
+      canvas: HTMLCanvasElement,
+      detector: NativeBarcodeDetector | null,
+    ): Promise<BarcodeDecodeResult | null> => {
+      if (detector) {
+        try {
+          const barcodes = await detector.detect(canvas);
+          const detected = barcodes.find((result) =>
+            Boolean(normalizeDetectedBarcode(result.rawValue)),
+          );
+
+          if (detected?.rawValue) {
+            return {
+              rawValue: detected.rawValue,
+              format: (detected as { format?: string }).format,
+            };
+          }
+        } catch {
+          // Fall through to ZXing. Some browsers expose BarcodeDetector but fail
+          // on canvas crops from live video.
+        }
+      }
+
+      const reader = await loadZxingReader();
+
+      if (!reader) {
+        return null;
+      }
+
+      try {
+        const result = reader.decodeFromCanvas(canvas);
+
+        return {
+          rawValue: result.getText(),
+          format: String(result.getBarcodeFormat?.() ?? ""),
+        };
+      } catch {
+        return null;
+      }
+    },
+    [loadZxingReader],
+  );
+
+  const decodeVideoRegion = useCallback(
+    async (
+      video: HTMLVideoElement,
+      region: SourceRegion,
+      detector: NativeBarcodeDetector | null,
+    ) => {
+      const startedAt = performance.now();
+      const canvas = drawVideoRegionToCanvas(video, region);
+      let result: BarcodeDecodeResult | null = null;
+
+      if (canvas) {
+        result = await decodeCanvasForBarcode(canvas, detector);
+      } else if (detector) {
+        try {
+          const barcodes = await detector.detect(video);
+          const detected = barcodes.find((entry) =>
+            Boolean(normalizeDetectedBarcode(entry.rawValue)),
+          );
+          result = detected?.rawValue
+            ? {
+                rawValue: detected.rawValue,
+                format: (detected as { format?: string }).format,
+              }
+            : null;
+        } catch {
+          result = null;
+        }
+      }
+
+      recordDecodeAttempt(startedAt, region, result);
+      return result;
+    },
+    [decodeCanvasForBarcode, recordDecodeAttempt],
   );
 
   const startBarcodeDetection = useCallback(async () => {
@@ -811,8 +1241,20 @@ export default function CameraBarcodeScanner({
     barcodeCandidateRef.current = null;
     const sessionToken = sessionTokenRef.current;
     setPhase("detecting");
-
     const nativeDetector = await createNativeBarcodeDetector();
+    nativeDetectorRef.current = nativeDetector?.detector ?? null;
+    decodeStatsRef.current = {
+      attempts: 0,
+      successes: 0,
+      totalDurationMs: 0,
+      inputWidth: 0,
+      inputHeight: 0,
+      region: null,
+      lastFormat: "",
+      activeLoops: 0,
+      lastBroadScanAt: Date.now(),
+      lastHighQualityScanAt: Date.now(),
+    };
 
     if (
       isStoppedRef.current ||
@@ -822,20 +1264,134 @@ export default function CameraBarcodeScanner({
       return;
     }
 
-    if (nativeDetector) {
-      startNativeScanner(video, nativeDetector.detector, sessionToken);
-      return;
+    if (!nativeDetector) {
+      await loadZxingReader();
     }
 
-    await startZxingScanner(video, sessionToken);
-  }, [startNativeScanner, startZxingScanner, stopBarcodeScanner]);
+    const detectLoop = async () => {
+      if (
+        isStoppedRef.current ||
+        hasLockedBarcodeRef.current ||
+        modeRef.current !== "barcode" ||
+        sessionToken !== sessionTokenRef.current
+      ) {
+        return;
+      }
 
-  const updateTorchSupport = useCallback((stream: MediaStream) => {
-    const track = getFirstVideoTrack(stream) as TorchCapableTrack | undefined;
-    const capabilities = track?.getCapabilities?.() as
-      | (MediaTrackCapabilities & { torch?: boolean })
-      | undefined;
+      if (processingFrameRef.current) {
+        scanTimerRef.current = window.setTimeout(detectLoop, 120);
+        return;
+      }
+
+      const sourceWidth = video.videoWidth || 0;
+      const sourceHeight = video.videoHeight || 0;
+
+      if (!sourceWidth || !sourceHeight) {
+        if (nativeDetectorRef.current) {
+          const startedAt = performance.now();
+          try {
+            const barcodes = await nativeDetectorRef.current.detect(video);
+            const detected = barcodes.find((entry) =>
+              Boolean(normalizeDetectedBarcode(entry.rawValue)),
+            );
+            const result = detected?.rawValue
+              ? {
+                  rawValue: detected.rawValue,
+                  format: (detected as { format?: string }).format,
+                }
+              : null;
+            recordDecodeAttempt(startedAt, null, result);
+
+            if (result?.rawValue) {
+              reportDetectedBarcode(result.rawValue, sessionToken);
+            }
+          } catch {
+            recordDecodeAttempt(startedAt, null, null);
+          }
+        }
+        scanTimerRef.current = window.setTimeout(detectLoop, 160);
+        return;
+      }
+
+      processingFrameRef.current = true;
+      decodeStatsRef.current.activeLoops = 1;
+
+      try {
+        const now = Date.now();
+        const centralRegion = getSourceRegionFromDom(
+          video,
+          barcodeFrameRef.current,
+        );
+        const regions = [centralRegion];
+
+        if (now - decodeStatsRef.current.lastBroadScanAt >= 560) {
+          decodeStatsRef.current.lastBroadScanAt = now;
+          regions.push(expandSourceRegion(centralRegion, 1.75, sourceWidth, sourceHeight));
+        }
+
+        if (now - decodeStatsRef.current.lastHighQualityScanAt >= 2600) {
+          decodeStatsRef.current.lastHighQualityScanAt = now;
+          regions.push({
+            x: 0,
+            y: 0,
+            width: sourceWidth,
+            height: sourceHeight,
+          });
+        }
+
+        for (const region of regions) {
+          const result = await decodeVideoRegion(
+            video,
+            region,
+            nativeDetectorRef.current,
+          );
+
+          if (result?.rawValue) {
+            reportDetectedBarcode(result.rawValue, sessionToken);
+            break;
+          }
+        }
+      } finally {
+        processingFrameRef.current = false;
+        decodeStatsRef.current.activeLoops = 0;
+      }
+
+      scanTimerRef.current = window.setTimeout(detectLoop, 140);
+    };
+
+    void detectLoop();
+  }, [
+    decodeVideoRegion,
+    loadZxingReader,
+    recordDecodeAttempt,
+    reportDetectedBarcode,
+    stopBarcodeScanner,
+  ]);
+
+  const updateCameraCapabilities = useCallback(async (stream: MediaStream) => {
+    const track = getFirstVideoTrack(stream) as CameraControlTrack | undefined;
+    const capabilities = getTrackCapabilities(track);
+    const settings = getTrackSettings(track);
+    const nextZoomRange = getZoomRange(capabilities);
+
+    trackCapabilitiesRef.current = capabilities;
+    trackSettingsRef.current = settings;
     setTorchSupported(Boolean(capabilities?.torch));
+    setZoomRange(nextZoomRange);
+    setCurrentZoom(
+      typeof settings?.zoom === "number"
+        ? settings.zoom
+        : nextZoomRange
+          ? clampZoom(1, nextZoomRange)
+          : null,
+    );
+
+    const focused = await applyContinuousFocus(track);
+    setFocusNotice(
+      focused
+        ? "Continuous focus active"
+        : "Move the phone slightly away, then closer to refocus.",
+    );
   }, []);
 
   const startCamera = useCallback(async () => {
@@ -851,22 +1407,43 @@ export default function CameraBarcodeScanner({
     }
 
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: false,
-        video: {
-          facingMode: { ideal: "environment" },
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-        },
-      });
+      stopBarcodeScanner();
+      stopActiveCameraStream();
+      const exactDeviceId = selectedDeviceIdRef.current;
+      let opened = await openCameraWithProfiles(exactDeviceId);
+      let stream = opened.stream;
+      let requestedConstraints = opened.requestedConstraints;
 
       if (isStoppedRef.current) {
         stopMediaStream(stream);
         return;
       }
 
+      const devices = await enumerateVideoDevices();
+      const { selected, candidates } = chooseBestVideoInputDevice(devices);
+      cameraCandidatesRef.current = candidates;
+      setCameraCandidates(candidates);
+
+      if (
+        !exactDeviceId &&
+        selected?.deviceId &&
+        selected.deviceId !== getTrackSettings(getFirstVideoTrack(stream))?.deviceId
+      ) {
+        stopMediaStream(stream);
+        selectedDeviceIdRef.current = selected.deviceId;
+        opened = await openCameraWithProfiles(selected.deviceId);
+        stream = opened.stream;
+        requestedConstraints = opened.requestedConstraints;
+      } else if (!exactDeviceId && selected?.deviceId) {
+        selectedDeviceIdRef.current = selected.deviceId;
+      }
+
+      requestedConstraintsRef.current = requestedConstraints;
       streamRef.current = stream;
-      updateTorchSupport(stream);
+      const cameraLabel =
+        selected?.label || getFirstVideoTrack(stream)?.label || "Selected camera";
+      selectedCameraLabelRef.current = cameraLabel;
+      setSelectedCameraLabel(cameraLabel);
 
       const video = videoRef.current;
 
@@ -889,6 +1466,8 @@ export default function CameraBarcodeScanner({
         // Some browsers start playback after metadata is ready.
       }
 
+      await waitForLoadedMetadata(video);
+      await updateCameraCapabilities(stream);
       setPhase(modeRef.current === "barcode" ? "detecting" : "ready");
 
       if (modeRef.current === "barcode") {
@@ -897,11 +1476,16 @@ export default function CameraBarcodeScanner({
     } catch (error) {
       setPhase(scannerPhaseFromAccessState(classifyCameraAccessError(error)));
     }
-  }, [startBarcodeDetection, updateTorchSupport]);
+  }, [
+    startBarcodeDetection,
+    stopActiveCameraStream,
+    stopBarcodeScanner,
+    updateCameraCapabilities,
+  ]);
 
   const toggleTorch = useCallback(async () => {
     const track = getFirstVideoTrack(streamRef.current) as
-      | TorchCapableTrack
+      | CameraControlTrack
       | undefined;
 
     if (!track || !torchSupported) {
@@ -920,6 +1504,74 @@ export default function CameraBarcodeScanner({
       setTorchEnabled(false);
     }
   }, [torchEnabled, torchSupported]);
+
+  const handleSwitchCamera = useCallback(() => {
+    const switchableCameras = cameraCandidates.filter(
+      (candidate) => !candidate.isLikelyFront && candidate.deviceId,
+    );
+
+    if (switchableCameras.length < 2) {
+      return;
+    }
+
+    const currentIndex = switchableCameras.findIndex(
+      (candidate) => candidate.deviceId === selectedDeviceIdRef.current,
+    );
+    const nextCamera =
+      switchableCameras[(currentIndex + 1) % switchableCameras.length] ??
+      switchableCameras[0];
+
+    selectedDeviceIdRef.current = nextCamera.deviceId;
+    selectedCameraLabelRef.current = nextCamera.label || "Next camera";
+    setSelectedCameraLabel(nextCamera.label || "Next camera");
+    resetBarcodeSession();
+    void startCamera();
+  }, [cameraCandidates, resetBarcodeSession, startCamera]);
+
+  const applyZoom = useCallback(
+    async (value: number) => {
+      const track = getFirstVideoTrack(streamRef.current) as
+        | CameraControlTrack
+        | undefined;
+
+      if (!track || !zoomRange) {
+        return;
+      }
+
+      const nextZoom = clampZoom(value, zoomRange);
+
+      try {
+        await track.applyConstraints({
+          advanced: [{ zoom: nextZoom }],
+        });
+        setCurrentZoom(nextZoom);
+        trackSettingsRef.current = getTrackSettings(track);
+      } catch {
+        setZoomRange(null);
+        setCurrentZoom(null);
+      }
+    },
+    [zoomRange],
+  );
+
+  const handleRefocus = useCallback(async () => {
+    barcodeCandidateRef.current = null;
+    setHintVisible(false);
+    const track = getFirstVideoTrack(streamRef.current) as
+      | CameraControlTrack
+      | undefined;
+    const focused = await applyContinuousFocus(track);
+
+    setFocusNotice(
+      focused
+        ? "Refocus requested"
+        : "Move the phone slightly away, then closer to refocus.",
+    );
+
+    if (modeRef.current === "barcode" && !hasLockedBarcodeRef.current) {
+      void startBarcodeDetection();
+    }
+  }, [startBarcodeDetection]);
 
   const handleModeChange = useCallback(
     (nextMode: CameraScannerMode) => {
@@ -956,6 +1608,7 @@ export default function CameraBarcodeScanner({
     setEditableIngredientText("");
     setEditableAllergenStatement("");
     setConfidenceWarnings([]);
+    imageQualityWarningsRef.current = [];
     setOcrErrorMessage("");
     void startCamera();
   }, [replacePreviewUrl, startCamera, stopScannerResources]);
@@ -970,6 +1623,37 @@ export default function CameraBarcodeScanner({
     void startCamera();
   }, [resetBarcodeSession, startBarcodeDetection, startCamera]);
 
+  const detectBarcodeFromImage = useCallback(
+    async (image: Blob | File) => {
+      if (typeof createImageBitmap !== "function") {
+        return null;
+      }
+
+      try {
+        const [nativeDetector, bitmap] = await Promise.all([
+          createNativeBarcodeDetector(),
+          createImageBitmap(image),
+        ]);
+        const canvas = drawImageBitmapToCanvas(bitmap);
+        bitmap.close?.();
+
+        if (!canvas) {
+          return null;
+        }
+
+        const result = await decodeCanvasForBarcode(
+          canvas,
+          nativeDetector?.detector ?? null,
+        );
+
+        return normalizeDetectedBarcode(result?.rawValue);
+      } catch {
+        return null;
+      }
+    },
+    [decodeCanvasForBarcode],
+  );
+
   const processImage = useCallback(
     async (image: Blob | File) => {
       setPhase("ocr_processing");
@@ -979,7 +1663,28 @@ export default function CameraBarcodeScanner({
       setConfidenceWarnings([]);
 
       try {
-        const result = await ocrRunner(image);
+        const barcodeLookupPromise = detectBarcodeFromImage(image).then(
+          async (barcode) => {
+            if (!barcode) {
+              return null;
+            }
+
+            try {
+              return await Promise.resolve(onBarcodeDetected(barcode));
+            } catch {
+              return null;
+            }
+          },
+        );
+        const [result, barcodeOutcome] = await Promise.all([
+          ocrRunner(image),
+          barcodeLookupPromise,
+        ]);
+        const barcodeStatus = getOutcomeStatus(barcodeOutcome);
+
+        if (barcodeStatus === "found") {
+          return;
+        }
 
         if (!result.ingredientText.trim()) {
           setOcrErrorMessage(
@@ -987,6 +1692,7 @@ export default function CameraBarcodeScanner({
           );
           setConfidenceWarnings(
             uniqueStrings([
+              ...imageQualityWarningsRef.current,
               ...result.confidenceWarnings,
               "Ingredient text was extracted from an image and may be incomplete.",
             ]),
@@ -997,7 +1703,12 @@ export default function CameraBarcodeScanner({
 
         setEditableIngredientText(result.ingredientText);
         setEditableAllergenStatement(result.possibleAllergenStatement);
-        setConfidenceWarnings(result.confidenceWarnings);
+        setConfidenceWarnings(
+          uniqueStrings([
+            ...imageQualityWarningsRef.current,
+            ...result.confidenceWarnings,
+          ]),
+        );
         setPhase("ocr_review");
       } catch {
         setOcrErrorMessage(
@@ -1006,7 +1717,7 @@ export default function CameraBarcodeScanner({
         setPhase("capture_review");
       }
     },
-    [ocrRunner],
+    [detectBarcodeFromImage, ocrRunner, onBarcodeDetected],
   );
 
   const captureIngredients = useCallback(async () => {
@@ -1018,11 +1729,46 @@ export default function CameraBarcodeScanner({
     }
 
     setPhase("capturing");
+    const track = getFirstVideoTrack(streamRef.current) as
+      | CameraControlTrack
+      | undefined;
+    await applyContinuousFocus(track);
+    await delay(180);
+
+    let capturedImage: Blob | null = null;
+    const ImageCaptureCtor = getImageCaptureConstructor();
+
+    if (track && ImageCaptureCtor) {
+      try {
+        const imageCapture = new ImageCaptureCtor(track);
+        const photoCapabilities = await imageCapture.getPhotoCapabilities?.();
+        const photoSettings: Record<string, unknown> = {};
+
+        if (photoCapabilities?.imageWidth?.max) {
+          photoSettings.imageWidth = photoCapabilities.imageWidth.max;
+        }
+
+        if (photoCapabilities?.imageHeight?.max) {
+          photoSettings.imageHeight = photoCapabilities.imageHeight.max;
+        }
+
+        capturedImage = await imageCapture.takePhoto?.(photoSettings);
+      } catch {
+        capturedImage = null;
+      }
+    }
+
+    if (capturedImage) {
+      imageQualityWarningsRef.current = await estimateBlobQuality(capturedImage);
+      stopScannerResources();
+      replacePreviewUrl(createPreviewUrl(capturedImage));
+      await processImage(capturedImage);
+      return;
+    }
+
     const width = video.videoWidth || 1280;
     const height = video.videoHeight || 720;
-    const canvas = document.createElement("canvas");
-    canvas.width = width;
-    canvas.height = height;
+    const canvas = createCanvas(width, height);
 
     const context = canvas.getContext("2d");
 
@@ -1033,11 +1779,10 @@ export default function CameraBarcodeScanner({
     }
 
     context.drawImage(video, 0, 0, width, height);
+    imageQualityWarningsRef.current = estimateCanvasQuality(canvas);
     stopScannerResources();
 
-    const capturedImage = await new Promise<Blob | null>((resolve) => {
-      canvas.toBlob((blob) => resolve(blob), "image/jpeg", 0.94);
-    });
+    capturedImage = await canvasToBlob(canvas, "image/jpeg", 0.96);
 
     if (!capturedImage) {
       setOcrErrorMessage("Ingredient label scan failed. You can paste the ingredient list manually.");
@@ -1072,6 +1817,7 @@ export default function CameraBarcodeScanner({
       }
 
       stopScannerResources();
+      imageQualityWarningsRef.current = await estimateBlobQuality(selectedFile);
       replacePreviewUrl(createPreviewUrl(selectedFile));
       await processImage(selectedFile);
     },
@@ -1083,6 +1829,7 @@ export default function CameraBarcodeScanner({
     setEditableIngredientText("");
     setEditableAllergenStatement("");
     setConfidenceWarnings([]);
+    imageQualityWarningsRef.current = [];
     setOcrErrorMessage("");
     setMode("ingredients");
     modeRef.current = "ingredients";
@@ -1379,6 +2126,19 @@ export default function CameraBarcodeScanner({
       : barcodeLookupStatus === "error"
         ? "The product lookup did not complete. You can try again, scan the ingredients, or enter the details manually."
         : "This barcode is not in the product data yet. Scan the ingredients to analyse the product another way.";
+  const switchableCameraCount = cameraCandidates.filter(
+    (candidate) => !candidate.isLikelyFront && candidate.deviceId,
+  ).length;
+  const zoomPresets = zoomRange
+    ? uniqueStrings(
+        [1, 1.5, 2]
+          .map((value) => clampZoom(value, zoomRange))
+          .filter((value) => value >= zoomRange.min && value <= zoomRange.max)
+          .map((value) => String(value)),
+      ).map(Number)
+    : [];
+  const showCameraControlStrip =
+    switchableCameraCount > 1 || zoomPresets.length > 0 || Boolean(focusNotice);
 
   return (
     <div className="fixed inset-0 z-50 h-[100dvh] min-h-[100dvh] overflow-hidden bg-black text-white">
@@ -1415,7 +2175,7 @@ export default function CameraBarcodeScanner({
       ) : null}
 
       {mode === "barcode" ? (
-        <BarcodeViewfinder detected={isBarcodeDetected} />
+        <BarcodeViewfinder detected={isBarcodeDetected} frameRef={barcodeFrameRef} />
       ) : (
         <IngredientViewfinder />
       )}
@@ -1439,6 +2199,47 @@ export default function CameraBarcodeScanner({
           </IconButton>
         </div>
         <ModeSwitch mode={mode} onModeChange={handleModeChange} />
+        {showCameraControlStrip ? (
+          <div className="mx-auto mt-2 flex max-w-[430px] flex-wrap items-center justify-center gap-2 rounded-full bg-[rgba(8,14,11,0.52)] px-2 py-2 backdrop-blur-[6px]">
+            {switchableCameraCount > 1 ? (
+              <button
+                type="button"
+                onClick={handleSwitchCamera}
+                className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-white/16 bg-white/10 px-3 text-[11px] font-bold text-white"
+              >
+                <SwitchCameraGlyph />
+                Switch
+              </button>
+            ) : null}
+            <button
+              type="button"
+              onClick={handleRefocus}
+              className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-white/16 bg-white/10 px-3 text-[11px] font-bold text-white"
+            >
+              <FocusGlyph />
+              Refocus
+            </button>
+            {zoomPresets.length > 0 ? (
+              <div className="flex items-center gap-1 rounded-full border border-white/16 bg-white/10 px-1 py-1">
+                {zoomPresets.map((preset) => (
+                  <button
+                    key={preset}
+                    type="button"
+                    onClick={() => void applyZoom(preset)}
+                    aria-pressed={currentZoom === preset}
+                    className={`min-h-7 rounded-full px-2.5 text-[11px] font-bold ${
+                      currentZoom === preset
+                        ? "bg-white text-[#12583D]"
+                        : "text-white"
+                    }`}
+                  >
+                    {preset}x
+                  </button>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        ) : null}
       </header>
 
       <section className="absolute inset-x-0 bottom-[calc(98px+env(safe-area-inset-bottom))] px-5 text-center">
@@ -1458,6 +2259,72 @@ export default function CameraBarcodeScanner({
           ) : null}
         </div>
       </section>
+
+      {debugDiagnostics && process.env.NODE_ENV !== "production" ? (
+        <aside className="absolute right-3 top-[calc(132px+env(safe-area-inset-top))] z-20 w-[min(92vw,360px)] rounded-[18px] border border-white/16 bg-black/70 p-3 text-left text-white shadow-[0_18px_36px_rgba(0,0,0,0.28)] backdrop-blur-[8px]">
+          <div className="flex items-center justify-between gap-2">
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-white/64">
+                Dev only
+              </p>
+              <h2 className="text-[14px] font-bold">Scanner Diagnostics</h2>
+              {selectedCameraLabel ? (
+                <p className="mt-0.5 max-w-[210px] truncate text-[11px] text-white/58">
+                  {selectedCameraLabel}
+                </p>
+              ) : null}
+            </div>
+            <button
+              type="button"
+              onClick={() =>
+                navigator.clipboard?.writeText(
+                  diagnosticsText || "Scanner diagnostics not ready yet.",
+                )
+              }
+              className="rounded-full border border-white/16 bg-white/10 px-3 py-1.5 text-[11px] font-bold"
+            >
+              Copy
+            </button>
+          </div>
+          <div className="mt-2 grid grid-cols-2 gap-1.5">
+            <button
+              type="button"
+              onClick={handleSwitchCamera}
+              disabled={switchableCameraCount < 2}
+              className="rounded-full border border-white/16 bg-white/10 px-2 py-1.5 text-[11px] font-bold disabled:opacity-45"
+            >
+              Test next rear camera
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                selectedDeviceIdRef.current = null;
+                void startCamera();
+              }}
+              className="rounded-full border border-white/16 bg-white/10 px-2 py-1.5 text-[11px] font-bold"
+            >
+              Reset preferred camera
+            </button>
+            <button
+              type="button"
+              onClick={handleTryBarcodeAgain}
+              className="rounded-full border border-white/16 bg-white/10 px-2 py-1.5 text-[11px] font-bold"
+            >
+              Run barcode test
+            </button>
+            <button
+              type="button"
+              onClick={captureIngredients}
+              className="rounded-full border border-white/16 bg-white/10 px-2 py-1.5 text-[11px] font-bold"
+            >
+              Capture test image
+            </button>
+          </div>
+          <pre className="mt-2 max-h-44 overflow-auto rounded-[12px] bg-black/50 p-2 text-[10px] leading-4 text-white/76">
+            {diagnosticsText || "Diagnostics will appear after the camera starts."}
+          </pre>
+        </aside>
+      ) : null}
 
       {phase === "looking_up" ? (
         <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/42 px-6">

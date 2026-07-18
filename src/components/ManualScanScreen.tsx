@@ -294,8 +294,10 @@ function buildInitialErrorMessage(initialScanMode?: string) {
 
 export default function ManualScanScreen({
   initialScanMode,
+  scannerDebug = false,
 }: {
   initialScanMode?: string;
+  scannerDebug?: boolean;
 }) {
   const router = useRouter();
   const userSettings = useUserSettings();
@@ -624,6 +626,7 @@ export default function ManualScanScreen({
           onTextConfirmed={ocrEnabled ? handleOcrTextConfirmed : undefined}
           onManualEntry={() => setIsCameraScannerOpen(false)}
           onClose={() => setIsCameraScannerOpen(false)}
+          debugDiagnostics={scannerDebug}
         />
       ) : null}
       {isOcrScannerOpen ? (

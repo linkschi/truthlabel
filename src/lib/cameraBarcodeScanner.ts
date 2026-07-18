@@ -30,6 +30,100 @@ export type NativeBarcodeDetectorConstructor = {
   getSupportedFormats?: () => Promise<string[]>;
 };
 
+export type CameraTrackCapabilities = MediaTrackCapabilities & {
+  focusMode?: string[];
+  zoom?:
+    | number
+    | {
+        min?: number;
+        max?: number;
+        step?: number;
+      };
+  torch?: boolean;
+};
+
+export type CameraTrackSettings = MediaTrackSettings & {
+  focusMode?: string;
+  zoom?: number;
+  torch?: boolean;
+};
+
+export type VideoDeviceCandidate = {
+  deviceId: string;
+  label: string;
+  score: number;
+  isLikelyRear: boolean;
+  isLikelyFront: boolean;
+  reasons: string[];
+};
+
+export type SourceRegion = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
+export type ViewfinderSourceRegionInput = {
+  videoWidth: number;
+  videoHeight: number;
+  renderedWidth: number;
+  renderedHeight: number;
+  viewfinderRect: SourceRegion;
+  objectFit?: "cover" | "contain";
+};
+
+export type ScannerDiagnosticsInput = {
+  browser?: {
+    userAgent?: string;
+    platform?: string;
+  };
+  devices?: VideoDeviceCandidate[];
+  selectedDeviceId?: string;
+  selectedDeviceLabel?: string;
+  trackLabel?: string;
+  requestedConstraints?: MediaStreamConstraints | null;
+  settings?: CameraTrackSettings | null;
+  capabilities?: CameraTrackCapabilities | null;
+  video?: {
+    videoWidth: number;
+    videoHeight: number;
+  };
+  decoder?: {
+    inputWidth?: number;
+    inputHeight?: number;
+    region?: SourceRegion | null;
+    averageDecodeDurationMs?: number;
+    attempts?: number;
+    successes?: number;
+    lastFormat?: string;
+    activeLoops?: number;
+  };
+};
+
+const positiveRearCameraIndicators = [
+  "back",
+  "rear",
+  "environment",
+  "main",
+  "primary",
+  "camera 0",
+];
+
+const negativeRearCameraIndicators = [
+  "front",
+  "user",
+  "selfie",
+  "ultra wide",
+  "ultrawide",
+  "0.5x",
+  "macro",
+  "depth",
+  "telephoto",
+  "tele",
+  "virtual",
+];
+
 export function getCameraScannerMessage(state: CameraScannerState) {
   switch (state) {
     case "requesting_permission":
@@ -82,6 +176,299 @@ export function classifyCameraAccessError(error: unknown): Exclude<
 
 export function normalizeDetectedBarcode(value: string | undefined) {
   return value?.replace(/\s+/g, "").trim() || "";
+}
+
+function normalizeDeviceLabel(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+export function scoreVideoInputDevice(
+  device: Pick<MediaDeviceInfo, "deviceId" | "kind" | "label">,
+): VideoDeviceCandidate {
+  const label = device.label ?? "";
+  const normalizedLabel = normalizeDeviceLabel(label);
+  const reasons: string[] = [];
+  let score = 0;
+
+  if (device.kind === "videoinput") {
+    score += 1;
+  }
+
+  positiveRearCameraIndicators.forEach((indicator) => {
+    if (normalizedLabel.includes(indicator)) {
+      score += indicator === "main" || indicator === "primary" ? 4 : 3;
+      reasons.push(`positive:${indicator}`);
+    }
+  });
+
+  if (/\bwide\b/.test(normalizedLabel) && !normalizedLabel.includes("ultra wide")) {
+    score += 1;
+    reasons.push("positive:wide");
+  }
+
+  negativeRearCameraIndicators.forEach((indicator) => {
+    if (normalizedLabel.includes(indicator)) {
+      score -= indicator === "front" || indicator === "selfie" ? 8 : 5;
+      reasons.push(`negative:${indicator}`);
+    }
+  });
+
+  const isLikelyFront = reasons.some((reason) =>
+    ["negative:front", "negative:user", "negative:selfie"].includes(reason),
+  );
+  const isLikelyRear =
+    !isLikelyFront &&
+    (reasons.some((reason) => reason.startsWith("positive:")) || score > 1);
+
+  return {
+    deviceId: device.deviceId,
+    label,
+    score,
+    isLikelyRear,
+    isLikelyFront,
+    reasons,
+  };
+}
+
+export function getRankedVideoInputDevices(devices: MediaDeviceInfo[]) {
+  return devices
+    .filter((device) => device.kind === "videoinput")
+    .map(scoreVideoInputDevice)
+    .sort((left, right) => right.score - left.score);
+}
+
+export function chooseBestVideoInputDevice(devices: MediaDeviceInfo[]) {
+  const rankedDevices = getRankedVideoInputDevices(devices);
+
+  if (rankedDevices.length === 0) {
+    return {
+      selected: null,
+      candidates: rankedDevices,
+    };
+  }
+
+  const rearCandidates = rankedDevices.filter((device) => device.isLikelyRear);
+  const nonFrontCandidates = rankedDevices.filter((device) => !device.isLikelyFront);
+  const candidatePool =
+    rearCandidates.length > 0
+      ? rearCandidates
+      : nonFrontCandidates.length > 0
+        ? nonFrontCandidates
+        : rankedDevices;
+
+  return {
+    selected: candidatePool[0] ?? null,
+    candidates: rankedDevices,
+  };
+}
+
+function withVideoDevice(
+  video: MediaTrackConstraints,
+  deviceId?: string | null,
+): MediaTrackConstraints {
+  if (!deviceId) {
+    return {
+      ...video,
+      facingMode: { ideal: "environment" },
+    };
+  }
+
+  return {
+    ...video,
+    deviceId: { exact: deviceId },
+  };
+}
+
+export function buildCameraConstraintProfiles(deviceId?: string | null) {
+  return [
+    {
+      audio: false,
+      video: withVideoDevice(
+        {
+          width: { ideal: 1920 },
+          height: { ideal: 1080 },
+          frameRate: { ideal: 30, max: 30 },
+          aspectRatio: { ideal: 16 / 9 },
+        },
+        deviceId,
+      ),
+    },
+    {
+      audio: false,
+      video: withVideoDevice(
+        {
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+          frameRate: { ideal: 24, max: 30 },
+          aspectRatio: { ideal: 16 / 9 },
+        },
+        deviceId,
+      ),
+    },
+    {
+      audio: false,
+      video: withVideoDevice(
+        {
+          frameRate: { ideal: 24, max: 30 },
+        },
+        deviceId,
+      ),
+    },
+  ] satisfies MediaStreamConstraints[];
+}
+
+export function summarizeTrackCapabilities(
+  capabilities?: CameraTrackCapabilities | null,
+) {
+  if (!capabilities) {
+    return null;
+  }
+
+  return {
+    width: capabilities.width,
+    height: capabilities.height,
+    aspectRatio: capabilities.aspectRatio,
+    frameRate: capabilities.frameRate,
+    facingMode: capabilities.facingMode,
+    focusMode: capabilities.focusMode,
+    zoom: capabilities.zoom,
+    torch: Boolean(capabilities.torch),
+  };
+}
+
+export function summarizeTrackSettings(settings?: CameraTrackSettings | null) {
+  if (!settings) {
+    return null;
+  }
+
+  return {
+    deviceId: settings.deviceId,
+    width: settings.width,
+    height: settings.height,
+    aspectRatio: settings.aspectRatio,
+    frameRate: settings.frameRate,
+    facingMode: settings.facingMode,
+    focusMode: settings.focusMode,
+    zoom: settings.zoom,
+    torch: settings.torch,
+  };
+}
+
+function clampRegion(region: SourceRegion, width: number, height: number): SourceRegion {
+  const x = Math.max(0, Math.min(region.x, width - 1));
+  const y = Math.max(0, Math.min(region.y, height - 1));
+  const maxWidth = Math.max(1, width - x);
+  const maxHeight = Math.max(1, height - y);
+
+  return {
+    x: Math.round(x),
+    y: Math.round(y),
+    width: Math.round(Math.max(1, Math.min(region.width, maxWidth))),
+    height: Math.round(Math.max(1, Math.min(region.height, maxHeight))),
+  };
+}
+
+export function expandSourceRegion(
+  region: SourceRegion,
+  scale: number,
+  videoWidth: number,
+  videoHeight: number,
+) {
+  const nextWidth = region.width * scale;
+  const nextHeight = region.height * scale;
+  const x = region.x - (nextWidth - region.width) / 2;
+  const y = region.y - (nextHeight - region.height) / 2;
+
+  return clampRegion(
+    {
+      x,
+      y,
+      width: nextWidth,
+      height: nextHeight,
+    },
+    videoWidth,
+    videoHeight,
+  );
+}
+
+export function getSourceRegionFromViewfinder({
+  videoWidth,
+  videoHeight,
+  renderedWidth,
+  renderedHeight,
+  viewfinderRect,
+  objectFit = "cover",
+}: ViewfinderSourceRegionInput): SourceRegion {
+  if (
+    videoWidth <= 0 ||
+    videoHeight <= 0 ||
+    renderedWidth <= 0 ||
+    renderedHeight <= 0
+  ) {
+    return {
+      x: 0,
+      y: 0,
+      width: Math.max(1, videoWidth),
+      height: Math.max(1, videoHeight),
+    };
+  }
+
+  const sourceAspect = videoWidth / videoHeight;
+  const renderedAspect = renderedWidth / renderedHeight;
+  const isCoverWidthLimited =
+    objectFit === "cover"
+      ? renderedAspect > sourceAspect
+      : renderedAspect <= sourceAspect;
+  const scale = isCoverWidthLimited
+    ? renderedWidth / videoWidth
+    : renderedHeight / videoHeight;
+  const displayedWidth = videoWidth * scale;
+  const displayedHeight = videoHeight * scale;
+  const hiddenX = Math.max(0, (displayedWidth - renderedWidth) / 2);
+  const hiddenY = Math.max(0, (displayedHeight - renderedHeight) / 2);
+
+  return clampRegion(
+    {
+      x: (viewfinderRect.x + hiddenX) / scale,
+      y: (viewfinderRect.y + hiddenY) / scale,
+      width: viewfinderRect.width / scale,
+      height: viewfinderRect.height / scale,
+    },
+    videoWidth,
+    videoHeight,
+  );
+}
+
+export function getScannerDiagnostics(input: ScannerDiagnosticsInput) {
+  return {
+    generatedAt: new Date().toISOString(),
+    browser: {
+      userAgent: input.browser?.userAgent ?? "",
+      platform: input.browser?.platform ?? "",
+    },
+    devices: input.devices ?? [],
+    selectedDeviceId: input.selectedDeviceId,
+    selectedDeviceLabel: input.selectedDeviceLabel,
+    trackLabel: input.trackLabel,
+    requestedConstraints: input.requestedConstraints ?? null,
+    settings: summarizeTrackSettings(input.settings),
+    capabilities: summarizeTrackCapabilities(input.capabilities),
+    video: input.video ?? null,
+    decoder: {
+      inputWidth: input.decoder?.inputWidth,
+      inputHeight: input.decoder?.inputHeight,
+      region: input.decoder?.region ?? null,
+      averageDecodeDurationMs: input.decoder?.averageDecodeDurationMs,
+      attempts: input.decoder?.attempts ?? 0,
+      successes: input.decoder?.successes ?? 0,
+      lastFormat: input.decoder?.lastFormat,
+      activeLoops: input.decoder?.activeLoops ?? 0,
+    },
+  };
 }
 
 export function stopMediaStream(stream: MediaStream | null | undefined) {
