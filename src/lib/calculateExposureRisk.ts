@@ -440,7 +440,7 @@ function buildDirectScoreCandidates(
       candidates.push({
         scoreEntityId: match.canonicalIngredientId,
         categoryId: "hydrogenated_partially_hydrogenated_oils",
-        categoryName: "Hydrogenated & Partially Hydrogenated Fats",
+        categoryName: "Hydrogenated / Partially Hydrogenated Oils",
         points: 35,
         reasonType: "direct_red_ingredient",
         message:
@@ -456,7 +456,7 @@ function buildDirectScoreCandidates(
       candidates.push({
         scoreEntityId: match.canonicalIngredientId,
         categoryId: "cancer_linked_watch",
-        categoryName: "Cancer-Related Concerns",
+        categoryName: "Cancer-linked Watch",
         points: 30,
         reasonType: "direct_red_ingredient",
         message:
@@ -472,7 +472,7 @@ function buildDirectScoreCandidates(
       candidates.push({
         scoreEntityId: match.canonicalIngredientId,
         categoryId: "harmful_additives",
-        categoryName: "Additive Load",
+        categoryName: "Harmful Additives",
         points: 25,
         reasonType: "direct_red_ingredient",
         message:
@@ -504,7 +504,7 @@ function buildDirectScoreCandidates(
       candidates.push({
         scoreEntityId: match.canonicalIngredientId,
         categoryId: "preservatives_shelf_life_systems",
-        categoryName: "Preservatives",
+        categoryName: "Preservatives & Shelf-Life Systems",
         points: 25,
         reasonType: "direct_red_ingredient",
         message:

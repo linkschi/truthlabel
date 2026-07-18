@@ -324,7 +324,7 @@ const microplasticContextTerms = [
 ];
 
 const additiveGroupDefinitions = [
-  { id: "artificial_colours", label: "Artificial Colors" },
+  { id: "artificial_colours", label: "Artificial Colours" },
   {
     id: "artificial_sweeteners_sugar_substitutes",
     label: "Artificial Sweeteners",
@@ -335,13 +335,13 @@ const additiveGroupDefinitions = [
   },
   {
     id: "emulsifiers_stabilisers_thickeners_gums",
-    label: "Emulsifiers / Stabilizers / Gums",
+    label: "Emulsifiers / Stabilisers / Gums",
   },
   {
     id: "flavour_enhancers_flavourings",
-    label: "Flavor Enhancers / Flavorings",
+    label: "Flavour Enhancers / Flavourings",
   },
-  { id: "harmful_additives", label: "Additive Load" },
+  { id: "harmful_additives", label: "Harmful Additives" },
 ] as const;
 
 const avoidWording = [

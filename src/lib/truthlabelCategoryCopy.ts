@@ -35,33 +35,33 @@ export type CategoryCopyInput = {
 };
 
 export const truthlabelCategoryDisplayNames: Record<string, string> = {
-  banned_restricted_items: "Banned & Restricted Ingredients",
-  artificial_colours: "Artificial Colors",
+  banned_restricted_items: "Banned / Restricted Items",
+  artificial_colours: "Artificial Colours",
   artificial_sweeteners_sugar_substitutes:
     "Artificial Sweeteners / Sugar Substitutes",
-  preservatives_shelf_life_systems: "Preservatives",
+  preservatives_shelf_life_systems: "Preservatives & Shelf-Life Systems",
   emulsifiers_stabilisers_thickeners_gums:
-    "Emulsifiers / Stabilizers / Thickeners / Gums",
-  flavour_enhancers_flavourings: "Flavor Enhancers & Flavorings",
-  seed_oils_processed_oils: "Processed Oils",
+    "Emulsifiers / Stabilisers / Thickeners / Gums",
+  flavour_enhancers_flavourings: "Flavour Enhancers / Flavourings",
+  seed_oils_processed_oils: "Seed Oils / Processed Oils",
   hydrogenated_partially_hydrogenated_oils:
-    "Hydrogenated & Partially Hydrogenated Fats",
-  ultra_processed_indicators: "Ultra-Processing",
+    "Hydrogenated / Partially Hydrogenated Oils",
+  ultra_processed_indicators: "Ultra-Processed Indicators",
   artificial_engineered_food_construction:
-    "Artificial or Engineered Food Construction",
-  harmful_additives: "Additive Load",
-  cancer_linked_watch: "Cancer-Related Concerns",
-  allergy_risk: "Allergens & Watch List",
-  natural_positive: "Natural & Simple Ingredients",
-  unknown_review: "Label Transparency",
-  meat_specific_concerns: "Processed Meat",
-  fry_oil_fast_food_oil: "Fried Food & Frying Oils",
+    "Artificial / Engineered Food Construction",
+  harmful_additives: "Harmful Additives",
+  cancer_linked_watch: "Cancer-linked Watch",
+  allergy_risk: "Allergy Risk",
+  natural_positive: "Natural / Positive Ingredients",
+  unknown_review: "Unknown / Review Ingredients",
+  meat_specific_concerns: "Meat-Specific Concerns",
+  fry_oil_fast_food_oil: "Fry Oil / Fast Food Oil",
   heavy_metals: "Heavy Metals",
   microplastics: "Microplastics",
-  brand_trust_safety: "Brand Safety, Recalls & Enforcement",
+  brand_trust_safety: "Brand Trust / Safety / Recalls / Lawsuits",
   total_ingredients: "Ingredient Count",
   natural_vs_processed: "Natural vs Processed",
-  additives_and_preservatives: "Additive Load",
+  additives_and_preservatives: "Additives & Preservatives",
 };
 
 export const truthlabelCategoryCopyProfiles: Record<string, CategoryCopyProfile> = {
