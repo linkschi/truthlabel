@@ -19,7 +19,7 @@ test("hydrogenatedPartiallyHydrogenatedOilsDataPack stores the full starter data
   );
 });
 
-test("hydrogenatedPartiallyHydrogenatedOilsDataPack uses green red only for category thresholds", () => {
+test("hydrogenatedPartiallyHydrogenatedOilsDataPack uses revised green yellow red thresholds", () => {
   const { categoryScoringRules, finalVerdictRules } =
     hydrogenatedPartiallyHydrogenatedOilsDataPack;
 
@@ -32,11 +32,11 @@ test("hydrogenatedPartiallyHydrogenatedOilsDataPack uses green red only for cate
     },
   );
   assert.deepEqual(categoryScoringRules.anyHydrogenatedOilFound, {
-    severity: "red",
-    display: "red_count_badge",
-    scoreImpact: 25,
+    severity: "yellow",
+    display: "yellow_count_badge",
+    scoreImpact: 12,
     reason:
-      "Product contains hydrogenated oil or hydrogenated fat, which Truthlabel treats as a serious processed-fat marker.",
+      "Product contains hydrogenated oil or hydrogenated fat, which Truthlabel treats as a processed-fat review marker.",
   });
   assert.deepEqual(categoryScoringRules.anyPartiallyHydrogenatedOilFound, {
     severity: "red",
@@ -59,12 +59,27 @@ test("hydrogenatedPartiallyHydrogenatedOilsDataPack uses green red only for cate
 });
 
 test("hydrogenatedPartiallyHydrogenatedOilsDataPack gives every item usable matching and user-facing copy", () => {
+  const redIds = hydrogenatedPartiallyHydrogenatedOilsDataPack.items
+    .filter((item) => item.severity === "red")
+    .map((item) => item.id)
+    .sort();
+
+  assert.deepEqual(redIds, [
+    "partially_hydrogenated_canola_rapeseed_oil",
+    "partially_hydrogenated_corn_sunflower_safflower_oils",
+    "partially_hydrogenated_cottonseed_oil",
+    "partially_hydrogenated_oil_general",
+    "partially_hydrogenated_palm_palm_kernel_oil",
+    "partially_hydrogenated_soybean_oil",
+    "trans_fat_marker",
+  ]);
+
   hydrogenatedPartiallyHydrogenatedOilsDataPack.items.forEach((item) => {
     assert.ok(item.mainName.length > 0);
     assert.ok(item.otherNames.length > 0);
     assert.ok(item.warningLabel.length > 0);
     assert.ok(item.userFacingReason.length > 0);
     assert.ok(item.matchingNotes.length > 0);
-    assert.equal(item.severity, "red");
+    assert.ok(["red", "yellow"].includes(item.severity));
   });
 });

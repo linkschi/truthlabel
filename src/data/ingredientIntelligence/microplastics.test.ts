@@ -9,12 +9,12 @@ test("microplasticsDataPack stores the requested starter dataset", () => {
   assert.equal(microplasticsDataPack.items.length, 15);
 });
 
-test("microplasticsDataPack keeps yellow and red severity paths", () => {
+test("microplasticsDataPack keeps starter entries yellow by default", () => {
   const severities = new Set(
     microplasticsDataPack.items.map((item) => item.basicSeveritySuggestion),
   );
 
-  assert.deepEqual([...severities].sort(), ["red", "yellow"]);
+  assert.deepEqual([...severities].sort(), ["yellow"]);
 });
 
 test("microplasticsDataPack keeps microplastic item metadata", () => {
@@ -26,18 +26,14 @@ test("microplasticsDataPack keeps microplastic item metadata", () => {
   });
 });
 
-test("microplasticsDataPack keeps red only for verified external concern paths", () => {
+test("microplasticsDataPack does not make detection wording automatic red", () => {
   const redIds = microplasticsDataPack.items
+    .map((item) => item as { id: string; basicSeveritySuggestion: "yellow" | "red" })
     .filter((item) => item.basicSeveritySuggestion === "red")
     .map((item) => item.id)
     .sort();
 
-  assert.deepEqual(redIds, [
-    "microplastics",
-    "nanoplastics",
-    "verified_microplastic_detection_marker",
-    "verified_nanoplastic_detection_marker",
-  ]);
+  assert.deepEqual(redIds, []);
   assert.equal(
     microplasticsDataPack.displayRulesForLater.noMarkers.severity,
     "green",
@@ -48,7 +44,7 @@ test("microplasticsDataPack keeps red only for verified external concern paths",
   );
   assert.equal(
     microplasticsDataPack.displayRulesForLater.hasVerifiedSignal.severity,
-    "red",
+    "yellow",
   );
   assert.ok(
     microplasticsDataPack.classificationRules.includes(

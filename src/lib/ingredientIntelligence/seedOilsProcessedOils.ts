@@ -188,7 +188,7 @@ export function summarizeSeedOilProcessedOilMatches(
     redItemCount: redItems.length,
     yellowItemCount: yellowItems.length,
     categorySeverity:
-      totalCount === 0 ? "green" : hasAutomaticRed || totalCount >= 2 ? "red" : "yellow",
+      totalCount === 0 ? "green" : hasAutomaticRed || totalCount >= 3 ? "red" : "yellow",
     hasHydrogenatedOil,
     hasAutomaticRed,
     redItems,

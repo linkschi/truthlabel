@@ -70,12 +70,12 @@ test("Zero Sugar Citrus Drink triggers red sweetener overload", () => {
   assert.equal(summary.matchCount, 3);
 });
 
-test("Shelf Stable Sauce triggers red preservative overload", () => {
+test("Shelf Stable Sauce keeps three preservatives at yellow review", () => {
   const output = runProduct("shelf-stable-sauce");
   const summary = findCategorySummary(output, "preservatives_shelf_life_systems");
 
-  assert.equal(summary.severity, "red");
-  assert.equal(summary.redReasonType, "count_overload");
+  assert.equal(summary.severity, "yellow");
+  assert.equal(summary.redReasonType, undefined);
   assert.equal(summary.matchCount, 3);
 });
 

@@ -46,9 +46,14 @@ test("artificial colours become red at 3 matches by count overload", () => {
   assert.equal(summary.redReasonType, "count_overload");
 });
 
-test("preservatives become red at 3 matches by count overload", () => {
+test("preservatives become red at 4 matches by count overload", () => {
   const output = runRules({
-    ingredients: ["Sodium benzoate", "Potassium sorbate", "Calcium propionate"],
+    ingredients: [
+      "Sodium benzoate",
+      "Potassium sorbate",
+      "Calcium propionate",
+      "Sodium nitrite",
+    ],
   });
   const summary = findSummary(output, "preservatives_shelf_life_systems");
 
@@ -66,9 +71,9 @@ test("artificial sweeteners become red at 3 matches by count overload", () => {
   assert.equal(summary.redReasonType, "count_overload");
 });
 
-test("seed oils become red at 2 processed-oil matches by count overload", () => {
+test("seed oils become red at 3 processed-oil matches by count overload", () => {
   const output = runRules({
-    ingredients: ["Canola oil", "Soybean oil"],
+    ingredients: ["Canola oil", "Soybean oil", "Sunflower oil"],
   });
   const summary = findSummary(output, "seed_oils_processed_oils");
 
@@ -87,6 +92,29 @@ test("hydrogenated oils become red from one partially hydrogenated oil match", (
 
   assert.equal(summary.severity, "red");
   assert.equal(summary.redReasonType, "direct_red_ingredient");
+});
+
+test("generic hydrogenated oil does not make standalone hydrogenated category red after revised flag update", () => {
+  const output = runRules({
+    ingredients: ["Hydrogenated soybean oil"],
+  });
+  const summary = findSummary(
+    output,
+    "hydrogenated_partially_hydrogenated_oils",
+  );
+
+  assert.equal(summary.severity, "green");
+  assert.equal(summary.redReasonType, undefined);
+});
+
+test("meat source claims stay green informational by themselves", () => {
+  const output = runRules({
+    ingredients: ["Grass-fed beef"],
+  });
+  const summary = findSummary(output, "meat_specific_concerns");
+
+  assert.equal(summary.severity, "green");
+  assert.equal(summary.displayLabel, "Info");
 });
 
 test("allergy risk becomes red when milk matches the user's allergy profile", () => {
@@ -111,14 +139,14 @@ test("allergy risk stays yellow when milk is found without a user profile match"
   assert.equal(summary.redReasonType, undefined);
 });
 
-test("unknown review ingredients become red at 4 vague terms by count overload", () => {
+test("unknown review ingredients stay yellow at 4 vague terms for MVP", () => {
   const output = runRules({
     ingredients: ["Natural flavour", "Seasoning", "Starch", "Vegetable oil"],
   });
   const summary = findSummary(output, "unknown_review");
 
-  assert.equal(summary.severity, "red");
-  assert.equal(summary.redReasonType, "count_overload");
+  assert.equal(summary.severity, "yellow");
+  assert.equal(summary.redReasonType, undefined);
 });
 
 test("Cancer-linked Watch stays yellow with one yellow watch item", () => {
@@ -130,14 +158,24 @@ test("Cancer-linked Watch stays yellow with one yellow watch item", () => {
   assert.equal(summary.severity, "yellow");
 });
 
-test("Cancer-linked Watch becomes red with two yellow watch items", () => {
+test("Cancer-linked Watch stays yellow with two yellow watch items for MVP", () => {
   const output = runRules({
     ingredients: ["BHA", "Sodium nitrite"],
   });
   const summary = findSummary(output, "cancer_linked_watch");
 
+  assert.equal(summary.severity, "yellow");
+  assert.equal(summary.redReasonType, undefined);
+});
+
+test("Cancer-linked Watch becomes red from a direct red watch item", () => {
+  const output = runRules({
+    ingredients: ["Red No. 3"],
+  });
+  const summary = findSummary(output, "cancer_linked_watch");
+
   assert.equal(summary.severity, "red");
-  assert.equal(summary.redReasonType, "count_overload");
+  assert.equal(summary.redReasonType, "direct_red_ingredient");
 });
 
 test("natural positive ingredients do not cancel additive warnings", () => {
@@ -161,9 +199,11 @@ test("ultra-processed indicators use simple green yellow red display labels", ()
   const redOutput = runRules({
     ingredients: [
       "Maltodextrin",
+      "Corn syrup solids",
       "Modified starch",
       "Soy protein isolate",
-      "Natural flavour",
+      "Hydrolyzed vegetable protein",
+      "Soy lecithin",
     ],
   });
   const greenSummary = findSummary(greenOutput, "ultra_processed_indicators");

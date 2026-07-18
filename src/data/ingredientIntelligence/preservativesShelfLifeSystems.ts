@@ -1248,12 +1248,12 @@ export const preservativesShelfLifeSystemsDataPack = {
       display: "No",
       scoreImpact: 0,
     },
-    oneToTwoPreservatives: {
+    oneToThreePreservatives: {
       severity: "yellow",
       display: "yellow_count_badge",
       scoreImpact: 6,
     },
-    threeOrMorePreservatives: {
+    fourOrMorePreservatives: {
       severity: "red",
       display: "red_count_badge",
       scoreImpact: 22,

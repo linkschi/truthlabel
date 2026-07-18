@@ -14,7 +14,7 @@ export type MeatSpecificConcernsItem = {
   regionalNames: string[];
   linkedExistingPackIds: string[];
   categoryTags: MeatSpecificConcernsCategoryTag[];
-  basicSeveritySuggestion: "yellow";
+  basicSeveritySuggestion: "green" | "yellow";
   reason: string;
   userFacingReason: string;
   dataStatus: "starter";
@@ -717,7 +717,7 @@ export const meatSpecificConcernsDataPack = {
       regionalNames: [],
       linkedExistingPackIds: [],
       categoryTags: ["meat_specific_concerns"],
-      basicSeveritySuggestion: "yellow",
+      basicSeveritySuggestion: "green",
       reason:
         "Feed or source claim that may help transparency but should not be treated as a medical claim.",
       userFacingReason:
@@ -751,7 +751,7 @@ export const meatSpecificConcernsDataPack = {
       regionalNames: [],
       linkedExistingPackIds: [],
       categoryTags: ["meat_specific_concerns"],
-      basicSeveritySuggestion: "yellow",
+      basicSeveritySuggestion: "green",
       reason:
         "Feed or source claim relevant to meat-source transparency.",
       userFacingReason:
@@ -788,7 +788,7 @@ export const meatSpecificConcernsDataPack = {
       regionalNames: [],
       linkedExistingPackIds: [],
       categoryTags: ["meat_specific_concerns"],
-      basicSeveritySuggestion: "yellow",
+      basicSeveritySuggestion: "green",
       reason:
         "Animal-raising claim that may be relevant to transparency but should not be treated as proof of health.",
       userFacingReason:
@@ -869,11 +869,11 @@ export const meatSpecificConcernsDataPack = {
         "artificial_engineered_food_construction:cultivated_cell_cultured_protein_markers",
       ],
       categoryTags: ["meat_specific_concerns"],
-      basicSeveritySuggestion: "yellow",
+      basicSeveritySuggestion: "green",
       reason:
-        "Engineered or novel meat-production marker.",
+        "Novel meat-production transparency marker. This is informational by default and should not be treated as an automatic harm signal.",
       userFacingReason:
-        "This product appears to use cultivated or cell-cultured meat wording. Truthlabel flags this as an engineered food-construction and transparency review item.",
+        "This product appears to use cultivated or cell-cultured meat wording. Truthlabel records this as meat-source and production-method transparency information.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
@@ -925,4 +925,3 @@ export const meatSpecificConcernsDataPack = {
 export type MeatSpecificConcernsDataPack = typeof meatSpecificConcernsDataPack;
 export type MeatSpecificConcernsDataPackItem =
   (typeof meatSpecificConcernsDataPack.items)[number];
-

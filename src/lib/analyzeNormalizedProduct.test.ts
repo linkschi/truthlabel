@@ -122,6 +122,10 @@ test("real product analysis turns three flavour systems into a red load check", 
           name: "Natural flavour",
           text: "Natural flavour",
         },
+        {
+          name: "Disodium guanylate",
+          text: "Disodium guanylate",
+        },
       ],
       nutrients: [],
       allergens: [],
@@ -203,7 +207,7 @@ test("real product analysis flags one processed oil as yellow", () => {
   assert.ok(result.watchListHits.includes("Processed oils"));
 });
 
-test("real product analysis turns two processed oils into a red load check", () => {
+test("real product analysis turns three processed oils into a red load check", () => {
   const result = analyzeNormalizedProduct(
     {
       barcode: "10007",
@@ -217,6 +221,10 @@ test("real product analysis turns two processed oils into a red load check", () 
         {
           name: "Soybean oil",
           text: "Soybean oil",
+        },
+        {
+          name: "Sunflower oil",
+          text: "Sunflower oil",
         },
       ],
       nutrients: [],
@@ -235,7 +243,7 @@ test("real product analysis turns two processed oils into a red load check", () 
   assert.ok(!result.immediateWarnings.some((item) => item.id === "real-restricted-item"));
 });
 
-test("real product analysis treats hydrogenated oil as a red processed-oil concern", () => {
+test("real product analysis treats hydrogenated oil as a yellow processed-oil review", () => {
   const result = analyzeNormalizedProduct(
     {
       barcode: "10008",
@@ -258,16 +266,16 @@ test("real product analysis treats hydrogenated oil as a red processed-oil conce
   const ingredient = result.ingredients[0];
   const scanCheck = result.scanChecks.find((item) => item.id === "scan-processed-oils");
 
-  assert.equal(ingredient.level, "red");
+  assert.equal(ingredient.level, "yellow");
   assert.equal(ingredient.rowStatusLabel, "Hydrogenated");
   assert.ok(ingredient.badges.includes("HYDROGENATED OIL FOUND"));
-  assert.equal(scanCheck?.tone, "red");
+  assert.equal(scanCheck?.tone, "yellow");
   assert.equal(scanCheck?.status, "Hydrogenated found");
-  assert.ok(result.summary.reasons.includes("Hydrogenated processed fat"));
-  assert.ok(result.immediateWarnings.some((item) => item.id === "real-hydrogenated-oil"));
+  assert.ok(!result.summary.reasons.includes("Hydrogenated processed fat"));
+  assert.ok(!result.immediateWarnings.some((item) => item.id === "real-hydrogenated-oil"));
 });
 
-test("real product analysis treats fully hydrogenated oil as a red processed-fat marker", () => {
+test("real product analysis treats fully hydrogenated oil as a yellow processed-fat review", () => {
   const result = analyzeNormalizedProduct(
     {
       barcode: "10009",
@@ -292,11 +300,11 @@ test("real product analysis treats fully hydrogenated oil as a red processed-fat
     (item) => item.id === "scan-hydrogenated-oils",
   );
 
-  assert.equal(ingredient.level, "red");
+  assert.equal(ingredient.level, "yellow");
   assert.equal(ingredient.rowStatusLabel, "Hydrogenated");
   assert.ok(ingredient.badges.includes("FULLY HYDROGENATED OIL FOUND"));
-  assert.equal(hydrogenatedCheck?.tone, "red");
-  assert.equal(hydrogenatedCheck?.status, "Found");
+  assert.equal(hydrogenatedCheck?.tone, "yellow");
+  assert.equal(hydrogenatedCheck?.status, "Review");
 });
 
 test("real product analysis treats partially hydrogenated oil as PHO regulatory red", () => {
@@ -418,7 +426,7 @@ test("real product analysis flags one ultra-processed marker as yellow", () => {
   assert.equal(scanCheck?.status, "1");
 });
 
-test("real product analysis turns four ultra-processed markers into a red load check", () => {
+test("real product analysis turns six ultra-processed markers into a red load check", () => {
   const result = analyzeNormalizedProduct(
     {
       barcode: "10014",
@@ -430,12 +438,20 @@ test("real product analysis turns four ultra-processed markers into a red load c
           text: "Maltodextrin",
         },
         {
+          name: "Corn syrup solids",
+          text: "Corn syrup solids",
+        },
+        {
           name: "Modified corn starch",
           text: "Modified corn starch",
         },
         {
-          name: "Artificial flavour",
-          text: "Artificial flavour",
+          name: "Soy protein isolate",
+          text: "Soy protein isolate",
+        },
+        {
+          name: "Hydrolyzed vegetable protein",
+          text: "Hydrolyzed vegetable protein",
         },
         {
           name: "Soy lecithin",

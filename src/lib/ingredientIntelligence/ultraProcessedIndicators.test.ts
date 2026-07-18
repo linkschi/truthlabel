@@ -23,24 +23,24 @@ test("ultra-processed indicator matching deduplicates name and code hits", () =>
   assert.deepEqual(matches.map((item) => item.id), ["flavour_enhancers"]);
 });
 
-test("ultra-processed indicator summary stays yellow for one to three markers", () => {
+test("ultra-processed indicator summary stays yellow for one to five markers", () => {
   const matches = findUltraProcessedIndicatorMatches(
-    "Maltodextrin, modified corn starch, artificial flavour",
+    "Maltodextrin, modified corn starch, artificial flavour, soy lecithin, xanthan gum",
   );
   const summary = summarizeUltraProcessedIndicatorMatches(matches);
 
-  assert.equal(summary.totalCount, 3);
+  assert.equal(summary.totalCount, 5);
   assert.equal(summary.categorySeverity, "yellow");
   assert.equal(summary.hasAutomaticRed, false);
 });
 
-test("ultra-processed indicator summary becomes red for four markers", () => {
+test("ultra-processed indicator summary becomes red for six markers", () => {
   const matches = findUltraProcessedIndicatorMatches(
-    "Maltodextrin, modified corn starch, artificial flavour, soy lecithin",
+    "Maltodextrin, modified corn starch, artificial flavour, soy lecithin, xanthan gum, protein isolate",
   );
   const summary = summarizeUltraProcessedIndicatorMatches(matches);
 
-  assert.equal(summary.totalCount, 4);
+  assert.equal(summary.totalCount, 6);
   assert.equal(summary.categorySeverity, "red");
   assert.equal(summary.hasAutomaticRed, false);
 });

@@ -48,22 +48,22 @@ test("flavour system summary stays green when no markers are found", () => {
   assert.equal(summary.hasAutomaticRed, false);
 });
 
-test("flavour system summary stays yellow for one or two systems", () => {
-  const matches = findFlavourSystemMatches("Yeast extract, natural flavour");
+test("flavour system summary stays yellow for one to three systems", () => {
+  const matches = findFlavourSystemMatches("Yeast extract, natural flavour, MSG");
   const summary = summarizeFlavourSystemMatches(matches);
 
-  assert.equal(summary.totalCount, 2);
+  assert.equal(summary.totalCount, 3);
   assert.equal(summary.categorySeverity, "yellow");
   assert.equal(summary.hasAutomaticRed, false);
 });
 
-test("flavour system summary becomes red for three flavour systems", () => {
+test("flavour system summary becomes red for four flavour systems", () => {
   const matches = findFlavourSystemMatches(
-    "Monosodium glutamate, yeast extract, natural flavour",
+    "Monosodium glutamate, yeast extract, natural flavour, disodium guanylate",
   );
   const summary = summarizeFlavourSystemMatches(matches);
 
-  assert.equal(summary.totalCount, 3);
+  assert.equal(summary.totalCount, 4);
   assert.equal(summary.categorySeverity, "red");
   assert.equal(summary.hasAutomaticRed, false);
 });

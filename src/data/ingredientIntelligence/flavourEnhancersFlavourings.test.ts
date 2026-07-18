@@ -25,19 +25,19 @@ test("flavourEnhancersFlavouringsDataPack uses the green yellow red flavour-syst
     display: "No",
     scoreImpact: 0,
   });
-  assert.deepEqual(categoryScoringRules.oneToTwoFlavourSystems, {
+  assert.deepEqual(categoryScoringRules.oneToThreeFlavourSystems, {
     severity: "yellow",
     display: "yellow_count_badge",
     scoreImpact: 8,
     reason:
-      "Product contains added flavourings, flavour enhancers, or taste-building systems.",
+      "Product contains added flavorings, flavor enhancers, or taste-building systems.",
   });
-  assert.deepEqual(categoryScoringRules.threeOrMoreFlavourSystems, {
+  assert.deepEqual(categoryScoringRules.fourOrMoreFlavourSystems, {
     severity: "red",
     display: "red_count_badge",
     scoreImpact: 22,
     reason:
-      "Product contains multiple flavouring or flavour-enhancing systems. Truthlabel treats this as a high flavour-system load.",
+      "Product contains multiple flavoring or flavor-enhancing systems. Truthlabel treats this as a high flavor-system load.",
   });
   assert.deepEqual(categoryScoringRules.anyBannedRestrictedFlavouring, {
     severity: "red",
@@ -53,11 +53,11 @@ test("flavourEnhancersFlavouringsDataPack uses the green yellow red flavour-syst
   });
   assert.equal(
     finalVerdictRules.redLoad,
-    "This product contains multiple flavouring or flavour-enhancing systems. Truthlabel flags this as a high flavour-system load.",
+    "This product contains multiple flavoring or flavor-enhancing systems. Truthlabel flags this as a high flavor-system load.",
   );
   assert.equal(
     finalVerdictRules.redRestricted,
-    "This product contains a banned or restricted flavouring ingredient. Truthlabel flags this as a serious regulatory concern.",
+    "This product contains a banned or restricted flavoring ingredient. Truthlabel flags this as a serious regulatory concern.",
   );
 });
 

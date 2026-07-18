@@ -12,14 +12,24 @@ test("meatSpecificConcernsDataPack stores the requested starter dataset", () => 
   assert.equal(meatSpecificConcernsDataPack.items.length, 20);
 });
 
-test("meatSpecificConcernsDataPack keeps all starter severities yellow", () => {
+test("meatSpecificConcernsDataPack keeps revised green and yellow severities", () => {
   const severities = new Set(
     meatSpecificConcernsDataPack.items.map(
       (item) => item.basicSeveritySuggestion,
     ),
   );
+  const greenIds = meatSpecificConcernsDataPack.items
+    .filter((item) => item.basicSeveritySuggestion === "green")
+    .map((item) => item.id)
+    .sort();
 
-  assert.deepEqual([...severities], ["yellow"]);
+  assert.deepEqual([...severities].sort(), ["green", "yellow"]);
+  assert.deepEqual(greenIds, [
+    "cultivated_cell_cultured_meat_marker",
+    "feed_source_grain_corn_soy_fed",
+    "feed_source_grass_fed",
+    "no_antibiotics_hormones_claim",
+  ]);
 });
 
 test("meatSpecificConcernsDataPack keeps meat-specific item metadata", () => {

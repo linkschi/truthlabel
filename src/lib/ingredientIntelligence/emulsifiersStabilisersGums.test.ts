@@ -23,22 +23,22 @@ test("texture additive summary stays green when no markers are found", () => {
   assert.equal(summary.hasAutomaticRed, false);
 });
 
-test("texture additive summary stays yellow for one or two additives", () => {
-  const matches = findTextureAdditiveMatches("Xanthan gum, guar gum");
+test("texture additive summary stays yellow for one to three additives", () => {
+  const matches = findTextureAdditiveMatches("Xanthan gum, guar gum, carrageenan");
   const summary = summarizeTextureAdditiveMatches(matches);
 
-  assert.equal(summary.totalCount, 2);
+  assert.equal(summary.totalCount, 3);
   assert.equal(summary.categorySeverity, "yellow");
   assert.equal(summary.hasAutomaticRed, false);
 });
 
-test("texture additive summary becomes red for three texture additives", () => {
+test("texture additive summary becomes red for four texture additives", () => {
   const matches = findTextureAdditiveMatches(
-    "Mono- and diglycerides, xanthan gum, carrageenan",
+    "Mono- and diglycerides, xanthan gum, carrageenan, guar gum",
   );
   const summary = summarizeTextureAdditiveMatches(matches);
 
-  assert.equal(summary.totalCount, 3);
+  assert.equal(summary.totalCount, 4);
   assert.equal(summary.categorySeverity, "red");
   assert.equal(summary.hasAutomaticRed, false);
 });

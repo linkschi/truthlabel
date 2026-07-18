@@ -167,21 +167,22 @@ const riskBandConfig: Array<{
 ];
 
 const directReasonRank: Record<RedReasonType, number> = {
-  allergy_profile_match: 0,
-  verified_external_signal: 1,
+  verified_external_signal: 0,
+  allergy_profile_match: 1,
   banned_restricted: 2,
   direct_red_ingredient: 3,
-  count_overload: 4,
-  category_combo_trigger: 5,
+  category_combo_trigger: 4,
+  count_overload: 5,
   high_processed_share: 6,
   long_ingredient_list: 7,
 };
 
 const mainReasonPriority: Record<string, number> = {
-  allergy_profile_match: 1,
-  active_official_recall: 2,
-  banned_restricted_items: 3,
-  verified_external_signal: 4,
+  active_official_recall: 1,
+  verified_external_signal: 2,
+  allergy_profile_match: 3,
+  banned_restricted_items: 4,
+  banned_restricted: 4,
   hydrogenated_partially_hydrogenated_oils: 5,
   red_cancer_linked_watch: 6,
   red_harmful_additive: 7,
@@ -260,7 +261,12 @@ const heavyMetalsRedIds = new Set(
 );
 
 const microplasticsRedIds = new Set(
-  microplasticsDataPack.items
+  (
+    microplasticsDataPack.items as readonly {
+      id: string;
+      basicSeveritySuggestion: "yellow" | "red";
+    }[]
+  )
     .filter((item) => item.basicSeveritySuggestion === "red")
     .map((item) => item.id),
 );
@@ -434,11 +440,11 @@ function buildDirectScoreCandidates(
       candidates.push({
         scoreEntityId: match.canonicalIngredientId,
         categoryId: "hydrogenated_partially_hydrogenated_oils",
-        categoryName: "Hydrogenated / Partially Hydrogenated Oils",
+        categoryName: "Hydrogenated & Partially Hydrogenated Fats",
         points: 35,
         reasonType: "direct_red_ingredient",
         message:
-          "Hydrogenated or partially hydrogenated oil was found, which adds a serious processed-fat score.",
+          "Partially hydrogenated oil or a positive trans-fat marker was found, which adds a serious processed-fat score.",
         matchedItem: match,
       });
     }
@@ -450,11 +456,11 @@ function buildDirectScoreCandidates(
       candidates.push({
         scoreEntityId: match.canonicalIngredientId,
         categoryId: "cancer_linked_watch",
-        categoryName: "Cancer-linked Watch",
+        categoryName: "Cancer-Related Concerns",
         points: 30,
         reasonType: "direct_red_ingredient",
         message:
-          "A red Cancer-linked Watch item was found, which adds a serious review score.",
+          "A red cancer-related concern item was found, which adds a serious review score.",
         matchedItem: match,
       });
     }
@@ -466,7 +472,7 @@ function buildDirectScoreCandidates(
       candidates.push({
         scoreEntityId: match.canonicalIngredientId,
         categoryId: "harmful_additives",
-        categoryName: "Harmful Additives",
+        categoryName: "Additive Load",
         points: 25,
         reasonType: "direct_red_ingredient",
         message:
@@ -498,7 +504,7 @@ function buildDirectScoreCandidates(
       candidates.push({
         scoreEntityId: match.canonicalIngredientId,
         categoryId: "preservatives_shelf_life_systems",
-        categoryName: "Preservatives & Shelf-Life Systems",
+        categoryName: "Preservatives",
         points: 25,
         reasonType: "direct_red_ingredient",
         message:
@@ -680,16 +686,17 @@ function getFloorRules(categorySummaries: IngredientCategorySummary[]) {
   if (
     redSummaries.some(
       (summary) =>
-        summary.categoryId === "hydrogenated_partially_hydrogenated_oils",
+        summary.categoryId === "hydrogenated_partially_hydrogenated_oils" &&
+        summary.redReasonType === "direct_red_ingredient",
     )
   ) {
     rules.push({
       id: "hydrogenated_oil_floor",
       minimumScore: 80,
       reasonType: "direct_red_ingredient",
-      label: "Hydrogenated oil floor",
+      label: "Partially hydrogenated oil floor",
       message:
-        "Hydrogenated or partially hydrogenated oil was found, so the score must be at least 80.",
+        "Partially hydrogenated oil or a positive trans-fat marker was found, so the score must be at least 80.",
     });
   }
 

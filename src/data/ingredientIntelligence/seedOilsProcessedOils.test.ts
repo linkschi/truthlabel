@@ -29,7 +29,7 @@ test("seedOilsProcessedOilsDataPack uses the green yellow red oil thresholds", (
     reason:
       "Product contains a seed oil, processed oil, frying oil, refined oil, shortening, or processed fat marker.",
   });
-  assert.deepEqual(categoryScoringRules.twoOrMoreSeedOrProcessedOils, {
+  assert.deepEqual(categoryScoringRules.threeOrMoreSeedOrProcessedOils, {
     severity: "red",
     display: "red_count_badge",
     scoreImpact: 18,

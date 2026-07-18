@@ -2,7 +2,7 @@ export const hydrogenatedPartiallyHydrogenatedOilsDataPack = {
   id: "hydrogenated_partially_hydrogenated_oils",
   categoryName: "Hydrogenated / Partially Hydrogenated Oils",
   categoryMeaning:
-    "This category detects hydrogenated oils, partially hydrogenated oils, hydrogenated vegetable fats, shortenings, margarines, and trans-fat markers. Truthlabel flags these because they show the product uses chemically modified fat systems rather than simple whole-food fats.",
+    "This category detects hydrogenated oils, partially hydrogenated oils, hydrogenated vegetable fats, shortenings, margarines, and trans-fat markers. Truthlabel flags generic hydrogenated fats as processed-fat review markers, while partially hydrogenated oils and positive trans-fat markers remain serious red signals.",
   dataStatus: "starter_verified_core",
   defaultCategorySeverity: "red",
 
@@ -304,16 +304,16 @@ export const hydrogenatedPartiallyHydrogenatedOilsDataPack = {
       ],
       spellingVariants: ["Hydrogenated"],
       regionalNames: [],
-      severity: "red",
+      severity: "yellow",
       reason:
-        "Hydrogenated oils are chemically modified fat systems. Truthlabel treats them as serious processed-fat markers, but not automatically as banned unless partially hydrogenated or region-specific rules apply.",
+        "Hydrogenated oils are chemically modified fat systems. Truthlabel treats them as processed-fat review markers, but not automatic red unless partially hydrogenated, banned/restricted, recalled, or escalated by category rules.",
       healthConcernType: "hydrogenated_processed_fat",
       warningLabel: "HYDROGENATED OIL FOUND",
       userFacingReason:
-        "This product contains hydrogenated oil or fat. Truthlabel flags this as a serious processed-fat marker because the oil has been chemically hardened or modified.",
+        "This product contains hydrogenated oil or fat. Truthlabel flags this as a processed-fat review marker because the oil has been chemically hardened or modified.",
       matchingNotes:
         "Match hydrogenated oil, hydrogenated vegetable oil, hydrogenated fat, hydrogenated vegetable fat, and HVO. If the phrase says partially hydrogenated, use the PHO red rule.",
-      scoringImpact: "red_processed_fat",
+      scoringImpact: "yellow_processed_fat_review",
       dataStatus: "starter",
     },
 
@@ -356,16 +356,16 @@ export const hydrogenatedPartiallyHydrogenatedOilsDataPack = {
         "Fully hydrogenated",
       ],
       regionalNames: [],
-      severity: "red",
+      severity: "yellow",
       reason:
-        "Fully hydrogenated oils are chemically hardened fat systems. Truthlabel flags them red as a serious processed-fat marker, but they should not be described as PHOs unless the label says partially hydrogenated.",
+        "Fully hydrogenated oils are chemically hardened fat systems. Truthlabel flags them as processed-fat review markers, but they should not be treated like PHOs unless the label says partially hydrogenated.",
       healthConcernType: "fully_hydrogenated_processed_fat",
       warningLabel: "FULLY HYDROGENATED OIL FOUND",
       userFacingReason:
-        "This product contains fully hydrogenated oil or fat. Truthlabel flags this as a serious processed-fat marker because the oil has been chemically hardened or modified.",
+        "This product contains fully hydrogenated oil or fat. Truthlabel flags this as a processed-fat review marker because the oil has been chemically hardened or modified.",
       matchingNotes:
         "Match fully hydrogenated oil, fully hydrogenated vegetable oil, fully hydrogenated fat, fully hydrogenated soybean/soya/canola/rapeseed/cottonseed/palm/palm kernel/coconut/sunflower oil, and FHVO. Do not call it partially hydrogenated unless the label says partially.",
-      scoringImpact: "red_processed_fat",
+      scoringImpact: "yellow_processed_fat_review",
       dataStatus: "starter",
     },
 
@@ -401,16 +401,16 @@ export const hydrogenatedPartiallyHydrogenatedOilsDataPack = {
         "Partially hydrogenated",
       ],
       regionalNames: [],
-      severity: "red",
+      severity: "yellow",
       reason:
-        "Hydrogenated or partially hydrogenated shortening is a serious processed-fat marker. If partially hydrogenated, it should trigger the PHO red rule.",
+        "Hydrogenated shortening is a processed-fat review marker. If the label says partially hydrogenated, it should trigger the PHO red rule.",
       healthConcernType: "hydrogenated_shortening_processed_fat",
       warningLabel: "HYDROGENATED SHORTENING FOUND",
       userFacingReason:
-        "This product contains hydrogenated or partially hydrogenated shortening. Truthlabel flags this as red because it is a chemically modified processed-fat system.",
+        "This product contains hydrogenated shortening or a related processed-fat system. Truthlabel flags this for review; partially hydrogenated shortening remains a red PHO concern.",
       matchingNotes:
         "Match hydrogenated shortening, partially hydrogenated shortening, hydrogenated vegetable shortening, and partially hydrogenated vegetable shortening. If partially hydrogenated appears, classify under PHO automatic red.",
-      scoringImpact: "automatic_red_if_partially_hydrogenated_else_red_processed_fat",
+      scoringImpact: "automatic_red_if_partially_hydrogenated_else_yellow_review",
       dataStatus: "starter",
     },
 
@@ -446,16 +446,16 @@ export const hydrogenatedPartiallyHydrogenatedOilsDataPack = {
         "Partially hydrogenated",
       ],
       regionalNames: [],
-      severity: "red",
+      severity: "yellow",
       reason:
-        "Hydrogenated or partially hydrogenated spreads are chemically modified fat systems. If partially hydrogenated, they should trigger the PHO red rule.",
+        "Hydrogenated spreads are chemically modified fat systems. If the label says partially hydrogenated, they should trigger the PHO red rule.",
       healthConcernType: "hydrogenated_spread_processed_fat",
       warningLabel: "HYDROGENATED FAT SPREAD FOUND",
       userFacingReason:
-        "This product contains a hydrogenated or partially hydrogenated fat spread. Truthlabel flags this as red because it is a chemically modified processed-fat system.",
+        "This product contains a hydrogenated fat spread or related processed-fat system. Truthlabel flags this for review; partially hydrogenated spreads remain a red PHO concern.",
       matchingNotes:
         "Match hydrogenated margarine, partially hydrogenated margarine, hydrogenated vegetable fat spread, and partially hydrogenated vegetable fat spread. If partially hydrogenated appears, classify under PHO automatic red.",
-      scoringImpact: "automatic_red_if_partially_hydrogenated_else_red_processed_fat",
+      scoringImpact: "automatic_red_if_partially_hydrogenated_else_yellow_review",
       dataStatus: "starter",
     },
 
@@ -519,11 +519,11 @@ export const hydrogenatedPartiallyHydrogenatedOilsDataPack = {
     },
 
     anyHydrogenatedOilFound: {
-      severity: "red",
-      display: "red_count_badge",
-      scoreImpact: 25,
+      severity: "yellow",
+      display: "yellow_count_badge",
+      scoreImpact: 12,
       reason:
-        "Product contains hydrogenated oil or hydrogenated fat, which Truthlabel treats as a serious processed-fat marker.",
+        "Product contains hydrogenated oil or hydrogenated fat, which Truthlabel treats as a processed-fat review marker.",
     },
 
     anyPartiallyHydrogenatedOilFound: {
@@ -545,7 +545,7 @@ export const hydrogenatedPartiallyHydrogenatedOilsDataPack = {
 
   finalVerdictRules: {
     redHydrogenated:
-      "This product contains hydrogenated oil or fat. Truthlabel flags this as a serious processed-fat marker because the oil has been chemically hardened or modified.",
+      "This product contains hydrogenated oil or fat. Truthlabel flags this as a processed-fat review marker because the oil has been chemically hardened or modified.",
 
     redPartiallyHydrogenated:
       "This product contains partially hydrogenated oil. Truthlabel flags this as red immediately because partially hydrogenated oils are linked to artificial trans fat and major regulatory restrictions in some regions.",

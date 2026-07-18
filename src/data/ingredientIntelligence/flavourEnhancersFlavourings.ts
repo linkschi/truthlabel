@@ -1199,19 +1199,19 @@ export const flavourEnhancersFlavouringsDataPack = {
       display: "No",
       scoreImpact: 0
     },
-    oneToTwoFlavourSystems: {
+    oneToThreeFlavourSystems: {
       severity: "yellow",
       display: "yellow_count_badge",
       scoreImpact: 8,
       reason:
-        "Product contains added flavourings, flavour enhancers, or taste-building systems."
+        "Product contains added flavorings, flavor enhancers, or taste-building systems."
     },
-    threeOrMoreFlavourSystems: {
+    fourOrMoreFlavourSystems: {
       severity: "red",
       display: "red_count_badge",
       scoreImpact: 22,
       reason:
-        "Product contains multiple flavouring or flavour-enhancing systems. Truthlabel treats this as a high flavour-system load."
+        "Product contains multiple flavoring or flavor-enhancing systems. Truthlabel treats this as a high flavor-system load."
     },
     anyBannedRestrictedFlavouring: {
       severity: "red",
@@ -1230,11 +1230,11 @@ export const flavourEnhancersFlavouringsDataPack = {
 
   finalVerdictRules: {
     yellow:
-      "This product contains flavourings or flavour enhancers. Truthlabel flags this because the product's taste may be built or boosted with added flavour systems.",
+      "This product contains flavorings or flavor enhancers. Truthlabel flags this because the product's taste may be built or boosted with added flavor systems.",
     redLoad:
-      "This product contains multiple flavouring or flavour-enhancing systems. Truthlabel flags this as a high flavour-system load.",
+      "This product contains multiple flavoring or flavor-enhancing systems. Truthlabel flags this as a high flavor-system load.",
     redRestricted:
-      "This product contains a banned or restricted flavouring ingredient. Truthlabel flags this as a serious regulatory concern."
+      "This product contains a banned or restricted flavoring ingredient. Truthlabel flags this as a serious regulatory concern."
   },
 
   matchingNormalizationRules: [

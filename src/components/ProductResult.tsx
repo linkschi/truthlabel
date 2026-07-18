@@ -1034,7 +1034,7 @@ function getFinalWarningReasonLabel(reason: ScanResult["finalVerdict"]["mainReas
   }
 
   if (reason.categoryId === "cancer_linked_watch") {
-    return "Cancer-linked Watch review signal found";
+    return "Cancer-related review signal found";
   }
 
   if (reason.categoryId === "ultra_processed_indicators") {
@@ -1099,7 +1099,7 @@ function getFinalVerdictClosing(scanResult: ScanResult) {
   }
 
   if (categoryIds.has("cancer_linked_watch")) {
-    return "Truthlabel flags this for review because cancer-watch or regulatory concern signals were found. This is not proof that the product causes cancer.";
+    return "Truthlabel flags this for review because cancer-related or regulatory concern signals were found. This is not proof of harm from one product.";
   }
 
   if (scanResult.finalVerdict.verdictTone === "red") {
@@ -1193,63 +1193,6 @@ function IngredientChip({
   );
 }
 
-function formatRegionList(regions: string[]) {
-  if (regions.length === 0) {
-    return "at least one region";
-  }
-
-  if (regions.length === 1) {
-    return regions[0];
-  }
-
-  if (regions.length === 2) {
-    return `${regions[0]} and ${regions[1]}`;
-  }
-
-  return `${regions.slice(0, -1).join(", ")}, and ${regions.at(-1)}`;
-}
-
-function formatCompactRegionList(regions: string[]) {
-  if (regions.length <= 3) {
-    return formatRegionList(regions);
-  }
-
-  return `multiple regions including ${formatRegionList(regions.slice(0, 3))}`;
-}
-
-function getDeepCheckReasonText(item: ScanResultDeepExposureCheck) {
-  if (item.status === "not_checked") {
-    return "Missing data is not proof of absence.";
-  }
-
-  if (item.categoryId !== "banned_restricted_items") {
-    return item.shortMessage;
-  }
-
-  const matchedNames = uniqueLabels(
-    item.matchedItemDetails.map((detail) => detail.displayName),
-  );
-  const regions = uniqueLabels(
-    item.matchedItemDetails.flatMap((detail) => detail.restrictionRegions),
-  );
-  const reasons = uniqueLabels(
-    item.matchedItemDetails.flatMap((detail) => detail.restrictionReasons),
-  );
-  const regionText = formatCompactRegionList(regions);
-
-  if (matchedNames.length > 1) {
-    return `This product was flagged because it contains multiple banned or restricted items. These items are banned, restricted, revoked, or not permitted in ${regionText}. Truthlabel treats this as a serious regulatory and safety concern based on available database signals.`;
-  }
-
-  const itemText = matchedNames[0] ?? "a banned or restricted item";
-
-  if (reasons.length === 1) {
-    return `This product was flagged because it contains ${itemText}, which is banned, restricted, revoked, or not permitted in ${regionText}. Reason: ${reasons[0]}`;
-  }
-
-  return `This product was flagged because it contains ${itemText}, which is banned, restricted, revoked, or not permitted in ${regionText}. Truthlabel treats this as a serious regulatory and safety concern based on available database signals.`;
-}
-
 function DeepCheckRow({
   item,
   isExpanded,
@@ -1263,7 +1206,6 @@ function DeepCheckRow({
   const badges = getDeepCheckStatusBadges(item);
   const detailId = `deep-check-detail-${item.categoryId}`;
   const isBannedRestrictedRow = item.categoryId === "banned_restricted_items";
-  const reasonText = getDeepCheckReasonText(item);
   const matchedItems = uniqueLabels(
     item.matchedItemDetails.map((detail) => detail.displayName),
   ).slice(0, 6);
@@ -1330,13 +1272,24 @@ function DeepCheckRow({
                 </div>
               ) : null}
 
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--text-secondary)]">
-                  Reason
+              <div className="rounded-[17px] border border-white/70 bg-white/70 px-3 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${chipToneClasses[tone]}`}>
+                    Reason: {item.reason}
+                  </span>
+                  <p className="text-[13px] font-semibold leading-5 text-[var(--text-main)]">
+                    {item.title}
+                  </p>
+                </div>
+                <p className="mt-2 text-[12px] leading-5 text-[var(--text-main)]">
+                  {item.message}
                 </p>
-                <p className="mt-1.5 text-[12px] leading-5 text-[var(--text-main)]">
-                  {reasonText}
-                </p>
+                {item.action ? (
+                  <p className="mt-2 rounded-[14px] border border-[var(--border-soft)] bg-[var(--bg-surface)] px-3 py-2 text-[12px] leading-5 text-[var(--text-secondary)]">
+                    <span className="font-semibold text-[var(--text-main)]">Action: </span>
+                    {item.action}
+                  </p>
+                ) : null}
               </div>
 
               <div className="mt-3 rounded-[16px] border border-white/70 bg-white/62 px-3 py-2.5">

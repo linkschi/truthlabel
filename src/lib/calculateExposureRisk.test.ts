@@ -57,9 +57,14 @@ test("one yellow preservative lands in the yellow review band", () => {
   assert.equal(result.verdictTone, "yellow");
 });
 
-test("three preservatives force a red score of at least 65", () => {
+test("four preservatives force a red score of at least 65", () => {
   const result = runExposureRisk({
-    ingredients: ["Sodium benzoate", "Potassium sorbate", "Calcium propionate"],
+    ingredients: [
+      "Sodium benzoate",
+      "Potassium sorbate",
+      "Calcium propionate",
+      "Sodium nitrite",
+    ],
   });
 
   assert.ok(result.exposureRisk >= 65);
@@ -85,7 +90,7 @@ test("an allergy-profile match forces the score to at least 90", () => {
   assert.equal(result.verdictLabel, "Strong Warning");
 });
 
-test("a hydrogenated oil forces the score to at least 80", () => {
+test("a partially hydrogenated oil forces the score to at least 80", () => {
   const result = runExposureRisk({
     ingredients: ["Partially hydrogenated soybean oil"],
   });
@@ -207,15 +212,15 @@ test("a microplastic packaging marker only stays yellow and not red", () => {
   assert.equal(result.verdictTone, "yellow");
 });
 
-test("a verified microplastic signal forces the score to at least 85", () => {
+test("microplastic detection wording stays yellow without official red evidence", () => {
   const result = runExposureRisk({
     ingredients: [],
     ingredientListAvailable: false,
     externalSignals: ["Verified microplastics detected in the product sample"],
   });
 
-  assert.ok(result.exposureRisk >= 85);
-  assert.equal(result.verdictLabel, "Strong Warning");
+  assert.ok(result.exposureRisk >= 25 && result.exposureRisk <= 64);
+  assert.equal(result.verdictTone, "yellow");
 });
 
 test("a long ingredient list at 15+ ingredients raises the score into red", () => {

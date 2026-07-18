@@ -1436,19 +1436,19 @@ export const emulsifiersStabilisersGumsDataPack = {
       display: "No",
       scoreImpact: 0
     },
-    oneToTwoTextureAdditives: {
+    oneToThreeTextureAdditives: {
       severity: "yellow",
       display: "yellow_count_badge",
       scoreImpact: 8,
       reason:
-        "Product contains emulsifiers, stabilisers, thickeners, gums, or texture-support ingredients."
+        "Product contains emulsifiers, stabilizers, thickeners, gums, or texture-support ingredients."
     },
-    threeOrMoreTextureAdditives: {
+    fourOrMoreTextureAdditives: {
       severity: "red",
       display: "red_count_badge",
       scoreImpact: 22,
       reason:
-        "Product contains multiple texture-engineering systems. Truthlabel treats this as a high emulsifier/stabiliser load."
+        "Product contains multiple texture-engineering systems. Truthlabel treats this as a high emulsifier/stabilizer load."
     },
     anyBannedRestrictedTextureAdditive: {
       severity: "red",
@@ -1461,9 +1461,9 @@ export const emulsifiersStabilisersGumsDataPack = {
 
   finalVerdictRules: {
     yellow:
-      "This product contains emulsifiers, stabilisers, thickeners, gums, or texture-support additives. Truthlabel flags this because the product's texture is being engineered or chemically supported.",
+      "This product contains emulsifiers, stabilizers, thickeners, gums, or texture-support additives. Truthlabel flags this because the product's texture is being engineered or chemically supported.",
     redLoad:
-      "This product contains multiple emulsifiers, stabilisers, thickeners, gums, or texture-support systems. Truthlabel flags this as a high texture-engineering load.",
+      "This product contains multiple emulsifiers, stabilizers, thickeners, gums, or texture-support systems. Truthlabel flags this as a high texture-engineering load.",
     redRestricted:
       "This product contains a banned or restricted texture additive. Truthlabel flags this as a serious regulatory concern."
   },

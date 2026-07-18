@@ -253,7 +253,7 @@ export function summarizeUltraProcessedIndicatorMatches(
     dedupedAutomaticTriggers.length > 0 || dedupedMatches.some(isRedUltraProcessedMarker);
   const totalCount = dedupedMatches.length;
   const categorySeverity =
-    hasAutomaticRed || totalCount >= 4
+    hasAutomaticRed || totalCount >= 6
       ? "red"
       : totalCount > 0
         ? "yellow"

@@ -22,13 +22,13 @@ test("ultraProcessedIndicatorsDataPack uses the requested green yellow red thres
     display: "No",
     scoreImpact: 0,
   });
-  assert.deepEqual(categoryScoringRules.oneToThreeUltraProcessedMarkers, {
+  assert.deepEqual(categoryScoringRules.oneToFiveUltraProcessedMarkers, {
     severity: "yellow",
     display: "yellow_count_badge",
     scoreImpact: 10,
     reason: "Product contains one or more ultra-processed ingredient markers.",
   });
-  assert.deepEqual(categoryScoringRules.fourOrMoreUltraProcessedMarkers, {
+  assert.deepEqual(categoryScoringRules.sixOrMoreUltraProcessedMarkers, {
     severity: "red",
     display: "red_count_badge",
     scoreImpact: 25,

@@ -44,7 +44,7 @@ export function summarizePreservativeMatches(
     redItemCount: redItems.length,
     yellowItemCount: yellowItems.length,
     categorySeverity:
-      totalCount === 0 ? "green" : hasAutomaticRed || totalCount >= 3 ? "red" : "yellow",
+      totalCount === 0 ? "green" : hasAutomaticRed || totalCount >= 4 ? "red" : "yellow",
     hasAutomaticRed,
     redItems,
     yellowItems,

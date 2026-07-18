@@ -28,13 +28,13 @@ test("preservativesShelfLifeSystemsDataPack uses the corrected green yellow red 
     display: "No",
     scoreImpact: 0,
   });
-  assert.deepEqual(categoryScoringRules.oneToTwoPreservatives, {
+  assert.deepEqual(categoryScoringRules.oneToThreePreservatives, {
     severity: "yellow",
     display: "yellow_count_badge",
     scoreImpact: 6,
   });
-  assert.equal(categoryScoringRules.threeOrMorePreservatives.severity, "red");
-  assert.equal(categoryScoringRules.threeOrMorePreservatives.display, "red_count_badge");
+  assert.equal(categoryScoringRules.fourOrMorePreservatives.severity, "red");
+  assert.equal(categoryScoringRules.fourOrMorePreservatives.display, "red_count_badge");
   assert.equal(
     finalVerdictRules.redFromLoad,
     "This product contains multiple preservative systems. Truthlabel flags this as a high shelf-life additive load.",

@@ -225,7 +225,7 @@ function buildHydrogenatedOilStatus(
     return "Trans fat found";
   }
 
-  return "Found";
+  return "Review";
 }
 
 function buildHydrogenatedOilExplanation(
@@ -235,7 +235,7 @@ function buildHydrogenatedOilExplanation(
     return "No hydrogenated or partially hydrogenated oils were found from the available ingredient list.";
   }
 
-  const names = summary.redItems.map((item) => item.mainName).join(", ");
+  const names = summary.matchedItems.map((item) => item.mainName).join(", ");
 
   if (summary.hasPartiallyHydrogenatedOil) {
     return `${names} triggered the partially hydrogenated oil regulatory concern.`;
@@ -245,7 +245,7 @@ function buildHydrogenatedOilExplanation(
     return `${names} triggered the positive trans-fat marker rule.`;
   }
 
-  return `${names} triggered the hydrogenated processed-fat marker rule.`;
+  return `${names} triggered a hydrogenated processed-fat review marker.`;
 }
 
 function buildUltraProcessedStatus(
@@ -305,7 +305,9 @@ function buildProcessedOilExplanation(
   >,
 ) {
   if (hydrogenatedSummary.totalCount > 0) {
-    const names = hydrogenatedSummary.redItems.map((item) => item.mainName).join(", ");
+    const names = hydrogenatedSummary.matchedItems
+      .map((item) => item.mainName)
+      .join(", ");
 
     if (hydrogenatedSummary.hasPartiallyHydrogenatedOil) {
       return `${names} triggered the partially hydrogenated oil rule.`;
@@ -315,7 +317,7 @@ function buildProcessedOilExplanation(
       return `${names} triggered the positive trans-fat marker rule.`;
     }
 
-    return `${names} triggered the hydrogenated processed-fat rule.`;
+    return `${names} triggered a hydrogenated processed-fat review marker.`;
   }
 
   if (summary.totalCount === 0) {
@@ -579,9 +581,15 @@ function buildRealIngredientAnalysis(
     badges.push(flavourSystem.warningLabel);
     watchListHits.add("Flavour systems");
   } else if (matchesProcessedOil) {
-    const oilMatch = hydrogenatedOilSummary.redItems[0] ?? seedOilSummary.redItems[0] ?? seedOilMatches[0];
+    const oilMatch =
+      hydrogenatedOilSummary.redItems[0] ??
+      hydrogenatedOilSummary.matchedItems[0] ??
+      seedOilSummary.redItems[0] ??
+      seedOilMatches[0];
     level = hydrogenatedOilSummary.categorySeverity === "red"
       ? "red"
+      : hydrogenatedOilSummary.totalCount > 0
+        ? "yellow"
       : seedOilSummary.categorySeverity;
     rowStatusLabel = hydrogenatedOilSummary.hasPartiallyHydrogenatedOil
       ? "PHO"
@@ -597,7 +605,7 @@ function buildRealIngredientAnalysis(
       : hydrogenatedOilSummary.hasTransFatMarker
         ? "Trans fat marker found."
         : hydrogenatedOilSummary.hasHydrogenatedOil
-          ? "Hydrogenated processed fat found."
+          ? "Hydrogenated processed-fat review marker found."
           : seedOilSummary.categorySeverity === "red"
         ? "High processed-oil load."
         : "Processed oil found.";
@@ -607,7 +615,7 @@ function buildRealIngredientAnalysis(
       : hydrogenatedOilSummary.hasTransFatMarker
         ? "This is a serious fat-quality concern. The app does not trigger this from 0g or trans-fat-free claims."
         : hydrogenatedOilSummary.hasHydrogenatedOil
-          ? "This is a serious processed-fat marker because the fat system has been chemically hardened or modified."
+          ? "This is a processed-fat review marker because the fat system has been chemically hardened or modified."
           : seedOilSummary.categorySeverity === "red"
         ? "This is a red processed-oil load concern, not a banned/restricted claim by itself."
         : "This ingredient is worth questioning if you are trying to avoid heavily processed oils.";
@@ -1327,6 +1335,8 @@ export function analyzeNormalizedProduct(
             buildProcessedOilStatus(seedOilSummary, hydrogenatedOilSummary),
             hydrogenatedOilSummary.categorySeverity === "red"
               ? "red"
+              : hydrogenatedOilSummary.totalCount > 0
+                ? "yellow"
               : seedOilSummary.categorySeverity,
             buildProcessedOilExplanation(seedOilSummary, hydrogenatedOilSummary),
           )
@@ -1343,7 +1353,7 @@ export function analyzeNormalizedProduct(
             "scan-hydrogenated-oils",
             "Hydrogenated oils",
             buildHydrogenatedOilStatus(hydrogenatedOilSummary),
-            "red",
+            hydrogenatedOilSummary.categorySeverity,
             buildHydrogenatedOilExplanation(hydrogenatedOilSummary),
           )
         : createScanCheck("scan-hydrogenated-oils", "Hydrogenated oils", "No", "green"),
@@ -1470,7 +1480,10 @@ export function analyzeNormalizedProduct(
     reasons.push("Partially hydrogenated oil");
   } else if (hydrogenatedOilSummary.hasTransFatMarker) {
     reasons.push("Trans fat marker");
-  } else if (hydrogenatedOilSummary.hasHydrogenatedOil) {
+  } else if (
+    hydrogenatedOilSummary.hasHydrogenatedOil &&
+    hydrogenatedOilSummary.categorySeverity === "red"
+  ) {
     reasons.push("Hydrogenated processed fat");
   } else if (seedOilSummary.categorySeverity === "red") {
     reasons.push("High processed-oil load");

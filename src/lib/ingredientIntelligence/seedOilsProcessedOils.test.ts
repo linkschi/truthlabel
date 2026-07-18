@@ -40,11 +40,13 @@ test("seed oil summary stays yellow for one processed oil", () => {
   assert.equal(summary.hasAutomaticRed, false);
 });
 
-test("seed oil summary becomes red for two seed or processed oils", () => {
-  const matches = findSeedOilProcessedOilMatches("Canola oil, soybean oil");
+test("seed oil summary becomes red for three seed or processed oils", () => {
+  const matches = findSeedOilProcessedOilMatches(
+    "Canola oil, soybean oil, sunflower oil",
+  );
   const summary = summarizeSeedOilProcessedOilMatches(matches);
 
-  assert.equal(summary.totalCount, 2);
+  assert.equal(summary.totalCount, 3);
   assert.equal(summary.categorySeverity, "red");
   assert.equal(summary.hasAutomaticRed, false);
 });

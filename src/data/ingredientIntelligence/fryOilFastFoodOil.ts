@@ -529,16 +529,16 @@ export const fryOilFastFoodOilDataPack = {
         "ultra_processed_indicators:hydrogenated_interesterified_fats",
       ],
       categoryTags: ["fry_oil_fast_food_oil"],
-      basicSeveritySuggestion: "red",
+      basicSeveritySuggestion: "yellow",
       reason:
-        "Hydrogenated oil marker that may indicate heavily processed fat.",
+        "Hydrogenated oil marker that may indicate processed frying fat. Red should come only from partially hydrogenated oil, banned/restricted overlap, recall, direct-risk, or overload rules.",
       userFacingReason:
-        "This product contains hydrogenated oil or fat. Truthlabel flags this as a serious processed-fat concern.",
+        "This product contains hydrogenated oil or fat. Truthlabel flags this as a processed-fat and frying-oil review item.",
       dataStatus: "starter",
       confidenceLevel: null,
       sourceRefs: [],
       matchingNotes:
-        "Use Hydrogenated Oils category for final red logic.",
+        "Use Hydrogenated Oils category for final logic. Do not make generic hydrogenated oil automatic red unless partially hydrogenated or another red rule applies.",
     },
     {
       id: "partially_hydrogenated_frying_oil_pho",
@@ -905,4 +905,3 @@ export const fryOilFastFoodOilDataPack = {
 export type FryOilFastFoodOilDataPack = typeof fryOilFastFoodOilDataPack;
 export type FryOilFastFoodOilDataPackItem =
   (typeof fryOilFastFoodOilDataPack.items)[number];
-

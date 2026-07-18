@@ -1492,7 +1492,7 @@ export const ultraProcessedIndicatorsDataPack = {
       scoreImpact: 0
     },
 
-    oneToThreeUltraProcessedMarkers: {
+    oneToFiveUltraProcessedMarkers: {
       severity: "yellow",
       display: "yellow_count_badge",
       scoreImpact: 10,
@@ -1500,7 +1500,7 @@ export const ultraProcessedIndicatorsDataPack = {
         "Product contains one or more ultra-processed ingredient markers."
     },
 
-    fourOrMoreUltraProcessedMarkers: {
+    sixOrMoreUltraProcessedMarkers: {
       severity: "red",
       display: "red_count_badge",
       scoreImpact: 25,

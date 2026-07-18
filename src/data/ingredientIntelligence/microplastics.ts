@@ -84,11 +84,11 @@ export const microplasticsDataPack = {
       detectionBasis: "external_dataset",
       linkedExistingPackIds: [],
       categoryTags: ["microplastics"],
-      basicSeveritySuggestion: "red",
+      basicSeveritySuggestion: "yellow",
       reason:
-        "Microplastic contaminant marker. Red should only trigger from verified product-specific testing, official warning, or external dataset evidence.",
+        "Microplastic contaminant review marker. Red should only trigger from an official recall, confirmed harmful contamination, or a validated threshold rule.",
       userFacingReason:
-        "This product has a verified microplastic-related testing signal. Truthlabel flags this as a serious microplastic concern based on external data.",
+        "This product has microplastic-related review wording or external-data context. Truthlabel flags this for review, not as automatic proof of elevated contamination.",
       dataStatus: "needs_external_data",
       confidenceLevel: null,
       sourceRefs: [],
@@ -126,11 +126,11 @@ export const microplasticsDataPack = {
       detectionBasis: "external_dataset",
       linkedExistingPackIds: [],
       categoryTags: ["microplastics"],
-      basicSeveritySuggestion: "red",
+      basicSeveritySuggestion: "yellow",
       reason:
-        "Nanoplastic contaminant marker. Red should only trigger from verified product-specific testing, official warning, or external dataset evidence.",
+        "Nanoplastic contaminant review marker. Red should only trigger from an official recall, confirmed harmful contamination, or a validated threshold rule.",
       userFacingReason:
-        "This product has a verified nanoplastic-related testing signal. Truthlabel flags this as a serious nanoplastic concern based on external data.",
+        "This product has nanoplastic-related review wording or external-data context. Truthlabel flags this for review, not as automatic proof of elevated contamination.",
       dataStatus: "needs_external_data",
       confidenceLevel: null,
       sourceRefs: [],
@@ -603,11 +603,11 @@ export const microplasticsDataPack = {
       detectionBasis: "official_testing_data",
       linkedExistingPackIds: [],
       categoryTags: ["microplastics"],
-      basicSeveritySuggestion: "red",
+      basicSeveritySuggestion: "yellow",
       reason:
-        "Verified detection marker from official testing or a credible external dataset.",
+        "Verified detection review marker. Red should only trigger from an official recall, confirmed harmful contamination, or a validated threshold rule.",
       userFacingReason:
-        "This product has verified microplastic detection data. Truthlabel flags this as a serious microplastic concern based on external evidence.",
+        "This product has microplastic detection context. Truthlabel flags this as a review item unless official recall, confirmed harmful contamination, or validated threshold evidence supports red.",
       dataStatus: "needs_external_data",
       confidenceLevel: null,
       sourceRefs: [],
@@ -640,11 +640,11 @@ export const microplasticsDataPack = {
       detectionBasis: "official_testing_data",
       linkedExistingPackIds: [],
       categoryTags: ["microplastics"],
-      basicSeveritySuggestion: "red",
+      basicSeveritySuggestion: "yellow",
       reason:
-        "Verified nanoplastic detection marker from official testing or a credible external dataset.",
+        "Verified nanoplastic detection review marker. Red should only trigger from an official recall, confirmed harmful contamination, or a validated threshold rule.",
       userFacingReason:
-        "This product has verified nanoplastic detection data. Truthlabel flags this as a serious nanoplastic concern based on external evidence.",
+        "This product has nanoplastic detection context. Truthlabel flags this as a review item unless official recall, confirmed harmful contamination, or validated threshold evidence supports red.",
       dataStatus: "needs_external_data",
       confidenceLevel: null,
       sourceRefs: [],
@@ -674,7 +674,7 @@ export const microplasticsDataPack = {
   classificationRules: [
     "Product category markers like bottled water, seafood, bivalves, and salt products default to yellow review when they are relevant.",
     "Packaging markers like plastic bottles, microwave-in-plastic formats, plastic tea bags, and coffee pods default to yellow review when they are relevant.",
-    "Verified elevated result, official warning, or credible external dataset can support red when the evidence is product-specific.",
+    "Verified detection or credible external dataset wording stays yellow by default unless an official recall, confirmed harmful contamination, or validated threshold rule supports red.",
     "Do not make red from packaging or category risk alone.",
     "Missing data is not proof of absence.",
   ],
@@ -689,13 +689,13 @@ export const microplasticsDataPack = {
       display: "Review",
     },
     hasVerifiedSignal: {
-      severity: "red",
-      display: "Serious concern",
+      severity: "yellow",
+      display: "Review",
     },
     notes: [
       "No marker or data = hide row or green No only if scan context supports it",
       "Product category or packaging marker only = yellow review",
-      "Verified elevated result, official warning, or credible external dataset = red",
+      "Verified detection or external dataset context = yellow review unless an official recall, confirmed harmful contamination, or validated threshold rule supports red",
       "Missing data is not proof of absence",
     ],
   },

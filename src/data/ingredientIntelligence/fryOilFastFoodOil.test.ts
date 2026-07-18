@@ -42,7 +42,7 @@ test("fryOilFastFoodOilDataPack preserves linked red-path markers", () => {
 
   assert.ok(hydrogenated);
   assert.ok(pho);
-  assert.equal(hydrogenated.basicSeveritySuggestion, "red");
+  assert.equal(hydrogenated.basicSeveritySuggestion, "yellow");
   assert.equal(pho.basicSeveritySuggestion, "red");
   assert.equal(fryOilFastFoodOilDataPack.displayRulesForLater.noMarkers.severity, "green");
   assert.equal(fryOilFastFoodOilDataPack.displayRulesForLater.hasMarkers.severity, "yellow");

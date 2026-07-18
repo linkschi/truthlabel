@@ -1,13 +1,11 @@
 import { artificialSweetenersDataPack } from "@/data/ingredientIntelligence/artificialSweetenersSugarSubstitutes";
-import {
-  artificialEngineeredFoodConstructionGroups,
-} from "@/data/ingredientIntelligence/artificialEngineeredFoodConstruction";
 import { brandTrustSafetyRecallsLawsuitsDataPack } from "@/data/ingredientIntelligence/brandTrustSafetyRecallsLawsuits";
 import { cancerLinkedWatchDataPack } from "@/data/ingredientIntelligence/cancerLinkedWatch";
 import { flavourEnhancersFlavouringsDataPack } from "@/data/ingredientIntelligence/flavourEnhancersFlavourings";
 import { harmfulAdditivesDataPack } from "@/data/ingredientIntelligence/harmfulAdditives";
 import { heavyMetalsDataPack } from "@/data/ingredientIntelligence/heavyMetals";
 import { hydrogenatedPartiallyHydrogenatedOilsDataPack } from "@/data/ingredientIntelligence/hydrogenatedPartiallyHydrogenatedOils";
+import { meatSpecificConcernsDataPack } from "@/data/ingredientIntelligence/meatSpecificConcerns";
 import { microplasticsDataPack } from "@/data/ingredientIntelligence/microplastics";
 import { preservativesShelfLifeSystemsDataPack } from "@/data/ingredientIntelligence/preservativesShelfLifeSystems";
 import {
@@ -21,6 +19,7 @@ import type {
   IngredientIntelligenceMatcherOutput,
 } from "./ingredientIntelligenceMatcher";
 import { normalizeIngredientIntelligenceText } from "./ingredientIntelligenceMatcher";
+import { truthlabelCategoryDisplayNames } from "./truthlabelCategoryCopy";
 
 type CategorySeverity = "green" | "yellow" | "red";
 type EvidenceType = IngredientIntelligenceDuplicateSafeMatch["evidenceType"];
@@ -71,33 +70,37 @@ export type IngredientCategoryRulesOutput = {
 };
 
 const categoryNames = {
-  banned_restricted_items: "Banned / Restricted Items",
-  artificial_colours: "Artificial Colours",
+  banned_restricted_items: truthlabelCategoryDisplayNames.banned_restricted_items,
+  artificial_colours: truthlabelCategoryDisplayNames.artificial_colours,
   artificial_sweeteners_sugar_substitutes:
-    "Artificial Sweeteners / Sugar Substitutes",
-  preservatives_shelf_life_systems: "Preservatives & Shelf-Life Systems",
+    truthlabelCategoryDisplayNames.artificial_sweeteners_sugar_substitutes,
+  preservatives_shelf_life_systems:
+    truthlabelCategoryDisplayNames.preservatives_shelf_life_systems,
   emulsifiers_stabilisers_thickeners_gums:
-    "Emulsifiers / Stabilisers / Thickeners / Gums",
-  flavour_enhancers_flavourings: "Flavour Enhancers / Flavourings",
-  seed_oils_processed_oils: "Seed Oils / Processed Oils",
+    truthlabelCategoryDisplayNames.emulsifiers_stabilisers_thickeners_gums,
+  flavour_enhancers_flavourings:
+    truthlabelCategoryDisplayNames.flavour_enhancers_flavourings,
+  seed_oils_processed_oils: truthlabelCategoryDisplayNames.seed_oils_processed_oils,
   hydrogenated_partially_hydrogenated_oils:
-    "Hydrogenated / Partially Hydrogenated Oils",
-  ultra_processed_indicators: "Ultra-Processed Indicators",
+    truthlabelCategoryDisplayNames.hydrogenated_partially_hydrogenated_oils,
+  ultra_processed_indicators:
+    truthlabelCategoryDisplayNames.ultra_processed_indicators,
   artificial_engineered_food_construction:
-    "Artificial / Engineered Food Construction",
-  harmful_additives: "Harmful Additives",
-  cancer_linked_watch: "Cancer-linked Watch",
-  allergy_risk: "Allergy Risk",
-  natural_positive: "Natural / Positive Ingredients",
-  unknown_review: "Unknown / Review Ingredients",
-  meat_specific_concerns: "Meat-Specific Concerns",
-  fry_oil_fast_food_oil: "Fry Oil / Fast Food Oil",
-  heavy_metals: "Heavy Metals",
-  microplastics: "Microplastics",
-  brand_trust_safety: "Brand Trust / Safety / Recalls / Lawsuits",
-  total_ingredients: "Ingredient Count",
-  natural_vs_processed: "Natural vs Processed",
-  additives_and_preservatives: "Additives & Preservatives",
+    truthlabelCategoryDisplayNames.artificial_engineered_food_construction,
+  harmful_additives: truthlabelCategoryDisplayNames.harmful_additives,
+  cancer_linked_watch: truthlabelCategoryDisplayNames.cancer_linked_watch,
+  allergy_risk: truthlabelCategoryDisplayNames.allergy_risk,
+  natural_positive: truthlabelCategoryDisplayNames.natural_positive,
+  unknown_review: truthlabelCategoryDisplayNames.unknown_review,
+  meat_specific_concerns: truthlabelCategoryDisplayNames.meat_specific_concerns,
+  fry_oil_fast_food_oil: truthlabelCategoryDisplayNames.fry_oil_fast_food_oil,
+  heavy_metals: truthlabelCategoryDisplayNames.heavy_metals,
+  microplastics: truthlabelCategoryDisplayNames.microplastics,
+  brand_trust_safety: truthlabelCategoryDisplayNames.brand_trust_safety,
+  total_ingredients: truthlabelCategoryDisplayNames.total_ingredients,
+  natural_vs_processed: truthlabelCategoryDisplayNames.natural_vs_processed,
+  additives_and_preservatives:
+    truthlabelCategoryDisplayNames.additives_and_preservatives,
 } as const;
 
 type CategoryId = keyof typeof categoryNames;
@@ -109,12 +112,12 @@ const severityRank: Record<CategorySeverity, number> = {
 };
 
 const redReasonRank: Record<RedReasonType, number> = {
-  banned_restricted: 0,
+  verified_external_signal: 0,
   allergy_profile_match: 1,
-  verified_external_signal: 2,
+  banned_restricted: 2,
   direct_red_ingredient: 3,
-  count_overload: 4,
-  category_combo_trigger: 5,
+  category_combo_trigger: 4,
+  count_overload: 5,
   high_processed_share: 6,
   long_ingredient_list: 7,
 };
@@ -126,31 +129,6 @@ const combinedAdditiveCategoryIds = new Set<CategoryId>([
   "emulsifiers_stabilisers_thickeners_gums",
   "flavour_enhancers_flavourings",
   "harmful_additives",
-]);
-
-const fillerBinderConstructionGroupIds = new Set([
-  "fillers_and_extenders",
-  "binders_and_texture_builders",
-]);
-
-const mechanicalConstructionGroupIds = new Set([
-  "reformed_reconstructed_meat_or_seafood_markers",
-  "mechanically_separated_recovered_meat_markers",
-]);
-
-const imitationConstructionGroupIds = new Set([
-  "imitation_analogue_food_markers",
-  "cultivated_cell_cultured_protein_markers",
-  "cultivated_fat_seafood_and_animal_cell_derived_ingredients",
-  "engineered_heme_leghemoglobin_meat_like_flavour_systems",
-]);
-
-const appearanceTextureConstructionGroupIds = new Set([
-  "binders_and_texture_builders",
-  "emulsifiers_and_stabilisers",
-  "artificial_colours_and_appearance_systems",
-  "protein_isolates_and_textured_proteins",
-  "extruded_printed_structured_food_technology_markers",
 ]);
 
 const allergenLabelsByCanonicalId: Record<string, string> = {
@@ -205,15 +183,6 @@ const externalLookupKeywords: Record<CategoryId, string[]> = {
   additives_and_preservatives: [],
 };
 
-const constructionGroupMatchers = artificialEngineeredFoodConstructionGroups.map(
-  (group) => ({
-    id: group.id,
-    searchTerms: uniqueStrings([group.groupName, ...group.markers])
-      .map((term) => normalizeIngredientIntelligenceText(term))
-      .filter(Boolean),
-  }),
-);
-
 const artificialColourRedIds = new Set(
   mergedArtificialColours
     .filter((item) => item.severity === "red")
@@ -260,7 +229,12 @@ const heavyMetalsRedIds = new Set(
 );
 
 const microplasticsRedIds = new Set(
-  microplasticsDataPack.items
+  (
+    microplasticsDataPack.items as readonly {
+      id: string;
+      basicSeveritySuggestion: "yellow" | "red";
+    }[]
+  )
     .filter((item) => item.basicSeveritySuggestion === "red")
     .map((item) => item.id),
 );
@@ -281,6 +255,25 @@ const hydrogenatedRedIds = new Set(
   hydrogenatedPartiallyHydrogenatedOilsDataPack.items
     .filter((item) => item.severity === "red")
     .map((item) => item.id),
+);
+
+function toLookupSlug(value: string) {
+  return normalizeIngredientIntelligenceText(value).replace(/\s+/g, "_");
+}
+
+const meatSpecificGreenIds = new Set(
+  meatSpecificConcernsDataPack.items
+    .filter((item) => item.basicSeveritySuggestion === "green")
+    .flatMap((item) => [
+      item.id,
+      item.mainName,
+      ...item.otherNames,
+      ...item.labelVariants,
+      ...item.spellingVariants,
+      ...item.regionalNames,
+    ])
+    .flatMap((value) => [value, normalizeIngredientIntelligenceText(value), toLookupSlug(value)])
+    .filter(Boolean),
 );
 
 function getArtificialColourLookupId(item: MergedArtificialColour) {
@@ -386,33 +379,6 @@ function formatCountLabel(count: number) {
   return count === 0 ? "No" : `${count}`;
 }
 
-function normalizeProductCategory(value: string | undefined) {
-  return normalizeIngredientIntelligenceText(value ?? "");
-}
-
-function isMeatFishSeafoodProduct(productCategory: string | undefined) {
-  const normalized = normalizeProductCategory(productCategory);
-  return [
-    "meat",
-    "beef",
-    "pork",
-    "chicken",
-    "turkey",
-    "poultry",
-    "fish",
-    "seafood",
-    "shellfish",
-    "shrimp",
-    "tuna",
-    "salmon",
-    "burger",
-    "sausage",
-    "nugget",
-    "deli",
-    "fast food",
-  ].some((term) => containsWholeTerm(normalized, term));
-}
-
 function getMatchLookupTexts(match: IngredientIntelligenceDuplicateSafeMatch) {
   return uniqueStrings([
     match.displayName,
@@ -423,17 +389,6 @@ function getMatchLookupTexts(match: IngredientIntelligenceDuplicateSafeMatch) {
   ])
     .map((value) => normalizeIngredientIntelligenceText(value))
     .filter(Boolean);
-}
-
-function getConstructionGroupIds(match: IngredientIntelligenceDuplicateSafeMatch) {
-  const lookupTexts = getMatchLookupTexts(match);
-  return constructionGroupMatchers
-    .filter(({ searchTerms }) =>
-      searchTerms.some((term) =>
-        lookupTexts.some((value) => containsWholeTerm(value, term)),
-      ),
-    )
-    .map((group) => group.id);
 }
 
 function isDirectRedIdMatch(
@@ -492,7 +447,10 @@ function getAutomaticRedReasonFromMatch(
     return "allergy_profile_match";
   }
 
-  if (match.sourcePacks.includes("hydrogenated_partially_hydrogenated_oils")) {
+  if (
+    match.sourcePacks.includes("hydrogenated_partially_hydrogenated_oils") &&
+    isDirectRedIdMatch(match, hydrogenatedRedIds)
+  ) {
     return "direct_red_ingredient";
   }
 
@@ -1188,7 +1146,6 @@ function getExternalLookupState(
 function summarizeConstructionCategory(
   matches: IngredientIntelligenceDuplicateSafeMatch[],
   ingredientListAvailable: boolean,
-  productCategory: string | undefined,
 ) {
   if (!ingredientListAvailable && matches.length === 0) {
     return buildBaseSummary("artificial_engineered_food_construction", matches, {
@@ -1199,29 +1156,8 @@ function summarizeConstructionCategory(
     });
   }
 
-  const groupMatches = matches.map((match) => ({
-    match,
-    groupIds: getConstructionGroupIds(match),
-  }));
-  const fillerBinderCount = groupMatches.filter(({ groupIds }) =>
-    groupIds.some((id) => fillerBinderConstructionGroupIds.has(id)),
-  ).length;
-  const hasMechanicalMarker = groupMatches.some(({ groupIds }) =>
-    groupIds.some((id) => mechanicalConstructionGroupIds.has(id)),
-  );
-  const hasImitationMarker = groupMatches.some(({ groupIds }) =>
-    groupIds.some((id) => imitationConstructionGroupIds.has(id)),
-  );
-  const hasAppearanceTextureMarker = groupMatches.some(({ groupIds }) =>
-    groupIds.some((id) => appearanceTextureConstructionGroupIds.has(id)),
-  );
   const hasBannedOverlap = matches.some(isBannedRestrictedOverlap);
-  const meatLikeProduct = isMeatFishSeafoodProduct(productCategory);
-  const hasComboTrigger =
-    hasBannedOverlap ||
-    (meatLikeProduct && fillerBinderCount >= 2) ||
-    (hasMechanicalMarker && fillerBinderCount >= 1) ||
-    (hasImitationMarker && hasAppearanceTextureMarker);
+  const hasComboTrigger = hasBannedOverlap;
 
   if (hasComboTrigger) {
     const message =
@@ -1232,18 +1168,6 @@ function summarizeConstructionCategory(
       shortMessage: message,
       userFacingReason: message,
       redReasonType: hasBannedOverlap ? "banned_restricted" : "category_combo_trigger",
-    });
-  }
-
-  if (matches.length >= 4) {
-    const message =
-      "This product contains multiple food-construction markers. Truthlabel flags this as a serious food-construction concern.";
-    return buildBaseSummary("artificial_engineered_food_construction", matches, {
-      severity: "red",
-      displayLabel: formatCountLabel(matches.length),
-      shortMessage: message,
-      userFacingReason: message,
-      redReasonType: "count_overload",
     });
   }
 
@@ -1293,7 +1217,7 @@ function summarizeUltraProcessedCategory(
     });
   }
 
-  if (matches.length >= 4) {
+  if (matches.length >= 6) {
     const message =
       "This product contains multiple ultra-processed markers.";
     return buildBaseSummary("ultra_processed_indicators", matches, {
@@ -1339,37 +1263,57 @@ function summarizeMeatSpecificCategory(
     });
   }
 
-  const automaticRedMatch = matches.find((match) => getAutomaticRedReasonFromMatch(match));
+  const concernMatches = matches.filter(
+    (match) => !isDirectRedIdMatch(match, meatSpecificGreenIds),
+  );
+  const informationalMatches = matches.filter((match) =>
+    isDirectRedIdMatch(match, meatSpecificGreenIds),
+  );
+
+  const automaticRedMatch = concernMatches.find((match) =>
+    getAutomaticRedReasonFromMatch(match),
+  );
   if (automaticRedMatch) {
     const message =
       "This product contains multiple meat-processing markers. Truthlabel flags this as a high meat-processing concern.";
-    return buildBaseSummary("meat_specific_concerns", matches, {
+    return buildBaseSummary("meat_specific_concerns", concernMatches, {
       severity: "red",
-      displayLabel: formatCountLabel(matches.length),
+      displayLabel: formatCountLabel(concernMatches.length),
       shortMessage: message,
       userFacingReason: message,
       redReasonType: getAutomaticRedReasonFromMatch(automaticRedMatch) ?? "category_combo_trigger",
     });
   }
 
-  if (matches.length >= 3) {
+  if (concernMatches.length >= 4) {
     const message =
       "This product contains multiple meat-processing markers. Truthlabel flags this as a high meat-processing concern.";
-    return buildBaseSummary("meat_specific_concerns", matches, {
+    return buildBaseSummary("meat_specific_concerns", concernMatches, {
       severity: "red",
-      displayLabel: formatCountLabel(matches.length),
+      displayLabel: formatCountLabel(concernMatches.length),
       shortMessage: message,
       userFacingReason: message,
       redReasonType: "count_overload",
     });
   }
 
-  if (matches.length > 0) {
+  if (concernMatches.length > 0) {
     const message =
       "This product contains meat-specific processing markers. Truthlabel flags this as a meat-processing review item.";
-    return buildBaseSummary("meat_specific_concerns", matches, {
+    return buildBaseSummary("meat_specific_concerns", concernMatches, {
       severity: "yellow",
-      displayLabel: formatCountLabel(matches.length),
+      displayLabel: formatCountLabel(concernMatches.length),
+      shortMessage: message,
+      userFacingReason: message,
+    });
+  }
+
+  if (informationalMatches.length > 0) {
+    const message =
+      "Only meat-source or production-method transparency information was found from available label data.";
+    return buildBaseSummary("meat_specific_concerns", informationalMatches, {
+      severity: "green",
+      displayLabel: "Info",
       shortMessage: message,
       userFacingReason: message,
     });
@@ -1458,11 +1402,11 @@ export function summarizeCategoryMatches(
       matches: getCategoryMatches(allMatches, "artificial_colours"),
       ingredientListAvailable,
       redThreshold: 3,
-      greenMessage: "No artificial colour found from available label data.",
+      greenMessage: "No artificial color found from available label data.",
       yellowMessage:
-        "This product contains artificial colour additives. Truthlabel flags these as additive review items.",
+        "This product contains artificial color additives. Truthlabel flags these as additive review items.",
       redMessage:
-        "This product contains multiple artificial colour additives. Truthlabel flags this as a high artificial-colour load.",
+        "This product contains multiple artificial color additives. Truthlabel flags this as a high artificial-color load.",
       directRedPredicate: (match) => isDirectRedIdMatch(match, artificialColourRedIds),
     }),
     buildCountCategorySummary({
@@ -1485,7 +1429,7 @@ export function summarizeCategoryMatches(
       categoryId: "preservatives_shelf_life_systems",
       matches: getCategoryMatches(allMatches, "preservatives_shelf_life_systems"),
       ingredientListAvailable,
-      redThreshold: 3,
+      redThreshold: 4,
       greenMessage:
         "No preservative or shelf-life additive found from available label data.",
       yellowMessage:
@@ -1501,32 +1445,32 @@ export function summarizeCategoryMatches(
         "emulsifiers_stabilisers_thickeners_gums",
       ),
       ingredientListAvailable,
-      redThreshold: 3,
+      redThreshold: 4,
       greenMessage:
-        "No emulsifier, stabiliser, thickener, or gum found from available label data.",
+        "No emulsifier, stabilizer, thickener, or gum found from available label data.",
       yellowMessage:
-        "This product contains emulsifiers, stabilisers, thickeners, or gums. Truthlabel flags these as texture-additive review items.",
+        "This product contains emulsifiers, stabilizers, thickeners, or gums. Truthlabel flags these as texture-additive review items.",
       redMessage:
-        "This product contains multiple texture-additive systems. Truthlabel flags this as a high emulsifier/stabiliser load.",
+        "This product contains multiple texture-additive systems. Truthlabel flags this as a high emulsifier/stabilizer load.",
     }),
     buildCountCategorySummary({
       categoryId: "flavour_enhancers_flavourings",
       matches: getCategoryMatches(allMatches, "flavour_enhancers_flavourings"),
       ingredientListAvailable,
-      redThreshold: 3,
+      redThreshold: 4,
       greenMessage:
-        "No flavour enhancer or flavouring system found from available label data.",
+        "No flavor enhancer or flavoring system found from available label data.",
       yellowMessage:
-        "This product contains flavour enhancers or flavouring systems. Truthlabel flags these as taste-building additive review items.",
+        "This product contains flavor enhancers or flavoring systems. Truthlabel flags these as taste-building additive review items.",
       redMessage:
-        "This product contains multiple flavouring or flavour-enhancer systems. Truthlabel flags this as a high flavour-system load.",
+        "This product contains multiple flavoring or flavor-enhancer systems. Truthlabel flags this as a high flavor-system load.",
       directRedPredicate: (match) => isDirectRedIdMatch(match, flavouringRedIds),
     }),
     buildCountCategorySummary({
       categoryId: "seed_oils_processed_oils",
       matches: getCategoryMatches(allMatches, "seed_oils_processed_oils"),
       ingredientListAvailable,
-      redThreshold: 2,
+      redThreshold: 3,
       greenMessage: "No seed or processed oil found from available label data.",
       yellowMessage:
         "This product contains a seed oil or processed oil. Truthlabel flags this as a processed-oil review item.",
@@ -1540,13 +1484,13 @@ export function summarizeCategoryMatches(
         "hydrogenated_partially_hydrogenated_oils",
       ),
       ingredientListAvailable,
-      redThreshold: 1,
+      redThreshold: 3,
       greenMessage:
         "No hydrogenated or partially hydrogenated oil found from available label data.",
       yellowMessage:
-        "This product contains hydrogenated or partially hydrogenated oil. Truthlabel flags this as a serious processed-fat concern.",
+        "This product contains hydrogenated oil or processed-fat markers. Truthlabel flags this as a processed-fat review item.",
       redMessage:
-        "This product contains hydrogenated or partially hydrogenated oil. Truthlabel flags this as a serious processed-fat concern.",
+        "This product contains partially hydrogenated oil, a positive trans-fat marker, or multiple processed-fat markers. Truthlabel flags this as a serious processed-fat concern.",
       directRedPredicate: (match) => isDirectRedIdMatch(match, hydrogenatedRedIds),
     }),
     summarizeUltraProcessedCategory(
@@ -1556,7 +1500,6 @@ export function summarizeCategoryMatches(
     summarizeConstructionCategory(
       getCategoryMatches(allMatches, "artificial_engineered_food_construction"),
       ingredientListAvailable,
-      input.productCategory,
     ),
     buildCountCategorySummary({
       categoryId: "harmful_additives",
@@ -1574,12 +1517,12 @@ export function summarizeCategoryMatches(
       categoryId: "cancer_linked_watch",
       matches: getCategoryMatches(allMatches, "cancer_linked_watch"),
       ingredientListAvailable,
-      redThreshold: 2,
-      greenMessage: "No Cancer-linked Watch signal found from available label data.",
+      redThreshold: Number.MAX_SAFE_INTEGER,
+      greenMessage: "No cancer-related concern signal found from available label data.",
       yellowMessage:
-        "This product contains an ingredient on Truthlabel's Cancer-linked Watch. This is a review signal, not proof that the product causes cancer.",
+        "This product contains an ingredient on Truthlabel's cancer-related concern list. This is a review signal, not proof of harm from one product.",
       redMessage:
-        "This product contains multiple Cancer-linked Watch signals. Truthlabel flags this as a serious review concern, not proof that the product causes cancer.",
+        "This product contains a cancer-related concern that Truthlabel treats as serious. This is not proof of harm from one product.",
       directRedPredicate: (match) => isDirectRedIdMatch(match, cancerWatchRedIds),
     }),
     buildAllergyRiskSummary(
@@ -1594,7 +1537,7 @@ export function summarizeCategoryMatches(
       categoryId: "unknown_review",
       matches: getCategoryMatches(allMatches, "unknown_review"),
       ingredientListAvailable,
-      redThreshold: 4,
+      redThreshold: Number.MAX_SAFE_INTEGER,
       greenMessage: "No vague or low-transparency label term found from available label data.",
       yellowMessage:
         "This product contains vague or low-transparency ingredient wording. Truthlabel flags this for review because the exact ingredient source is not fully clear.",

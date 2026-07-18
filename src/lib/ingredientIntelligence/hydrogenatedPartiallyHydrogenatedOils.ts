@@ -7,12 +7,13 @@ import { normalizeAliasText } from "@/lib/ingredientIntelligence/aliasMatching";
 export type HydrogenatedPartiallyHydrogenatedOilsCategorySummary = {
   totalCount: number;
   redItemCount: number;
-  categorySeverity: "green" | "red";
+  categorySeverity: "green" | "yellow" | "red";
   hasHydrogenatedOil: boolean;
   hasFullyHydrogenatedOil: boolean;
   hasPartiallyHydrogenatedOil: boolean;
   hasTransFatMarker: boolean;
   hasAutomaticRed: boolean;
+  matchedItems: HydrogenatedPartiallyHydrogenatedOilsItem[];
   redItems: HydrogenatedPartiallyHydrogenatedOilsItem[];
 };
 
@@ -217,15 +218,16 @@ export function summarizeHydrogenatedPartiallyHydrogenatedOilMatches(
     uniqueMatches.set(item.id, item);
   });
 
-  const redItems = [...uniqueMatches.values()];
-  const hasPartiallyHydrogenatedOil = redItems.some((item) =>
+  const matchedItems = [...uniqueMatches.values()];
+  const redItems = matchedItems.filter((item) => item.severity === "red");
+  const hasPartiallyHydrogenatedOil = matchedItems.some((item) =>
     item.healthConcernType.includes("partially_hydrogenated"),
   );
-  const hasFullyHydrogenatedOil = redItems.some((item) =>
+  const hasFullyHydrogenatedOil = matchedItems.some((item) =>
     item.healthConcernType.includes("fully_hydrogenated"),
   );
-  const hasTransFatMarker = redItems.some((item) => item.id === transFatMarkerId);
-  const hasHydrogenatedOil = redItems.some(
+  const hasTransFatMarker = matchedItems.some((item) => item.id === transFatMarkerId);
+  const hasHydrogenatedOil = matchedItems.some(
     (item) =>
       item.healthConcernType.includes("hydrogenated") ||
       item.healthConcernType.includes("trans_fat"),
@@ -236,14 +238,16 @@ export function summarizeHydrogenatedPartiallyHydrogenatedOilMatches(
     redItems.some((item) => item.scoringImpact === "automatic_red");
 
   return {
-    totalCount: redItems.length,
+    totalCount: matchedItems.length,
     redItemCount: redItems.length,
-    categorySeverity: redItems.length > 0 ? "red" : "green",
+    categorySeverity:
+      redItems.length > 0 ? "red" : matchedItems.length > 0 ? "yellow" : "green",
     hasHydrogenatedOil,
     hasFullyHydrogenatedOil,
     hasPartiallyHydrogenatedOil,
     hasTransFatMarker,
     hasAutomaticRed,
+    matchedItems,
     redItems,
   };
 }

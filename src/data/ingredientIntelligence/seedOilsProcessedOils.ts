@@ -998,7 +998,7 @@ export const seedOilsProcessedOilsDataPack = {
       reason:
         "Product contains a seed oil, processed oil, frying oil, refined oil, shortening, or processed fat marker."
     },
-    twoOrMoreSeedOrProcessedOils: {
+    threeOrMoreSeedOrProcessedOils: {
       severity: "red",
       display: "red_count_badge",
       scoreImpact: 18,

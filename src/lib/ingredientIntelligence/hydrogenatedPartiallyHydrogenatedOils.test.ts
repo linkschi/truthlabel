@@ -15,14 +15,14 @@ test("hydrogenated oil summary stays green when no markers are found", () => {
   assert.equal(summary.hasAutomaticRed, false);
 });
 
-test("hydrogenated oil triggers red processed-fat marker but not regulatory automatic red", () => {
+test("hydrogenated oil triggers yellow processed-fat review but not regulatory automatic red", () => {
   const matches = findHydrogenatedPartiallyHydrogenatedOilMatches(
     "Hydrogenated vegetable oil",
   );
   const summary = summarizeHydrogenatedPartiallyHydrogenatedOilMatches(matches);
 
   assert.deepEqual(matches.map((item) => item.id), ["hydrogenated_oil_general"]);
-  assert.equal(summary.categorySeverity, "red");
+  assert.equal(summary.categorySeverity, "yellow");
   assert.equal(summary.hasHydrogenatedOil, true);
   assert.equal(summary.hasPartiallyHydrogenatedOil, false);
   assert.equal(summary.hasAutomaticRed, false);
@@ -35,18 +35,18 @@ test("specific hydrogenated base oil still triggers the generic hydrogenated rul
   const summary = summarizeHydrogenatedPartiallyHydrogenatedOilMatches(matches);
 
   assert.deepEqual(matches.map((item) => item.id), ["hydrogenated_oil_general"]);
-  assert.equal(summary.categorySeverity, "red");
+  assert.equal(summary.categorySeverity, "yellow");
   assert.equal(summary.hasHydrogenatedOil, true);
 });
 
-test("fully hydrogenated oil triggers red processed-fat marker", () => {
+test("fully hydrogenated oil triggers yellow processed-fat review", () => {
   const matches = findHydrogenatedPartiallyHydrogenatedOilMatches(
     "Fully hydrogenated soybean oil",
   );
   const summary = summarizeHydrogenatedPartiallyHydrogenatedOilMatches(matches);
 
   assert.deepEqual(matches.map((item) => item.id), ["fully_hydrogenated_oil"]);
-  assert.equal(summary.categorySeverity, "red");
+  assert.equal(summary.categorySeverity, "yellow");
   assert.equal(summary.hasFullyHydrogenatedOil, true);
   assert.equal(summary.hasPartiallyHydrogenatedOil, false);
 });

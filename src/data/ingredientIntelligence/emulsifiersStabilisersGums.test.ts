@@ -25,19 +25,19 @@ test("emulsifiersStabilisersGumsDataPack uses the corrected green yellow red thr
     display: "No",
     scoreImpact: 0,
   });
-  assert.deepEqual(categoryScoringRules.oneToTwoTextureAdditives, {
+  assert.deepEqual(categoryScoringRules.oneToThreeTextureAdditives, {
     severity: "yellow",
     display: "yellow_count_badge",
     scoreImpact: 8,
     reason:
-      "Product contains emulsifiers, stabilisers, thickeners, gums, or texture-support ingredients.",
+      "Product contains emulsifiers, stabilizers, thickeners, gums, or texture-support ingredients.",
   });
-  assert.deepEqual(categoryScoringRules.threeOrMoreTextureAdditives, {
+  assert.deepEqual(categoryScoringRules.fourOrMoreTextureAdditives, {
     severity: "red",
     display: "red_count_badge",
     scoreImpact: 22,
     reason:
-      "Product contains multiple texture-engineering systems. Truthlabel treats this as a high emulsifier/stabiliser load.",
+      "Product contains multiple texture-engineering systems. Truthlabel treats this as a high emulsifier/stabilizer load.",
   });
   assert.deepEqual(categoryScoringRules.anyBannedRestrictedTextureAdditive, {
     severity: "red",
@@ -47,7 +47,7 @@ test("emulsifiersStabilisersGumsDataPack uses the corrected green yellow red thr
   });
   assert.equal(
     finalVerdictRules.redLoad,
-    "This product contains multiple emulsifiers, stabilisers, thickeners, gums, or texture-support systems. Truthlabel flags this as a high texture-engineering load.",
+    "This product contains multiple emulsifiers, stabilizers, thickeners, gums, or texture-support systems. Truthlabel flags this as a high texture-engineering load.",
   );
 });
 

@@ -172,16 +172,17 @@ test("runManualScan turns three sweeteners into a red overload summary", () => {
   assert.equal(summary.matchCount, 3);
 });
 
-test("runManualScan turns three preservatives into a red overload summary", () => {
+test("runManualScan turns four preservatives into a red overload summary", () => {
   const output = analyzeManualInput({
     productCategory: "Packaged / Processed Foods",
-    ingredientText: "Water, sodium benzoate, potassium sorbate, TBHQ",
+    ingredientText:
+      "Water, sodium benzoate, potassium sorbate, calcium propionate, TBHQ",
   });
   const summary = findCategorySummary(output, "preservatives_shelf_life_systems");
 
   assert.equal(summary.severity, "red");
   assert.equal(summary.redReasonType, "count_overload");
-  assert.equal(summary.matchCount, 3);
+  assert.equal(summary.matchCount, 4);
 });
 
 test("runManualScan upgrades inline allergen statements to red when they match the allergy profile", () => {

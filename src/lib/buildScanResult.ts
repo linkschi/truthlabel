@@ -2,6 +2,11 @@ import type { ExposureRiskMainReason, ExposureRiskResult } from "@/lib/calculate
 import { bannedRestrictedItems } from "@/data/ingredientIntelligence/bannedRestrictedItems";
 import { publicAppConfig } from "@/lib/appConfig";
 import type { RedReasonType, IngredientCategorySummary } from "@/lib/ingredientCategoryRules";
+import {
+  getCategoryCopy,
+  truthlabelCategoryDisplayNames,
+  type CategoryCopy,
+} from "@/lib/truthlabelCategoryCopy";
 import type {
   IngredientIntelligenceDuplicateSafeMatch,
   IngredientIntelligenceMatch,
@@ -58,6 +63,10 @@ export type ScanResultOverviewRow = {
   label: string;
   severity: Severity;
   displayValue: string;
+  reason: string;
+  title: string;
+  message: string;
+  action?: string;
   shortMessage: string;
   redReasonType?: RedReasonType;
   matchCount: number;
@@ -92,6 +101,10 @@ export type ScanResultDeepExposureCheck = {
   label: string;
   severity: Severity | null;
   displayValue: string;
+  reason: string;
+  title: string;
+  message: string;
+  action?: string;
   shortMessage: string;
   redReasonType?: RedReasonType;
   matchCount: number;
@@ -167,44 +180,48 @@ export type ScanResult = {
 };
 
 const categoryLabels: Record<string, string> = {
-  banned_restricted_items: "Banned / Restricted Items",
-  artificial_colours: "Artificial Colours",
+  banned_restricted_items: truthlabelCategoryDisplayNames.banned_restricted_items,
+  artificial_colours: truthlabelCategoryDisplayNames.artificial_colours,
   artificial_sweeteners_sugar_substitutes:
-    "Artificial Sweeteners / Sugar Substitutes",
-  preservatives_shelf_life_systems: "Preservatives & Shelf-Life Systems",
+    truthlabelCategoryDisplayNames.artificial_sweeteners_sugar_substitutes,
+  preservatives_shelf_life_systems:
+    truthlabelCategoryDisplayNames.preservatives_shelf_life_systems,
   emulsifiers_stabilisers_thickeners_gums:
-    "Emulsifiers / Stabilisers / Thickeners / Gums",
-  flavour_enhancers_flavourings: "Flavour Enhancers / Flavourings",
-  seed_oils_processed_oils: "Seed Oils / Processed Oils",
+    truthlabelCategoryDisplayNames.emulsifiers_stabilisers_thickeners_gums,
+  flavour_enhancers_flavourings:
+    truthlabelCategoryDisplayNames.flavour_enhancers_flavourings,
+  seed_oils_processed_oils: truthlabelCategoryDisplayNames.seed_oils_processed_oils,
   hydrogenated_partially_hydrogenated_oils:
-    "Hydrogenated / Partially Hydrogenated Oils",
-  ultra_processed_indicators: "Ultra-Processed Indicators",
+    truthlabelCategoryDisplayNames.hydrogenated_partially_hydrogenated_oils,
+  ultra_processed_indicators:
+    truthlabelCategoryDisplayNames.ultra_processed_indicators,
   artificial_engineered_food_construction:
-    "Artificial / Engineered Food Construction",
-  harmful_additives: "Harmful Additives",
-  cancer_linked_watch: "Cancer-linked Watch",
-  allergy_risk: "Allergy Risk",
-  natural_positive: "Natural / Positive Ingredients",
-  unknown_review: "Unknown / Review Ingredients",
-  meat_specific_concerns: "Meat-Specific Concerns",
-  fry_oil_fast_food_oil: "Fry Oil / Fast Food Oil",
-  heavy_metals: "Heavy Metals",
-  microplastics: "Microplastics",
-  brand_trust_safety: "Brand Trust / Safety / Recalls / Lawsuits",
-  total_ingredients: "Ingredient Count",
-  natural_vs_processed: "Natural vs Processed",
-  additives_and_preservatives: "Additives & Preservatives",
+    truthlabelCategoryDisplayNames.artificial_engineered_food_construction,
+  harmful_additives: truthlabelCategoryDisplayNames.harmful_additives,
+  cancer_linked_watch: truthlabelCategoryDisplayNames.cancer_linked_watch,
+  allergy_risk: truthlabelCategoryDisplayNames.allergy_risk,
+  natural_positive: truthlabelCategoryDisplayNames.natural_positive,
+  unknown_review: truthlabelCategoryDisplayNames.unknown_review,
+  meat_specific_concerns: truthlabelCategoryDisplayNames.meat_specific_concerns,
+  fry_oil_fast_food_oil: truthlabelCategoryDisplayNames.fry_oil_fast_food_oil,
+  heavy_metals: truthlabelCategoryDisplayNames.heavy_metals,
+  microplastics: truthlabelCategoryDisplayNames.microplastics,
+  brand_trust_safety: truthlabelCategoryDisplayNames.brand_trust_safety,
+  total_ingredients: truthlabelCategoryDisplayNames.total_ingredients,
+  natural_vs_processed: truthlabelCategoryDisplayNames.natural_vs_processed,
+  additives_and_preservatives:
+    truthlabelCategoryDisplayNames.additives_and_preservatives,
 };
 
 const redReasonOrder: Record<RedReasonType, number> = {
-  banned_restricted: 0,
+  verified_external_signal: 0,
   allergy_profile_match: 1,
-  verified_external_signal: 2,
+  banned_restricted: 2,
   direct_red_ingredient: 3,
-  count_overload: 4,
-  high_processed_share: 5,
-  long_ingredient_list: 6,
-  category_combo_trigger: 7,
+  category_combo_trigger: 4,
+  count_overload: 5,
+  high_processed_share: 6,
+  long_ingredient_list: 7,
 };
 
 const externalCategoryIds = new Set([
@@ -307,7 +324,7 @@ const microplasticContextTerms = [
 ];
 
 const additiveGroupDefinitions = [
-  { id: "artificial_colours", label: "Artificial Colours" },
+  { id: "artificial_colours", label: "Artificial Colors" },
   {
     id: "artificial_sweeteners_sugar_substitutes",
     label: "Artificial Sweeteners",
@@ -318,13 +335,13 @@ const additiveGroupDefinitions = [
   },
   {
     id: "emulsifiers_stabilisers_thickeners_gums",
-    label: "Emulsifiers / Stabilisers / Gums",
+    label: "Emulsifiers / Stabilizers / Gums",
   },
   {
     id: "flavour_enhancers_flavourings",
-    label: "Flavour Enhancers / Flavourings",
+    label: "Flavor Enhancers / Flavorings",
   },
-  { id: "harmful_additives", label: "Harmful Additives" },
+  { id: "harmful_additives", label: "Additive Load" },
 ] as const;
 
 const avoidWording = [
@@ -450,11 +467,33 @@ function getMatchedItemDetails(
   return matches.map(toMatchedItemDetail);
 }
 
+const notCheckedCopy: CategoryCopy = {
+  reason: "Not found",
+  title: "Not found",
+  message:
+    "This check did not run with enough data. Missing data is not proof of absence.",
+};
+
+function getSummaryCopy(
+  summary: IngredientCategorySummary,
+  details = getMatchedItemDetails(summary.matchedItems),
+) {
+  return getCategoryCopy({
+    categoryId: summary.categoryId,
+    severity: summary.severity,
+    redReasonType: summary.redReasonType,
+    matchCount: summary.matchCount,
+    matchedItems: uniqueStrings(details.map((detail) => detail.displayName)),
+    regions: uniqueStrings(details.flatMap((detail) => detail.restrictionRegions)),
+    regulatoryReason: details.flatMap((detail) => detail.restrictionReasons)[0],
+  });
+}
+
 function toQuickOverviewRow(summary: IngredientCategorySummary, sortOrder: number): ScanResultOverviewRow {
   const label =
     summary.categoryId === "ultra_processed_indicators"
       ? "Ultra-Processed"
-      : summary.categoryName;
+      : categoryLabels[summary.categoryId] ?? summary.categoryName;
   const displayValue =
     summary.categoryId === "ultra_processed_indicators"
       ? summary.severity === "red"
@@ -463,12 +502,17 @@ function toQuickOverviewRow(summary: IngredientCategorySummary, sortOrder: numbe
           ? "Likely"
           : "No major markers"
       : summary.displayLabel;
+  const copy = getSummaryCopy(summary);
 
   return {
     categoryId: summary.categoryId,
     label,
     severity: summary.severity,
     displayValue,
+    reason: copy.reason,
+    title: copy.title,
+    message: copy.message,
+    action: copy.action,
     shortMessage: summary.shortMessage,
     redReasonType: summary.redReasonType,
     matchCount: summary.matchCount,
@@ -649,7 +693,10 @@ function toDeepExposureCheck(
   categoryId: string,
   summary: IngredientCategorySummary | undefined,
 ): ScanResultDeepExposureCheck {
-  const label = summary?.categoryName ?? categoryLabels[categoryId] ?? categoryId;
+  const label =
+    (summary ? categoryLabels[summary.categoryId] : categoryLabels[categoryId]) ??
+    summary?.categoryName ??
+    categoryId;
 
   if (!summary || !summary.displayAllowed) {
     return {
@@ -657,6 +704,10 @@ function toDeepExposureCheck(
       label,
       severity: null,
       displayValue: "Not found",
+      reason: notCheckedCopy.reason,
+      title: notCheckedCopy.title,
+      message: notCheckedCopy.message,
+      action: notCheckedCopy.action,
       shortMessage: "Not found.",
       matchCount: summary?.matchCount ?? 0,
       matchedItemsPreview: summary ? getMatchedItemsPreview(summary.matchedItems) : [],
@@ -665,17 +716,23 @@ function toDeepExposureCheck(
       status: "not_checked",
     };
   }
+  const matchedItemDetails = getMatchedItemDetails(summary.matchedItems);
+  const copy = getSummaryCopy(summary, matchedItemDetails);
 
   return {
     categoryId,
     label,
     severity: summary.severity,
     displayValue: summary.displayLabel,
+    reason: copy.reason,
+    title: copy.title,
+    message: copy.message,
+    action: copy.action,
     shortMessage: summary.shortMessage,
     redReasonType: summary.redReasonType,
     matchCount: summary.matchCount,
     matchedItemsPreview: getMatchedItemsPreview(summary.matchedItems),
-    matchedItemDetails: getMatchedItemDetails(summary.matchedItems),
+    matchedItemDetails,
     displayAllowed: true,
     status: "checked",
   };
@@ -914,7 +971,7 @@ function buildConfidenceNotes(
 
   if (cancerSummary && cancerSummary.severity !== "green") {
     notes.push(
-      "Cancer-linked Watch is a review signal, not proof that the product causes cancer.",
+      "Cancer-related concern flags are review signals, not proof of harm from one product.",
     );
   }
 

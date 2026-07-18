@@ -144,9 +144,11 @@ test("Ultra-Processed overview uses the simplified display labels", () => {
   const redResult = buildResult({
     ingredients: [
       "Maltodextrin",
+      "Corn syrup solids",
       "Modified starch",
       "Soy protein isolate",
-      "Natural flavour",
+      "Hydrolyzed vegetable protein",
+      "Soy lecithin",
     ],
   });
 
@@ -160,9 +162,14 @@ test("Ultra-Processed overview uses the simplified display labels", () => {
   );
 });
 
-test("three preservatives make preservatives red by count overload and final verdict red", () => {
+test("four preservatives make preservatives red by count overload and final verdict red", () => {
   const result = buildResult({
-    ingredients: ["Sodium benzoate", "Potassium sorbate", "Calcium propionate"],
+    ingredients: [
+      "Sodium benzoate",
+      "Potassium sorbate",
+      "Calcium propionate",
+      "Sodium nitrite",
+    ],
   });
 
   const preservativeOverviewRow = findQuickOverviewRow(
