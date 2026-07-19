@@ -1610,6 +1610,27 @@ function IngredientChip({
   );
 }
 
+function formatReasonPhrase(value: string) {
+  const normalized = value.trim().replace(/_/g, " ").replace(/\s+/g, " ");
+
+  if (!normalized) {
+    return "";
+  }
+
+  return normalized.charAt(0).toLowerCase() + normalized.slice(1);
+}
+
+function getDeepCheckReasonStatement(item: ScanResultDeepExposureCheck) {
+  const title = item.title.trim();
+  const reason = formatReasonPhrase(item.reason);
+
+  if (!reason || title.toLowerCase().includes(reason.toLowerCase())) {
+    return title;
+  }
+
+  return `${title}: ${reason}`;
+}
+
 function DeepCheckRow({
   item,
   isExpanded,
@@ -1634,6 +1655,7 @@ function DeepCheckRow({
     item.matchCount > 0
       ? `${item.matchCount} match${item.matchCount === 1 ? "" : "es"} found`
       : "No matched item shown";
+  const reasonStatement = getDeepCheckReasonStatement(item);
   const whatThisMeansForYou = getWhatThisMeansForYou({
     categoryId: item.categoryId,
     tone: item.severity ?? "green",
@@ -1717,15 +1739,15 @@ function DeepCheckRow({
               ) : null}
 
               <div className="rounded-[15px] border border-white/70 bg-white/70 px-2.5 py-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
-                <div className="flex flex-wrap items-center gap-1.5">
-                  <span className={`rounded-full border px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.11em] ${chipToneClasses[tone]}`}>
-                    Reason: {item.reason}
-                  </span>
-                  <p className="text-[12px] font-semibold leading-5 text-[var(--text-main)]">
-                    {item.title}
+                <div className={`rounded-[13px] border px-2.5 py-2 ${chipToneClasses[tone]}`}>
+                  <p className="text-[9px] font-semibold uppercase tracking-[0.12em] opacity-80">
+                    Reason
+                  </p>
+                  <p className="mt-1 text-[12px] font-semibold leading-5">
+                    {reasonStatement}
                   </p>
                 </div>
-                <p className="mt-1.5 text-[12px] leading-[1.45] text-[var(--text-main)]">
+                <p className="mt-2 text-[12px] leading-[1.45] text-[var(--text-main)]">
                   {item.message}
                 </p>
                 <p className="mt-1.5 rounded-[12px] border border-[var(--border-soft)] bg-[var(--bg-surface)] px-2.5 py-1.5 text-[12px] leading-[1.45] text-[var(--text-secondary)]">
