@@ -1073,13 +1073,32 @@ function getFinalVerdictOpening(scanResult: ScanResult) {
   return scanResult.finalVerdict.opening;
 }
 
+function formatFinalReasonCount(reason: ScanResult["finalVerdict"]["mainReasons"][number]) {
+  const count = reason.matchedItems.length;
+
+  return count > 0 ? ` (${count})` : "";
+}
+
+function getFinalReasonPrimaryItem(
+  reason: ScanResult["finalVerdict"]["mainReasons"][number],
+) {
+  return reason.matchedItems[0]?.trim();
+}
+
 function getFinalWarningReasonLabel(reason: ScanResult["finalVerdict"]["mainReasons"][number]) {
+  const primaryItem = getFinalReasonPrimaryItem(reason);
+  const countLabel = formatFinalReasonCount(reason);
+
   if (reason.reasonType === "allergy_profile_match") {
-    return `Matches your allergy profile: ${reason.matchedItems[0] ?? reason.categoryName}`;
+    return primaryItem
+      ? `${primaryItem} matches your allergy profile`
+      : "A listed allergen matches your allergy profile";
   }
 
   if (reason.reasonType === "banned_restricted") {
-    return "Banned, restricted, or not-permitted ingredient found";
+    return primaryItem
+      ? `${primaryItem} is banned, restricted, or not permitted in at least one region`
+      : "Banned, restricted, or not-permitted ingredient found";
   }
 
   if (reason.reasonType === "verified_external_signal") {
@@ -1087,7 +1106,23 @@ function getFinalWarningReasonLabel(reason: ScanResult["finalVerdict"]["mainReas
   }
 
   if (reason.reasonType === "count_overload") {
-    return `High ${reason.categoryName.toLowerCase()} load`;
+    const overloadLabels: Record<string, string> = {
+      additives_and_preservatives: `High additive/preservative load${countLabel}`,
+      artificial_colours: `Multiple artificial colours found${countLabel}`,
+      artificial_engineered_food_construction: `High engineered-food load${countLabel}`,
+      artificial_sweeteners_sugar_substitutes: `Multiple sweeteners or sugar substitutes found${countLabel}`,
+      emulsifiers_stabilisers_thickeners_gums: `High texture-additive load${countLabel}`,
+      flavour_enhancers_flavourings: `High flavour-system load${countLabel}`,
+      fry_oil_fast_food_oil: `High frying-oil processing load${countLabel}`,
+      harmful_additives: `High additive concern load${countLabel}`,
+      meat_specific_concerns: `High meat-processing marker load${countLabel}`,
+      preservatives_shelf_life_systems: `High preservative load${countLabel}`,
+      seed_oils_processed_oils: `Multiple processed oils or fats found${countLabel}`,
+      ultra_processed_indicators: `Very high ultra-processing marker load${countLabel}`,
+      unknown_review: `Multiple unclear label terms found${countLabel}`,
+    };
+
+    return overloadLabels[reason.categoryId] ?? `High concern load${countLabel}`;
   }
 
   if (reason.reasonType === "long_ingredient_list") {
@@ -1099,30 +1134,96 @@ function getFinalWarningReasonLabel(reason: ScanResult["finalVerdict"]["mainReas
   }
 
   if (reason.reasonType === "category_combo_trigger") {
-    return `${reason.categoryName} combination trigger`;
+    return `Combined issue pattern found in ${reason.categoryName}`;
+  }
+
+  if (reason.reasonType === "direct_red_ingredient") {
+    return primaryItem
+      ? `${primaryItem} has a serious red flag`
+      : "A serious red-flag ingredient was found";
   }
 
   if (reason.categoryId === "cancer_linked_watch") {
-    return "Cancer-related review signal found";
+    return primaryItem
+      ? `Cancer-linked review signal: ${primaryItem}`
+      : "Cancer-linked review signal found";
   }
 
   if (reason.categoryId === "ultra_processed_indicators") {
-    return "Ultra-processed markers found";
+    return `Ultra-processed markers found${countLabel}`;
   }
 
   if (reason.categoryId === "unknown_review") {
-    return "Low-transparency label terms found";
+    return `Low-transparency label terms found${countLabel}`;
   }
 
   if (reason.categoryId === "preservatives_shelf_life_systems") {
-    return "Preservatives or shelf-life additives found";
+    return primaryItem
+      ? `Preservative or shelf-life additive found: ${primaryItem}`
+      : `Preservatives or shelf-life additives found${countLabel}`;
   }
 
   if (reason.categoryId === "artificial_sweeteners_sugar_substitutes") {
-    return "Artificial or non-sugar sweeteners found";
+    return primaryItem
+      ? `Sweetener system found: ${primaryItem}`
+      : `Artificial or non-sugar sweeteners found${countLabel}`;
   }
 
-  return reason.categoryName;
+  if (reason.categoryId === "artificial_colours") {
+    return primaryItem
+      ? `Artificial colour found: ${primaryItem}`
+      : `Artificial colours found${countLabel}`;
+  }
+
+  if (reason.categoryId === "seed_oils_processed_oils") {
+    return primaryItem
+      ? `Processed oil found: ${primaryItem}`
+      : `Processed oils found${countLabel}`;
+  }
+
+  if (reason.categoryId === "hydrogenated_partially_hydrogenated_oils") {
+    return primaryItem
+      ? `Hydrogenated or partially hydrogenated fat found: ${primaryItem}`
+      : "Hydrogenated or partially hydrogenated fat found";
+  }
+
+  if (reason.categoryId === "artificial_engineered_food_construction") {
+    return primaryItem
+      ? `Engineered-food marker found: ${primaryItem}`
+      : `Engineered-food markers found${countLabel}`;
+  }
+
+  if (reason.categoryId === "meat_specific_concerns") {
+    return primaryItem
+      ? `Meat-processing marker found: ${primaryItem}`
+      : `Meat-processing markers found${countLabel}`;
+  }
+
+  if (reason.categoryId === "fry_oil_fast_food_oil") {
+    return primaryItem
+      ? `Frying-oil marker found: ${primaryItem}`
+      : `Frying-oil markers found${countLabel}`;
+  }
+
+  if (reason.categoryId === "heavy_metals") {
+    return "Heavy-metal review or warning signal found";
+  }
+
+  if (reason.categoryId === "microplastics") {
+    return "Microplastic review or warning signal found";
+  }
+
+  if (reason.categoryId === "natural_vs_processed") {
+    return "High processed/artificial ingredient share";
+  }
+
+  if (reason.categoryId === "total_ingredients") {
+    return "Ingredient list is unusually long";
+  }
+
+  return primaryItem
+    ? `${reason.categoryName}: ${primaryItem}`
+    : reason.message || reason.categoryName;
 }
 
 function getFinalWarningReasons(scanResult: ScanResult) {
