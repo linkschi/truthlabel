@@ -497,16 +497,16 @@ export const hydrogenatedPartiallyHydrogenatedOilsDataPack = {
         "Industrially produced",
       ],
       regionalNames: [],
-      severity: "red",
+      severity: "yellow",
       reason:
-        "Trans fat wording is a serious fat-quality warning. However, nutrition-panel wording like 0g trans fat must not trigger this item by itself.",
+        "Trans fat wording is a fat-quality review marker. Nutrition-panel wording like 0g trans fat must not trigger this item by itself.",
       healthConcernType: "trans_fat_marker",
       warningLabel: "TRANS FAT MARKER FOUND",
       userFacingReason:
-        "This product contains a trans fat marker. Truthlabel flags this as red because industrial trans fats are a serious fat-quality concern.",
+        "This product contains a trans fat marker. Truthlabel flags this for review unless partially hydrogenated oil or verified product-specific evidence confirms a red concern.",
       matchingNotes:
         "Match trans fat only when it appears as a positive ingredient/claim such as contains trans fat or trans fatty acids. Do not trigger from '0g trans fat', 'zero trans fat', 'no trans fat', or 'trans fat free' unless partially hydrogenated oil also appears in the ingredient list.",
-      scoringImpact: "automatic_red",
+      scoringImpact: "yellow_review",
       dataStatus: "starter",
     },
   ],
@@ -535,9 +535,9 @@ export const hydrogenatedPartiallyHydrogenatedOilsDataPack = {
     },
 
     anyTransFatMarkerFound: {
-      severity: "red",
-      display: "red_count_badge",
-      scoreImpact: "automatic_red",
+      severity: "yellow",
+      display: "yellow_count_badge",
+      scoreImpact: 12,
       reason:
         "Product contains a trans fat marker. Do not trigger this rule from '0g trans fat' or 'trans fat free' claims unless PHO is also present.",
     },
@@ -551,7 +551,7 @@ export const hydrogenatedPartiallyHydrogenatedOilsDataPack = {
       "This product contains partially hydrogenated oil. Truthlabel flags this as red immediately because partially hydrogenated oils are linked to artificial trans fat and major regulatory restrictions in some regions.",
 
     redTransFat:
-      "This product contains a trans fat marker. Truthlabel flags this as a serious fat-quality concern.",
+      "This product contains a trans fat marker. Truthlabel flags this for review unless PHO or verified product-specific evidence confirms a red concern.",
 
     green:
       "No hydrogenated or partially hydrogenated oils were found from the available ingredient list.",

@@ -381,7 +381,7 @@ export const brandTrustSafetyRecallsLawsuitsDataPack = {
       affectedScope: "specific_product",
       linkedExistingPackIds: ["lawsuits_recalls"],
       categoryTags: ["brand_trust_safety"],
-      basicSeveritySuggestion: "yellow",
+      basicSeveritySuggestion: "green",
       redOnlyWhenVerified: true,
       reason: "Product-specific lawsuit allegation exists in external data.",
       userFacingReason:
@@ -401,7 +401,7 @@ export const brandTrustSafetyRecallsLawsuitsDataPack = {
       affectedScope: "brand_level",
       linkedExistingPackIds: ["lawsuits_recalls", "brand_trust_safety"],
       categoryTags: ["brand_trust_safety"],
-      basicSeveritySuggestion: "yellow",
+      basicSeveritySuggestion: "green",
       redOnlyWhenVerified: true,
       reason: "Brand-level lawsuit allegation exists in external data.",
       userFacingReason:
@@ -467,7 +467,7 @@ export const brandTrustSafetyRecallsLawsuitsDataPack = {
       affectedScope: "brand_level",
       linkedExistingPackIds: ["brand_trust_safety"],
       categoryTags: ["brand_trust_safety"],
-      basicSeveritySuggestion: "yellow",
+      basicSeveritySuggestion: "green",
       redOnlyWhenVerified: true,
       reason:
         "Brand provides transparency disclosures such as ingredient sourcing, COAs, testing reports, allergen protocols, or manufacturing details.",
@@ -488,7 +488,7 @@ export const brandTrustSafetyRecallsLawsuitsDataPack = {
       affectedScope: "brand_level",
       linkedExistingPackIds: ["brand_trust_safety"],
       categoryTags: ["brand_trust_safety"],
-      basicSeveritySuggestion: "yellow",
+      basicSeveritySuggestion: "green",
       redOnlyWhenVerified: true,
       reason: "Brand or product safety data is missing or not available.",
       userFacingReason:
@@ -508,7 +508,7 @@ export const brandTrustSafetyRecallsLawsuitsDataPack = {
       affectedScope: "specific_product",
       linkedExistingPackIds: ["brand_trust_safety"],
       categoryTags: ["brand_trust_safety"],
-      basicSeveritySuggestion: "yellow",
+      basicSeveritySuggestion: "green",
       redOnlyWhenVerified: true,
       reason: "User-submitted concern exists but is not verified.",
       userFacingReason:

@@ -31,18 +31,18 @@ test("seed oil summary stays green when no oil markers are found", () => {
   assert.equal(summary.hasAutomaticRed, false);
 });
 
-test("seed oil summary stays yellow for one processed oil", () => {
+test("seed oil summary treats one plain named oil as informational green", () => {
   const matches = findSeedOilProcessedOilMatches("Canola oil");
   const summary = summarizeSeedOilProcessedOilMatches(matches);
 
-  assert.equal(summary.totalCount, 1);
-  assert.equal(summary.categorySeverity, "yellow");
+  assert.equal(summary.totalCount, 0);
+  assert.equal(summary.categorySeverity, "green");
   assert.equal(summary.hasAutomaticRed, false);
 });
 
 test("seed oil summary becomes red for three seed or processed oils", () => {
   const matches = findSeedOilProcessedOilMatches(
-    "Canola oil, soybean oil, sunflower oil",
+    "Frying oil, shortening, refined oil",
   );
   const summary = summarizeSeedOilProcessedOilMatches(matches);
 
@@ -51,15 +51,15 @@ test("seed oil summary becomes red for three seed or processed oils", () => {
   assert.equal(summary.hasAutomaticRed, false);
 });
 
-test("hydrogenated oil triggers automatic red and does not double count the base oil", () => {
+test("hydrogenated oil triggers yellow review and does not double count the base oil", () => {
   const matches = findSeedOilProcessedOilMatches("Hydrogenated soybean oil");
   const summary = summarizeSeedOilProcessedOilMatches(matches);
 
   assert.deepEqual(matches.map((item) => item.id), ["hydrogenated_oils"]);
   assert.equal(summary.totalCount, 1);
-  assert.equal(summary.categorySeverity, "red");
+  assert.equal(summary.categorySeverity, "yellow");
   assert.equal(summary.hasHydrogenatedOil, true);
-  assert.equal(summary.hasAutomaticRed, true);
+  assert.equal(summary.hasAutomaticRed, false);
 });
 
 test("partially hydrogenated oil triggers automatic red without duplicating hydrogenated oil", () => {

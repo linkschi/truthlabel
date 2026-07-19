@@ -87,7 +87,7 @@ test("allergy profile match upgrades milk allergy risk to red", () => {
   assert.equal(milkMatch.evidenceType, "user_profile");
 });
 
-test("allergy risk stays yellow without a matching user profile", () => {
+test("allergy risk stays informational without a matching user profile", () => {
   const output = matchIngredientIntelligence({
     ingredients: ["milk powder"],
     userAllergyProfile: [],
@@ -95,7 +95,7 @@ test("allergy risk stays yellow without a matching user profile", () => {
   const milkMatch = findDuplicateSafeMatch(output, "Allergy Risk");
 
   assert.ok(milkMatch);
-  assert.equal(milkMatch.basicSeveritySuggestion, "yellow");
+  assert.equal(milkMatch.basicSeveritySuggestion, "green");
 });
 
 test("eggplant does not trigger egg allergy", () => {
@@ -169,7 +169,7 @@ test("heavy metals show yellow review markers for baby food rice context, not re
   assert.equal(heavyMetals.highestSeveritySuggestion, "yellow");
 });
 
-test("microplastics show yellow review markers for bottled water PET packaging, not red contamination", () => {
+test("microplastics keep bottled water PET packaging informational, not red contamination", () => {
   const output = matchIngredientIntelligence({
     ingredients: [],
     productName: "Bottled Water",
@@ -178,7 +178,7 @@ test("microplastics show yellow review markers for bottled water PET packaging, 
   const microplastics = findCategorySummary(output, "Microplastics");
 
   assert.ok(microplastics);
-  assert.equal(microplastics.highestSeveritySuggestion, "yellow");
+  assert.equal(microplastics.highestSeveritySuggestion, "green");
 });
 
 test("small salt ingredients do not trigger the salt microplastics review marker by themselves", () => {

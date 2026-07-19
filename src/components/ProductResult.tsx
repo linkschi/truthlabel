@@ -840,7 +840,105 @@ function formatMatchSummary(matchCount: number, matchedItemsPreview: string[]) {
   return `${countLabel} • ${matchedItemsPreview.join(", ")}`;
 }
 
+function getWhatThisMeansForYou(args: {
+  categoryId?: string;
+  tone: "green" | "yellow" | "red";
+  reason?: string;
+  title?: string;
+  message?: string;
+  action?: string;
+  redReasonType?: string;
+  matchedItemsPreview?: string[];
+}) {
+  const existingAction = args.action?.trim();
+  if (existingAction) {
+    return existingAction;
+  }
+
+  const context = [
+    args.categoryId,
+    args.reason,
+    args.title,
+    args.message,
+    ...(args.matchedItemsPreview ?? []),
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+  if (
+    args.tone === "red" &&
+    args.redReasonType === "allergy_profile_match"
+  ) {
+    return "Do not consume it if you are allergic to the matched allergen.";
+  }
+
+  if (
+    args.tone === "red" &&
+    (args.redReasonType === "verified_external_signal" ||
+      /active safety|active recall|confirmed contamination|confirmed safety|personal allergen|your allergen/.test(
+        context,
+      ))
+  ) {
+    return "Do not consume this product.";
+  }
+
+  if (args.tone === "red") {
+    if (args.redReasonType === "count_overload") {
+      return "You may want to limit how often you consume this product.";
+    }
+
+    return "Avoid this product.";
+  }
+
+  if (args.tone === "yellow") {
+    if (
+      /bioengineered|gmo|genetic|cell-grown|cell grown|cell-cultured|cultivated|precision-fermented|fermentation-derived|molecular farming|plant-made|biotechnology/.test(
+        context,
+      )
+    ) {
+      return "You may want to avoid this if you prefer food that is not genetically modified, cell-grown, or made using biotechnology.";
+    }
+
+    if (
+      /processed|processing|reconstructed|isolated|textured|modified|imitation|ultra|preservative|additive|fried|oil|emulsifier|stabilizer|stabiliser|binder|filler|flavor|flavour|concentrate|powder|structured/.test(
+        context,
+      )
+    ) {
+      return "You may want to limit or avoid this if you prefer simpler, less processed food.";
+    }
+
+    return "Review this finding in context with the full label before deciding how often to consume it.";
+  }
+
+  return "Keep this in context with the full product label.";
+}
+
+function getWhyRedExplanation(redReasonType?: string) {
+  switch (redReasonType) {
+    case "allergy_profile_match":
+      return "This red warning is immediate because the product matches your allergy Watch List.";
+    case "verified_external_signal":
+      return "This red warning is immediate because an official or verified external safety signal was found.";
+    case "banned_restricted":
+      return "This red warning is serious because the ingredient is banned, restricted, revoked, or not permitted in at least one region.";
+    case "direct_red_ingredient":
+      return "This red warning is serious because a directly flagged ingredient was detected.";
+    case "count_overload":
+      return "This red warning comes from too many moderate findings in the same category. It is an overload warning, not automatically a ban.";
+    case "long_ingredient_list":
+      return "This red warning comes from a very long ingredient list crossing Truthlabel's ingredient-count threshold.";
+    case "high_processed_share":
+      return "This red warning comes from a high processed/artificial share in the ingredient list.";
+    case "category_combo_trigger":
+      return "This red warning comes from a category-specific combination of concern signals.";
+    default:
+      return "This red warning means Truthlabel found a serious concern or a category threshold was crossed.";
+  }
+}
+
 function buildCategoryDetail(args: {
+  categoryId?: string;
   title: string;
   tone: "green" | "yellow" | "red";
   status: string;
@@ -854,6 +952,16 @@ function buildCategoryDetail(args: {
       label: "What this means",
       text: args.shortMessage,
     },
+    {
+      label: "What this means for you",
+      text: getWhatThisMeansForYou({
+        categoryId: args.categoryId,
+        tone: args.tone,
+        message: args.shortMessage,
+        redReasonType: args.redReasonType,
+        matchedItemsPreview: args.matchedItemsPreview,
+      }),
+    },
   ];
 
   const matchSummary = formatMatchSummary(args.matchCount, args.matchedItemsPreview);
@@ -866,8 +974,8 @@ function buildCategoryDetail(args: {
 
   if (args.redReasonType) {
     sections.push({
-      label: "Why this went red",
-      text: `This row reached a red state because of ${args.redReasonType.replace(/_/g, " ")}.`,
+      label: "Why this is red",
+      text: getWhyRedExplanation(args.redReasonType),
     });
   }
 
@@ -906,7 +1014,7 @@ function buildIngredientDetail(item: ScanResultIngredientItem) {
         text: matchedCategories,
       },
       {
-        label: "What to do",
+        label: "What this means for you",
         text:
           item.group === "unmatched"
             ? "Review the physical label and ingredient context. Unmatched does not mean safe."
@@ -1147,6 +1255,16 @@ function DeepCheckRow({
     item.matchCount > 0
       ? `${item.matchCount} match${item.matchCount === 1 ? "" : "es"} found`
       : "No matched item shown";
+  const whatThisMeansForYou = getWhatThisMeansForYou({
+    categoryId: item.categoryId,
+    tone: item.severity ?? "green",
+    reason: item.reason,
+    title: item.title,
+    message: item.message,
+    action: item.action,
+    redReasonType: item.redReasonType,
+    matchedItemsPreview: item.matchedItemsPreview,
+  });
 
   return (
     <div>
@@ -1218,12 +1336,12 @@ function DeepCheckRow({
                 <p className="mt-2 text-[12px] leading-5 text-[var(--text-main)]">
                   {item.message}
                 </p>
-                {item.action ? (
-                  <p className="mt-2 rounded-[14px] border border-[var(--border-soft)] bg-[var(--bg-surface)] px-3 py-2 text-[12px] leading-5 text-[var(--text-secondary)]">
-                    <span className="font-semibold text-[var(--text-main)]">Action: </span>
-                    {item.action}
-                  </p>
-                ) : null}
+                <p className="mt-2 rounded-[14px] border border-[var(--border-soft)] bg-[var(--bg-surface)] px-3 py-2 text-[12px] leading-5 text-[var(--text-secondary)]">
+                  <span className="font-semibold text-[var(--text-main)]">
+                    What this means for you:{" "}
+                  </span>
+                  {whatThisMeansForYou}
+                </p>
               </div>
 
               <div className="mt-3 rounded-[16px] border border-white/70 bg-white/62 px-3 py-2.5">
@@ -1938,6 +2056,7 @@ export default function ProductResult({
                       onClick={() =>
                         setActiveDetail(
                           buildCategoryDetail({
+                            categoryId: reason.categoryId,
                             title: reason.categoryName,
                             tone: reason.severity,
                             status: reason.reasonType.replace(/_/g, " "),

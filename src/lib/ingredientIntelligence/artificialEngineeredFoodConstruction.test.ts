@@ -28,23 +28,40 @@ test("construction analysis turns yellow for one marker", () => {
   assert.equal(summary.displayCount, 1);
 });
 
-test("construction analysis turns red for four matched markers", () => {
+test("construction analysis stays yellow for four overload-eligible processing markers", () => {
   const summary = analyzeArtificialEngineeredFoodConstruction({
     ingredientNames: [
       "Soy protein isolate",
       "Methylcellulose",
       "Natural flavour",
-      "Caramel colour",
+      "Modified starch",
+    ],
+    productCategory: "packaged_processed",
+  });
+
+  assert.equal(summary.categorySeverity, "yellow");
+  assert.equal(summary.totalMarkerCount, 4);
+  assert.equal(summary.overloadEligibleMarkerCount, 4);
+});
+
+test("construction analysis turns red at five overload-eligible processing markers", () => {
+  const summary = analyzeArtificialEngineeredFoodConstruction({
+    ingredientNames: [
+      "Soy protein isolate",
+      "Methylcellulose",
+      "Natural flavour",
+      "Modified starch",
+      "Protein powder",
     ],
     productCategory: "packaged_processed",
   });
 
   assert.equal(summary.categorySeverity, "red");
-  assert.equal(summary.totalMarkerCount, 4);
-  assert.match(summary.warningText, /serious food-construction concern/i);
+  assert.equal(summary.overloadEligibleMarkerCount, 5);
+  assert.match(summary.warningText, /reconstructed, isolated, textured/i);
 });
 
-test("meat products with fillers and binders cross the red trigger", () => {
+test("meat products with fillers and binders stay yellow unless overload threshold is crossed", () => {
   const summary = analyzeArtificialEngineeredFoodConstruction({
     productName: "Chicken patties",
     ingredientNames: [
@@ -52,12 +69,12 @@ test("meat products with fillers and binders cross the red trigger", () => {
       "Water added",
       "Soy protein",
       "Modified starch",
-      "Sodium phosphate",
+      "Methylcellulose",
     ],
     productCategory: "meat_fast_food",
   });
 
-  assert.equal(summary.categorySeverity, "red");
+  assert.equal(summary.categorySeverity, "yellow");
   assert.equal(summary.hasMeatOrSeafoodExtenderTrigger, true);
 });
 
@@ -70,7 +87,7 @@ test("bioengineered disclosure stays a transparency-led yellow flag", () => {
 
   assert.equal(summary.categorySeverity, "yellow");
   assert.equal(summary.hasBioengineeredDisclosure, true);
-  assert.match(summary.warningText, /transparency/i);
+  assert.match(summary.warningText, /genetic engineering/i);
 });
 
 test("cultivated protein wording stays yellow by default", () => {
@@ -82,17 +99,17 @@ test("cultivated protein wording stays yellow by default", () => {
 
   assert.equal(summary.categorySeverity, "yellow");
   assert.equal(summary.hasCultivatedProtein, true);
-  assert.match(summary.warningText, /not conventional whole-cut meat/i);
+  assert.match(summary.warningText, /grown from animal cells/i);
 });
 
-test("imitation seafood with multiple construction markers becomes red", () => {
+test("imitation seafood with multiple construction markers stays yellow below overload threshold", () => {
   const summary = analyzeArtificialEngineeredFoodConstruction({
     productName: "Imitation crab sticks",
     ingredientNames: ["Surimi", "Modified starch", "Crab flavour", "Colour added"],
     productCategory: "seafood",
   });
 
-  assert.equal(summary.categorySeverity, "red");
+  assert.equal(summary.categorySeverity, "yellow");
   assert.equal(summary.totalMarkerCount, 4);
 });
 
@@ -257,7 +274,7 @@ test("high-moisture extrusion triggers the structured food technology group as y
   );
 });
 
-test("animal-free whey plus three other construction markers becomes red", () => {
+test("animal-free whey plus three processing markers stays yellow below overload threshold", () => {
   const summary = analyzeArtificialEngineeredFoodConstruction({
     ingredientNames: [
       "Soy protein isolate",
@@ -268,8 +285,10 @@ test("animal-free whey plus three other construction markers becomes red", () =>
     productCategory: "packaged_processed",
   });
 
-  assert.equal(summary.categorySeverity, "red");
+  assert.equal(summary.categorySeverity, "yellow");
   assert.equal(summary.totalMarkerCount, 4);
+  assert.equal(summary.consumerPreferenceMarkerCount, 1);
+  assert.equal(summary.overloadEligibleMarkerCount, 3);
 });
 
 test("bioengineered label wording stays a yellow transparency warning and not an unsafe claim", () => {
@@ -280,7 +299,7 @@ test("bioengineered label wording stays a yellow transparency warning and not an
   });
 
   assert.equal(summary.categorySeverity, "yellow");
-  assert.match(summary.warningText, /transparency/i);
+  assert.match(summary.warningText, /genetic engineering/i);
   assert.doesNotMatch(summary.warningText, /unsafe|dangerous/i);
 });
 

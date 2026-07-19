@@ -39,7 +39,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       ],
       spellingVariants: ["Soya lecithin", "Soy lecithin"],
       regionalNames: [],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Emulsifier used to stop ingredients from separating and improve texture.",
       healthConcernType: "emulsifier_texture_stabiliser",
@@ -328,7 +328,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       ],
       spellingVariants: [],
       regionalNames: [],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Emulsifier family used to stabilise fats, oils, creams, toppings, bakery products, and processed foods.",
       healthConcernType: "emulsifier_texture_stabiliser",
@@ -441,7 +441,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       ],
       spellingVariants: [],
       regionalNames: [],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Emulsifiers used to build smooth texture, stability, and fat dispersion.",
       healthConcernType: "emulsifier_texture_stabiliser",
@@ -473,7 +473,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       ],
       spellingVariants: [],
       regionalNames: [],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Emulsifier used to support texture, stability, and fat dispersion in processed foods.",
       healthConcernType: "emulsifier_texture_stabiliser",
@@ -612,7 +612,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       ],
       spellingVariants: ["Stabiliser", "Stabilizer"],
       regionalNames: [],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Gum thickener used to thicken sauces, drinks, dressings, gluten-free foods, and processed textures.",
       healthConcernType: "gum_thickener_stabiliser",
@@ -646,7 +646,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       ],
       spellingVariants: ["Stabiliser", "Stabilizer"],
       regionalNames: [],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Gum thickener used to thicken, stabilise, and improve texture.",
       healthConcernType: "gum_thickener_stabiliser",
@@ -681,7 +681,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       ],
       spellingVariants: ["Stabiliser", "Stabilizer"],
       regionalNames: [],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Gum thickener used to stabilise texture, especially in dairy, desserts, sauces, and processed foods.",
       healthConcernType: "gum_thickener_stabiliser",
@@ -716,7 +716,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       ],
       spellingVariants: ["Stabiliser", "Stabilizer"],
       regionalNames: [],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Gelling and stabilising gum used to suspend ingredients and build texture.",
       healthConcernType: "gum_gelling_stabiliser",
@@ -749,7 +749,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       ],
       spellingVariants: ["Stabiliser", "Stabilizer"],
       regionalNames: [],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Gum thickener used to stabilise and build processed texture.",
       healthConcernType: "gum_thickener_stabiliser",
@@ -786,7 +786,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       ],
       spellingVariants: ["Fibre", "Fiber", "Stabiliser", "Stabilizer"],
       regionalNames: [],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Gum used as a stabiliser, emulsifier, thickener, and fibre/bulking ingredient.",
       healthConcernType: "gum_emulsifier_stabiliser",
@@ -820,7 +820,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       ],
       spellingVariants: ["Stabiliser", "Stabilizer"],
       regionalNames: [],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Gum thickener and stabiliser used to support texture.",
       healthConcernType: "gum_thickener_stabiliser",
@@ -854,7 +854,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       ],
       spellingVariants: ["Stabiliser", "Stabilizer"],
       regionalNames: [],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Gum thickener and stabiliser used to support processed texture.",
       healthConcernType: "gum_thickener_stabiliser",
@@ -892,7 +892,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       ],
       spellingVariants: ["Stabiliser", "Stabilizer"],
       regionalNames: ["Konnyaku"],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Thickener and gelling ingredient used to build texture and structure.",
       healthConcernType: "gum_thickener_gelling_agent",
@@ -931,7 +931,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       ],
       spellingVariants: ["Stabiliser", "Stabilizer"],
       regionalNames: [],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Gelling and thickening ingredient used to build texture in jams, desserts, drinks, and processed foods.",
       healthConcernType: "gelling_thickener_stabiliser",
@@ -966,7 +966,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       ],
       spellingVariants: ["Stabiliser", "Stabilizer"],
       regionalNames: [],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Gelling and thickening ingredient used to create firm gel texture.",
       healthConcernType: "gelling_thickener_stabiliser",
@@ -1039,7 +1039,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       ],
       spellingVariants: ["Stabiliser", "Stabilizer"],
       regionalNames: [],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Seaweed-derived thickener, stabiliser, and gelling family used to build texture and structure.",
       healthConcernType: "thickener_gelling_stabiliser",
@@ -1078,7 +1078,7 @@ export const emulsifiersStabilisersGumsDataPack = {
       ],
       spellingVariants: ["Fibre", "Fiber", "Stabiliser", "Stabilizer"],
       regionalNames: [],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Cellulose ingredient used as a stabiliser, bulking agent, anti-caking ingredient, or texture builder.",
       healthConcernType: "cellulose_texture_bulking_stabiliser",
@@ -1416,7 +1416,7 @@ export const emulsifiersStabilisersGumsDataPack = {
         "Stabilizer"
       ],
       regionalNames: [],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Gelling and texture ingredient used to set, thicken, or stabilise foods.",
       healthConcernType: "gelling_texture_stabiliser",

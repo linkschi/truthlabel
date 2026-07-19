@@ -36,7 +36,7 @@ export function summarizePreservativeMatches(
     (item) => item.scoringImpact === "automatic_red" || item.severity === "red",
   );
   const yellowItems = dedupedMatches.filter((item) => item.severity === "yellow");
-  const totalCount = dedupedMatches.length;
+  const totalCount = redItems.length + yellowItems.length;
   const hasAutomaticRed = redItems.length > 0;
 
   return {

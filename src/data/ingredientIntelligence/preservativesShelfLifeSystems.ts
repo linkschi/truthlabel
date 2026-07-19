@@ -1,6 +1,10 @@
-export type PreservativesShelfLifeSystemsItemSeverity = "yellow" | "red";
+export type PreservativesShelfLifeSystemsItemSeverity =
+  | "green"
+  | "yellow"
+  | "red";
 
 export type PreservativesShelfLifeSystemsItemScoringImpact =
+  | "informational"
   | "yellow_preservative"
   | "automatic_red";
 
@@ -141,7 +145,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       id: "potassium_sorbate",
       mainName: "Potassium Sorbate",
       otherNames: ["Potassium sorbate", "E202", "E-202", "INS 202"],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Preservative used to slow mould, yeast, and microbial growth.",
       healthConcernType: "mould_yeast_control_preservative",
@@ -156,7 +160,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       id: "sodium_sorbate",
       mainName: "Sodium Sorbate",
       otherNames: ["Sodium sorbate", "E201", "E-201", "INS 201"],
-      severity: "yellow",
+      severity: "green",
       reason: "Sorbate preservative used to slow microbial spoilage.",
       healthConcernType: "mould_yeast_control_preservative",
       warningLabel: "PRESERVATIVE FOUND",
@@ -170,7 +174,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       id: "calcium_sorbate",
       mainName: "Calcium Sorbate",
       otherNames: ["Calcium sorbate", "E203", "E-203", "INS 203"],
-      severity: "yellow",
+      severity: "green",
       reason: "Sorbate preservative used to slow spoilage.",
       healthConcernType: "mould_yeast_control_preservative",
       warningLabel: "PRESERVATIVE FOUND",
@@ -184,7 +188,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       id: "sorbic_acid",
       mainName: "Sorbic Acid",
       otherNames: ["Sorbic acid", "E200", "E-200", "INS 200"],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Preservative acid used to control mould and yeast growth.",
       healthConcernType: "mould_yeast_control_preservative",
@@ -199,7 +203,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       id: "calcium_propionate",
       mainName: "Calcium Propionate",
       otherNames: ["Calcium propionate", "E282", "E-282", "INS 282"],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Preservative commonly used in bread and bakery products to slow mould growth.",
       healthConcernType: "bakery_mould_control_preservative",
@@ -214,7 +218,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       id: "sodium_propionate",
       mainName: "Sodium Propionate",
       otherNames: ["Sodium propionate", "E281", "E-281", "INS 281"],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Preservative used to slow mould growth, especially in bakery-type products.",
       healthConcernType: "bakery_mould_control_preservative",
@@ -229,7 +233,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       id: "propionic_acid",
       mainName: "Propionic Acid",
       otherNames: ["Propionic acid", "E280", "E-280", "INS 280"],
-      severity: "yellow",
+      severity: "green",
       reason: "Preservative acid used to slow mould growth.",
       healthConcernType: "bakery_mould_control_preservative",
       warningLabel: "PRESERVATIVE FOUND",
@@ -501,7 +505,7 @@ export const preservativesShelfLifeSystemsDataPack = {
         "E-320",
         "INS 320",
       ],
-      severity: "yellow",
+      severity: "red",
       reason:
         "Synthetic antioxidant preservative used to slow fat and oil rancidity. FDA has launched a reassessment of BHA, so Truthlabel treats it as a higher-review preservative.",
       healthConcernType: "synthetic_antioxidant_preservative_under_review",
@@ -510,7 +514,7 @@ export const preservativesShelfLifeSystemsDataPack = {
         "This product contains BHA, a synthetic preservative used to prevent fats and oils from going rancid. Truthlabel flags this as a higher-review preservative because it is under renewed safety review.",
       matchingNotes:
         "Match BHA, butylated hydroxyanisole, butyl hydroxyanisole, E320, and INS 320.",
-      scoringImpact: "yellow_preservative",
+      scoringImpact: "automatic_red",
       dataStatus: "verified_core",
     },
     {
@@ -610,7 +614,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       id: "natamycin",
       mainName: "Natamycin",
       otherNames: ["Natamycin", "Pimaricin", "E235", "E-235", "INS 235"],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Antifungal preservative used on some cheese, meat, and food surfaces to control mould and yeast.",
       healthConcernType: "antifungal_preservative",
@@ -625,7 +629,7 @@ export const preservativesShelfLifeSystemsDataPack = {
       id: "nisin",
       mainName: "Nisin",
       otherNames: ["Nisin", "E234", "E-234", "INS 234"],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Antimicrobial preservative used to control certain bacteria in foods.",
       healthConcernType: "antimicrobial_preservative",
@@ -647,7 +651,7 @@ export const preservativesShelfLifeSystemsDataPack = {
         "E-1105",
         "INS 1105",
       ],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Enzyme used as an antimicrobial preservative in some foods; can also matter for egg-allergy review when sourced from egg.",
       healthConcernType: "antimicrobial_preservative_possible_egg_allergen",
@@ -694,7 +698,7 @@ export const preservativesShelfLifeSystemsDataPack = {
         "E-243",
         "INS 243",
       ],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Antimicrobial preservative used to control bacteria in certain foods.",
       healthConcernType: "antimicrobial_preservative",

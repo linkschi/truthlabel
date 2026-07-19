@@ -50,9 +50,9 @@ test("preservatives become red at 4 matches by count overload", () => {
   const output = runRules({
     ingredients: [
       "Sodium benzoate",
-      "Potassium sorbate",
-      "Calcium propionate",
+      "Potassium benzoate",
       "Sodium nitrite",
+      "BHT",
     ],
   });
   const summary = findSummary(output, "preservatives_shelf_life_systems");
@@ -63,7 +63,7 @@ test("preservatives become red at 4 matches by count overload", () => {
 
 test("artificial sweeteners become red at 3 matches by count overload", () => {
   const output = runRules({
-    ingredients: ["Aspartame", "Sucralose", "Saccharin"],
+    ingredients: ["Sucralose", "Saccharin", "Acesulfame potassium"],
   });
   const summary = findSummary(output, "artificial_sweeteners_sugar_substitutes");
 
@@ -71,9 +71,9 @@ test("artificial sweeteners become red at 3 matches by count overload", () => {
   assert.equal(summary.redReasonType, "count_overload");
 });
 
-test("seed oils become red at 3 processed-oil matches by count overload", () => {
+test("processed oil system markers become red at 3 matches by count overload", () => {
   const output = runRules({
-    ingredients: ["Canola oil", "Soybean oil", "Sunflower oil"],
+    ingredients: ["Vegetable oil", "Vegetable shortening", "Frying oil"],
   });
   const summary = findSummary(output, "seed_oils_processed_oils");
 
@@ -128,14 +128,15 @@ test("allergy risk becomes red when milk matches the user's allergy profile", ()
   assert.equal(summary.redReasonType, "allergy_profile_match");
 });
 
-test("allergy risk stays yellow when milk is found without a user profile match", () => {
+test("allergy risk stays green informational when milk is found without a user profile match", () => {
   const output = runRules({
     ingredients: ["Milk powder"],
     userAllergyProfile: [],
   });
   const summary = findSummary(output, "allergy_risk");
 
-  assert.equal(summary.severity, "yellow");
+  assert.equal(summary.severity, "green");
+  assert.equal(summary.displayLabel, "Info");
   assert.equal(summary.redReasonType, undefined);
 });
 
@@ -151,7 +152,7 @@ test("unknown review ingredients stay yellow at 4 vague terms for MVP", () => {
 
 test("Cancer-linked Watch stays yellow with one yellow watch item", () => {
   const output = runRules({
-    ingredients: ["BHA"],
+    ingredients: ["Sodium nitrite"],
   });
   const summary = findSummary(output, "cancer_linked_watch");
 
@@ -160,7 +161,7 @@ test("Cancer-linked Watch stays yellow with one yellow watch item", () => {
 
 test("Cancer-linked Watch stays yellow with two yellow watch items for MVP", () => {
   const output = runRules({
-    ingredients: ["BHA", "Sodium nitrite"],
+    ingredients: ["Sodium nitrite", "Potassium nitrate"],
   });
   const summary = findSummary(output, "cancer_linked_watch");
 
@@ -237,14 +238,15 @@ test("heavy metals become red for a verified recall signal", () => {
   assert.equal(summary.redReasonType, "verified_external_signal");
 });
 
-test("brand trust stays yellow for a lawsuit allegation", () => {
+test("brand trust keeps lawsuit allegations informational until verified", () => {
   const output = runRules({
     ingredients: [],
     externalSignals: ["Product-specific lawsuit allegation"],
   });
   const summary = findSummary(output, "brand_trust_safety");
 
-  assert.equal(summary.severity, "yellow");
+  assert.equal(summary.severity, "green");
+  assert.equal(summary.displayLabel, "No");
 });
 
 test("brand trust becomes red for an active official recall", () => {

@@ -12,14 +12,14 @@ test("fryOilFastFoodOilDataPack stores the requested starter dataset", () => {
   assert.equal(fryOilFastFoodOilDataPack.items.length, 22);
 });
 
-test("fryOilFastFoodOilDataPack keeps yellow and red starter severities", () => {
+test("fryOilFastFoodOilDataPack keeps green yellow and red starter severities", () => {
   const severities = new Set(
     fryOilFastFoodOilDataPack.items.map(
       (item) => item.basicSeveritySuggestion,
     ),
   );
 
-  assert.deepEqual([...severities].sort(), ["red", "yellow"]);
+  assert.deepEqual([...severities].sort(), ["green", "red", "yellow"]);
 });
 
 test("fryOilFastFoodOilDataPack keeps fry-oil item metadata", () => {

@@ -173,9 +173,11 @@ export function summarizeSeedOilProcessedOilMatches(
 
   const dedupedMatches = [...uniqueMatches.values()];
   const redItems = dedupedMatches.filter(hasAutomaticRedRule);
-  const yellowItems = dedupedMatches.filter((item) => !redItems.includes(item));
-  const totalCount = dedupedMatches.length;
-  const hasHydrogenatedOil = redItems.some(
+  const yellowItems = dedupedMatches.filter(
+    (item) => item.severity === "yellow" && !redItems.includes(item),
+  );
+  const totalCount = redItems.length + yellowItems.length;
+  const hasHydrogenatedOil = dedupedMatches.some(
     (item) =>
       item.id === hydrogenatedOilId ||
       item.id === partiallyHydrogenatedOilId ||

@@ -196,6 +196,7 @@ const scoreExcludedCategoryIds = new Set([
   "additives_and_preservatives",
   "artificial_engineered_food_construction",
   "artificial_colours",
+  "unknown_review",
 ]);
 
 const countOverloadRedScores: Partial<Record<string, number>> = {
@@ -372,7 +373,10 @@ function buildDirectScoreCandidates(
       });
     }
 
-    if (match.sourcePacks.includes("banned_restricted_items")) {
+    if (
+      match.sourcePacks.includes("banned_restricted_items") &&
+      match.basicSeveritySuggestion === "red"
+    ) {
       candidates.push({
         scoreEntityId: match.canonicalIngredientId,
         categoryId: "banned_restricted_items",

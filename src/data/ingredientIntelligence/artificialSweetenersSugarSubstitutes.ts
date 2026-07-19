@@ -1,6 +1,7 @@
-export type ArtificialSweetenersItemSeverity = "yellow" | "red";
+export type ArtificialSweetenersItemSeverity = "green" | "yellow" | "red";
 
 export type ArtificialSweetenersItemScoringImpact =
+  | "informational"
   | "yellow_sweetener"
   | "automatic_red";
 
@@ -85,16 +86,16 @@ export const artificialSweetenersDataPack = {
         "Canderel",
         "APM",
       ],
-      severity: "yellow",
+      severity: "red",
       reason:
-        "High-intensity artificial sweetener used to create sweetness with very little sugar or calories.",
-      healthConcernType: "high_intensity_artificial_sweetener",
-      warningLabel: "ARTIFICIAL SWEETENER FOUND",
+        "High-intensity artificial sweetener with a possible cancer-hazard classification signal under Truthlabel's stricter evidence policy.",
+      healthConcernType: "possible_cancer_concern",
+      warningLabel: "POSSIBLE CANCER CONCERN",
       userFacingReason:
-        "This product contains aspartame, a high-intensity artificial sweetener. Truthlabel flags this because the product's sweetness is being created through added sweetener technology rather than simple sugar or whole-food sweetness.",
+        "Aspartame has been classified as possibly carcinogenic to humans based on limited evidence. Truthlabel treats this as a red watch signal while avoiding any claim that one product is proven to cause cancer.",
       matchingNotes:
         "Match aspartame, E951, INS 951, NutraSweet, Equal, Canderel, and APM.",
-      scoringImpact: "yellow_sweetener",
+      scoringImpact: "automatic_red",
       dataStatus: "verified_core",
     },
     {
@@ -286,16 +287,16 @@ export const artificialSweetenersDataPack = {
         "Truvia",
         "PureVia",
       ],
-      severity: "yellow",
+      severity: "green",
       reason:
         "High-intensity non-sugar sweetener derived from stevia compounds. Truthlabel flags it because it is still an added sweetening system.",
-      healthConcernType: "non_sugar_high_intensity_sweetener",
-      warningLabel: "NON-SUGAR SWEETENER FOUND",
+      healthConcernType: "non_sugar_sweetener_information",
+      warningLabel: "NON-SUGAR SWEETENER INFORMATION",
       userFacingReason:
-        "This product contains steviol glycosides, a non-sugar high-intensity sweetener. Truthlabel flags this because sweetness is being added through a concentrated sweetener system.",
+        "This product contains a non-sugar sweetener. Truthlabel records it for label transparency but does not treat this ingredient as a harmful warning by presence alone.",
       matchingNotes:
         "Match steviol glycosides, stevia extract, stevia leaf extract, rebaudioside A/M/D, Reb A/M/D, stevioside, E960, and INS 960.",
-      scoringImpact: "yellow_sweetener",
+      scoringImpact: "informational",
       dataStatus: "verified_core",
     },
     {
@@ -335,30 +336,30 @@ export const artificialSweetenersDataPack = {
         "Monk fruit sweetener",
         "Lakanto",
       ],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Non-sugar high-intensity sweetener derived from monk fruit compounds.",
-      healthConcernType: "non_sugar_high_intensity_sweetener",
-      warningLabel: "NON-SUGAR SWEETENER FOUND",
+      healthConcernType: "non_sugar_sweetener_information",
+      warningLabel: "NON-SUGAR SWEETENER INFORMATION",
       userFacingReason:
-        "This product contains monk fruit extract, a non-sugar high-intensity sweetener. Truthlabel flags this because the product uses a concentrated sweetener system.",
+        "This product contains a non-sugar sweetener. Truthlabel records it for label transparency but does not treat this ingredient as a harmful warning by presence alone.",
       matchingNotes:
         "Match monk fruit extract, luo han guo extract, lo han kuo extract, mogrosides, mogroside V, monk fruit sweetener, and Lakanto.",
-      scoringImpact: "yellow_sweetener",
+      scoringImpact: "informational",
       dataStatus: "starter",
     },
     {
       id: "thaumatin",
       mainName: "Thaumatin",
       otherNames: ["Thaumatin", "E957", "E-957", "INS 957", "Talin"],
-      severity: "yellow",
+      severity: "green",
       reason: "Intense sweetener/flavour modifier used in some foods.",
-      healthConcernType: "intense_sweetener_flavour_modifier",
-      warningLabel: "NON-SUGAR SWEETENER FOUND",
+      healthConcernType: "non_sugar_sweetener_information",
+      warningLabel: "NON-SUGAR SWEETENER INFORMATION",
       userFacingReason:
-        "This product contains thaumatin, an intense sweetener or flavour modifier. Truthlabel flags this because the product uses a concentrated sweetening or taste-modifying system.",
+        "This product contains a non-sugar sweetener. Truthlabel records it for label transparency but does not treat this ingredient as a harmful warning by presence alone.",
       matchingNotes: "Match thaumatin, E957, INS 957, and Talin.",
-      scoringImpact: "yellow_sweetener",
+      scoringImpact: "informational",
       dataStatus: "starter",
     },
     {

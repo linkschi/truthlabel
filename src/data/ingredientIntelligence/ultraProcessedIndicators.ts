@@ -919,16 +919,16 @@ export const ultraProcessedIndicatorsDataPack = {
         "Interesterified"
       ],
       regionalNames: [],
-      severity: "red",
+      severity: "yellow",
       reason:
-        "Hydrogenated, partially hydrogenated, or engineered fat systems are strong ultra-processed markers. Partially hydrogenated oils should also trigger the dedicated red PHO category.",
+        "Hydrogenated, partially hydrogenated, or engineered fat systems are ultra-processed markers. Partially hydrogenated oils should also trigger the dedicated red PHO category.",
       healthConcernType: "engineered_fat_ultra_processed_marker",
       warningLabel: "ENGINEERED FAT SYSTEM FOUND",
       userFacingReason:
-        "This product contains hydrogenated, partially hydrogenated, interesterified, or engineered fat systems. Truthlabel flags this as a serious ultra-processed fat marker.",
+        "This product contains hydrogenated, partially hydrogenated, interesterified, or engineered fat systems. Truthlabel flags this as an ultra-processed fat review marker.",
       matchingNotes:
         "Match hydrogenated oils/fats, partially hydrogenated oils/fats, interesterified oils/fats, modified vegetable fat, structured fat, and shortening. If partially hydrogenated appears, also trigger the Hydrogenated / Partially Hydrogenated Oils red rule.",
-      scoringImpact: "automatic_red_if_partially_hydrogenated_else_red_marker",
+      scoringImpact: "automatic_red_if_partially_hydrogenated_else_yellow_review",
       dataStatus: "starter"
     },
 
@@ -1032,7 +1032,7 @@ export const ultraProcessedIndicatorsDataPack = {
         "Re-constituted"
       ],
       regionalNames: [],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Powdered, reconstituted, or concentrate-based ingredients can show the food is built from processed ingredient fractions.",
       healthConcernType: "reconstituted_powdered_ultra_processed_marker",
@@ -1224,7 +1224,7 @@ export const ultraProcessedIndicatorsDataPack = {
         "Aluminum"
       ],
       regionalNames: [],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Anti-caking and flow agents are functional additives used to keep powders dry, flowing, and shelf-stable.",
       healthConcernType: "anti_caking_ultra_processed_marker",
@@ -1471,7 +1471,7 @@ export const ultraProcessedIndicatorsDataPack = {
         "Sulphate"
       ],
       regionalNames: [],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Fortification and premix systems can show the product is rebuilt or nutritionally adjusted after processing.",
       healthConcernType: "fortification_ultra_processed_marker",

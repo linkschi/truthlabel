@@ -1,13 +1,22 @@
 import { artificialSweetenersDataPack } from "@/data/ingredientIntelligence/artificialSweetenersSugarSubstitutes";
+import {
+  artificialEngineeredFoodConstructionCategoryColorMap,
+  artificialEngineeredFoodConstructionGroups,
+  getArtificialEngineeredFoodConstructionGroupBehavior,
+} from "@/data/ingredientIntelligence/artificialEngineeredFoodConstruction";
 import { brandTrustSafetyRecallsLawsuitsDataPack } from "@/data/ingredientIntelligence/brandTrustSafetyRecallsLawsuits";
 import { cancerLinkedWatchDataPack } from "@/data/ingredientIntelligence/cancerLinkedWatch";
+import { emulsifiersStabilisersGumsDataPack } from "@/data/ingredientIntelligence/emulsifiersStabilisersGums";
 import { flavourEnhancersFlavouringsDataPack } from "@/data/ingredientIntelligence/flavourEnhancersFlavourings";
+import { fryOilFastFoodOilDataPack } from "@/data/ingredientIntelligence/fryOilFastFoodOil";
 import { harmfulAdditivesDataPack } from "@/data/ingredientIntelligence/harmfulAdditives";
 import { heavyMetalsDataPack } from "@/data/ingredientIntelligence/heavyMetals";
 import { hydrogenatedPartiallyHydrogenatedOilsDataPack } from "@/data/ingredientIntelligence/hydrogenatedPartiallyHydrogenatedOils";
 import { meatSpecificConcernsDataPack } from "@/data/ingredientIntelligence/meatSpecificConcerns";
 import { microplasticsDataPack } from "@/data/ingredientIntelligence/microplastics";
 import { preservativesShelfLifeSystemsDataPack } from "@/data/ingredientIntelligence/preservativesShelfLifeSystems";
+import { seedOilsProcessedOilsDataPack } from "@/data/ingredientIntelligence/seedOilsProcessedOils";
+import { ultraProcessedIndicatorsDataPack } from "@/data/ingredientIntelligence/ultraProcessedIndicators";
 import {
   mergedArtificialColours,
   type MergedArtificialColour,
@@ -189,10 +198,22 @@ const artificialColourRedIds = new Set(
     .map((item) => getArtificialColourLookupId(item)),
 );
 
+const artificialColourGreenIds = new Set(
+  mergedArtificialColours
+    .filter((item) => item.severity === "green")
+    .map((item) => getArtificialColourLookupId(item)),
+);
+
 const artificialSweetenerRedIds = new Set(
   artificialSweetenersDataPack.items
     .filter((item) => item.severity === "red")
     .map((item) => item.id),
+);
+
+const artificialSweetenerGreenIds = new Set(
+  artificialSweetenersDataPack.items
+    .filter((item) => item.severity === "green")
+    .flatMap((item) => getPackItemLookupIds(item)),
 );
 
 const preservativeRedIds = new Set(
@@ -201,10 +222,28 @@ const preservativeRedIds = new Set(
     .map((item) => item.id),
 );
 
+const preservativeGreenIds = new Set(
+  preservativesShelfLifeSystemsDataPack.items
+    .filter((item) => item.severity === "green")
+    .flatMap((item) => getPackItemLookupIds(item)),
+);
+
 const flavouringRedIds = new Set(
   flavourEnhancersFlavouringsDataPack.items
     .filter((item) => item.severity === "red")
     .map((item) => item.id),
+);
+
+const flavouringGreenIds = new Set(
+  flavourEnhancersFlavouringsDataPack.items
+    .filter((item) => item.severity === "green")
+    .flatMap((item) => getPackItemLookupIds(item)),
+);
+
+const emulsifierGreenIds = new Set(
+  emulsifiersStabilisersGumsDataPack.items
+    .filter((item) => item.severity === "green")
+    .flatMap((item) => getPackItemLookupIds(item)),
 );
 
 const harmfulAdditiveRedIds = new Set(
@@ -212,6 +251,15 @@ const harmfulAdditiveRedIds = new Set(
     [item.canonicalIngredientId, item.linkedIngredientId, item.id].filter(
       (value): value is string =>
         item.basicSeveritySuggestion === "red" && typeof value === "string",
+    ),
+  ),
+);
+
+const harmfulAdditiveGreenIds = new Set(
+  harmfulAdditivesDataPack.items.flatMap((item) =>
+    [item.canonicalIngredientId, item.linkedIngredientId, item.id].filter(
+      (value): value is string =>
+        item.basicSeveritySuggestion === "green" && typeof value === "string",
     ),
   ),
 );
@@ -232,11 +280,17 @@ const microplasticsRedIds = new Set(
   (
     microplasticsDataPack.items as readonly {
       id: string;
-      basicSeveritySuggestion: "yellow" | "red";
+      basicSeveritySuggestion: "green" | "yellow" | "red";
     }[]
   )
     .filter((item) => item.basicSeveritySuggestion === "red")
     .map((item) => item.id),
+);
+
+const microplasticsGreenIds = new Set(
+  microplasticsDataPack.items
+    .filter((item) => item.basicSeveritySuggestion === "green")
+    .flatMap((item) => getPackItemLookupIds(item)),
 );
 
 const brandTrustRedIds = new Set(
@@ -257,8 +311,60 @@ const hydrogenatedRedIds = new Set(
     .map((item) => item.id),
 );
 
+const hydrogenatedGreenIds = new Set<string>();
+
+const seedOilGreenIds = new Set(
+  seedOilsProcessedOilsDataPack.items
+    .filter((item) => item.severity === "green")
+    .flatMap((item) => getPackItemLookupIds(item)),
+);
+
+const ultraProcessedGreenIds = new Set(
+  ultraProcessedIndicatorsDataPack.items
+    .filter((item) => item.severity === "green")
+    .flatMap((item) => getPackItemLookupIds(item)),
+);
+
+const fryOilGreenIds = new Set(
+  fryOilFastFoodOilDataPack.items
+    .filter((item) => item.basicSeveritySuggestion === "green")
+    .flatMap((item) => getPackItemLookupIds(item)),
+);
+
 function toLookupSlug(value: string) {
   return normalizeIngredientIntelligenceText(value).replace(/\s+/g, "_");
+}
+
+function getPackItemLookupIds(item: {
+  id: string;
+  mainName?: string;
+  canonicalName?: string;
+  otherNames?: readonly string[];
+  labelVariants?: readonly string[];
+  spellingVariants?: readonly string[];
+  regionalNames?: readonly string[];
+  abbreviations?: readonly string[];
+  eNumbers?: readonly string[];
+  insNumbers?: readonly string[];
+}) {
+  const values = [
+    item.id,
+    item.mainName,
+    item.canonicalName,
+    ...(item.otherNames ?? []),
+    ...(item.labelVariants ?? []),
+    ...(item.spellingVariants ?? []),
+    ...(item.regionalNames ?? []),
+    ...(item.abbreviations ?? []),
+    ...(item.eNumbers ?? []),
+    ...(item.insNumbers ?? []),
+  ].filter((value): value is string => Boolean(value));
+
+  return values.flatMap((value) => [
+    value,
+    normalizeIngredientIntelligenceText(value),
+    toLookupSlug(value),
+  ]);
 }
 
 const meatSpecificGreenIds = new Set(
@@ -275,6 +381,22 @@ const meatSpecificGreenIds = new Set(
     .flatMap((value) => [value, normalizeIngredientIntelligenceText(value), toLookupSlug(value)])
     .filter(Boolean),
 );
+
+const informationalIdsByCategory: Partial<Record<CategoryId, Set<string>>> = {
+  artificial_colours: artificialColourGreenIds,
+  artificial_sweeteners_sugar_substitutes: artificialSweetenerGreenIds,
+  preservatives_shelf_life_systems: preservativeGreenIds,
+  emulsifiers_stabilisers_thickeners_gums: emulsifierGreenIds,
+  flavour_enhancers_flavourings: flavouringGreenIds,
+  seed_oils_processed_oils: seedOilGreenIds,
+  hydrogenated_partially_hydrogenated_oils: hydrogenatedGreenIds,
+  ultra_processed_indicators: ultraProcessedGreenIds,
+  harmful_additives: harmfulAdditiveGreenIds,
+  meat_specific_concerns: meatSpecificGreenIds,
+  fry_oil_fast_food_oil: fryOilGreenIds,
+  microplastics: microplasticsGreenIds,
+  brand_trust_safety: brandTrustGreenIds,
+};
 
 function getArtificialColourLookupId(item: MergedArtificialColour) {
   return ((item as { duplicateGroupId?: string }).duplicateGroupId ?? item.id);
@@ -350,6 +472,39 @@ function getCategoryMatches(
   return allMatches.filter((match) => match.sourcePacks.includes(categoryId));
 }
 
+function isInformationalMatch(
+  match: IngredientIntelligenceDuplicateSafeMatch,
+  categoryId?: CategoryId,
+) {
+  if (categoryId) {
+    const informationalIds = informationalIdsByCategory[categoryId];
+    return Boolean(
+      informationalIds &&
+        match.sourcePacks.includes(categoryId) &&
+        isDirectRedIdMatch(match, informationalIds),
+    );
+  }
+
+  return match.basicSeveritySuggestion === "green";
+}
+
+function isConcernMatchForAnyCategory(
+  match: IngredientIntelligenceDuplicateSafeMatch,
+  categoryIds: Set<CategoryId>,
+) {
+  return match.sourcePacks.some((sourcePack) => {
+    const categoryId = sourcePack as CategoryId;
+    return categoryIds.has(categoryId) && !isInformationalMatch(match, categoryId);
+  });
+}
+
+function getConcernMatches(
+  matches: IngredientIntelligenceDuplicateSafeMatch[],
+  categoryId?: CategoryId,
+) {
+  return matches.filter((match) => !isInformationalMatch(match, categoryId));
+}
+
 function toEvidenceTypes(matches: IngredientIntelligenceDuplicateSafeMatch[]) {
   return uniqueStrings(matches.map((match) => match.evidenceType)) as EvidenceType[];
 }
@@ -391,6 +546,52 @@ function getMatchLookupTexts(match: IngredientIntelligenceDuplicateSafeMatch) {
     .filter(Boolean);
 }
 
+const constructionGroupMarkerLookup = artificialEngineeredFoodConstructionGroups.map(
+  (group) => ({
+    groupId: group.id,
+    markerTerms: uniqueStrings([
+      group.id.replace(/[_-]+/g, " "),
+      group.groupName,
+      ...group.markers,
+    ])
+      .map((value) => normalizeIngredientIntelligenceText(value))
+      .filter(Boolean)
+      .sort((left, right) => right.length - left.length),
+  }),
+);
+
+function getConstructionGroupIdsForMatch(
+  match: IngredientIntelligenceDuplicateSafeMatch,
+) {
+  const lookupTexts = getMatchLookupTexts(match);
+  const groupIds = new Set<string>();
+
+  constructionGroupMarkerLookup.forEach(({ groupId, markerTerms }) => {
+    const hasMatch = markerTerms.some((markerTerm) =>
+      lookupTexts.some(
+        (lookupText) =>
+          lookupText.includes(markerTerm) ||
+          (lookupText.length >= 5 && markerTerm.includes(lookupText)),
+      ),
+    );
+
+    if (hasMatch) {
+      groupIds.add(groupId);
+    }
+  });
+
+  return groupIds;
+}
+
+function isConstructionOverloadEligibleMatch(
+  match: IngredientIntelligenceDuplicateSafeMatch,
+) {
+  return [...getConstructionGroupIdsForMatch(match)].some(
+    (groupId) =>
+      getArtificialEngineeredFoodConstructionGroupBehavior(groupId).overloadEligible,
+  );
+}
+
 function isDirectRedIdMatch(
   match: IngredientIntelligenceDuplicateSafeMatch,
   redIds: Set<string>,
@@ -406,7 +607,10 @@ function isDirectRedIdMatch(
 }
 
 function isBannedRestrictedOverlap(match: IngredientIntelligenceDuplicateSafeMatch) {
-  return match.sourcePacks.includes("banned_restricted_items");
+  return (
+    match.sourcePacks.includes("banned_restricted_items") &&
+    match.basicSeveritySuggestion === "red"
+  );
 }
 
 function isAllergyProfileMatch(match: IngredientIntelligenceDuplicateSafeMatch) {
@@ -518,36 +722,49 @@ function buildCountCategorySummary(params: {
     });
   }
 
+  const concernMatches = getConcernMatches(matches, categoryId);
   const directRedMatch = directRedPredicate
-    ? matches.find((match) => directRedPredicate(match))
+    ? concernMatches.find((match) => directRedPredicate(match))
     : undefined;
 
   if (directRedMatch) {
-    return buildBaseSummary(categoryId, matches, {
+    return buildBaseSummary(categoryId, concernMatches, {
       severity: "red",
-      displayLabel: formatCountLabel(matches.length),
+      displayLabel: formatCountLabel(concernMatches.length),
       shortMessage: redMessage,
       userFacingReason: redMessage,
       redReasonType: directRedReasonType,
     });
   }
 
-  if (matches.length >= redThreshold) {
-    return buildBaseSummary(categoryId, matches, {
+  if (concernMatches.length >= redThreshold) {
+    return buildBaseSummary(categoryId, concernMatches, {
       severity: "red",
-      displayLabel: formatCountLabel(matches.length),
+      displayLabel: formatCountLabel(concernMatches.length),
       shortMessage: redMessage,
       userFacingReason: redMessage,
       redReasonType: "count_overload",
     });
   }
 
-  if (matches.length > 0) {
-    return buildBaseSummary(categoryId, matches, {
+  if (concernMatches.length > 0) {
+    return buildBaseSummary(categoryId, concernMatches, {
       severity: "yellow",
-      displayLabel: formatCountLabel(matches.length),
+      displayLabel: formatCountLabel(concernMatches.length),
       shortMessage: yellowMessage,
       userFacingReason: yellowMessage,
+    });
+  }
+
+  if (matches.length > 0) {
+    const message =
+      "Only informational label items were found from available label data.";
+    return buildBaseSummary(categoryId, matches, {
+      severity: "green",
+      displayLabel: "Info",
+      shortMessage: message,
+      userFacingReason: message,
+      isInformational: true,
     });
   }
 
@@ -572,15 +789,29 @@ function buildBannedRestrictedSummary(
     });
   }
 
-  if (matches.length > 0) {
+  const redMatches = matches.filter((match) => match.basicSeveritySuggestion === "red");
+  const reviewMatches = getConcernMatches(matches, "banned_restricted_items");
+
+  if (redMatches.length > 0) {
     const message =
       "This product contains a banned, restricted, revoked, or not-permitted ingredient in at least one region. Truthlabel flags this as a serious regulatory concern.";
-    return buildBaseSummary("banned_restricted_items", matches, {
+    return buildBaseSummary("banned_restricted_items", redMatches, {
       severity: "red",
-      displayLabel: formatCountLabel(matches.length),
+      displayLabel: formatCountLabel(redMatches.length),
       shortMessage: message,
       userFacingReason: message,
       redReasonType: "banned_restricted",
+    });
+  }
+
+  if (reviewMatches.length > 0) {
+    const message =
+      "This product contains an ingredient with regulatory restriction or removal-watch context. Truthlabel flags this for review because status can depend on country, use, and effective date.";
+    return buildBaseSummary("banned_restricted_items", reviewMatches, {
+      severity: "yellow",
+      displayLabel: formatCountLabel(reviewMatches.length),
+      shortMessage: message,
+      userFacingReason: message,
     });
   }
 
@@ -636,6 +867,19 @@ function buildAllergyRiskSummary(
     ),
   );
   const profileMatchAllergen = matches.find((match) => isAllergyProfileMatch(match));
+  const crossContactProfileMatch = matches.find(
+    (match) =>
+      match.basicSeveritySuggestion === "yellow" &&
+      match.canonicalIngredientId !== "allergy_label_warning" &&
+      getMatchLookupTexts(match).some(
+        (text) =>
+          containsWholeTerm(text, "may contain") ||
+          containsWholeTerm(text, "traces of") ||
+          containsWholeTerm(text, "shared equipment") ||
+          containsWholeTerm(text, "same oil") ||
+          containsWholeTerm(text, "same facility"),
+      ),
+  );
 
   if (profileMatchAllergen) {
     const allergen =
@@ -653,16 +897,30 @@ function buildAllergyRiskSummary(
     });
   }
 
-  if (specificAllergens.length > 0) {
-    const message =
-      specificAllergens.length === 1
-        ? `This product contains a common allergen: ${specificAllergens[0]}.`
-        : `This product contains common allergens: ${specificAllergens.join(", ")}.`;
+  if (crossContactProfileMatch) {
+    const allergen =
+      allergenLabelsByCanonicalId[crossContactProfileMatch.canonicalIngredientId] ??
+      "a flagged allergen";
+    const message = `This label includes a possible cross-contact warning for ${allergen}, which matches your allergy profile.`;
     return buildBaseSummary("allergy_risk", matches, {
       severity: "yellow",
       displayLabel: "Found",
       shortMessage: message,
       userFacingReason: message,
+    });
+  }
+
+  if (specificAllergens.length > 0) {
+    const message =
+      specificAllergens.length === 1
+        ? `Common allergen found for label transparency: ${specificAllergens[0]}. It does not match your selected allergy profile.`
+        : `Common allergens found for label transparency: ${specificAllergens.join(", ")}. These do not match your selected allergy profile.`;
+    return buildBaseSummary("allergy_risk", matches, {
+      severity: "green",
+      displayLabel: "Info",
+      shortMessage: message,
+      userFacingReason: message,
+      isInformational: true,
     });
   }
 
@@ -708,6 +966,7 @@ function buildHeavyMetalsSummary(
 ) {
   const lookupState = getExternalLookupState("heavy_metals", input.externalSignals);
   const verifiedRed = matches.some(isHeavyMetalsVerifiedRed);
+  const concernMatches = getConcernMatches(matches, "heavy_metals");
 
   if (verifiedRed) {
     const message =
@@ -721,14 +980,26 @@ function buildHeavyMetalsSummary(
     });
   }
 
-  if (matches.length > 0) {
+  if (concernMatches.length > 0) {
     const message =
       "This product type may need heavy-metal review. This is not proof that this exact product contains elevated heavy metals.";
-    return buildBaseSummary("heavy_metals", matches, {
+    return buildBaseSummary("heavy_metals", concernMatches, {
       severity: "yellow",
       displayLabel: "Review",
       shortMessage: message,
       userFacingReason: message,
+    });
+  }
+
+  if (matches.length > 0) {
+    const message =
+      "Only heavy-metal review context was found. Product-specific testing or official recall data is needed for a stronger warning.";
+    return buildBaseSummary("heavy_metals", matches, {
+      severity: "green",
+      displayLabel: "Info",
+      shortMessage: message,
+      userFacingReason: message,
+      isInformational: true,
     });
   }
 
@@ -758,6 +1029,7 @@ function buildMicroplasticsSummary(
 ) {
   const lookupState = getExternalLookupState("microplastics", input.externalSignals);
   const verifiedRed = matches.some(isMicroplasticsVerifiedRed);
+  const concernMatches = getConcernMatches(matches, "microplastics");
 
   if (verifiedRed) {
     const message =
@@ -771,14 +1043,26 @@ function buildMicroplasticsSummary(
     });
   }
 
-  if (matches.length > 0) {
+  if (concernMatches.length > 0) {
     const message =
       "This product type or packaging may need microplastic review. This is not proof that this exact product contains elevated microplastics.";
-    return buildBaseSummary("microplastics", matches, {
+    return buildBaseSummary("microplastics", concernMatches, {
       severity: "yellow",
       displayLabel: "Review",
       shortMessage: message,
       userFacingReason: message,
+    });
+  }
+
+  if (matches.length > 0) {
+    const message =
+      "Only microplastic or packaging context was found. This is not proof that this exact product contains elevated microplastics.";
+    return buildBaseSummary("microplastics", matches, {
+      severity: "green",
+      displayLabel: "Info",
+      shortMessage: message,
+      userFacingReason: message,
+      isInformational: true,
     });
   }
 
@@ -811,11 +1095,12 @@ function buildBrandTrustSummary(
     input.externalSignals,
   );
   const redMatch = matches.find(isBrandTrustVerifiedRed);
+  const concernMatches = getConcernMatches(matches, "brand_trust_safety");
   const greenMatch = matches.find((match) => isDirectRedIdMatch(match, brandTrustGreenIds));
-  const lawsuitMatch = matches.find((match) =>
+  const lawsuitMatch = concernMatches.find((match) =>
     getMatchLookupTexts(match).some((text) => containsWholeTerm(text, "lawsuit allegation")),
   );
-  const historicalRecallMatch = matches.find((match) =>
+  const historicalRecallMatch = concernMatches.find((match) =>
     getMatchLookupTexts(match).some((text) => containsWholeTerm(text, "historical recall")),
   );
 
@@ -864,14 +1149,26 @@ function buildBrandTrustSummary(
     });
   }
 
-  if (matches.length > 0) {
+  if (concernMatches.length > 0) {
     const message =
       "Brand or product safety review signal found. Review the external evidence and affected scope.";
-    return buildBaseSummary("brand_trust_safety", matches, {
+    return buildBaseSummary("brand_trust_safety", concernMatches, {
       severity: "yellow",
       displayLabel: "Review",
       shortMessage: message,
       userFacingReason: message,
+    });
+  }
+
+  if (matches.length > 0) {
+    const message =
+      "Only brand or product transparency information was found. This is background context, not proof of danger.";
+    return buildBaseSummary("brand_trust_safety", matches, {
+      severity: "green",
+      displayLabel: "Info",
+      shortMessage: message,
+      userFacingReason: message,
+      isInformational: true,
     });
   }
 
@@ -997,11 +1294,10 @@ function buildAdditivesAndPreservativesSummary(
   ingredientListAvailable: boolean,
 ) {
   const matches = uniqueBy(
-    allMatches.filter((match) =>
-      match.sourcePacks.some((sourcePack) =>
-        combinedAdditiveCategoryIds.has(sourcePack as CategoryId),
+    allMatches
+      .filter((match) =>
+        isConcernMatchForAnyCategory(match, combinedAdditiveCategoryIds),
       ),
-    ),
     (match) => match.canonicalIngredientId,
   );
 
@@ -1156,38 +1452,78 @@ function summarizeConstructionCategory(
     });
   }
 
-  const hasBannedOverlap = matches.some(isBannedRestrictedOverlap);
-  const hasComboTrigger = hasBannedOverlap;
+  const concernMatches = getConcernMatches(matches, "artificial_engineered_food_construction");
+  const directRedMatch = concernMatches.find((match) =>
+    getAutomaticRedReasonFromMatch(match),
+  );
 
-  if (hasComboTrigger) {
+  if (directRedMatch) {
+    const redReasonType =
+      getAutomaticRedReasonFromMatch(directRedMatch) ?? "direct_red_ingredient";
     const message =
-      "This product contains multiple food-construction markers. Truthlabel flags this as a serious food-construction concern.";
-    return buildBaseSummary("artificial_engineered_food_construction", matches, {
+      redReasonType === "banned_restricted"
+        ? "This product contains a banned, restricted, revoked, or not-permitted engineered-food ingredient in at least one region. Truthlabel flags this as a serious regulatory concern."
+        : "This product contains a seriously flagged engineered-food ingredient. Truthlabel flags this for review based on available regulatory or scientific concern signals.";
+    return buildBaseSummary("artificial_engineered_food_construction", concernMatches, {
       severity: "red",
-      displayLabel: formatCountLabel(matches.length),
+      displayLabel: formatCountLabel(concernMatches.length),
       shortMessage: message,
       userFacingReason: message,
-      redReasonType: hasBannedOverlap ? "banned_restricted" : "category_combo_trigger",
+      redReasonType,
+    });
+  }
+
+  const overloadEligibleMatches = concernMatches.filter(
+    isConstructionOverloadEligibleMatch,
+  );
+  if (
+    overloadEligibleMatches.length >=
+    artificialEngineeredFoodConstructionCategoryColorMap.red.overloadThreshold
+  ) {
+    const message =
+      artificialEngineeredFoodConstructionCategoryColorMap.red.overloadMessage;
+    return buildBaseSummary(
+      "artificial_engineered_food_construction",
+      overloadEligibleMatches,
+      {
+        severity: "red",
+        displayLabel: formatCountLabel(overloadEligibleMatches.length),
+        shortMessage: message,
+        userFacingReason: message,
+        redReasonType: "count_overload",
+      },
+    );
+  }
+
+  if (concernMatches.length > 0) {
+    const message =
+      artificialEngineeredFoodConstructionCategoryColorMap.yellow.message;
+    return buildBaseSummary("artificial_engineered_food_construction", concernMatches, {
+      severity: "yellow",
+      displayLabel: formatCountLabel(concernMatches.length),
+      shortMessage: message,
+      userFacingReason: message,
     });
   }
 
   if (matches.length > 0) {
     const message =
-      "This product contains artificial or engineered food-construction markers. Truthlabel flags this because the ingredient list suggests the food may be built, extended, reconstructed, or heavily structured.";
+      "Only informational food-construction or fortification context was found from available label data.";
     return buildBaseSummary("artificial_engineered_food_construction", matches, {
-      severity: "yellow",
-      displayLabel: formatCountLabel(matches.length),
+      severity: "green",
+      displayLabel: "Info",
       shortMessage: message,
       userFacingReason: message,
+      isInformational: true,
     });
   }
 
   return buildBaseSummary("artificial_engineered_food_construction", matches, {
     severity: "green",
     displayLabel: "No",
-    shortMessage: "No artificial or engineered food-construction marker found from available label data.",
+    shortMessage: artificialEngineeredFoodConstructionCategoryColorMap.green.display,
     userFacingReason:
-      "No artificial or engineered food-construction marker found from available label data.",
+      artificialEngineeredFoodConstructionCategoryColorMap.green.display,
   });
 }
 
@@ -1204,11 +1540,12 @@ function summarizeUltraProcessedCategory(
     });
   }
 
-  const automaticRedMatch = matches.find((match) => getAutomaticRedReasonFromMatch(match));
+  const concernMatches = getConcernMatches(matches, "ultra_processed_indicators");
+  const automaticRedMatch = concernMatches.find((match) => getAutomaticRedReasonFromMatch(match));
   if (automaticRedMatch) {
     const message =
       "This product contains multiple ultra-processed markers.";
-    return buildBaseSummary("ultra_processed_indicators", matches, {
+    return buildBaseSummary("ultra_processed_indicators", concernMatches, {
       severity: "red",
       displayLabel: "High",
       shortMessage: message,
@@ -1217,10 +1554,10 @@ function summarizeUltraProcessedCategory(
     });
   }
 
-  if (matches.length >= 6) {
+  if (concernMatches.length >= 6) {
     const message =
       "This product contains multiple ultra-processed markers.";
-    return buildBaseSummary("ultra_processed_indicators", matches, {
+    return buildBaseSummary("ultra_processed_indicators", concernMatches, {
       severity: "red",
       displayLabel: "High",
       shortMessage: message,
@@ -1229,14 +1566,26 @@ function summarizeUltraProcessedCategory(
     });
   }
 
-  if (matches.length > 0) {
+  if (concernMatches.length > 0) {
     const message =
       "This product contains ultra-processed ingredient markers.";
-    return buildBaseSummary("ultra_processed_indicators", matches, {
+    return buildBaseSummary("ultra_processed_indicators", concernMatches, {
       severity: "yellow",
       displayLabel: "Likely",
       shortMessage: message,
       userFacingReason: message,
+    });
+  }
+
+  if (matches.length > 0) {
+    const message =
+      "Only informational processing context was found from available label data.";
+    return buildBaseSummary("ultra_processed_indicators", matches, {
+      severity: "green",
+      displayLabel: "Info",
+      shortMessage: message,
+      userFacingReason: message,
+      isInformational: true,
     });
   }
 

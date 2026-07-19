@@ -16,10 +16,23 @@ test("bannedRestrictedItems stores the full starter restricted dataset", () => {
   );
 });
 
-test("bannedRestrictedItems keeps every stored rule as automatic red", () => {
+test("bannedRestrictedItems separates automatic red from regional review rules", () => {
+  const yellowReviewIds = new Set([
+    "orange_b",
+    "citrus_red_no_2",
+    "petrolatum",
+    "paraffin_wax",
+  ]);
+
   bannedRestrictedItems.forEach((item) => {
-    assert.equal(item.severity, "red");
-    assert.equal(item.scoreImpact, "automatic_red");
+    if (yellowReviewIds.has(item.id)) {
+      assert.equal(item.severity, "yellow");
+      assert.equal(item.scoreImpact, "yellow_review");
+    } else {
+      assert.equal(item.severity, "red");
+      assert.equal(item.scoreImpact, "automatic_red");
+    }
+
     assert.ok(item.warningLabel.length > 0);
     assert.ok(item.userFacingReason.length > 0);
     assert.ok(item.countriesRestrictedOrBannedIn.length > 0);

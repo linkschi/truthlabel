@@ -234,7 +234,6 @@ export function summarizeHydrogenatedPartiallyHydrogenatedOilMatches(
   );
   const hasAutomaticRed =
     hasPartiallyHydrogenatedOil ||
-    hasTransFatMarker ||
     redItems.some((item) => item.scoringImpact === "automatic_red");
 
   return {

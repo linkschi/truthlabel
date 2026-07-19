@@ -145,8 +145,10 @@ export function summarizeFlavourSystemMatches(
 
   const dedupedMatches = [...uniqueMatches.values()];
   const redItems = dedupedMatches.filter(hasAutomaticRedRule);
-  const yellowItems = dedupedMatches.filter((item) => !redItems.includes(item));
-  const totalCount = dedupedMatches.length;
+  const yellowItems = dedupedMatches.filter(
+    (item) => item.severity === "yellow" && !redItems.includes(item),
+  );
+  const totalCount = redItems.length + yellowItems.length;
   const hasAutomaticRed = redItems.length > 0;
 
   return {

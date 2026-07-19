@@ -6,7 +6,13 @@ import { cancerLinkedWatchDataPack } from "./cancerLinkedWatch";
 test("cancerLinkedWatchDataPack stores the requested starter dataset", () => {
   assert.equal(cancerLinkedWatchDataPack.id, "cancer_linked_watch");
   assert.equal(cancerLinkedWatchDataPack.categoryName, "Cancer-linked Watch");
-  assert.equal(cancerLinkedWatchDataPack.items.length, 15);
+  assert.equal(cancerLinkedWatchDataPack.items.length, 16);
+  assert.ok(
+    cancerLinkedWatchDataPack.items.some(
+      (item) =>
+        item.id === "aspartame" && item.basicSeveritySuggestion === "red",
+    ),
+  );
 });
 
 test("cancerLinkedWatchDataPack keeps only yellow and red severity suggestions", () => {

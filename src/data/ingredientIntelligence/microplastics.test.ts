@@ -9,12 +9,12 @@ test("microplasticsDataPack stores the requested starter dataset", () => {
   assert.equal(microplasticsDataPack.items.length, 15);
 });
 
-test("microplasticsDataPack keeps starter entries yellow by default", () => {
+test("microplasticsDataPack keeps packaging markers informational and review markers yellow", () => {
   const severities = new Set(
     microplasticsDataPack.items.map((item) => item.basicSeveritySuggestion),
   );
 
-  assert.deepEqual([...severities].sort(), ["yellow"]);
+  assert.deepEqual([...severities].sort(), ["green", "yellow"]);
 });
 
 test("microplasticsDataPack keeps microplastic item metadata", () => {
@@ -28,7 +28,7 @@ test("microplasticsDataPack keeps microplastic item metadata", () => {
 
 test("microplasticsDataPack does not make detection wording automatic red", () => {
   const redIds = microplasticsDataPack.items
-    .map((item) => item as { id: string; basicSeveritySuggestion: "yellow" | "red" })
+    .map((item) => item as { id: string; basicSeveritySuggestion: "green" | "yellow" | "red" })
     .filter((item) => item.basicSeveritySuggestion === "red")
     .map((item) => item.id)
     .sort();

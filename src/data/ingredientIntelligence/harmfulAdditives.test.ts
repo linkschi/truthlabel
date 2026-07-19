@@ -9,12 +9,12 @@ test("harmfulAdditivesDataPack stores the requested starter dataset", () => {
   assert.equal(harmfulAdditivesDataPack.items.length, 30);
 });
 
-test("harmfulAdditivesDataPack keeps only yellow and red severity suggestions", () => {
+test("harmfulAdditivesDataPack keeps green yellow and red severity suggestions", () => {
   const severities = new Set(
     harmfulAdditivesDataPack.items.map((item) => item.basicSeveritySuggestion),
   );
 
-  assert.deepEqual([...severities].sort(), ["red", "yellow"]);
+  assert.deepEqual([...severities].sort(), ["green", "red", "yellow"]);
 });
 
 test("harmfulAdditivesDataPack keeps the harmful_additives tag on every item", () => {
@@ -28,7 +28,11 @@ test("harmfulAdditivesDataPack keeps the harmful_additives tag on every item", (
 
 test("harmfulAdditivesDataPack keeps source refs on serious regulatory items", () => {
   harmfulAdditivesDataPack.items
-    .filter((item) => item.basicSeveritySuggestion === "red")
+    .filter(
+      (item) =>
+        item.basicSeveritySuggestion === "red" &&
+        item.dataStatus === "verified_core",
+    )
     .forEach((item) => {
       assert.ok(item.sourceRefs.length > 0);
       assert.equal(item.dataStatus, "verified_core");

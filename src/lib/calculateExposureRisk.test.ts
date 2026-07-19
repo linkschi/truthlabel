@@ -103,7 +103,7 @@ test("many yellow issues cap at 64 when no category turns red", () => {
   const result = runExposureRisk({
     ingredients: [
       "Tartrazine",
-      "Aspartame",
+      "Sucralose",
       "Sodium benzoate",
       "Water",
       "Apple",
@@ -115,7 +115,7 @@ test("many yellow issues cap at 64 when no category turns red", () => {
   });
 
   assert.ok(result.exposureRisk >= 25 && result.exposureRisk <= 64);
-  assert.equal(result.verdictLabel, "High Review");
+  assert.equal(result.verdictLabel, "Worth Reviewing");
   assert.equal(result.verdictTone, "yellow");
   assert.ok(
     result.scoreBreakdown.every((entry) => entry.reasonType !== "count_overload"),
@@ -124,7 +124,7 @@ test("many yellow issues cap at 64 when no category turns red", () => {
 
 test("many yellow issues can exceed 65 after category overload rules trigger", () => {
   const result = runExposureRisk({
-    ingredients: ["Aspartame", "Sucralose", "Acesulfame potassium"],
+    ingredients: ["Sucralose", "Saccharin", "Acesulfame potassium"],
   });
 
   assert.ok(result.exposureRisk >= 65);
@@ -200,7 +200,7 @@ test("a verified heavy-metals warning forces the score to at least 90", () => {
   assert.equal(result.verdictLabel, "Strong Warning");
 });
 
-test("a microplastic packaging marker only stays yellow and not red", () => {
+test("a microplastic packaging marker stays informational and not red", () => {
   const result = runExposureRisk({
     ingredients: [],
     ingredientListAvailable: false,
@@ -208,8 +208,8 @@ test("a microplastic packaging marker only stays yellow and not red", () => {
     packagingText: "PET bottle",
   });
 
-  assert.ok(result.exposureRisk >= 25 && result.exposureRisk <= 64);
-  assert.equal(result.verdictTone, "yellow");
+  assert.ok(result.exposureRisk < 25);
+  assert.equal(result.verdictTone, "green");
 });
 
 test("microplastic detection wording stays yellow without official red evidence", () => {

@@ -1,6 +1,9 @@
 export type FryOilFastFoodOilCategoryTag = "fry_oil_fast_food_oil";
 
-export type FryOilFastFoodOilBasicSeveritySuggestion = "yellow" | "red";
+export type FryOilFastFoodOilBasicSeveritySuggestion =
+  | "green"
+  | "yellow"
+  | "red";
 
 export type FryOilFastFoodOilItem = {
   id: string;
@@ -183,7 +186,7 @@ export const fryOilFastFoodOilDataPack = {
         "seed_oils_processed_oils:refined_oil_marker",
       ],
       categoryTags: ["fry_oil_fast_food_oil"],
-      basicSeveritySuggestion: "yellow",
+      basicSeveritySuggestion: "green",
       reason:
         "Processed oil often used in packaged foods, frying, snacks, and fast-food oil systems.",
       userFacingReason:
@@ -220,7 +223,7 @@ export const fryOilFastFoodOilDataPack = {
         "allergy_risk:soy_soya",
       ],
       categoryTags: ["fry_oil_fast_food_oil"],
-      basicSeveritySuggestion: "yellow",
+      basicSeveritySuggestion: "green",
       reason:
         "Processed oil commonly used in packaged foods, fried foods, sauces, and fast-food oil systems.",
       userFacingReason:
@@ -250,7 +253,7 @@ export const fryOilFastFoodOilDataPack = {
       regionalNames: ["Maize oil"],
       linkedExistingPackIds: ["seed_oils_processed_oils:corn_oil"],
       categoryTags: ["fry_oil_fast_food_oil"],
-      basicSeveritySuggestion: "yellow",
+      basicSeveritySuggestion: "green",
       reason:
         "Processed seed/grain oil used in frying, snacks, and packaged foods.",
       userFacingReason:
@@ -285,7 +288,7 @@ export const fryOilFastFoodOilDataPack = {
         "hydrogenated_partially_hydrogenated_oils:hydrogenated_oil_general",
       ],
       categoryTags: ["fry_oil_fast_food_oil"],
-      basicSeveritySuggestion: "yellow",
+      basicSeveritySuggestion: "green",
       reason:
         "Processed seed oil used in some fried foods, shortenings, snacks, and packaged products.",
       userFacingReason:
@@ -320,7 +323,7 @@ export const fryOilFastFoodOilDataPack = {
         "seed_oils_processed_oils:refined_oil_marker",
       ],
       categoryTags: ["fry_oil_fast_food_oil"],
-      basicSeveritySuggestion: "yellow",
+      basicSeveritySuggestion: "green",
       reason:
         "Processed seed oil commonly used in fried foods, snacks, crisps/chips, and packaged products.",
       userFacingReason:
@@ -350,7 +353,7 @@ export const fryOilFastFoodOilDataPack = {
       regionalNames: [],
       linkedExistingPackIds: ["seed_oils_processed_oils:safflower_oil"],
       categoryTags: ["fry_oil_fast_food_oil"],
-      basicSeveritySuggestion: "yellow",
+      basicSeveritySuggestion: "green",
       reason:
         "Processed seed oil used in snacks, packaged foods, and frying oil systems.",
       userFacingReason:
@@ -388,7 +391,7 @@ export const fryOilFastFoodOilDataPack = {
         "ultra_processed_indicators:refined_processed_oils",
       ],
       categoryTags: ["fry_oil_fast_food_oil"],
-      basicSeveritySuggestion: "yellow",
+      basicSeveritySuggestion: "green",
       reason:
         "Processed tropical oil/fat often used in frying, snacks, fast food, and shelf-stable products.",
       userFacingReason:
@@ -422,7 +425,7 @@ export const fryOilFastFoodOilDataPack = {
         "allergy_risk:peanut",
       ],
       categoryTags: ["fry_oil_fast_food_oil"],
-      basicSeveritySuggestion: "yellow",
+      basicSeveritySuggestion: "green",
       reason:
         "Oil sometimes used for frying and relevant to allergen transparency.",
       userFacingReason:
@@ -447,7 +450,7 @@ export const fryOilFastFoodOilDataPack = {
       regionalNames: [],
       linkedExistingPackIds: ["seed_oils_processed_oils:rice_bran_oil"],
       categoryTags: ["fry_oil_fast_food_oil"],
-      basicSeveritySuggestion: "yellow",
+      basicSeveritySuggestion: "green",
       reason:
         "Processed oil sometimes used in frying and packaged foods.",
       userFacingReason:
@@ -651,7 +654,7 @@ export const fryOilFastFoodOilDataPack = {
         "unknown_review:processing_aid_unspecified",
       ],
       categoryTags: ["fry_oil_fast_food_oil"],
-      basicSeveritySuggestion: "yellow",
+      basicSeveritySuggestion: "green",
       reason:
         "Anti-foaming agent sometimes used in oil or frying systems.",
       userFacingReason:
@@ -811,7 +814,7 @@ export const fryOilFastFoodOilDataPack = {
       regionalNames: [],
       linkedExistingPackIds: ["allergy_risk:allergen_warning_statement"],
       categoryTags: ["fry_oil_fast_food_oil"],
-      basicSeveritySuggestion: "yellow",
+      basicSeveritySuggestion: "green",
       reason:
         "Restaurant/menu marker that may matter for allergen cross-contact and frying-oil transparency.",
       userFacingReason:
@@ -848,7 +851,7 @@ export const fryOilFastFoodOilDataPack = {
         "meat_specific_concerns:vague_meat_source",
       ],
       categoryTags: ["fry_oil_fast_food_oil"],
-      basicSeveritySuggestion: "yellow",
+      basicSeveritySuggestion: "green",
       reason:
         "Animal fat used as a cooking or frying fat. This is a frying/source transparency marker.",
       userFacingReason:

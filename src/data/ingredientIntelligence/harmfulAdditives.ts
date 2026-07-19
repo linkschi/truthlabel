@@ -1,4 +1,7 @@
-export type HarmfulAdditivesBasicSeveritySuggestion = "yellow" | "red";
+export type HarmfulAdditivesBasicSeveritySuggestion =
+  | "green"
+  | "yellow"
+  | "red";
 
 export type HarmfulAdditivesDataStatus =
   | "starter"
@@ -512,7 +515,7 @@ export const harmfulAdditivesDataPack = {
         "ultra_processed_indicators:preservative_systems",
       ],
       categoryTags: ["harmful_additives"],
-      basicSeveritySuggestion: "yellow",
+      basicSeveritySuggestion: "red",
       reason: "Synthetic antioxidant preservative.",
       userFacingReason:
         "This product contains BHA, a synthetic antioxidant preservative. Truthlabel flags this as an additive review concern.",
@@ -792,7 +795,7 @@ export const harmfulAdditivesDataPack = {
         "ultra_processed_indicators:flavour_enhancers",
       ],
       categoryTags: ["harmful_additives"],
-      basicSeveritySuggestion: "yellow",
+      basicSeveritySuggestion: "green",
       reason: "Flavour enhancer used to intensify savoury taste.",
       userFacingReason:
         "This product contains MSG, a flavour enhancer. Truthlabel flags this as an additive review concern.",
@@ -825,7 +828,7 @@ export const harmfulAdditivesDataPack = {
         "ultra_processed_indicators:flavour_enhancers",
       ],
       categoryTags: ["harmful_additives"],
-      basicSeveritySuggestion: "yellow",
+      basicSeveritySuggestion: "green",
       reason: "Flavour enhancer often used with glutamates.",
       userFacingReason:
         "This product contains disodium inosinate, a flavour enhancer. Truthlabel flags this as an additive review concern.",
@@ -858,7 +861,7 @@ export const harmfulAdditivesDataPack = {
         "ultra_processed_indicators:flavour_enhancers",
       ],
       categoryTags: ["harmful_additives"],
-      basicSeveritySuggestion: "yellow",
+      basicSeveritySuggestion: "green",
       reason: "Flavour enhancer often used with glutamates.",
       userFacingReason:
         "This product contains disodium guanylate, a flavour enhancer. Truthlabel flags this as an additive review concern.",

@@ -21,7 +21,10 @@ export type ArtificialColourFamily =
 
 export type ArtificialColourSourceType = "label_based" | "manual_watchlist";
 
-export type ArtificialColourScoreImpact = "yellow_additive" | "automatic_red";
+export type ArtificialColourScoreImpact =
+  | "informational"
+  | "yellow_additive"
+  | "automatic_red";
 
 export type ArtificialColourEvidenceStatus = "needs_region_verification";
 
@@ -50,7 +53,7 @@ export type ArtificialColourStarterItem = {
   insNumbers: string[];
   colourFamily: ArtificialColourFamily;
   categories: ArtificialColourCategory[];
-  severity: "yellow" | "red";
+  severity: "green" | "yellow" | "red";
   scoreImpact: ArtificialColourScoreImpact;
   sourceType: ArtificialColourSourceType;
   evidenceStatus: ArtificialColourEvidenceStatus;

@@ -58,7 +58,7 @@ test("Red No. 3 and E127 stay one canonical match inside the demo scan runner", 
   );
 });
 
-test("Zero Sugar Citrus Drink triggers red sweetener overload", () => {
+test("Zero Sugar Citrus Drink triggers direct red because Aspartame is strict red", () => {
   const output = runProduct("zero-sugar-citrus-drink");
   const summary = findCategorySummary(
     output,
@@ -66,17 +66,17 @@ test("Zero Sugar Citrus Drink triggers red sweetener overload", () => {
   );
 
   assert.equal(summary.severity, "red");
-  assert.equal(summary.redReasonType, "count_overload");
+  assert.equal(summary.redReasonType, "direct_red_ingredient");
   assert.equal(summary.matchCount, 3);
 });
 
-test("Shelf Stable Sauce keeps three preservatives at yellow review", () => {
+test("Shelf Stable Sauce counts only concern-level preservatives", () => {
   const output = runProduct("shelf-stable-sauce");
   const summary = findCategorySummary(output, "preservatives_shelf_life_systems");
 
   assert.equal(summary.severity, "yellow");
   assert.equal(summary.redReasonType, undefined);
-  assert.equal(summary.matchCount, 3);
+  assert.equal(summary.matchCount, 1);
 });
 
 test("Chocolate Milk Drink becomes red for Allergy Risk with a milk profile match", () => {
@@ -99,11 +99,12 @@ test("Baby Rice Puffs keep Heavy Metals at yellow review, not red", () => {
   assert.equal(summary.redReasonType, undefined);
 });
 
-test("Spring Water keeps Microplastics at yellow review, not red", () => {
+test("Spring Water keeps Microplastics as green informational packaging context", () => {
   const output = runProduct("spring-water");
   const summary = findCategorySummary(output, "microplastics");
 
-  assert.equal(summary.severity, "yellow");
+  assert.equal(summary.severity, "green");
+  assert.equal(summary.isInformational, true);
   assert.equal(summary.redReasonType, undefined);
 });
 

@@ -40,7 +40,7 @@ export const flavourEnhancersFlavouringsDataPack = {
       ],
       spellingVariants: ["Flavour", "Flavor"],
       regionalNames: [],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Flavour enhancer used to intensify savoury/umami taste in processed foods.",
       healthConcernType: "flavour_enhancer_umami_booster",
@@ -114,7 +114,7 @@ export const flavourEnhancersFlavouringsDataPack = {
       ],
       spellingVariants: ["Flavour", "Flavor"],
       regionalNames: [],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Glutamate flavour enhancer family used to boost savoury/umami taste.",
       healthConcernType: "flavour_enhancer_umami_booster",
@@ -182,7 +182,7 @@ export const flavourEnhancersFlavouringsDataPack = {
       ],
       spellingVariants: ["Flavour", "Flavor"],
       regionalNames: [],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Nucleotide flavour enhancer family used to strongly boost savoury taste, often together with MSG or glutamates.",
       healthConcernType: "nucleotide_flavour_enhancer",
@@ -251,7 +251,7 @@ export const flavourEnhancersFlavouringsDataPack = {
       ],
       spellingVariants: ["Flavour", "Flavor"],
       regionalNames: [],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Nucleotide flavour enhancer family used to intensify savoury taste, often in snacks, noodles, sauces, seasonings, and processed meats.",
       healthConcernType: "nucleotide_flavour_enhancer",
@@ -307,7 +307,7 @@ export const flavourEnhancersFlavouringsDataPack = {
       ],
       spellingVariants: ["Flavour", "Flavor"],
       regionalNames: [],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Powerful savoury flavour enhancer blend often used with MSG/glutamates to intensify processed food taste.",
       healthConcernType: "nucleotide_flavour_enhancer",
@@ -343,7 +343,7 @@ export const flavourEnhancersFlavouringsDataPack = {
       ],
       spellingVariants: ["Flavour", "Flavor"],
       regionalNames: [],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Savoury flavouring ingredient often used to create umami taste in processed foods.",
       healthConcernType: "savoury_flavouring_umami_marker",
@@ -384,7 +384,7 @@ export const flavourEnhancersFlavouringsDataPack = {
         "Flavor"
       ],
       regionalNames: [],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Processed yeast-derived flavouring used to intensify savoury taste.",
       healthConcernType: "savoury_flavouring_umami_marker",
@@ -923,7 +923,7 @@ export const flavourEnhancersFlavouringsDataPack = {
       ],
       spellingVariants: ["Flavour", "Flavor"],
       regionalNames: [],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Flavour enhancer or modifier used in some processed foods.",
       healthConcernType: "flavour_enhancer_modifier",

@@ -15,11 +15,14 @@ export type ArtificialColourHealthConcernType =
   | "genotoxicity_concern"
   | "colour_additive";
 
-export type ArtificialColourAlertTone = "firm_review" | "firm_alert";
+export type ArtificialColourAlertTone =
+  | "informational"
+  | "firm_review"
+  | "firm_alert";
 
 export type ArtificialColourSeverityOverlayItem = {
   id: string;
-  severity: "yellow" | "red";
+  severity: "green" | "yellow" | "red";
   scoreImpact: ArtificialColourScoreImpact;
   restrictionStatus: ArtificialColourRestrictionStatus;
   restrictedRegions: string[];
@@ -128,17 +131,17 @@ export const artificialColoursSeverityOverlay: ArtificialColourSeverityOverlayIt
   },
   {
     id: "amaranth",
-    severity: "yellow",
-    scoreImpact: "yellow_additive",
+    severity: "red",
+    scoreImpact: "automatic_red",
     restrictionStatus: "needs_verification",
     restrictedRegions: [],
     restrictionReason:
       "Synthetic artificial colour additive. Region status needs verification before banned/restricted wording is used.",
     healthConcernType: "synthetic_colour_additive",
-    alertTone: "firm_review",
-    warningLabel: "ARTIFICIAL COLOUR FOUND",
+    alertTone: "firm_alert",
+    warningLabel: "BANNED / RESTRICTED COLOUR",
     userFacingReason:
-      "This is an artificial colour additive. Truthlabel flags it because it is a synthetic additive used to change the appearance of food. Avoid products with artificial colours where possible.",
+        "This is the same substance as FD&C Red No. 2. Truthlabel treats it as a red artificial-colour concern where a supported market has delisted or prohibited that colour additive.",
   },
   {
     id: "ponceau_4r",
@@ -254,31 +257,31 @@ export const artificialColoursSeverityOverlay: ArtificialColourSeverityOverlayIt
   },
   {
     id: "citrus_red_no_2",
-    severity: "red",
-    scoreImpact: "automatic_red",
+    severity: "yellow",
+    scoreImpact: "yellow_additive",
     restrictionStatus: "under_removal_process",
     restrictedRegions: ["US"],
     restrictionReason:
       "FDA announced action to remove the color additive regulation allowing this dye.",
     healthConcernType: "regulatory_removal_action",
-    alertTone: "firm_alert",
-    warningLabel: "BANNED / RESTRICTED COLOUR",
+    alertTone: "firm_review",
+    warningLabel: "REGULATORY REMOVAL WATCH",
     userFacingReason:
-      "This ingredient is under regulatory removal action in the United States. Truthlabel flags this as a serious safety concern. Avoid this ingredient where possible.",
+        "Regulators are taking steps to remove or limit this colour from the food supply. Its current legal status depends on the country and effective date, so Truthlabel flags it for regulatory review.",
   },
   {
     id: "orange_b",
-    severity: "red",
-    scoreImpact: "automatic_red",
+    severity: "yellow",
+    scoreImpact: "yellow_additive",
     restrictionStatus: "under_removal_process",
     restrictedRegions: ["US"],
     restrictionReason:
       "FDA announced action to remove the color additive regulation allowing this dye.",
     healthConcernType: "regulatory_removal_action",
-    alertTone: "firm_alert",
-    warningLabel: "BANNED / RESTRICTED COLOUR",
+    alertTone: "firm_review",
+    warningLabel: "REGULATORY REMOVAL WATCH",
     userFacingReason:
-      "This ingredient is under regulatory removal action in the United States. Truthlabel flags this as a serious safety concern. Avoid this ingredient where possible.",
+        "Regulators are taking steps to remove or limit this colour from the food supply. Its current legal status depends on the country and effective date, so Truthlabel flags it for regulatory review.",
   },
   {
     id: "titanium_dioxide",
@@ -309,30 +312,30 @@ export const artificialColoursSeverityOverlay: ArtificialColourSeverityOverlayIt
   },
   {
     id: "caramel_i",
-    severity: "yellow",
-    scoreImpact: "yellow_additive",
+    severity: "green",
+    scoreImpact: "informational",
     restrictionStatus: "none",
     restrictedRegions: [],
     restrictionReason:
       "Plain caramel colour additive used to darken foods and drinks.",
     healthConcernType: "colour_additive",
-    alertTone: "firm_review",
-    warningLabel: "COLOUR ADDITIVE FOUND",
+    alertTone: "informational",
+    warningLabel: "COLOUR ADDITIVE INFORMATION",
     userFacingReason:
-      "This is a colour additive used to change the appearance of food or drinks. Truthlabel counts it as a processed/artificial ingredient.",
+        "This caramel colour class is recorded as colour-additive information. Truthlabel does not treat it as a harmful-ingredient warning by presence alone.",
   },
   {
     id: "caramel_ii",
-    severity: "yellow",
-    scoreImpact: "yellow_additive",
+    severity: "green",
+    scoreImpact: "informational",
     restrictionStatus: "none",
     restrictedRegions: [],
     restrictionReason: "Caramel colour additive used to darken foods and drinks.",
     healthConcernType: "colour_additive",
-    alertTone: "firm_review",
-    warningLabel: "COLOUR ADDITIVE FOUND",
+    alertTone: "informational",
+    warningLabel: "COLOUR ADDITIVE INFORMATION",
     userFacingReason:
-      "This is a colour additive used to change the appearance of food or drinks. Truthlabel counts it as a processed/artificial ingredient.",
+        "This caramel colour class is recorded as colour-additive information. Truthlabel does not treat it as a harmful-ingredient warning by presence alone.",
   },
   {
     id: "caramel_iii",

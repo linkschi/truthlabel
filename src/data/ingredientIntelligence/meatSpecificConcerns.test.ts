@@ -12,7 +12,7 @@ test("meatSpecificConcernsDataPack stores the requested starter dataset", () => 
   assert.equal(meatSpecificConcernsDataPack.items.length, 20);
 });
 
-test("meatSpecificConcernsDataPack keeps revised green and yellow severities", () => {
+test("meatSpecificConcernsDataPack keeps revised green yellow and red severities", () => {
   const severities = new Set(
     meatSpecificConcernsDataPack.items.map(
       (item) => item.basicSeveritySuggestion,
@@ -23,12 +23,16 @@ test("meatSpecificConcernsDataPack keeps revised green and yellow severities", (
     .map((item) => item.id)
     .sort();
 
-  assert.deepEqual([...severities].sort(), ["green", "yellow"]);
+  assert.deepEqual([...severities].sort(), ["green", "red", "yellow"]);
   assert.deepEqual(greenIds, [
+    "breaded_coated_meat_marker",
+    "brine_marinade_solution",
     "cultivated_cell_cultured_meat_marker",
     "feed_source_grain_corn_soy_fed",
     "feed_source_grass_fed",
     "no_antibiotics_hormones_claim",
+    "soy_plant_protein_in_meat",
+    "water_added_injected_meat",
   ]);
 });
 

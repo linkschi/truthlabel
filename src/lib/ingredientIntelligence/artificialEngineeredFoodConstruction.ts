@@ -1,6 +1,8 @@
 import {
+  artificialEngineeredFoodConstructionCategoryColorMap,
   artificialEngineeredFoodConstructionGroups,
   artificialEngineeredFoodConstructionGroupsById,
+  getArtificialEngineeredFoodConstructionGroupBehavior,
   type ArtificialEngineeredFoodConstructionGroup,
 } from "@/data/ingredientIntelligence/artificialEngineeredFoodConstruction";
 import { bannedRestrictedItems } from "@/data/ingredientIntelligence/bannedRestrictedItems";
@@ -46,6 +48,11 @@ export type ArtificialEngineeredFoodConstructionGroupMatch = {
 export type ArtificialEngineeredFoodConstructionSummary = {
   totalMarkerCount: number;
   neutralMarkerCount: number;
+  consumerPreferenceMarkerCount: number;
+  processingMarkerCount: number;
+  inheritedMarkerCount: number;
+  transparencyMarkerCount: number;
+  overloadEligibleMarkerCount: number;
   displayCount: number;
   categorySeverity: MatchableSeverity;
   hasMeaningfulValue: boolean;
@@ -333,6 +340,31 @@ function getEvidenceCount(
   ).length;
 }
 
+function evidenceHasGroupBehavior(
+  match: EvidenceMatch,
+  predicate: (
+    behavior: ReturnType<
+      typeof getArtificialEngineeredFoodConstructionGroupBehavior
+    >,
+  ) => boolean,
+) {
+  return [...match.matchedGroupIds].some((groupId) =>
+    predicate(getArtificialEngineeredFoodConstructionGroupBehavior(groupId)),
+  );
+}
+
+function getEvidenceCountByGroupBehavior(
+  matches: EvidenceMatch[],
+  predicate: (
+    behavior: ReturnType<
+      typeof getArtificialEngineeredFoodConstructionGroupBehavior
+    >,
+  ) => boolean,
+) {
+  return matches.filter((match) => evidenceHasGroupBehavior(match, predicate))
+    .length;
+}
+
 function getGroupMatchedIngredients(
   groupMatches: ArtificialEngineeredFoodConstructionGroupMatch[],
   groupId: string,
@@ -372,7 +404,7 @@ function buildWarningText({
   groupMatches: ArtificialEngineeredFoodConstructionGroupMatch[];
 }) {
   if (categorySeverity === "red") {
-    return labelTransparencyRiskGroup.strongerWarning;
+    return artificialEngineeredFoodConstructionCategoryColorMap.red.overloadMessage;
   }
 
   const directMatches = groupMatches.filter(
@@ -380,7 +412,11 @@ function buildWarningText({
   );
 
   if (directMatches.length === 1) {
-    return directMatches[0].group.userFacingWarning;
+    const behavior = getArtificialEngineeredFoodConstructionGroupBehavior(
+      directMatches[0].group.id,
+    );
+
+    return `${behavior.title}. ${behavior.directExplanation}`;
   }
 
   if (
@@ -414,7 +450,7 @@ function buildWarningText({
   }
 
   if (groupMatches.length > 1) {
-    return labelTransparencyRiskGroup.userFacingWarning;
+    return artificialEngineeredFoodConstructionCategoryColorMap.yellow.message;
   }
 
   return "No artificial or engineered food-construction markers were found.";
@@ -478,6 +514,26 @@ export function analyzeArtificialEngineeredFoodConstruction(
 
   const totalMarkerCount = countedEvidence.length;
   const neutralMarkerCount = neutralOnlyEvidence.length;
+  const consumerPreferenceMarkerCount = getEvidenceCountByGroupBehavior(
+    countedEvidence,
+    (behavior) => behavior.flagType === "consumer_preference",
+  );
+  const processingMarkerCount = getEvidenceCountByGroupBehavior(
+    countedEvidence,
+    (behavior) => behavior.flagType === "processing",
+  );
+  const inheritedMarkerCount = getEvidenceCountByGroupBehavior(
+    countedEvidence,
+    (behavior) => behavior.flagType === "inherited",
+  );
+  const transparencyMarkerCount = getEvidenceCountByGroupBehavior(
+    countedEvidence,
+    (behavior) => behavior.flagType === "label_transparency",
+  );
+  const overloadEligibleMarkerCount = getEvidenceCountByGroupBehavior(
+    countedEvidence,
+    (behavior) => behavior.overloadEligible,
+  );
   const hasBioengineeredDisclosure = countedEvidence.some((match) =>
     match.matchedGroupIds.has(bioengineeredGroupId) ||
     match.matchedGroupIds.has(specificBioengineeredFoodsGroupId),
@@ -548,7 +604,9 @@ export function analyzeArtificialEngineeredFoodConstruction(
     input.productCategory === "drinks_beverages" ||
     hasAnyKeyword(joinedContextText, drinkKeywords);
   const looksLikeMeatFishOrSeafood = looksLikeMeatOrFastFood || looksLikeSeafood;
-  const hasHeavyConstructionLoad = totalMarkerCount >= 4;
+  const hasHeavyConstructionLoad =
+    overloadEligibleMarkerCount >=
+    artificialEngineeredFoodConstructionCategoryColorMap.red.overloadThreshold;
   const hasMeatOrSeafoodExtenderTrigger =
     looksLikeMeatFishOrSeafood && extenderBinderCombinedCount >= 2;
   const hasReformedWithBinderTrigger =
@@ -586,37 +644,7 @@ export function analyzeArtificialEngineeredFoodConstruction(
 
   if (hasHeavyConstructionLoad) {
     redReasons.push(
-      `The product shows ${totalMarkerCount} total construction markers, which crosses the 4+ red threshold.`,
-    );
-  }
-
-  if (hasMeatOrSeafoodExtenderTrigger) {
-    redReasons.push(
-      "Two or more filler, binder, or extender markers appear in a meat, fish, or seafood context.",
-    );
-  }
-
-  if (hasReformedWithBinderTrigger) {
-    redReasons.push(
-      "Reformed or mechanically separated meat/seafood appears with binders, fillers, or extenders.",
-    );
-  }
-
-  if (hasImitationTextureTrigger) {
-    redReasons.push(
-      "Imitation or cultivated protein markers appear with artificial texture or appearance systems.",
-    );
-  }
-
-  if (hasNovelTechnologyEscalationTrigger) {
-    redReasons.push(
-      "Novel engineered, animal-free, recombinant, or cultivated ingredient markers appear together with multiple companion construction systems.",
-    );
-  }
-
-  if (hasSimpleFoodMismatch) {
-    redReasons.push(
-      "The product looks like a simple food, but the ingredient evidence shows a heavy construction load.",
+      `The product shows ${overloadEligibleMarkerCount} overload-eligible processing markers, which crosses Truthlabel's ${artificialEngineeredFoodConstructionCategoryColorMap.red.overloadThreshold}-marker engineered-food overload threshold.`,
     );
   }
 
@@ -655,39 +683,25 @@ export function analyzeArtificialEngineeredFoodConstruction(
 
   let scoreContribution = 0;
 
-  if (totalMarkerCount >= 4) {
+  if (overloadEligibleMarkerCount >= 5) {
     scoreContribution += 25;
-  } else if (totalMarkerCount === 3) {
+  } else if (overloadEligibleMarkerCount === 4) {
     scoreContribution += 16;
-  } else if (totalMarkerCount === 2) {
+  } else if (overloadEligibleMarkerCount === 3) {
     scoreContribution += 10;
-  } else if (totalMarkerCount === 1) {
+  } else if (overloadEligibleMarkerCount === 2) {
     scoreContribution += 6;
+  } else if (overloadEligibleMarkerCount === 1) {
+    scoreContribution += 4;
   }
 
   if (hasMechanicallySeparated || hasReformedOrReconstructed) {
     scoreContribution = Math.max(scoreContribution, 12);
   }
 
-  if (hasBioengineeredDisclosure) {
-    scoreContribution += 6;
-  }
-
-  if (hasCultivatedProtein) {
-    scoreContribution += 8;
-  }
-
-  if (hasNovelTechnologyReviewBoost) {
-    scoreContribution += 4;
-  }
-
   if (
     hasBannedRestrictedOverlap ||
-    hasMeatOrSeafoodExtenderTrigger ||
-    hasReformedWithBinderTrigger ||
-    hasImitationTextureTrigger ||
-    hasSimpleFoodMismatch ||
-    hasNovelTechnologyEscalationTrigger
+    hasHeavyConstructionLoad
   ) {
     scoreContribution = Math.max(scoreContribution, 25);
   }
@@ -702,6 +716,11 @@ export function analyzeArtificialEngineeredFoodConstruction(
   return {
     totalMarkerCount,
     neutralMarkerCount,
+    consumerPreferenceMarkerCount,
+    processingMarkerCount,
+    inheritedMarkerCount,
+    transparencyMarkerCount,
+    overloadEligibleMarkerCount,
     displayCount,
     categorySeverity,
     hasMeaningfulValue: categorySeverity !== "green" || neutralMarkerCount >= 2,

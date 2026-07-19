@@ -14,7 +14,7 @@ export type MeatSpecificConcernsItem = {
   regionalNames: string[];
   linkedExistingPackIds: string[];
   categoryTags: MeatSpecificConcernsCategoryTag[];
-  basicSeveritySuggestion: "green" | "yellow";
+  basicSeveritySuggestion: "green" | "yellow" | "red";
   reason: string;
   userFacingReason: string;
   dataStatus: "starter";
@@ -193,7 +193,7 @@ export const meatSpecificConcernsDataPack = {
         "artificial_engineered_food_construction:label_transparency_risk_markers",
       ],
       categoryTags: ["meat_specific_concerns"],
-      basicSeveritySuggestion: "yellow",
+      basicSeveritySuggestion: "green",
       reason:
         "Marker that the meat product may contain added water, brine, or solution.",
       userFacingReason:
@@ -238,7 +238,7 @@ export const meatSpecificConcernsDataPack = {
         "unknown_review:compound_ingredient_unexpanded",
       ],
       categoryTags: ["meat_specific_concerns"],
-      basicSeveritySuggestion: "yellow",
+      basicSeveritySuggestion: "green",
       reason:
         "Meat-processing marker showing the product may be treated with brine, marinade, or solution.",
       userFacingReason:
@@ -321,7 +321,7 @@ export const meatSpecificConcernsDataPack = {
         "preservatives_shelf_life_systems",
       ],
       categoryTags: ["meat_specific_concerns"],
-      basicSeveritySuggestion: "yellow",
+      basicSeveritySuggestion: "red",
       reason:
         "Processed-meat marker connected to curing systems.",
       userFacingReason:
@@ -510,7 +510,7 @@ export const meatSpecificConcernsDataPack = {
         "unknown_review:vegetable_protein_unspecified",
       ],
       categoryTags: ["meat_specific_concerns"],
-      basicSeveritySuggestion: "yellow",
+      basicSeveritySuggestion: "green",
       reason:
         "Plant protein may be used to extend or texture processed meat products.",
       userFacingReason:
@@ -597,7 +597,7 @@ export const meatSpecificConcernsDataPack = {
         "preservatives_shelf_life_systems",
       ],
       categoryTags: ["meat_specific_concerns"],
-      basicSeveritySuggestion: "yellow",
+      basicSeveritySuggestion: "red",
       reason:
         "Processed-meat product marker.",
       userFacingReason:
@@ -649,7 +649,7 @@ export const meatSpecificConcernsDataPack = {
       confidenceLevel: null,
       sourceRefs: [],
       matchingNotes:
-        "Do not mark red from product form alone. Analyze ingredients for binders, fillers, oils, additives, coatings, and preservatives.",
+        "Keep yellow from product form alone. Treat as red only if separate evidence shows curing, smoking, salting, fermentation, or another processed-meat preservation system.",
     },
     {
       id: "breaded_coated_meat_marker",
@@ -678,7 +678,7 @@ export const meatSpecificConcernsDataPack = {
         "unknown_review:compound_ingredient_unexpanded",
       ],
       categoryTags: ["meat_specific_concerns"],
-      basicSeveritySuggestion: "yellow",
+      basicSeveritySuggestion: "green",
       reason:
         "Coated meat products often include extra starches, oils, additives, or seasoning systems.",
       userFacingReason:

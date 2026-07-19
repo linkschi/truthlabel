@@ -48,6 +48,7 @@ export type HeavyMetalsItem = {
   confidenceLevel: HeavyMetalsConfidenceLevel;
   sourceRefs: string[];
   matchingNotes: string;
+  requiresProductEvidence?: boolean;
 };
 
 export const heavyMetalsDataPack = {
@@ -76,6 +77,7 @@ export const heavyMetalsDataPack = {
       linkedExistingPackIds: [],
       categoryTags: ["heavy_metals"],
       basicSeveritySuggestion: "red",
+      requiresProductEvidence: true,
       reason:
         "Heavy metal contaminant. Red should only trigger from verified product-specific testing, official recall, or official warning data.",
       userFacingReason:
@@ -112,6 +114,7 @@ export const heavyMetalsDataPack = {
       linkedExistingPackIds: [],
       categoryTags: ["heavy_metals"],
       basicSeveritySuggestion: "red",
+      requiresProductEvidence: true,
       reason:
         "Heavy metal or metalloid contaminant. Red should only trigger from verified product-specific testing, official recall, or official warning data.",
       userFacingReason:
@@ -143,6 +146,7 @@ export const heavyMetalsDataPack = {
       linkedExistingPackIds: [],
       categoryTags: ["heavy_metals"],
       basicSeveritySuggestion: "red",
+      requiresProductEvidence: true,
       reason:
         "Heavy metal contaminant. Red should only trigger from verified product-specific testing, official recall, or official warning data.",
       userFacingReason:
@@ -180,6 +184,7 @@ export const heavyMetalsDataPack = {
       linkedExistingPackIds: [],
       categoryTags: ["heavy_metals"],
       basicSeveritySuggestion: "red",
+      requiresProductEvidence: true,
       reason:
         "Heavy metal contaminant, especially relevant to some seafood categories. Red should only trigger from verified product-specific data or official high-mercury seafood rules.",
       userFacingReason:

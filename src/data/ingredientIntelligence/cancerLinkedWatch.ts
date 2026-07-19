@@ -219,17 +219,62 @@ export const cancerLinkedWatchDataPack = {
         "harmful_additives:bha",
       ],
       categoryTags: ["cancer_linked_watch"],
-      basicSeveritySuggestion: "yellow",
+      basicSeveritySuggestion: "red",
       cancerWatchReasonType: "animal_study_cancer_concern",
       reason:
-        "Synthetic antioxidant preservative with animal-study cancer concern signals.",
+        "Synthetic antioxidant preservative with possible cancer-hazard concern signals.",
       userFacingReason:
-        "This ingredient is on Truthlabel's Cancer-linked Watch because it has animal-study cancer concern signals. Truthlabel flags it for review, not as proof that the product causes cancer.",
+        "This ingredient is on Truthlabel's Cancer-linked Watch because it has possible cancer-hazard concern signals. Truthlabel flags it for review, not as proof that the product causes cancer.",
       dataStatus: "needs_region_verification",
       confidenceLevel: null,
       sourceRefs: ["NTP_BHA_REPORT_ON_CARCINOGENS"],
       matchingNotes:
         "Reuse alias coverage from Preservatives & Shelf-Life Systems and Harmful Additives. Do not double count if BHA and E320 appear together.",
+    },
+    {
+      id: "aspartame",
+      canonicalIngredientId: "aspartame",
+      linkedIngredientId: "aspartame",
+      mainName: "Aspartame",
+      otherNames: [
+        "Aspartame",
+        "E951",
+        "E-951",
+        "INS 951",
+        "NutraSweet",
+        "Equal",
+        "Canderel",
+        "APM",
+      ],
+      chemicalNames: [
+        "N-(L-alpha-Aspartyl)-L-phenylalanine 1-methyl ester",
+      ],
+      brandNames: ["NutraSweet", "Equal", "Canderel"],
+      eNumbers: ["E951", "E-951"],
+      insNumbers: ["951", "INS 951"],
+      abbreviations: ["APM"],
+      labelVariants: [
+        "Sweetener aspartame",
+        "Artificial sweetener aspartame",
+        "Contains aspartame",
+      ],
+      spellingVariants: [],
+      regionalNames: [],
+      linkedExistingPackIds: [
+        "artificial_sweeteners_sugar_substitutes:aspartame",
+      ],
+      categoryTags: ["cancer_linked_watch"],
+      basicSeveritySuggestion: "red",
+      cancerWatchReasonType: "iarc_possible_carcinogen",
+      reason:
+        "High-intensity sweetener with a possible cancer-hazard classification signal.",
+      userFacingReason:
+        "This ingredient is on Truthlabel's Cancer-linked Watch because it has a possible cancer-hazard classification signal. This is a review signal, not proof that one product causes cancer.",
+      dataStatus: "verified_core",
+      confidenceLevel: null,
+      sourceRefs: ["IARC_ASPARTAME_2023"],
+      matchingNotes:
+        "Do not double count when aspartame also appears in Artificial Sweeteners. Wording must say possible cancer-hazard classification, not proven product-level cancer risk.",
     },
     {
       id: "sodium_nitrite",
@@ -687,12 +732,12 @@ export const cancerLinkedWatchDataPack = {
         "preservatives_shelf_life_systems:potassium_nitrate",
       ],
       categoryTags: ["cancer_linked_watch"],
-      basicSeveritySuggestion: "yellow",
+      basicSeveritySuggestion: "red",
       cancerWatchReasonType: "processed_meat_context",
       reason:
-        "Processed meat curing and smoking are relevant to cancer-concern context.",
+        "Processed meat curing, smoking, salting, or fermentation is a cancer-watch concern context.",
       userFacingReason:
-        "This product appears to use a processed-meat curing or smoking system. Truthlabel flags this as a cancer-watch review concern, not proof of harm from one product.",
+        "This product appears to use a processed-meat curing, smoking, salting, or fermentation system. Truthlabel flags this as a cancer-watch concern, not proof of harm from one product.",
       dataStatus: "needs_expansion",
       confidenceLevel: null,
       sourceRefs: ["WHO_IARC_PROCESSED_MEAT_2015"],

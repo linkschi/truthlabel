@@ -1,4 +1,4 @@
-export type MicroplasticsBasicSeveritySuggestion = "yellow" | "red";
+export type MicroplasticsBasicSeveritySuggestion = "green" | "yellow" | "red";
 
 export type MicroplasticsDataStatus =
   | "starter"
@@ -166,7 +166,7 @@ export const microplasticsDataPack = {
       detectionBasis: "product_category_marker",
       linkedExistingPackIds: ["natural_positive:water"],
       categoryTags: ["microplastics"],
-      basicSeveritySuggestion: "yellow",
+      basicSeveritySuggestion: "green",
       reason:
         "Bottled water in plastic packaging is a product category where microplastic review may be relevant, but product-specific testing is needed.",
       userFacingReason:
@@ -207,7 +207,7 @@ export const microplasticsDataPack = {
       detectionBasis: "packaging_marker",
       linkedExistingPackIds: [],
       categoryTags: ["microplastics"],
-      basicSeveritySuggestion: "yellow",
+      basicSeveritySuggestion: "green",
       reason:
         "Plastic-bottle packaging may be relevant to microplastic review, but packaging alone does not prove contamination.",
       userFacingReason:
@@ -253,7 +253,7 @@ export const microplasticsDataPack = {
       detectionBasis: "packaging_marker",
       linkedExistingPackIds: [],
       categoryTags: ["microplastics"],
-      basicSeveritySuggestion: "yellow",
+      basicSeveritySuggestion: "green",
       reason:
         "Plastic-contact food packaging may be relevant to microplastic review, but packaging alone does not prove contamination.",
       userFacingReason:
@@ -326,7 +326,7 @@ export const microplasticsDataPack = {
       brandNames: [],
       eNumbers: [],
       insNumbers: [],
-      abbreviations: ["PET"],
+      abbreviations: [],
       labelVariants: ["Pyramid tea bag", "Nylon tea bag", "Mesh tea bag"],
       spellingVariants: [],
       regionalNames: [],
@@ -376,7 +376,7 @@ export const microplasticsDataPack = {
       detectionBasis: "packaging_marker",
       linkedExistingPackIds: ["natural_positive:tea_coffee_infusions"],
       categoryTags: ["microplastics"],
-      basicSeveritySuggestion: "yellow",
+      basicSeveritySuggestion: "green",
       reason:
         "Single-serve pods or capsules may involve plastic contact and heat, which can be relevant to microplastic review.",
       userFacingReason:
@@ -420,7 +420,7 @@ export const microplasticsDataPack = {
         "allergy_risk:molluscs",
       ],
       categoryTags: ["microplastics"],
-      basicSeveritySuggestion: "yellow",
+      basicSeveritySuggestion: "green",
       reason:
         "Seafood is a product category where microplastic review may be relevant depending on species, sourcing, and testing data.",
       userFacingReason:
@@ -454,7 +454,7 @@ export const microplasticsDataPack = {
       detectionBasis: "product_category_marker",
       linkedExistingPackIds: ["allergy_risk:molluscs"],
       categoryTags: ["microplastics"],
-      basicSeveritySuggestion: "yellow",
+      basicSeveritySuggestion: "green",
       reason:
         "Bivalve shellfish are a seafood subgroup often discussed in microplastic exposure review because they may be eaten whole.",
       userFacingReason:
@@ -488,7 +488,7 @@ export const microplasticsDataPack = {
       detectionBasis: "product_category_marker",
       linkedExistingPackIds: ["natural_positive:salt"],
       categoryTags: ["microplastics"],
-      basicSeveritySuggestion: "yellow",
+      basicSeveritySuggestion: "green",
       reason:
         "Salt products may require microplastic review depending on source and testing data.",
       userFacingReason:

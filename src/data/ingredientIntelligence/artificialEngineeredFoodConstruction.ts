@@ -10,6 +10,41 @@ export type ArtificialEngineeredFoodConstructionDataStatus =
   | "needs_expansion"
   | "verified_core";
 
+export type ArtificialEngineeredFoodConstructionFlagType =
+  | "consumer_preference"
+  | "processing"
+  | "inherited"
+  | "label_transparency";
+
+export type ArtificialEngineeredFoodConstructionGroupBehavior = {
+  flagType: ArtificialEngineeredFoodConstructionFlagType;
+  reason:
+    | "Bioengineered"
+    | "Cell-grown"
+    | "Fortified"
+    | "Fermented"
+    | "Engineered"
+    | "Imitation"
+    | "Reformed"
+    | "Recovered"
+    | "Isolated"
+    | "Filled"
+    | "Bound"
+    | "Modified"
+    | "Stabilized"
+    | "Flavored"
+    | "Concentrated"
+    | "Reconstructed"
+    | "Added fiber"
+    | "Structured"
+    | "Unclear";
+  title: string;
+  directExplanation: string;
+  countsTowardHarmfulIngredientTotal: boolean;
+  countsTowardHealthVerdict: boolean;
+  overloadEligible: boolean;
+};
+
 export type ArtificialEngineeredFoodConstructionGroup = {
   id: string;
   groupName: string;
@@ -31,6 +66,330 @@ const dataStatus: ArtificialEngineeredFoodConstructionDataStatus =
 
 export const artificialEngineeredFoodConstructionDeveloperNote =
   "This is a living marker database. New food-construction ingredients, label terms, and processing markers should be added over time.";
+
+export const artificialEngineeredFoodConstructionCategoryColorMap = {
+  green: {
+    display: "No engineered-food markers detected.",
+  },
+  yellow: {
+    reason: "Engineered",
+    title: "Engineered food methods detected",
+    message:
+      "This product uses biotechnology, reconstructed ingredients, or industrial food-building methods. This does not automatically mean it is harmful, but you may want to review it if you prefer simpler or less engineered food.",
+    action:
+      "Choose a simpler or conventionally produced alternative if this matters to you.",
+  },
+  red: {
+    display:
+      "A specific red ingredient is present, a serious override applies, or enough processing markers cross the overload threshold.",
+    overloadThreshold: 5,
+    overloadReason: "Overload",
+    overloadTitle: "High engineered-food load",
+    overloadMessage:
+      "This product contains several reconstructed, isolated, textured, or heavily modified ingredients. You may want to limit how often you consume it.",
+  },
+} as const;
+
+export const artificialEngineeredFoodConstructionGroupColorMap = {
+  bioengineered_gmo_disclosure_markers: {
+    flagType: "consumer_preference",
+    reason: "Bioengineered",
+    title: "Bioengineered disclosure detected",
+    directExplanation:
+      "This product contains or may contain an ingredient produced using genetic engineering.",
+    countsTowardHarmfulIngredientTotal: false,
+    countsTowardHealthVerdict: false,
+    overloadEligible: false,
+  },
+  cultivated_cell_cultured_protein_markers: {
+    flagType: "consumer_preference",
+    reason: "Cell-grown",
+    title: "Cell-cultured protein detected",
+    directExplanation:
+      "This protein was grown from animal cells instead of coming from conventional farming.",
+    countsTowardHarmfulIngredientTotal: false,
+    countsTowardHealthVerdict: false,
+    overloadEligible: false,
+  },
+  imitation_analogue_food_markers: {
+    flagType: "processing",
+    reason: "Imitation",
+    title: "Imitation food marker detected",
+    directExplanation:
+      "This product is designed to copy another food using substitute ingredients.",
+    countsTowardHarmfulIngredientTotal: true,
+    countsTowardHealthVerdict: true,
+    overloadEligible: true,
+  },
+  reformed_reconstructed_meat_or_seafood_markers: {
+    flagType: "processing",
+    reason: "Reformed",
+    title: "Reformed food marker detected",
+    directExplanation:
+      "Smaller pieces or processed proteins were combined and shaped to resemble a whole cut.",
+    countsTowardHarmfulIngredientTotal: true,
+    countsTowardHealthVerdict: true,
+    overloadEligible: true,
+  },
+  mechanically_separated_recovered_meat_markers: {
+    flagType: "processing",
+    reason: "Recovered",
+    title: "Mechanically recovered meat marker detected",
+    directExplanation:
+      "Meat was mechanically removed from bones and processed into a meat mixture.",
+    countsTowardHarmfulIngredientTotal: true,
+    countsTowardHealthVerdict: true,
+    overloadEligible: true,
+  },
+  protein_isolates_and_textured_proteins: {
+    flagType: "processing",
+    reason: "Isolated",
+    title: "Isolated or textured protein detected",
+    directExplanation:
+      "Protein was separated from its original food and processed to change its texture or function.",
+    countsTowardHarmfulIngredientTotal: true,
+    countsTowardHealthVerdict: true,
+    overloadEligible: true,
+  },
+  fillers_and_extenders: {
+    flagType: "processing",
+    reason: "Filled",
+    title: "Filler or extender detected",
+    directExplanation:
+      "Added ingredients increase volume or reduce the amount of the main food ingredient.",
+    countsTowardHarmfulIngredientTotal: true,
+    countsTowardHealthVerdict: true,
+    overloadEligible: true,
+  },
+  binders_and_texture_builders: {
+    flagType: "processing",
+    reason: "Bound",
+    title: "Binder or texture builder detected",
+    directExplanation:
+      "Added ingredients hold the product together or create a manufactured texture.",
+    countsTowardHarmfulIngredientTotal: true,
+    countsTowardHealthVerdict: true,
+    overloadEligible: true,
+  },
+  modified_starches_and_industrial_carbohydrates: {
+    flagType: "processing",
+    reason: "Modified",
+    title: "Modified carbohydrate detected",
+    directExplanation:
+      "Carbohydrates were industrially changed to improve texture, stability, or shelf life.",
+    countsTowardHarmfulIngredientTotal: true,
+    countsTowardHealthVerdict: true,
+    overloadEligible: true,
+  },
+  emulsifiers_and_stabilisers: {
+    flagType: "processing",
+    reason: "Stabilized",
+    title: "Emulsifier or stabilizer detected",
+    directExplanation:
+      "Added ingredients keep the product mixed, stable, or consistent.",
+    countsTowardHarmfulIngredientTotal: true,
+    countsTowardHealthVerdict: true,
+    overloadEligible: true,
+  },
+  artificial_flavours_and_flavour_systems: {
+    flagType: "processing",
+    reason: "Flavored",
+    title: "Flavor system detected",
+    directExplanation:
+      "Added flavor systems were used to create or strengthen the product's taste.",
+    countsTowardHarmfulIngredientTotal: true,
+    countsTowardHealthVerdict: true,
+    overloadEligible: true,
+  },
+  artificial_colours_and_appearance_systems: {
+    flagType: "inherited",
+    reason: "Engineered",
+    title: "Appearance system detected",
+    directExplanation:
+      "A broad appearance-system marker was found; known specific colors should use their own severity.",
+    countsTowardHarmfulIngredientTotal: false,
+    countsTowardHealthVerdict: false,
+    overloadEligible: false,
+  },
+  artificial_sweeteners: {
+    flagType: "inherited",
+    reason: "Engineered",
+    title: "Sweetener system detected",
+    directExplanation:
+      "A broad sweetener-system marker was found; known specific sweeteners should use their own severity.",
+    countsTowardHarmfulIngredientTotal: false,
+    countsTowardHealthVerdict: false,
+    overloadEligible: false,
+  },
+  processed_oils_and_engineered_fats: {
+    flagType: "inherited",
+    reason: "Engineered",
+    title: "Processed oil or engineered fat system detected",
+    directExplanation:
+      "A broad oil or engineered-fat marker was found; PHO and other known red fats should use their own severity.",
+    countsTowardHarmfulIngredientTotal: false,
+    countsTowardHealthVerdict: false,
+    overloadEligible: false,
+  },
+  preservatives_and_shelf_life_systems: {
+    flagType: "inherited",
+    reason: "Engineered",
+    title: "Shelf-life system detected",
+    directExplanation:
+      "A broad preservative marker was found; known specific preservatives should use their own severity.",
+    countsTowardHarmfulIngredientTotal: false,
+    countsTowardHealthVerdict: false,
+    overloadEligible: false,
+  },
+  ultra_processed_powder_concentrate_markers: {
+    flagType: "processing",
+    reason: "Concentrated",
+    title: "Powder or concentrate marker detected",
+    directExplanation:
+      "Part of the food was broken down, concentrated, or converted into a manufactured powder.",
+    countsTowardHarmfulIngredientTotal: true,
+    countsTowardHealthVerdict: true,
+    overloadEligible: true,
+  },
+  made_from_concentrate_reconstructed_food_markers: {
+    flagType: "processing",
+    reason: "Reconstructed",
+    title: "Reconstructed-food marker detected",
+    directExplanation:
+      "The food was concentrated and later rebuilt using water or other ingredients.",
+    countsTowardHarmfulIngredientTotal: true,
+    countsTowardHealthVerdict: true,
+    overloadEligible: true,
+  },
+  synthetic_vitamins_and_fortification_systems: {
+    flagType: "consumer_preference",
+    reason: "Fortified",
+    title: "Fortification system detected",
+    directExplanation:
+      "Vitamins or minerals were added during manufacturing rather than coming entirely from the original food.",
+    countsTowardHarmfulIngredientTotal: false,
+    countsTowardHealthVerdict: false,
+    overloadEligible: false,
+  },
+  industrial_fibre_additives: {
+    flagType: "processing",
+    reason: "Added fiber",
+    title: "Added fiber system detected",
+    directExplanation:
+      "Isolated or manufactured fiber was added instead of coming entirely from whole foods.",
+    countsTowardHarmfulIngredientTotal: true,
+    countsTowardHealthVerdict: true,
+    overloadEligible: true,
+  },
+  animal_free_dairy_precision_fermented_milk_proteins: {
+    flagType: "consumer_preference",
+    reason: "Fermented",
+    title: "Precision-fermented dairy protein detected",
+    directExplanation:
+      "Milk protein was produced using precision fermentation instead of coming directly from a dairy animal.",
+    countsTowardHarmfulIngredientTotal: false,
+    countsTowardHealthVerdict: false,
+    overloadEligible: false,
+  },
+  animal_free_egg_fermentation_derived_egg_proteins: {
+    flagType: "consumer_preference",
+    reason: "Fermented",
+    title: "Fermentation-derived egg protein detected",
+    directExplanation:
+      "Egg protein was produced using precision fermentation instead of coming directly from an egg.",
+    countsTowardHarmfulIngredientTotal: false,
+    countsTowardHealthVerdict: false,
+    overloadEligible: false,
+  },
+  engineered_heme_leghemoglobin_meat_like_flavour_systems: {
+    flagType: "processing",
+    reason: "Engineered",
+    title: "Engineered heme system detected",
+    directExplanation:
+      "Biotechnology was used to create a meat-like color or flavor component.",
+    countsTowardHarmfulIngredientTotal: true,
+    countsTowardHealthVerdict: true,
+    overloadEligible: true,
+  },
+  molecular_farming_plant_made_animal_proteins: {
+    flagType: "consumer_preference",
+    reason: "Engineered",
+    title: "Plant-made animal protein detected",
+    directExplanation:
+      "A plant was engineered to produce a protein normally associated with animals.",
+    countsTowardHarmfulIngredientTotal: false,
+    countsTowardHealthVerdict: false,
+    overloadEligible: false,
+  },
+  specific_bioengineered_food_disclosure_targets: {
+    flagType: "consumer_preference",
+    reason: "Bioengineered",
+    title: "Specific bioengineered food disclosure detected",
+    directExplanation:
+      "Reliable product information identifies this food or ingredient as bioengineered.",
+    countsTowardHarmfulIngredientTotal: false,
+    countsTowardHealthVerdict: false,
+    overloadEligible: false,
+  },
+  cultivated_fat_seafood_and_animal_cell_derived_ingredients: {
+    flagType: "consumer_preference",
+    reason: "Cell-grown",
+    title: "Cell-derived animal ingredient detected",
+    directExplanation:
+      "This food component was produced by growing animal cells under controlled conditions.",
+    countsTowardHarmfulIngredientTotal: false,
+    countsTowardHealthVerdict: false,
+    overloadEligible: false,
+  },
+  microbial_biomass_fermentation_protein: {
+    flagType: "consumer_preference",
+    reason: "Fermented",
+    title: "Microbial fermentation protein detected",
+    directExplanation:
+      "This protein was produced using microorganisms and controlled fermentation.",
+    countsTowardHarmfulIngredientTotal: false,
+    countsTowardHealthVerdict: false,
+    overloadEligible: false,
+  },
+  extruded_printed_structured_food_technology_markers: {
+    flagType: "processing",
+    reason: "Structured",
+    title: "Structured food technology detected",
+    directExplanation:
+      "The food was shaped or constructed using extrusion, printing, or another industrial process.",
+    countsTowardHarmfulIngredientTotal: true,
+    countsTowardHealthVerdict: true,
+    overloadEligible: true,
+  },
+  label_transparency_risk_markers: {
+    flagType: "label_transparency",
+    reason: "Unclear",
+    title: "Food-construction details are unclear",
+    directExplanation:
+      "The label does not clearly explain some ingredients or processes used to make the product.",
+    countsTowardHarmfulIngredientTotal: false,
+    countsTowardHealthVerdict: false,
+    overloadEligible: false,
+  },
+} as const satisfies Record<
+  string,
+  ArtificialEngineeredFoodConstructionGroupBehavior
+>;
+
+export function getArtificialEngineeredFoodConstructionGroupBehavior(
+  groupId: string,
+) {
+  const behaviorById =
+    artificialEngineeredFoodConstructionGroupColorMap as Record<
+      string,
+      ArtificialEngineeredFoodConstructionGroupBehavior
+    >;
+
+  return (
+    behaviorById[groupId] ??
+    behaviorById.label_transparency_risk_markers
+  );
+}
 
 export const artificialEngineeredFoodConstructionGroups: ArtificialEngineeredFoodConstructionGroup[] =
   [
@@ -765,7 +1124,7 @@ export const artificialEngineeredFoodConstructionGroups: ArtificialEngineeredFoo
         "Calcium carbonate",
         "Calcium phosphate",
       ],
-      severityDefault: "neutral",
+      severityDefault: "yellow",
       redTriggers: [],
       userFacingWarning:
         "This product contains added fortification ingredients. Truthlabel flags this as an added nutrient system, not a whole-food nutrient source.",

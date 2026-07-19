@@ -68,11 +68,11 @@ test("one red ingredient and six ordinary ingredients produce 52/100", () => {
 
 test("five yellow concerns and eight ordinary ingredients produce 55/100", () => {
   const result = calculate([
-    "Aspartame",
     "Sucralose",
     "Acesulfame potassium",
     "Sodium benzoate",
-    "Potassium sorbate",
+    "BHT",
+    "TBHQ",
     "Water",
     "Sugar",
     "Salt",

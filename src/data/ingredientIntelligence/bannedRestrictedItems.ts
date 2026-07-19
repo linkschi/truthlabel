@@ -1030,11 +1030,11 @@ export const bannedRestrictedItems = [
     categoryMeaning:
       "This item belongs in Banned / Restricted Items because it is narrowly restricted and under FDA revocation action.",
     healthConcernType: "restricted_colour_additive_under_revocation_action",
-    severity: "red",
-    scoreImpact: "automatic_red",
+    severity: "yellow",
+    scoreImpact: "yellow_review",
     warningLabel: "RESTRICTED COLOUR ADDITIVE",
     userFacingReason:
-      "This colour additive is narrowly restricted and under regulatory removal action in the United States. Truthlabel flags this as a serious safety concern. Avoid this ingredient where possible.",
+        "This colour additive is narrowly restricted and under regulatory removal action in the United States. Truthlabel flags this as a regulatory review item until a completed prohibition is verified.",
     codexNotes:
       "Do not say fully banned yet unless the final rule has been issued. Use restricted/removal-watch wording.",
     sourceRefs: ["FDA_COLOR_QA", "FDA_ORANGE_B_PROPOSED_REVOCATION"]
@@ -1063,11 +1063,11 @@ export const bannedRestrictedItems = [
     categoryMeaning:
       "This item belongs in Banned / Restricted Items because it is narrowly restricted and under FDA removal action.",
     healthConcernType: "restricted_colour_additive_under_removal_action",
-    severity: "red",
-    scoreImpact: "automatic_red",
+    severity: "yellow",
+    scoreImpact: "yellow_review",
     warningLabel: "RESTRICTED COLOUR ADDITIVE",
     userFacingReason:
-      "This colour additive is narrowly restricted and under regulatory removal action in the United States. Truthlabel flags this as a serious safety concern. Avoid this ingredient where possible.",
+        "This colour additive is narrowly restricted and under regulatory removal action in the United States. Truthlabel flags this as a regulatory review item until a completed prohibition is verified.",
     codexNotes:
       "Do not say fully banned yet unless final revocation is confirmed. Use restricted/removal-watch wording.",
     sourceRefs: ["FDA_COLOR_QA", "FDA_SYNTHETIC_DYES_PHASEOUT"]
@@ -1121,11 +1121,11 @@ export const bannedRestrictedItems = [
     categoryMeaning:
       "This item belongs in Banned / Restricted Items because it appears on Canada's adulterating-substances list.",
     healthConcernType: "adulterating_substance",
-    severity: "red",
-    scoreImpact: "automatic_red",
+    severity: "yellow",
+    scoreImpact: "yellow_review",
     warningLabel: "BANNED / RESTRICTED INGREDIENT",
     userFacingReason:
-      "This ingredient is listed as an adulterating substance in foods in Canada. Truthlabel flags this as a serious safety concern. Avoid this ingredient where possible.",
+        "This substance has regulatory review relevance for food use in some regions. Truthlabel flags it for careful regional verification rather than treating it as universally banned.",
     sourceRefs: ["HEALTH_CANADA_ADULTERATING_SUBSTANCES"]
   },
 
@@ -1149,11 +1149,11 @@ export const bannedRestrictedItems = [
     categoryMeaning:
       "This item belongs in Banned / Restricted Items because Canada treats it as adulterating in foods except a specific chewing gum exception.",
     healthConcernType: "adulterating_substance_with_exception",
-    severity: "red",
-    scoreImpact: "automatic_red",
+    severity: "yellow",
+    scoreImpact: "yellow_review",
     warningLabel: "RESTRICTED INGREDIENT",
     userFacingReason:
-      "This ingredient is restricted in Canada for foods, with a specific chewing gum exception. Truthlabel flags this as a serious safety concern when found outside the allowed exception.",
+        "This substance has regulatory review relevance and exceptions in some food contexts. Truthlabel flags it for regional and product-context review rather than treating it as an automatic red item.",
     codexNotes:
       "Requires product-context logic. Do not flag chewing gum with paraffin wax base the same way without checking the exception.",
     sourceRefs: ["HEALTH_CANADA_ADULTERATING_SUBSTANCES"]

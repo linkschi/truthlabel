@@ -84,6 +84,7 @@ type PreparedPackItem = {
   allergenGroup: string | null;
   ingredientGroup: string | null;
   detectionBasis: string | null;
+  requiresProductEvidence: boolean;
 };
 
 type SearchTerm = {
@@ -618,6 +619,7 @@ function preparePackItem(pack: PackDefinition, item: AnyItem): PreparedPackItem 
     allergenGroup: asString(item.allergenGroup),
     ingredientGroup: asString(item.ingredientGroup),
     detectionBasis: asString(item.detectionBasis),
+    requiresProductEvidence: item.requiresProductEvidence === true,
   };
 }
 
@@ -838,6 +840,20 @@ function hasFreeFromContext(source: string, term: string) {
   );
 }
 
+function hasCrossContactContext(normalizedSource: string) {
+  return [
+    "may contain",
+    "traces of",
+    "may contain traces",
+    "shared equipment",
+    "same equipment",
+    "same facility",
+    "same factory",
+    "shared fryer",
+    "shared oil",
+  ].some((term) => containsWholeNormalizedTerm(normalizedSource, term));
+}
+
 function shouldBlockTermMatch(
   prepared: PreparedPackItem,
   source: PreparedSource,
@@ -966,6 +982,10 @@ function getSourcesForPreparedItem(
     case "allergy":
       return [...byKind("ingredient"), ...byKind("allergen_statement")];
     case "external": {
+      if (prepared.requiresProductEvidence) {
+        return byKind("external_signal");
+      }
+
       switch (prepared.detectionBasis) {
         case "ingredient_marker":
           return byKind("ingredient");
@@ -1112,11 +1132,25 @@ function buildRawMatches(
         prepared.pack.categoryId === "allergy_risk" &&
         Boolean(prepared.allergenGroup) &&
         normalizedProfileGroups.includes(prepared.allergenGroup!);
+      const isAllergyMatch = prepared.pack.categoryId === "allergy_risk";
+      const isAllergenWarningStatement =
+        isAllergyMatch &&
+        (prepared.itemId === "allergen_warning_statement" ||
+          prepared.allergenGroup === "label_warning");
+      const isCrossContactProfileMatch =
+        isAllergyMatch &&
+        userProfileMatched &&
+        source.kind === "allergen_statement" &&
+        hasCrossContactContext(source.normalized);
+      const isDirectProfileMatch = userProfileMatched && !isCrossContactProfileMatch;
 
-      const severity =
-        userProfileMatched && prepared.pack.categoryId === "allergy_risk"
+      const severity = isAllergyMatch
+        ? isDirectProfileMatch
           ? "red"
-          : prepared.basicSeveritySuggestion;
+          : isAllergenWarningStatement || isCrossContactProfileMatch
+            ? "yellow"
+            : "green"
+        : prepared.basicSeveritySuggestion;
 
       rawMatches.push({
         canonicalIngredientId: buildCanonicalIngredientId(
@@ -1133,7 +1167,7 @@ function buildRawMatches(
         dataStatus: prepared.dataStatus,
         confidenceLevel: prepared.confidenceLevel,
         linkedExistingPackIds: prepared.linkedExistingPackIds,
-        evidenceType: resolveEvidenceType(prepared, source, userProfileMatched),
+        evidenceType: resolveEvidenceType(prepared, source, isDirectProfileMatch),
         duplicateSafe: true,
         sourceKind: source.kind,
         categoryId: prepared.pack.categoryId,
@@ -1400,9 +1434,13 @@ function buildIngredientGroups(matches: IngredientIntelligenceMatch[]) {
 
   groupedByIngredient.forEach((ingredientMatches) => {
     const sourcePackIds = ingredientMatches.flatMap((match) => match.sourcePacks);
-    const bucket: IngredientGroupKey = sourcePackIds.some(
-      (packId) => packId !== "natural_positive" && packId !== "unknown_review",
-    )
+    const processingSourcePackIds = sourcePackIds.filter(
+      (packId) =>
+        packId !== "natural_positive" &&
+        packId !== "unknown_review" &&
+        packId !== "allergy_risk",
+    );
+    const bucket: IngredientGroupKey = processingSourcePackIds.length > 0
       ? "processed_artificial"
       : sourcePackIds.includes("unknown_review")
         ? "unknown_review"

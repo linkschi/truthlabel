@@ -104,7 +104,7 @@ export const seedOilsProcessedOilsDataPack = {
       regionalNames: [
         "Rapeseed oil"
       ],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Seed oil commonly used in processed foods, frying, snacks, sauces, and baked goods.",
       healthConcernType: "seed_oil",
@@ -153,7 +153,7 @@ export const seedOilsProcessedOilsDataPack = {
       regionalNames: [
         "Soya oil"
       ],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Seed/bean oil commonly used in processed foods, dressings, sauces, snacks, and frying.",
       healthConcernType: "seed_oil_processed_oil",
@@ -203,7 +203,7 @@ export const seedOilsProcessedOilsDataPack = {
         "Expeller pressed"
       ],
       regionalNames: [],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Seed oil commonly used in snacks, fried foods, sauces, spreads, and packaged foods.",
       healthConcernType: "seed_oil",
@@ -244,7 +244,7 @@ export const seedOilsProcessedOilsDataPack = {
       regionalNames: [
         "Maize oil"
       ],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Processed seed/grain oil used in packaged foods, frying, snacks, and sauces.",
       healthConcernType: "seed_oil_processed_oil",
@@ -283,7 +283,7 @@ export const seedOilsProcessedOilsDataPack = {
         "Cotton seed"
       ],
       regionalNames: [],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Seed oil used in processed foods, frying, shortenings, snacks, and baked goods.",
       healthConcernType: "seed_oil_processed_oil",
@@ -322,7 +322,7 @@ export const seedOilsProcessedOilsDataPack = {
         "High oleic"
       ],
       regionalNames: [],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Seed oil used in processed foods, dressings, sauces, and snacks.",
       healthConcernType: "seed_oil",
@@ -359,7 +359,7 @@ export const seedOilsProcessedOilsDataPack = {
         "Grape seed"
       ],
       regionalNames: [],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Seed oil used in processed foods, sauces, dressings, and frying.",
       healthConcernType: "seed_oil",
@@ -392,7 +392,7 @@ export const seedOilsProcessedOilsDataPack = {
       ],
       spellingVariants: [],
       regionalNames: [],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Processed grain/bran oil used in packaged foods, frying, and snacks.",
       healthConcernType: "processed_oil",
@@ -443,7 +443,7 @@ export const seedOilsProcessedOilsDataPack = {
         "Groundnut oil",
         "Arachis oil"
       ],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Processed legume oil used in frying, sauces, snacks, and packaged foods.",
       healthConcernType: "processed_oil_allergen_relevant",
@@ -485,7 +485,7 @@ export const seedOilsProcessedOilsDataPack = {
         "Gingelly oil",
         "Til oil"
       ],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Seed oil used as an ingredient or flavour oil. It may also be relevant for sesame allergy checks.",
       healthConcernType: "seed_oil_allergen_relevant",
@@ -526,7 +526,7 @@ export const seedOilsProcessedOilsDataPack = {
       ],
       spellingVariants: [],
       regionalNames: [],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Processed vegetable oil/fat commonly used in packaged foods, baked goods, spreads, and snacks.",
       healthConcernType: "processed_oil",
@@ -570,7 +570,7 @@ export const seedOilsProcessedOilsDataPack = {
         "Palm kernal"
       ],
       regionalNames: [],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Processed kernel oil/fat commonly used in confectionery, coatings, spreads, and packaged foods.",
       healthConcernType: "processed_kernel_oil",
@@ -611,7 +611,7 @@ export const seedOilsProcessedOilsDataPack = {
         "Extra virgin"
       ],
       regionalNames: [],
-      severity: "yellow",
+      severity: "green",
       reason:
         "Processed or added isolated oil/fat ingredient. It is not a seed oil, but it belongs in the processed oils check when used as an added oil.",
       healthConcernType: "processed_added_oil",
@@ -859,16 +859,16 @@ export const seedOilsProcessedOilsDataPack = {
       ],
       spellingVariants: [],
       regionalNames: [],
-      severity: "red",
+      severity: "yellow",
       reason:
-        "Hydrogenated oil is a highly processed fat marker. Truthlabel treats hydrogenated fat systems as a red processed-oil concern.",
+        "Hydrogenated oil is a processed fat marker. Partially hydrogenated oils remain a separate red PHO concern.",
       healthConcernType: "hydrogenated_processed_fat",
       warningLabel: "HYDROGENATED OIL FOUND",
       userFacingReason:
-        "This product contains hydrogenated oil or fat. Truthlabel flags this as a serious processed-oil concern because the fat system has been chemically hardened or modified.",
+        "This product contains hydrogenated oil or fat. Truthlabel flags this as a processed-fat review marker unless the label says partially hydrogenated oil.",
       matchingNotes:
         "Match hydrogenated oil, hydrogenated vegetable oil, fully hydrogenated oil, hydrogenated fat, hydrogenated soybean/soya/canola/rapeseed/cottonseed/palm/palm kernel/coconut/sunflower oil, and HVO.",
-      scoringImpact: "red_processed_fat",
+      scoringImpact: "yellow_processed_fat",
       dataStatus: "starter"
     },
 
@@ -1006,15 +1006,15 @@ export const seedOilsProcessedOilsDataPack = {
         "Product contains multiple seed/processed oil systems. Truthlabel treats this as a high processed-oil load."
     },
     anyHydrogenatedOrPartiallyHydrogenatedOil: {
-      severity: "red",
-      display: "red_count_badge",
-      scoreImpact: "automatic_red",
+      severity: "yellow",
+      display: "yellow_count_badge",
+      scoreImpact: 12,
       examples: [
         "hydrogenated_oils",
         "partially_hydrogenated_oils"
       ],
       reason:
-        "Product contains hydrogenated or partially hydrogenated oil/fat."
+        "Product contains a hydrogenated or partially hydrogenated oil/fat marker. Partially hydrogenated oil should trigger red through the dedicated PHO rule."
     }
   },
 
@@ -1024,7 +1024,7 @@ export const seedOilsProcessedOilsDataPack = {
     redLoad:
       "This product contains multiple seed oils, processed oils, refined oils, or processed fat systems. Truthlabel flags this as a high processed-oil load.",
     redHydrogenated:
-      "This product contains hydrogenated or partially hydrogenated oil. Truthlabel flags this as a serious processed-oil concern."
+      "This product contains hydrogenated oil. Truthlabel flags this as a processed-fat review marker unless partially hydrogenated oil is confirmed."
   },
 
   matchingNormalizationRules: [

@@ -76,16 +76,16 @@ test("PHO abbreviation deduplicates to the general partially hydrogenated rule",
   assert.equal(summary.hasAutomaticRed, true);
 });
 
-test("positive trans fat marker triggers red", () => {
+test("positive trans fat marker triggers yellow review unless PHO is confirmed", () => {
   const matches = findHydrogenatedPartiallyHydrogenatedOilMatches(
     "Contains trans fat",
   );
   const summary = summarizeHydrogenatedPartiallyHydrogenatedOilMatches(matches);
 
   assert.deepEqual(matches.map((item) => item.id), ["trans_fat_marker"]);
-  assert.equal(summary.categorySeverity, "red");
+  assert.equal(summary.categorySeverity, "yellow");
   assert.equal(summary.hasTransFatMarker, true);
-  assert.equal(summary.hasAutomaticRed, true);
+  assert.equal(summary.hasAutomaticRed, false);
 });
 
 test("negative trans fat claims do not trigger red by themselves", () => {

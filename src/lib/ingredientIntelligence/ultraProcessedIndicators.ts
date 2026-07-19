@@ -229,9 +229,10 @@ function dedupeAutomaticRedTriggers(
 
 function isRedUltraProcessedMarker(item: UltraProcessedIndicatorsItem) {
   const normalizedImpact = normalizeAliasText(item.scoringImpact);
+  const severity = item.severity as "green" | "yellow" | "red";
 
   return (
-    item.severity === "red" ||
+    severity === "red" ||
     normalizedImpact.includes("automatic red") ||
     normalizedImpact.includes("red marker")
   );

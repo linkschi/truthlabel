@@ -160,7 +160,7 @@ test("runManualScan turns three sweeteners into a red overload summary", () => {
   const output = analyzeManualInput({
     productCategory: "Drinks / Beverages",
     ingredientText:
-      "Carbonated water, aspartame, sucralose, acesulfame potassium",
+      "Carbonated water, sucralose, saccharin, acesulfame potassium",
   });
   const summary = findCategorySummary(
     output,
@@ -176,7 +176,7 @@ test("runManualScan turns four preservatives into a red overload summary", () =>
   const output = analyzeManualInput({
     productCategory: "Packaged / Processed Foods",
     ingredientText:
-      "Water, sodium benzoate, potassium sorbate, calcium propionate, TBHQ",
+      "Water, sodium benzoate, potassium benzoate, sodium nitrite, TBHQ",
   });
   const summary = findCategorySummary(output, "preservatives_shelf_life_systems");
 
@@ -278,7 +278,7 @@ test("runManualScan falls back to saved allergy profile and default category fro
   }
 });
 
-test("runManualScan keeps an explicit empty allergy profile instead of falling back to saved settings", () => {
+test("runManualScan keeps an explicit empty allergy profile and treats milk as informational", () => {
   const restoreWindow = installMockWindowWithStorage({
     "insideit.user-settings": JSON.stringify({
       ...defaultUserSettings,
@@ -300,7 +300,7 @@ test("runManualScan keeps an explicit empty allergy profile instead of falling b
       (row) => row.categoryId === "allergy_risk",
     );
 
-    assert.equal(allergyRow?.severity, "yellow");
+    assert.equal(allergyRow?.severity, "green");
     assert.equal(allergyRow?.redReasonType, undefined);
   } finally {
     restoreWindow();

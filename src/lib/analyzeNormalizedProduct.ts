@@ -18,7 +18,9 @@ import {
   type MergedArtificialColour,
 } from "@/lib/ingredientIntelligence/artificialColours";
 import { findArtificialSweetenerMatches } from "@/lib/ingredientIntelligence/artificialSweeteners";
+import { summarizeArtificialSweetenerMatches } from "@/lib/ingredientIntelligence/artificialSweeteners";
 import { findTextureAdditiveMatches } from "@/lib/ingredientIntelligence/emulsifiersStabilisersGums";
+import { summarizeTextureAdditiveMatches } from "@/lib/ingredientIntelligence/emulsifiersStabilisersGums";
 import {
   findFlavourSystemMatches,
   summarizeFlavourSystemMatches,
@@ -27,7 +29,10 @@ import {
   findHydrogenatedPartiallyHydrogenatedOilMatches,
   summarizeHydrogenatedPartiallyHydrogenatedOilMatches,
 } from "@/lib/ingredientIntelligence/hydrogenatedPartiallyHydrogenatedOils";
-import { findPreservativeMatches } from "@/lib/ingredientIntelligence/preservativesShelfLifeSystems";
+import {
+  findPreservativeMatches,
+  summarizePreservativeMatches,
+} from "@/lib/ingredientIntelligence/preservativesShelfLifeSystems";
 import {
   findSeedOilProcessedOilMatches,
   summarizeSeedOilProcessedOilMatches,
@@ -46,7 +51,6 @@ import { buildOverallSummary } from "@/lib/summaryEngine";
 import type { NormalizedIngredient, NormalizedNutrient, NormalizedProduct } from "@/types/product";
 
 const additiveTerms = [
-  "lecithin",
   "colour",
   "color",
   "flavour",
@@ -324,7 +328,7 @@ function buildProcessedOilExplanation(
     return "No seed oil or processed-oil marker was found in the available label data.";
   }
 
-  if (summary.totalCount >= 2) {
+  if (summary.totalCount >= 3) {
     return "This product contains multiple seed oils, processed oils, refined oils, or processed fat systems. Truthlabel treats this as a high processed-oil load.";
   }
 
@@ -455,10 +459,11 @@ function buildRealIngredientAnalysis(
       ? toRestrictedIngredient(restrictedArtificialColour)
       : findRestrictedIngredient(ingredientText);
   const textureAdditiveMatches = findTextureAdditiveMatches(ingredientText);
-  const matchesTextureAdditive = textureAdditiveMatches.length > 0;
+  const textureAdditiveSummary = summarizeTextureAdditiveMatches(textureAdditiveMatches);
+  const matchesTextureAdditive = textureAdditiveSummary.totalCount > 0;
   const flavourSystemMatches = findFlavourSystemMatches(ingredientText);
   const flavourSystemSummary = summarizeFlavourSystemMatches(flavourSystemMatches);
-  const matchesFlavourSystem = flavourSystemMatches.length > 0;
+  const matchesFlavourSystem = flavourSystemSummary.totalCount > 0;
   const matchesAdditives =
     artificialColourMatches.length > 0 ||
     matchesTextureAdditive ||
@@ -468,7 +473,8 @@ function buildRealIngredientAnalysis(
       normalizeForMatch(ingredientText).includes(normalizeForMatch(tag)),
     );
   const preservativeMatches = findPreservativeMatches(ingredientText);
-  const matchesPreservatives = preservativeMatches.length > 0;
+  const preservativeSummary = summarizePreservativeMatches(preservativeMatches);
+  const matchesPreservatives = preservativeSummary.totalCount > 0;
   const seedOilMatches = findSeedOilProcessedOilMatches(ingredientText);
   const seedOilSummary = summarizeSeedOilProcessedOilMatches(seedOilMatches);
   const hydrogenatedOilMatches =
@@ -485,10 +491,12 @@ function buildRealIngredientAnalysis(
       ultraProcessedAutomaticRedTriggers,
     );
   const matchesProcessedOil =
-    seedOilMatches.length > 0 || hydrogenatedOilMatches.length > 0;
+    seedOilSummary.totalCount > 0 || hydrogenatedOilSummary.totalCount > 0;
   const matchesUltraProcessedIndicator = ultraProcessedIndicatorMatches.length > 0;
   const artificialSweetenerMatches = findArtificialSweetenerMatches(ingredientText);
-  const matchesArtificialSweetener = artificialSweetenerMatches.length > 0;
+  const artificialSweetenerSummary =
+    summarizeArtificialSweetenerMatches(artificialSweetenerMatches);
+  const matchesArtificialSweetener = artificialSweetenerSummary.totalCount > 0;
 
   let level: ConcernLevel = "green";
   let rowStatusLabel = "Normal";
@@ -536,30 +544,42 @@ function buildRealIngredientAnalysis(
     badges.push(primaryArtificialColour.warningLabel);
     watchListHits.add("Artificial colours");
   } else if (matchesPreservatives) {
-    const preservative = preservativeMatches[0];
-    level = "yellow";
-    rowStatusLabel = "Review";
-    helperText = "Preservative found.";
+    const preservative =
+      preservativeSummary.redItems[0] ?? preservativeSummary.yellowItems[0]!;
+    level = preservativeSummary.hasAutomaticRed ? "red" : "yellow";
+    rowStatusLabel = preservativeSummary.hasAutomaticRed ? "Restricted" : "Review";
+    helperText = preservativeSummary.hasAutomaticRed
+      ? "Serious preservative concern found."
+      : "Preservative found.";
     whyFlagged = `${ingredient.name} matches ${preservative.mainName}, a preservative in the current rule set.`;
     whatItMeans = "This ingredient is worth questioning in context.";
     whatToDo = "Use it as a review point before regular use.";
     badges.push("Preservative");
     watchListHits.add("Preservatives");
   } else if (matchesArtificialSweetener) {
-    const sweetener = artificialSweetenerMatches[0];
-    level = "yellow";
-    rowStatusLabel = "Review";
-    helperText = "Artificial sweetener found.";
+    const sweetener =
+      artificialSweetenerSummary.redItems[0] ??
+      artificialSweetenerSummary.yellowItems[0]!;
+    level = artificialSweetenerSummary.hasAutomaticRed ? "red" : "yellow";
+    rowStatusLabel = artificialSweetenerSummary.hasAutomaticRed
+      ? "Restricted"
+      : "Review";
+    helperText = artificialSweetenerSummary.hasAutomaticRed
+      ? "Serious sweetener concern found."
+      : "Artificial sweetener found.";
     whyFlagged = `${ingredient.name} matches ${sweetener.mainName}, an artificial or non-sugar sweetener in the current rule set.`;
     whatItMeans = "This ingredient is worth questioning in context.";
     whatToDo = "Use it as a review point before regular use.";
     badges.push("Artificial sweetener");
     watchListHits.add("Artificial sweeteners");
   } else if (matchesTextureAdditive) {
-    const textureAdditive = textureAdditiveMatches[0];
-    level = "yellow";
-    rowStatusLabel = "Review";
-    helperText = "Texture additive found.";
+    const textureAdditive =
+      textureAdditiveSummary.redItems[0] ?? textureAdditiveSummary.yellowItems[0]!;
+    level = textureAdditiveSummary.hasAutomaticRed ? "red" : "yellow";
+    rowStatusLabel = textureAdditiveSummary.hasAutomaticRed ? "Restricted" : "Review";
+    helperText = textureAdditiveSummary.hasAutomaticRed
+      ? "Serious texture-additive concern found."
+      : "Texture additive found.";
     whyFlagged = `${ingredient.name} matches ${textureAdditive.mainName}, a texture-support additive in the current rule set.`;
     whatItMeans = "This ingredient is used to build, hold, thicken, or stabilise food texture.";
     whatToDo = "Use it as a review point before regular use.";

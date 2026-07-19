@@ -50,7 +50,14 @@ test("brandTrustSafetyRecallsLawsuitsDataPack preserves recall and trust logic",
     "public_health_alert",
     "undeclared_allergen_recall",
   ]);
-  assert.deepEqual(greenIds, ["clean_official_recall_check"]);
+  assert.deepEqual(greenIds.sort(), [
+    "brand_level_lawsuit_allegation",
+    "brand_transparency_disclosure",
+    "clean_official_recall_check",
+    "missing_brand_product_safety_data",
+    "product_specific_lawsuit_allegation",
+    "user_reported_concern",
+  ]);
   assert.equal(
     brandTrustSafetyRecallsLawsuitsDataPack.displayRulesForLater.noSignalFound.severity,
     "green",

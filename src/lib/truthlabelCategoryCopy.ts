@@ -15,9 +15,12 @@ export type CategoryCopyProfile = {
     | "phaseout"
     | "serious"
     | "cancer"
+    | "probable"
+    | "possible"
     | "recall"
     | "allergen"
     | "confirmed"
+    | "contaminated"
     | "transfat"
     | "overload",
     CategoryCopy
@@ -82,21 +85,25 @@ export const truthlabelCategoryCopyProfiles: Record<string, CategoryCopyProfile>
     red: {
       banned: {
         reason: "Banned",
-        title: "[Ingredient] is banned or restricted in [regions]",
+        title: "Banned food color detected",
         message:
-          "[Ingredient] has a serious official regulatory flag in [regions] because [regulatoryReason].",
+          "[Ingredient] is banned or no longer authorized for food use in [regions] because [regulatoryReason].",
+        action: "Avoid this product.",
       },
       overload: {
         reason: "Overload",
         title: "High artificial-color load",
         message:
-          "This product contains [count] different yellow artificial colors. Together they cross Truthlabel's red threshold.",
+          "This product contains [count] flagged artificial colors.",
+        action:
+          "Avoid frequent consumption and choose a product with fewer artificial colors.",
       },
       serious: {
         reason: "Serious",
-        title: "Restricted food color detected",
+        title: "Serious food color concern",
         message:
           "[Ingredient] has a serious regulatory or safety flag because [regulatoryReason].",
+        action: "Avoid this product.",
       },
     },
   },
@@ -123,14 +130,15 @@ export const truthlabelCategoryCopyProfiles: Record<string, CategoryCopyProfile>
         message:
           "This product directly contains [Ingredient], which is on your Watch List.",
         action:
-          "Do not eat this product if you are allergic to [Ingredient].",
+          "Do not consume it if you are allergic to [Ingredient].",
       },
       recall: {
         reason: "Recall",
         title: "Undeclared allergen warning",
         message:
-          "An official alert says this product may contain an allergen without declaring it correctly on the label.",
-        action: "Do not use this product. Follow the official recall instructions.",
+          "An official alert says this product may contain [Ingredient] without listing it correctly.",
+        action:
+          "Do not consume it if the warning applies to your product or batch.",
       },
       overload: {
         reason: "Allergen",
@@ -138,7 +146,7 @@ export const truthlabelCategoryCopyProfiles: Record<string, CategoryCopyProfile>
         message:
           "This product directly contains [Ingredient], which is on your Watch List.",
         action:
-          "Do not eat this product if you are allergic to [Ingredient].",
+          "Do not consume it if you are allergic to [Ingredient].",
       },
     },
   },
@@ -162,17 +170,20 @@ export const truthlabelCategoryCopyProfiles: Record<string, CategoryCopyProfile>
         title: "Banned sweetener detected",
         message:
           "[Ingredient] is banned or not permitted as a food sweetener in [regions] because [regulatoryReason].",
+        action: "Avoid this product.",
       },
       overload: {
         reason: "Overload",
         title: "High sweetener load",
         message:
-          "This product contains [count] different yellow sweeteners or sugar substitutes. Together they cross Truthlabel's red threshold.",
+          "This product contains [count] different sweeteners or sugar substitutes.",
+        action: "Limit how often you consume it.",
       },
       serious: {
         reason: "Serious",
         title: "Serious sweetener concern",
         message: "[Ingredient] has a serious regulatory or health flag because [regulatoryReason].",
+        action: "Avoid this product.",
       },
     },
   },
@@ -200,21 +211,31 @@ export const truthlabelCategoryCopyProfiles: Record<string, CategoryCopyProfile>
     red: {
       banned: {
         reason: "Banned",
-        title: "[Ingredient] is banned or restricted in [regions]",
+        title: "Banned ingredient detected",
         message:
-          "It is flagged because [regulatoryReason]. Truthlabel flags it red even though it may still be allowed elsewhere.",
+          "[Ingredient] is banned for food use in [regions] because [regulatoryReason].",
+        action: "Avoid this product.",
+      },
+      phaseout: {
+        reason: "Phaseout",
+        title: "Ingredient being removed from food use",
+        message:
+          "[Ingredient] must be removed from foods in [regions] because [regulatoryReason].",
+        action: "We recommend choosing an alternative.",
       },
       serious: {
         reason: "Serious",
-        title: "Serious regulatory concern",
+        title: "Serious ingredient concern",
         message:
-          "[Ingredient] has a serious official regulatory flag in [regions] because [regulatoryReason].",
+          "[Ingredient] has a serious official regulatory or safety flag in [regions] because [regulatoryReason].",
+        action: "Avoid this product.",
       },
       overload: {
         reason: "Banned",
-        title: "[Ingredient] is banned or restricted in [regions]",
+        title: "Banned ingredient detected",
         message:
           "Truthlabel found one or more ingredients with serious official regulatory flags in [regions].",
+        action: "Avoid this product.",
       },
     },
   },
@@ -244,17 +265,16 @@ export const truthlabelCategoryCopyProfiles: Record<string, CategoryCopyProfile>
         reason: "Recall",
         title: "Active safety alert",
         message:
-          "This product is connected to an active official recall, outbreak, contamination warning, or public-health alert.",
+          "This product is under an active official recall.",
         action:
-          "Do not use this product. Check the lot number and follow the official recall instructions.",
+          "Do not consume it. Follow the official recall instructions.",
       },
       confirmed: {
-        reason: "Confirmed",
-        title: "Confirmed safety warning",
+        reason: "Contaminated",
+        title: "Confirmed contamination",
         message:
-          "A verified official warning or product-specific safety signal was found for this product.",
-        action:
-          "Do not use this product until you have checked the official alert details.",
+          "An official warning or verified test found dangerous contamination in this product.",
+        action: "Do not consume this product.",
       },
     },
   },
@@ -280,26 +300,47 @@ export const truthlabelCategoryCopyProfiles: Record<string, CategoryCopyProfile>
         reason: "Cancer",
         title: "Established cancer concern",
         message:
-          "[Ingredient] has an established cancer-related regulatory or scientific concern signal. This is not proof of harm from one product.",
-        action: "Avoid frequent consumption if this ingredient is present.",
+          "Strong evidence links [Ingredient] or the relevant food exposure to cancer.",
+        action:
+          "We recommend avoiding this product or consuming it very rarely.",
+      },
+      probable: {
+        reason: "Probable",
+        title: "Probable cancer concern",
+        message:
+          "Evidence shows a probable link between [Ingredient] and cancer.",
+        action:
+          "Avoid regular consumption and choose an alternative when possible.",
+      },
+      possible: {
+        reason: "Possible",
+        title: "Possible cancer concern",
+        message:
+          "Research has raised a possible cancer link, although the evidence is not conclusive.",
+        action:
+          "You may want to avoid regular consumption when alternatives are available.",
       },
       banned: {
         reason: "Banned",
         title: "Banned over cancer concerns",
         message:
           "[Ingredient] is banned or being removed from food use in [regions] because of [regulatoryReason].",
+        action: "Avoid this product.",
       },
       serious: {
         reason: "Serious",
         title: "Serious cancer-related concern",
         message:
           "[Ingredient] has a serious cancer-related regulatory or scientific concern signal.",
+        action: "Avoid this product.",
       },
       overload: {
         reason: "Possible",
         title: "Possible cancer link",
         message:
           "Truthlabel treats possible cancer links as review signals for the MVP unless a separate established concern, ban, or official signal applies.",
+        action:
+          "You may want to avoid regular consumption when alternatives are available.",
       },
     },
   },
@@ -326,18 +367,22 @@ export const truthlabelCategoryCopyProfiles: Record<string, CategoryCopyProfile>
         title: "Serious texture-additive concern",
         message:
           "[Ingredient] has a serious regulatory or health flag because [regulatoryReason].",
+        action: "Avoid this product.",
       },
       banned: {
         reason: "Banned",
         title: "Banned texture-additive concern",
         message:
           "[Ingredient] is banned or not permitted in [regions] because [regulatoryReason].",
+        action: "Avoid this product.",
       },
       overload: {
         reason: "Overload",
         title: "High texture-additive load",
         message:
-          "This product contains [count] yellow emulsifiers, stabilizers, or thickeners. Together they cross Truthlabel's red threshold.",
+          "This product contains several emulsifiers, stabilizers, thickeners, or gums.",
+        action:
+          "Limit frequent consumption and choose a less processed alternative.",
       },
     },
   },
@@ -367,21 +412,24 @@ export const truthlabelCategoryCopyProfiles: Record<string, CategoryCopyProfile>
     red: {
       banned: {
         reason: "Banned",
-        title: "Banned flavoring ingredient detected",
+        title: "Banned flavoring ingredient",
         message:
           "[Ingredient] is banned for food use in [regions] because [regulatoryReason].",
+        action: "Avoid this product.",
       },
       overload: {
         reason: "Overload",
         title: "High flavor-system load",
         message:
-          "This product contains [count] yellow flavor-system or flavor-transparency flags. Together they cross Truthlabel's red threshold.",
+          "This product contains several added flavor systems or unclear flavor ingredients.",
+        action: "Limit how often you consume it.",
       },
       serious: {
         reason: "Serious",
         title: "Serious flavoring concern",
         message:
           "[Ingredient] has a serious regulatory or health flag because [regulatoryReason].",
+        action: "Avoid this product.",
       },
     },
   },
@@ -401,7 +449,7 @@ export const truthlabelCategoryCopyProfiles: Record<string, CategoryCopyProfile>
     },
     red: {
       transfat: {
-        reason: "Transfat",
+        reason: "Trans fat",
         title: "Industrial trans fat detected",
         message:
           "This product contains partially hydrogenated frying oil, a source of industrial trans fat.",
@@ -411,7 +459,9 @@ export const truthlabelCategoryCopyProfiles: Record<string, CategoryCopyProfile>
         reason: "Overload",
         title: "High frying-system load",
         message:
-          "This product contains [count] fried-food, frying-fat, or processed-oil markers. Together they cross Truthlabel's red threshold.",
+          "This product contains several frying, coating, and processed-fat concerns.",
+        action:
+          "Keep it as an occasional food rather than a regular choice.",
       },
     },
   },
@@ -435,19 +485,23 @@ export const truthlabelCategoryCopyProfiles: Record<string, CategoryCopyProfile>
         reason: "Serious",
         title: "Serious additive concern",
         message:
-          "This product contains [Ingredient], which is red because [regulatoryReason].",
+          "This product contains [Ingredient], which has a serious regulatory or health concern because [regulatoryReason].",
+        action: "Avoid this product.",
       },
       overload: {
         reason: "Overload",
         title: "High additive load",
         message:
-          "This product contains [count] yellow additive concerns. Together they cross Truthlabel's red threshold.",
+          "This product contains [count] different moderate additive concerns.",
+        action:
+          "Limit how often you consume it and choose a product with a simpler ingredient list.",
       },
       banned: {
         reason: "Banned",
         title: "Banned additive concern",
         message:
           "[Ingredient] is banned or restricted in [regions] because [regulatoryReason].",
+        action: "Avoid this product.",
       },
     },
   },
@@ -471,19 +525,23 @@ export const truthlabelCategoryCopyProfiles: Record<string, CategoryCopyProfile>
         reason: "Serious",
         title: "Serious additive concern",
         message:
-          "This product contains [Ingredient], which is red because [regulatoryReason].",
+          "This product contains [Ingredient], which has a serious regulatory or health concern because [regulatoryReason].",
+        action: "Avoid this product.",
       },
       overload: {
         reason: "Overload",
         title: "High additive load",
         message:
-          "This product contains [count] yellow additive concerns. Together they cross Truthlabel's red threshold.",
+          "This product contains [count] different moderate additive concerns.",
+        action:
+          "Limit how often you consume it and choose a product with a simpler ingredient list.",
       },
       banned: {
         reason: "Banned",
         title: "Banned additive concern",
         message:
           "[Ingredient] is banned or restricted in [regions] because [regulatoryReason].",
+        action: "Avoid this product.",
       },
     },
   },
@@ -510,14 +568,14 @@ export const truthlabelCategoryCopyProfiles: Record<string, CategoryCopyProfile>
         title: "Heavy-metal level above safety limit",
         message:
           "A verified test or official alert found a heavy-metal warning above the applicable safety limit.",
-        action: "Do not use this product.",
+        action: "Do not consume this product.",
       },
       recall: {
         reason: "Recall",
         title: "Heavy-metal recall warning",
         message:
           "An official recall or public-health alert reported a heavy-metal concern for this product.",
-        action: "Do not use this product. Follow the official recall instructions.",
+        action: "Do not consume it. Follow the official recall instructions.",
       },
     },
   },
@@ -538,16 +596,18 @@ export const truthlabelCategoryCopyProfiles: Record<string, CategoryCopyProfile>
     },
     red: {
       transfat: {
-        reason: "Transfat",
-        title: "Partially hydrogenated oil detected",
-        message: "This ingredient is a source of industrial trans fat.",
+        reason: "Trans fat",
+        title: "Industrial trans fat detected",
+        message:
+          "This product contains partially hydrogenated oil, an industrial trans-fat source.",
         action: "Avoid this product.",
       },
       overload: {
         reason: "Overload",
         title: "High processed-fat load",
         message:
-          "This product contains [count] yellow processed-fat markers. Together they cross Truthlabel's red threshold.",
+          "This product contains [count] processed oils or fats, crossing Truthlabel's threshold.",
+        action: "Limit or avoid frequent consumption.",
       },
     },
   },
@@ -569,16 +629,20 @@ export const truthlabelCategoryCopyProfiles: Record<string, CategoryCopyProfile>
     },
     red: {
       serious: {
-        reason: "Serious",
-        title: "Serious processed-meat concern",
+        reason: "Cancer",
+        title: "Established processed-meat concern",
         message:
-          "This product contains [Ingredient], which has a serious regulatory or direct-health flag because [regulatoryReason].",
+          "Regular consumption of this type of processed meat is linked to an increased risk of colorectal cancer.",
+        action:
+          "Avoid making this a regular food and choose unprocessed alternatives more often.",
       },
       overload: {
         reason: "Overload",
         title: "High processed-meat load",
         message:
-          "This product contains [count] yellow curing, filler, smoke, restructuring, or processing markers. Together they cross Truthlabel's red threshold.",
+          "This product contains several curing, smoke, filler, binder, or restructuring concerns.",
+        action:
+          "Avoid frequent consumption and choose fresh, unprocessed meat more often.",
       },
     },
   },
@@ -604,8 +668,8 @@ export const truthlabelCategoryCopyProfiles: Record<string, CategoryCopyProfile>
         reason: "Confirmed",
         title: "Confirmed contamination warning",
         message:
-          "An official warning or validated product-specific test found microplastic contamination at a level considered harmful under the applicable standard.",
-        action: "Do not use this product.",
+          "A verified test or official warning found contamination at a level considered harmful under the applicable standard.",
+        action: "Do not consume this product.",
       },
     },
   },
@@ -635,22 +699,26 @@ export const truthlabelCategoryCopyProfiles: Record<string, CategoryCopyProfile>
     },
     red: {
       banned: {
-        reason: "Banned",
+        reason: "Serious",
         title: "Serious preservative concern",
         message:
-          "[Ingredient] is red because [regulatoryReason].",
+          "[Ingredient] has a serious regulatory or health concern because [regulatoryReason].",
+        action: "Avoid this product.",
       },
       serious: {
         reason: "Serious",
         title: "Serious preservative concern",
         message:
-          "[Ingredient] is red because [regulatoryReason].",
+          "[Ingredient] has a serious regulatory or health concern because [regulatoryReason].",
+        action: "Avoid this product.",
       },
       overload: {
         reason: "Overload",
         title: "High preservative load",
         message:
-          "This product contains [count] yellow preservatives. Together they cross Truthlabel's red threshold.",
+          "This product contains [count] moderate preservative concerns.",
+        action:
+          "Limit regular consumption and choose products with fewer preservatives.",
       },
     },
   },
@@ -673,16 +741,18 @@ export const truthlabelCategoryCopyProfiles: Record<string, CategoryCopyProfile>
     },
     red: {
       transfat: {
-        reason: "Transfat",
-        title: "Partially hydrogenated oil detected",
-        message: "This product contains an industrial trans-fat source.",
+        reason: "Trans fat",
+        title: "Industrial trans fat detected",
+        message:
+          "This product contains partially hydrogenated oil, an industrial trans-fat source.",
         action: "Avoid this product.",
       },
       overload: {
         reason: "Overload",
         title: "High processed-oil load",
         message:
-          "This product contains [count] yellow processed-oil or processed-fat markers. Together they cross Truthlabel's red threshold.",
+          "This product contains [count] processed oils or fats, crossing Truthlabel's threshold.",
+        action: "Limit or avoid frequent consumption.",
       },
     },
   },
@@ -706,13 +776,87 @@ export const truthlabelCategoryCopyProfiles: Record<string, CategoryCopyProfile>
         reason: "Overload",
         title: "Very high processing load",
         message:
-          "This product contains [count] different yellow ultra-processing markers. Together they cross Truthlabel's red threshold.",
+          "This product contains [count] different ultra-processing markers.",
+        action:
+          "Truthlabel recommends limiting or avoiding it as a regular food.",
       },
       serious: {
         reason: "Serious",
         title: "Serious processing concern",
         message:
           "A serious banned, restricted, or direct-risk ingredient should be explained under its real category, not described merely as ultra-processed.",
+        action: "Avoid this product.",
+      },
+    },
+  },
+  artificial_engineered_food_construction: {
+    green: {
+      reason: "Clear",
+      title: "No engineered-food markers detected",
+      message: "No artificial or engineered food-construction markers were found.",
+    },
+    yellow: {
+      preference: {
+        reason: "Engineered",
+        title: "Engineered food methods detected",
+        message:
+          "This product uses biotechnology, bioengineered disclosure, cell-grown ingredients, precision fermentation, or added fortification. This does not automatically mean it is harmful.",
+        action:
+          "You may want to avoid this if you prefer food that is not genetically modified, cell-grown, or made using biotechnology.",
+      },
+      processing: {
+        reason: "Engineered",
+        title: "Engineered food methods detected",
+        message:
+          "This product uses reconstructed ingredients, isolated proteins, texture systems, modified carbohydrates, or industrial food-building methods.",
+        action:
+          "You may want to limit or avoid this if you prefer simpler, less processed food.",
+      },
+      unclear: {
+        reason: "Unclear",
+        title: "Food-construction details are unclear",
+        message:
+          "The label does not clearly explain some ingredients or processes used to make this product.",
+        action:
+          "You may want to choose a product with a clearer ingredient list if knowing exactly how your food was made matters to you.",
+      },
+    },
+    red: {
+      banned: {
+        reason: "Banned",
+        title: "Banned engineered ingredient",
+        message:
+          "[Ingredient] is banned or restricted in [regions] because [regulatoryReason].",
+        action: "Avoid this product.",
+      },
+      serious: {
+        reason: "Serious",
+        title: "Serious engineered-ingredient concern",
+        message:
+          "This product contains [Ingredient], which has a serious health or regulatory flag because [regulatoryReason].",
+        action: "Avoid this product.",
+      },
+      overload: {
+        reason: "Overload",
+        title: "High engineered-food load",
+        message:
+          "This product contains several reconstructed, isolated, textured, or heavily modified ingredients.",
+        action:
+          "Limit how often you consume it if you prefer simpler, less engineered food.",
+      },
+      recall: {
+        reason: "Recall",
+        title: "Active safety alert",
+        message:
+          "This product is connected to an active official recall or safety warning.",
+        action: "Do not consume it. Follow the official recall instructions.",
+      },
+      allergen: {
+        reason: "Allergen",
+        title: "Your allergen is present",
+        message:
+          "This product contains [Ingredient], which is on your allergy Watch List.",
+        action: "Do not consume it if you are allergic to [Ingredient].",
       },
     },
   },
@@ -738,6 +882,8 @@ export const truthlabelCategoryCopyProfiles: Record<string, CategoryCopyProfile>
         title: "Ingredient details are unclear",
         message:
           "Vague wording is a transparency concern, but it does not prove that hidden ingredients are dangerous.",
+        action:
+          "Choose a product with a clearer ingredient list when possible.",
       },
     },
   },
@@ -761,6 +907,8 @@ export const truthlabelCategoryCopyProfiles: Record<string, CategoryCopyProfile>
         title: "Very long ingredient list",
         message:
           "This product has [count] listed ingredients, which crosses Truthlabel's high ingredient-count threshold.",
+        action:
+          "Limit frequent consumption if you prefer simpler products with shorter ingredient lists.",
       },
     },
   },
@@ -785,12 +933,16 @@ export const truthlabelCategoryCopyProfiles: Record<string, CategoryCopyProfile>
         title: "High processed share",
         message:
           "This product appears heavily processed based on the available ingredient list.",
+        action:
+          "Limit how often you consume it and choose simpler foods more often.",
       },
       serious: {
         reason: "Processed",
         title: "High processed share",
         message:
           "This product appears heavily processed based on the available ingredient list.",
+        action:
+          "Limit how often you consume it and choose simpler foods more often.",
       },
     },
   },
@@ -848,6 +1000,24 @@ function fillCopyTemplate(copy: CategoryCopy, input: CategoryCopyInput): Categor
 }
 
 function getYellowReasonKey(categoryId: string, matchedItems: string[]) {
+  if (categoryId === "artificial_engineered_food_construction") {
+    const matchedText = matchedItems.join(" ");
+
+    if (/unclear|proprietary|unspecified|not clearly|label transparency/i.test(matchedText)) {
+      return "unclear";
+    }
+
+    if (
+      /imitation|analog|analogue|reformed|reconstructed|mechanically|separated|recovered|isolate|isolated|textured|filler|extender|binder|modified|starch|methylcellulose|emulsifier|stabilizer|stabiliser|flavor|flavour|powder|concentrate|fiber|fibre|leghemoglobin|heme|extrud|printed|structured|surimi/i.test(
+        matchedText,
+      )
+    ) {
+      return "processing";
+    }
+
+    return "preference";
+  }
+
   if (
     categoryId === "flavour_enhancers_flavourings" &&
     matchedItems.some((item) => /natural flavor|natural flavour|flavoring|flavouring/i.test(item))

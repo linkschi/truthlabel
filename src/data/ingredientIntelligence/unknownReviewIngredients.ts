@@ -31,6 +31,12 @@ export const unknownReviewIngredientsDataPack = {
   categoryMeaning:
     "This category detects vague, unclear, generic, proprietary, or low-transparency ingredient wording. It supports ingredient grouping, natural-vs-processed classification, label-transparency warnings, unknown/review counts, and final verdict explanation without treating vague wording as proof of harm.",
   dataStatus: "starter_needs_expansion",
+  dataBehavior: {
+    flagType: "label_transparency",
+    overloadEligible: false,
+    countsTowardHarmfulIngredientTotal: false,
+    countsTowardFinalVerdict: false,
+  },
   defaultCategorySeverity: "yellow",
 
   items: [

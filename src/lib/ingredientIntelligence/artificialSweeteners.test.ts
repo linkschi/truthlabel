@@ -30,7 +30,7 @@ test("artificial sweetener matching catches added brand and label variants", () 
 });
 
 test("artificial sweetener summary stays yellow for one or two sweeteners", () => {
-  const matches = findArtificialSweetenerMatches("Aspartame, Sucralose");
+  const matches = findArtificialSweetenerMatches("Sucralose, Acesulfame potassium");
   const summary = summarizeArtificialSweetenerMatches(matches);
 
   assert.equal(summary.totalCount, 2);
@@ -40,7 +40,7 @@ test("artificial sweetener summary stays yellow for one or two sweeteners", () =
 
 test("artificial sweetener summary becomes red for three sweeteners", () => {
   const matches = findArtificialSweetenerMatches(
-    "Aspartame, Sucralose, Saccharin",
+    "Sucralose, Saccharin, Acesulfame potassium",
   );
   const summary = summarizeArtificialSweetenerMatches(matches);
 

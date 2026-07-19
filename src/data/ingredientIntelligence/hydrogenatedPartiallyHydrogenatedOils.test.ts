@@ -46,9 +46,9 @@ test("hydrogenatedPartiallyHydrogenatedOilsDataPack uses revised green yellow re
       "Product contains partially hydrogenated oil, a major artificial trans-fat marker with serious regulatory restrictions in some regions.",
   });
   assert.deepEqual(categoryScoringRules.anyTransFatMarkerFound, {
-    severity: "red",
-    display: "red_count_badge",
-    scoreImpact: "automatic_red",
+    severity: "yellow",
+    display: "yellow_count_badge",
+    scoreImpact: 12,
     reason:
       "Product contains a trans fat marker. Do not trigger this rule from '0g trans fat' or 'trans fat free' claims unless PHO is also present.",
   });
@@ -71,7 +71,6 @@ test("hydrogenatedPartiallyHydrogenatedOilsDataPack gives every item usable matc
     "partially_hydrogenated_oil_general",
     "partially_hydrogenated_palm_palm_kernel_oil",
     "partially_hydrogenated_soybean_oil",
-    "trans_fat_marker",
   ]);
 
   hydrogenatedPartiallyHydrogenatedOilsDataPack.items.forEach((item) => {
