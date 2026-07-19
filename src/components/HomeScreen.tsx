@@ -302,24 +302,24 @@ function Icon({ name, className = "" }: { name: HomeIconName; className?: string
 function tintClasses(tint: Tint) {
   switch (tint) {
     case "yellow":
-      return "bg-[#FFF6D8] text-[#8A6500]";
+      return "bg-[#F8EED2] text-[#7A4B12]";
     case "red":
-      return "bg-[#FDEDEE] text-[#A33A3F]";
+      return "bg-[#F4E7E5] text-[#7F1D1D]";
     case "neutral":
-      return "bg-[#F6F8F7] text-[#66716B]";
+      return "bg-[#F3F0EA] text-[#5F5950]";
     case "green":
     default:
-      return "bg-[#E8F6EF] text-[#0E5A3F]";
+      return "bg-[#E8F2EA] text-[#166534]";
   }
 }
 
 function TruthlabelMark() {
   return (
-    <span className="inline-flex h-[34px] w-[34px] items-center justify-center rounded-[11px] bg-[linear-gradient(145deg,#B91C1C_0%,#EA580C_100%)] shadow-[0_7px_18px_rgba(185,28,28,0.18)]">
+    <span className="inline-flex h-[34px] w-[34px] items-center justify-center rounded-[11px] bg-[linear-gradient(145deg,#6F1D1B_0%,#A14325_100%)] shadow-[0_7px_18px_rgba(111,29,27,0.16)]">
       <span className="grid gap-[3px]">
-        <span className="h-[3px] w-[18px] rounded-full bg-white" />
-        <span className="h-[3px] w-[18px] rounded-full bg-[#FDE68A]" />
-        <span className="h-[3px] w-[18px] rounded-full bg-[#86EFAC]" />
+        <span className="h-[3px] w-[18px] rounded-full bg-[#FFF7ED]" />
+        <span className="h-[3px] w-[18px] rounded-full bg-[#D7A83A]" />
+        <span className="h-[3px] w-[18px] rounded-full bg-[#4F8F61]" />
       </span>
     </span>
   );
@@ -335,14 +335,14 @@ function HomeHeader() {
       >
         <TruthlabelMark />
         <span className="text-[20px] font-extrabold tracking-[-0.02em] text-[#101613]">
-          Truth<span className="text-[#B91C1C]">label</span>
+          Truth<span className="text-[#7F1D1D]">label</span>
         </span>
       </Link>
 
       <Link
         href="/account"
         aria-label="Open Truthlabel account"
-        className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#F3D2D4] bg-[#FDEDEE] text-[#A33A3F] transition hover:bg-[#FBE0E2] focus-visible:ring-2 focus-visible:ring-[#B91C1C] focus-visible:ring-offset-2 active:scale-[0.98]"
+        className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#E8D4CF] bg-[#F7EFEC] text-[#7F1D1D] transition hover:bg-[#F1E2DE] focus-visible:ring-2 focus-visible:ring-[#7F1D1D] focus-visible:ring-offset-2 active:scale-[0.98]"
       >
         <Icon name="user" className="h-[21px] w-[21px]" />
       </Link>
@@ -355,7 +355,7 @@ function HeroSection() {
     <section className="mt-3">
       <h1 className="max-w-[330px] text-[32px] font-black leading-[1.05] tracking-[-0.025em] text-[#101613] min-[390px]:text-[34px]">
         Scan before you{" "}
-        <span className="text-[#B91C1C]">trust it.</span>
+        <span className="text-[#7F1D1D]">trust it.</span>
       </h1>
       <p className="mt-3 max-w-[360px] text-[14.5px] leading-[1.5] text-[#66716B]">
         Truthlabel scans barcodes and ingredient labels to help you understand what a food product contains.
@@ -402,16 +402,16 @@ function ScanActionCard({
 }) {
   const isCamera = variant === "camera";
   const cardClasses = isCamera
-    ? "border-transparent bg-[linear-gradient(145deg,#B91C1C_0%,#EA580C_100%)] text-white shadow-[0_9px_24px_rgba(185,28,28,0.18)] hover:shadow-[0_11px_28px_rgba(185,28,28,0.22)] focus-visible:ring-white"
-    : "border-[#F3E4A9] bg-[#FFFBEA] text-[#101613] shadow-[0_5px_18px_rgba(92,60,10,0.07)] hover:border-[#E7C95D] hover:shadow-[0_8px_22px_rgba(92,60,10,0.09)] focus-visible:ring-[#B45309]";
+    ? "border-transparent bg-[linear-gradient(145deg,#3A1B19_0%,#7F2D24_58%,#A14325_100%)] text-white shadow-[0_9px_24px_rgba(58,27,25,0.16)] hover:shadow-[0_11px_28px_rgba(58,27,25,0.2)] focus-visible:ring-white"
+    : "border-[#E7D6B0] bg-[#FBF5E6] text-[#101613] shadow-[0_5px_18px_rgba(61,45,18,0.06)] hover:border-[#D3B56F] hover:shadow-[0_8px_22px_rgba(61,45,18,0.08)] focus-visible:ring-[#8A5A17]";
   const iconClasses = isCamera
     ? "bg-white/15 text-white ring-1 ring-white/22"
-    : "bg-[#FFF6D8] text-[#8A6500]";
+    : "bg-[#F3E8C6] text-[#7A4B12]";
   const arrowClasses = isCamera
-    ? "bg-white/92 text-[#B91C1C]"
-    : "bg-white text-[#8A6500]";
+    ? "bg-white/92 text-[#7F1D1D]"
+    : "bg-white text-[#7A4B12]";
   const mutedText = isCamera ? "text-white/78" : "text-[#66716B]";
-  const capabilityText = isCamera ? "text-white/86" : "text-[#8A6500]";
+  const capabilityText = isCamera ? "text-white/86" : "text-[#7A4B12]";
 
   return (
     <Link
@@ -526,7 +526,7 @@ function AccordionCard({
         aria-controls={contentId}
         aria-expanded={isOpen}
         onClick={() => onToggle(id)}
-        className="grid min-h-[62px] w-full grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-3 rounded-[16px] px-3.5 py-3 text-left outline-none transition duration-200 hover:bg-[#F8F6F2] focus-visible:ring-2 focus-visible:ring-[#B91C1C] focus-visible:ring-offset-2"
+        className="grid min-h-[62px] w-full grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-3 rounded-[16px] px-3.5 py-3 text-left outline-none transition duration-200 hover:bg-[#F8F6F2] focus-visible:ring-2 focus-visible:ring-[#7F1D1D] focus-visible:ring-offset-2"
       >
         <span
           className={`inline-flex h-10 w-10 items-center justify-center rounded-[13px] ${tintClasses(tint)}`}
@@ -606,7 +606,7 @@ function WatchListPreview({ watchItems }: { watchItems: string[] }) {
 
       <Link
         href="/settings"
-        className="mt-3 flex min-h-[42px] w-full items-center justify-center rounded-[12px] border border-[#F3D2D4] bg-white px-4 text-[13px] font-bold text-[#A33A3F] transition hover:bg-[#FDEDEE] focus-visible:ring-2 focus-visible:ring-[#B91C1C] focus-visible:ring-offset-2 active:scale-[0.99]"
+        className="mt-3 flex min-h-[42px] w-full items-center justify-center rounded-[12px] border border-[#E8D4CF] bg-white px-4 text-[13px] font-bold text-[#7F1D1D] transition hover:bg-[#F7EFEC] focus-visible:ring-2 focus-visible:ring-[#7F1D1D] focus-visible:ring-offset-2 active:scale-[0.99]"
       >
         {watchItems.length > 0 ? "Edit Watch List" : "Set Up Watch List"}
       </Link>
@@ -633,7 +633,7 @@ function ToolRow({
     <Link
       href={href}
       onClick={onNavigate}
-      className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-[14px] px-2 py-2.5 outline-none transition hover:bg-[#F8F6F2] focus-visible:ring-2 focus-visible:ring-[#B91C1C] focus-visible:ring-offset-2 active:scale-[0.99]"
+      className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-[14px] px-2 py-2.5 outline-none transition hover:bg-[#F8F6F2] focus-visible:ring-2 focus-visible:ring-[#7F1D1D] focus-visible:ring-offset-2 active:scale-[0.99]"
     >
       <span className="inline-flex h-9 w-9 items-center justify-center rounded-[12px] bg-[#F6F8F7] text-[#66716B]">
         <Icon name={icon} className="h-[18px] w-[18px]" />
@@ -795,7 +795,7 @@ function TrustNote() {
   return (
     <section className="mt-6 rounded-[16px] border border-[#E9E1D2] bg-[#FBF8F1] px-4 py-3.5">
       <div className="flex items-start gap-3">
-        <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[12px] bg-white text-[#A33A3F]">
+        <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[12px] bg-white text-[#7F1D1D]">
           <Icon name="shield" className="h-[19px] w-[19px]" />
         </span>
         <div>
@@ -844,13 +844,13 @@ function BottomNavigation() {
             key={`${item.label}-${item.href}`}
             href={item.href}
             aria-current={item.active ? "page" : undefined}
-            className={`flex min-h-11 flex-col items-center justify-center gap-1 rounded-[12px] text-[11px] font-semibold outline-none transition focus-visible:ring-2 focus-visible:ring-[#B91C1C] focus-visible:ring-offset-2 ${
-              item.active ? "text-[#B91C1C]" : "text-[#5F6C65] hover:text-[#B91C1C]"
+            className={`flex min-h-11 flex-col items-center justify-center gap-1 rounded-[12px] text-[11px] font-semibold outline-none transition focus-visible:ring-2 focus-visible:ring-[#7F1D1D] focus-visible:ring-offset-2 ${
+              item.active ? "text-[#7F1D1D]" : "text-[#5F6C65] hover:text-[#7F1D1D]"
             }`}
           >
             <span
               className={`inline-flex h-[30px] w-9 items-center justify-center rounded-[12px] ${
-                item.active ? "bg-[#FDEDEE]" : ""
+                item.active ? "bg-[#F4E7E5]" : ""
               }`}
             >
               <Icon name={item.icon} className="h-[20px] w-[20px]" />
@@ -877,7 +877,7 @@ export default function HomeScreen() {
   }
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-[radial-gradient(circle_at_top_left,rgba(253,237,238,0.78),transparent_34%),radial-gradient(circle_at_top_right,rgba(255,246,216,0.82),transparent_31%),#FFFDFC] px-[18px] pt-[calc(12px+env(safe-area-inset-top))] text-[#101613] sm:px-5">
+    <main className="min-h-screen overflow-x-hidden bg-[radial-gradient(circle_at_top_left,rgba(244,231,229,0.58),transparent_34%),radial-gradient(circle_at_top_right,rgba(248,238,210,0.46),transparent_31%),#FFFDFC] px-[18px] pt-[calc(12px+env(safe-area-inset-top))] text-[#101613] sm:px-5">
       <div className="mx-auto w-full max-w-[480px] pb-[calc(100px+env(safe-area-inset-bottom))]">
         <HomeHeader />
         <HeroSection />
