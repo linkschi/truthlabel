@@ -15,6 +15,7 @@ import {
   stopMediaStream,
 } from "@/lib/cameraBarcodeScanner";
 import {
+  cropImageBlobToSourceRegion,
   extractIngredientTextFromImage,
   IngredientOcrTimeoutError,
   type IngredientOcrRunner,
@@ -131,7 +132,7 @@ async function waitForVideoReady(video: HTMLVideoElement) {
   return video.videoWidth > 0 && video.videoHeight > 0;
 }
 
-function captureLabelRegion(
+function getLabelSourceRegion(
   video: HTMLVideoElement,
   frame: HTMLDivElement | null,
 ) {
@@ -170,6 +171,14 @@ function captureLabelRegion(
     }
   }
 
+  return region;
+}
+
+function captureLabelRegion(
+  video: HTMLVideoElement,
+  frame: HTMLDivElement | null,
+) {
+  const region = getLabelSourceRegion(video, frame);
   const canvas = document.createElement("canvas");
   canvas.width = region.width;
   canvas.height = region.height;
@@ -438,10 +447,19 @@ export default function OcrIngredientScanner({
       streamRef.current,
     );
     if (highResolutionPhoto) {
+      const labelRegion = getLabelSourceRegion(video, labelFrameRef.current);
+      const croppedPhoto = await cropImageBlobToSourceRegion(
+        highResolutionPhoto,
+        labelRegion,
+        {
+          width: video.videoWidth || 1280,
+          height: video.videoHeight || 720,
+        },
+      );
       stopCamera();
       setCameraState("idle");
-      replacePreviewUrl(createPreviewUrl(highResolutionPhoto));
-      await processImage(highResolutionPhoto);
+      replacePreviewUrl(createPreviewUrl(croppedPhoto));
+      await processImage(croppedPhoto);
       return;
     }
 

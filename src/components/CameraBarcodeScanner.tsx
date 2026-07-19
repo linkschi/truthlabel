@@ -27,6 +27,7 @@ import {
   type VideoDeviceCandidate,
 } from "@/lib/cameraBarcodeScanner";
 import {
+  cropImageBlobToSourceRegion,
   extractIngredientTextFromImage,
   IngredientOcrTimeoutError,
   type IngredientOcrRunner,
@@ -1736,6 +1737,14 @@ export default function CameraBarcodeScanner({
     await applyContinuousFocus(track);
     await delay(180);
 
+    const width = video.videoWidth || 1280;
+    const height = video.videoHeight || 720;
+    const labelRegion = expandSourceRegion(
+      getSourceRegionFromDom(video, ingredientFrameRef.current),
+      1.08,
+      width,
+      height,
+    );
     let capturedImage: Blob | null = null;
     const ImageCaptureCtor = getImageCaptureConstructor();
 
@@ -1760,21 +1769,17 @@ export default function CameraBarcodeScanner({
     }
 
     if (capturedImage) {
-      imageQualityWarningsRef.current = await estimateBlobQuality(capturedImage);
+      const croppedImage = await cropImageBlobToSourceRegion(capturedImage, labelRegion, {
+        width,
+        height,
+      });
+      imageQualityWarningsRef.current = await estimateBlobQuality(croppedImage);
       stopScannerResources();
-      replacePreviewUrl(createPreviewUrl(capturedImage));
-      await processImage(capturedImage);
+      replacePreviewUrl(createPreviewUrl(croppedImage));
+      await processImage(croppedImage);
       return;
     }
 
-    const width = video.videoWidth || 1280;
-    const height = video.videoHeight || 720;
-    const labelRegion = expandSourceRegion(
-      getSourceRegionFromDom(video, ingredientFrameRef.current),
-      1.08,
-      width,
-      height,
-    );
     const canvas = drawVideoRegionToCanvas(video, labelRegion);
 
     if (!canvas) {

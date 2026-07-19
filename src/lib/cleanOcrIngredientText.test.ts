@@ -51,3 +51,33 @@ test("cleanOcrIngredientText adds a low-confidence warning when OCR confidence i
     ),
   );
 });
+
+test("cleanOcrIngredientText drops nutrition panel and contact text after ingredients", () => {
+  const result = cleanOcrIngredientText(
+    [
+      "INGREDIENTS: Water, sugar, citric acid, sodium benzoate.",
+      "NUTRITION INFORMATION",
+      "Energy 210kJ",
+      "Protein 0g",
+      "Manufactured by Example Foods",
+      "www.example.test",
+    ].join("\n"),
+  );
+
+  assert.equal(result.ingredientText, "Water, sugar, citric acid, sodium benzoate");
+  assert.doesNotMatch(result.ingredientText, /energy|protein|manufactured|www/i);
+});
+
+test("cleanOcrIngredientText rejects nutrition-only OCR as no ingredient text", () => {
+  const result = cleanOcrIngredientText(
+    "Nutrition Information\nEnergy 210kJ\nProtein 1g\nCarbohydrate 12g\nBarcode 6003678052405",
+  );
+
+  assert.equal(result.ingredientText, "");
+});
+
+test("cleanOcrIngredientText handles common OCR ingredient heading confusion", () => {
+  const result = cleanOcrIngredientText("INGREDIENT5: Water, sugar, cocoa");
+
+  assert.equal(result.ingredientText, "Water, sugar, cocoa");
+});
