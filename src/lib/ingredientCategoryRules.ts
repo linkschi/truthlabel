@@ -308,7 +308,11 @@ const brandTrustGreenIds = new Set(
 const hydrogenatedRedIds = new Set(
   hydrogenatedPartiallyHydrogenatedOilsDataPack.items
     .filter((item) => item.severity === "red")
-    .map((item) => item.id),
+    .flatMap((item) => [
+      item.id,
+      (item as { canonicalIngredientId?: string }).canonicalIngredientId,
+    ])
+    .filter((value): value is string => Boolean(value)),
 );
 
 const hydrogenatedGreenIds = new Set<string>();

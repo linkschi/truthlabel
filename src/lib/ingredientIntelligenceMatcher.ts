@@ -288,7 +288,7 @@ const packDefinitions: PackDefinition[] = [
     items:
       hydrogenatedPartiallyHydrogenatedOilsDataPack.items as unknown as AnyItem[],
     matchProfile: "ingredient_only",
-    canonicalStrategy: "item_id",
+    canonicalStrategy: "canonical_or_item",
     ingredientGroup: "processed_artificial",
   },
   {
@@ -921,6 +921,15 @@ function shouldBlockTermMatch(
     prepared.pack.categoryId === "microplastics" &&
     prepared.itemId === "salt_microplastic_review_marker" &&
     source.kind === "ingredient"
+  ) {
+    return true;
+  }
+
+  if (
+    prepared.pack.categoryId === "hydrogenated_partially_hydrogenated_oils" &&
+    containsWholeNormalizedTerm(normalizedSource, "partially hydrogenated") &&
+    normalizedTerm.includes("hydrogenated") &&
+    !normalizedTerm.includes("partially hydrogenated")
   ) {
     return true;
   }

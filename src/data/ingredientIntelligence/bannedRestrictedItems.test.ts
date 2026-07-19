@@ -18,10 +18,10 @@ test("bannedRestrictedItems stores the full starter restricted dataset", () => {
 
 test("bannedRestrictedItems separates automatic red from regional review rules", () => {
   const yellowReviewIds = new Set([
-    "orange_b",
-    "citrus_red_no_2",
-    "petrolatum",
-    "paraffin_wax",
+    "orange_b_restricted_removal_watch",
+    "citrus_red_no_2_restricted_removal_watch",
+    "petrolatum_food_canada",
+    "paraffin_wax_canada_restricted",
   ]);
 
   bannedRestrictedItems.forEach((item) => {

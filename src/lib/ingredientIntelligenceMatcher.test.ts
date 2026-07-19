@@ -221,3 +221,40 @@ test("oil-free wording does not trigger processed-oil categories from the free-f
   assert.equal(findCategorySummary(output, "Seed Oils / Processed Oils"), undefined);
   assert.equal(findCategorySummary(output, "Fry Oil / Fast Food Oil"), undefined);
 });
+
+test("partially hydrogenated oil variants collapse into one banned PHO signal", () => {
+  const output = matchIngredientIntelligence({
+    ingredients: ["Partially hydrogenated palm kernel oil"],
+  });
+  const phoMatch = output.duplicateSafeMatches.find(
+    (match) => match.canonicalIngredientId === "partially_hydrogenated_oils",
+  );
+
+  assert.ok(phoMatch);
+  assert.equal(
+    output.duplicateSafeMatches.filter((match) =>
+      match.sourcePacks.includes("hydrogenated_partially_hydrogenated_oils"),
+    ).length,
+    1,
+  );
+  assert.ok(phoMatch.sourcePacks.includes("banned_restricted_items"));
+  assert.ok(
+    phoMatch.sourcePacks.includes("hydrogenated_partially_hydrogenated_oils"),
+  );
+  assert.equal(phoMatch.basicSeveritySuggestion, "red");
+});
+
+test("generic hydrogenated shortening stays review-only and does not trigger the banned PHO rule", () => {
+  const output = matchIngredientIntelligence({
+    ingredients: ["Hydrogenated shortening"],
+  });
+  const hydrogenatedMatch = findDuplicateSafeMatch(
+    output,
+    "Hydrogenated / Partially Hydrogenated Oils",
+  );
+
+  assert.ok(hydrogenatedMatch);
+  assert.equal(hydrogenatedMatch.basicSeveritySuggestion, "yellow");
+  assert.ok(!hydrogenatedMatch.sourcePacks.includes("banned_restricted_items"));
+  assert.equal(findCategorySummary(output, "Banned / Restricted Items"), undefined);
+});

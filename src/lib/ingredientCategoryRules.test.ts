@@ -94,6 +94,17 @@ test("hydrogenated oils become red from one partially hydrogenated oil match", (
   assert.equal(summary.redReasonType, "direct_red_ingredient");
 });
 
+test("partially hydrogenated oil variants also become red banned/restricted matches", () => {
+  const output = runRules({
+    ingredients: ["Partially hydrogenated sunflower oil"],
+  });
+  const summary = findSummary(output, "banned_restricted_items");
+
+  assert.equal(summary.severity, "red");
+  assert.equal(summary.redReasonType, "banned_restricted");
+  assert.equal(summary.matchCount, 1);
+});
+
 test("generic hydrogenated oil does not make standalone hydrogenated category red after revised flag update", () => {
   const output = runRules({
     ingredients: ["Hydrogenated soybean oil"],

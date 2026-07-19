@@ -105,6 +105,31 @@ test("Red No. 3 keeps artificial-colour overlap internal and shows visible red w
   assert.ok(itemMatches[0]?.matchedCategories.includes("Artificial Colours"));
 });
 
+test("partially hydrogenated oil appears as a visible banned/restricted warning", () => {
+  const result = buildResult({
+    ingredients: ["Partially hydrogenated sunflower oil"],
+  });
+
+  const bannedRow = findQuickOverviewRow(result, "banned_restricted_items");
+  const bannedDeepCheck = findDeepCheck(result, "banned_restricted_items");
+  const phoMatches = result.ingredientBreakdown.processedArtificial.filter(
+    (item) => item.canonicalIngredientId === "partially_hydrogenated_oils",
+  );
+
+  assert.equal(bannedRow?.severity, "red");
+  assert.equal(bannedDeepCheck?.severity, "red");
+  assert.equal(bannedDeepCheck?.matchCount, 1);
+  assert.equal(phoMatches.length, 1);
+  assert.ok(
+    phoMatches[0]?.matchedCategories.includes("Banned / Restricted Items"),
+  );
+  assert.ok(
+    phoMatches[0]?.matchedCategories.includes(
+      "Hydrogenated / Partially Hydrogenated Oils",
+    ),
+  );
+});
+
 test("detailed ingredient-system categories are hidden from Quick Overview", () => {
   const result = buildResult({
     ingredients: [
@@ -166,13 +191,13 @@ test("Ultra-Processed overview uses the simplified display labels", () => {
   );
 });
 
-test("four preservatives make preservatives red by count overload and final verdict red", () => {
+test("four yellow preservative concerns make preservatives red by count overload and final verdict red", () => {
   const result = buildResult({
     ingredients: [
       "Sodium benzoate",
-      "Potassium sorbate",
-      "Calcium propionate",
+      "Potassium benzoate",
       "Sodium nitrite",
+      "BHT",
     ],
   });
 
@@ -243,7 +268,7 @@ test("milk allergy profile match creates a red allergy check and do-not-consume 
   assert.equal(result.ingredientLoad.score, 3);
 });
 
-test("milk without a matching allergy profile stays yellow but hides from Deep Exposure", () => {
+test("milk without a matching allergy profile stays informational and hides from Deep Exposure", () => {
   const result = buildResult({
     ingredients: ["Milk powder"],
   });
@@ -251,7 +276,8 @@ test("milk without a matching allergy profile stays yellow but hides from Deep E
   const allergyOverviewRow = findQuickOverviewRow(result, "allergy_risk");
   const allergyDeepRow = findDeepCheck(result, "allergy_risk");
 
-  assert.equal(allergyOverviewRow?.severity, "yellow");
+  assert.equal(allergyOverviewRow?.severity, "green");
+  assert.equal(allergyOverviewRow?.displayValue, "Info");
   assert.equal(allergyDeepRow, undefined);
 });
 

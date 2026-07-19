@@ -9,6 +9,7 @@ export const hydrogenatedPartiallyHydrogenatedOilsDataPack = {
   items: [
     {
       id: "partially_hydrogenated_oil_general",
+      canonicalIngredientId: "partially_hydrogenated_oils",
       mainName: "Partially Hydrogenated Oil",
       otherNames: [
         "Partially hydrogenated oil",
@@ -61,6 +62,7 @@ export const hydrogenatedPartiallyHydrogenatedOilsDataPack = {
 
     {
       id: "partially_hydrogenated_soybean_oil",
+      canonicalIngredientId: "partially_hydrogenated_oils",
       mainName: "Partially Hydrogenated Soybean Oil",
       otherNames: [
         "Partially hydrogenated soybean oil",
@@ -75,7 +77,7 @@ export const hydrogenatedPartiallyHydrogenatedOilsDataPack = {
       brandNames: [],
       eNumbers: [],
       insNumbers: [],
-      abbreviations: ["PHO", "PH soybean oil"],
+      abbreviations: ["PH soybean oil"],
       labelVariants: [
         "Partially hydrogenated soybean oil",
         "Partially hydrogenated soya oil",
@@ -85,7 +87,6 @@ export const hydrogenatedPartiallyHydrogenatedOilsDataPack = {
         "Soybean",
         "Soya bean",
         "Soyabean",
-        "Partially-hydrogenated",
       ],
       regionalNames: ["Soya oil"],
       severity: "red",
@@ -103,6 +104,7 @@ export const hydrogenatedPartiallyHydrogenatedOilsDataPack = {
 
     {
       id: "partially_hydrogenated_cottonseed_oil",
+      canonicalIngredientId: "partially_hydrogenated_oils",
       mainName: "Partially Hydrogenated Cottonseed Oil",
       otherNames: [
         "Partially hydrogenated cottonseed oil",
@@ -114,7 +116,7 @@ export const hydrogenatedPartiallyHydrogenatedOilsDataPack = {
       brandNames: [],
       eNumbers: [],
       insNumbers: [],
-      abbreviations: ["PHO", "PH cottonseed oil"],
+      abbreviations: ["PH cottonseed oil"],
       labelVariants: [
         "Partially hydrogenated cottonseed oil",
         "Partially hydrogenated cotton seed oil",
@@ -122,7 +124,6 @@ export const hydrogenatedPartiallyHydrogenatedOilsDataPack = {
       spellingVariants: [
         "Cottonseed",
         "Cotton seed",
-        "Partially-hydrogenated",
       ],
       regionalNames: [],
       severity: "red",
@@ -140,6 +141,7 @@ export const hydrogenatedPartiallyHydrogenatedOilsDataPack = {
 
     {
       id: "partially_hydrogenated_canola_rapeseed_oil",
+      canonicalIngredientId: "partially_hydrogenated_oils",
       mainName: "Partially Hydrogenated Canola / Rapeseed Oil",
       otherNames: [
         "Partially hydrogenated canola oil",
@@ -156,13 +158,13 @@ export const hydrogenatedPartiallyHydrogenatedOilsDataPack = {
       brandNames: [],
       eNumbers: [],
       insNumbers: [],
-      abbreviations: ["PHO", "LEAR"],
+      abbreviations: [],
       labelVariants: [
         "Partially hydrogenated canola oil",
         "Partially hydrogenated rapeseed oil",
         "Partially hydrogenated LEAR oil",
       ],
-      spellingVariants: ["Partially-hydrogenated"],
+      spellingVariants: [],
       regionalNames: ["Rapeseed oil"],
       severity: "red",
       reason:
@@ -179,6 +181,7 @@ export const hydrogenatedPartiallyHydrogenatedOilsDataPack = {
 
     {
       id: "partially_hydrogenated_palm_palm_kernel_oil",
+      canonicalIngredientId: "partially_hydrogenated_oils",
       mainName: "Partially Hydrogenated Palm / Palm Kernel Oil",
       otherNames: [
         "Partially hydrogenated palm oil",
@@ -199,7 +202,7 @@ export const hydrogenatedPartiallyHydrogenatedOilsDataPack = {
       brandNames: [],
       eNumbers: [],
       insNumbers: [],
-      abbreviations: ["PHO", "PKO"],
+      abbreviations: [],
       labelVariants: [
         "Partially hydrogenated palm oil",
         "Partially hydrogenated palm kernel oil",
@@ -210,7 +213,6 @@ export const hydrogenatedPartiallyHydrogenatedOilsDataPack = {
         "Palm kernel",
         "Palmkernel",
         "Palm kernal",
-        "Partially-hydrogenated",
       ],
       regionalNames: [],
       severity: "red",
@@ -228,6 +230,7 @@ export const hydrogenatedPartiallyHydrogenatedOilsDataPack = {
 
     {
       id: "partially_hydrogenated_corn_sunflower_safflower_oils",
+      canonicalIngredientId: "partially_hydrogenated_oils",
       mainName: "Partially Hydrogenated Corn / Sunflower / Safflower Oils",
       otherNames: [
         "Partially hydrogenated corn oil",
@@ -249,14 +252,14 @@ export const hydrogenatedPartiallyHydrogenatedOilsDataPack = {
       brandNames: [],
       eNumbers: [],
       insNumbers: [],
-      abbreviations: ["PHO"],
+      abbreviations: [],
       labelVariants: [
         "Partially hydrogenated corn oil",
         "Partially hydrogenated maize oil",
         "Partially hydrogenated sunflower oil",
         "Partially hydrogenated safflower oil",
       ],
-      spellingVariants: ["Partially-hydrogenated"],
+      spellingVariants: [],
       regionalNames: ["Maize oil"],
       severity: "red",
       reason:
@@ -374,32 +377,20 @@ export const hydrogenatedPartiallyHydrogenatedOilsDataPack = {
       mainName: "Hydrogenated Shortening",
       otherNames: [
         "Hydrogenated shortening",
-        "Partially hydrogenated shortening",
         "Hydrogenated vegetable shortening",
-        "Partially hydrogenated vegetable shortening",
         "Hydrogenated baking shortening",
-        "Partially hydrogenated baking shortening",
         "Hydrogenated frying shortening",
-        "Partially hydrogenated frying shortening",
       ],
-      chemicalNames: [
-        "Hydrogenated vegetable fat shortening",
-        "Partially hydrogenated vegetable fat shortening",
-      ],
+      chemicalNames: ["Hydrogenated vegetable fat shortening"],
       brandNames: ["Crisco"],
       eNumbers: [],
       insNumbers: [],
-      abbreviations: ["PHO"],
+      abbreviations: [],
       labelVariants: [
         "Hydrogenated shortening",
-        "Partially hydrogenated shortening",
         "Hydrogenated vegetable shortening",
-        "Partially hydrogenated vegetable shortening",
       ],
-      spellingVariants: [
-        "Partially-hydrogenated",
-        "Partially hydrogenated",
-      ],
+      spellingVariants: [],
       regionalNames: [],
       severity: "yellow",
       reason:
@@ -419,32 +410,20 @@ export const hydrogenatedPartiallyHydrogenatedOilsDataPack = {
       mainName: "Hydrogenated Margarine / Spread",
       otherNames: [
         "Hydrogenated margarine",
-        "Partially hydrogenated margarine",
         "Hydrogenated vegetable fat spread",
-        "Partially hydrogenated vegetable fat spread",
         "Hydrogenated vegetable oil spread",
-        "Partially hydrogenated vegetable oil spread",
         "Hydrogenated table spread",
-        "Partially hydrogenated table spread",
       ],
-      chemicalNames: [
-        "Hydrogenated vegetable fat spread",
-        "Partially hydrogenated vegetable fat spread",
-      ],
+      chemicalNames: ["Hydrogenated vegetable fat spread"],
       brandNames: [],
       eNumbers: [],
       insNumbers: [],
-      abbreviations: ["PHO"],
+      abbreviations: [],
       labelVariants: [
         "Hydrogenated margarine",
-        "Partially hydrogenated margarine",
         "Hydrogenated vegetable fat spread",
-        "Partially hydrogenated vegetable fat spread",
       ],
-      spellingVariants: [
-        "Partially-hydrogenated",
-        "Partially hydrogenated",
-      ],
+      spellingVariants: [],
       regionalNames: [],
       severity: "yellow",
       reason:
