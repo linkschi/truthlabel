@@ -953,7 +953,7 @@ function buildCategoryDetail(args: {
       text: args.shortMessage,
     },
     {
-      label: "What this means for you",
+      label: "Action",
       text: getWhatThisMeansForYou({
         categoryId: args.categoryId,
         tone: args.tone,
@@ -1014,7 +1014,7 @@ function buildIngredientDetail(item: ScanResultIngredientItem) {
         text: matchedCategories,
       },
       {
-        label: "What this means for you",
+        label: "Action",
         text:
           item.group === "unmatched"
             ? "Review the physical label and ingredient context. Unmatched does not mean safe."
@@ -1338,7 +1338,7 @@ function DeepCheckRow({
                 </p>
                 <p className="mt-2 rounded-[14px] border border-[var(--border-soft)] bg-[var(--bg-surface)] px-3 py-2 text-[12px] leading-5 text-[var(--text-secondary)]">
                   <span className="font-semibold text-[var(--text-main)]">
-                    What this means for you:{" "}
+                    Action:{" "}
                   </span>
                   {whatThisMeansForYou}
                 </p>
