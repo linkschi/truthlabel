@@ -1299,23 +1299,23 @@ function DeepCheckRow({
       >
         <div className="min-h-0 overflow-hidden">
           <div
-            className={`relative overflow-hidden rounded-[20px] border px-3.5 py-3.5 shadow-[0_14px_26px_rgba(23,20,18,0.06)] ${deepDetailCardClasses[tone]}`}
+            className={`relative overflow-hidden rounded-[18px] border px-3 py-3 shadow-[0_12px_22px_rgba(23,20,18,0.055)] ${deepDetailCardClasses[tone]}`}
           >
             <span
               aria-hidden="true"
               className={`absolute inset-y-3 left-0 w-1 rounded-r-full ${deepDetailAccentClasses[tone]}`}
             />
-            <div className="pl-2">
+            <div className="pl-1.5">
               {isBannedRestrictedRow && matchedItems.length > 0 ? (
-                <div className="mb-3 rounded-[16px] border border-[var(--red-border)] bg-white/72 px-3 py-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--red-dark)]">
+                <div className="mb-2.5 rounded-[14px] border border-[var(--red-border)] bg-white/72 px-2.5 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]">
+                  <p className="text-[9px] font-semibold uppercase tracking-[0.13em] text-[var(--red-dark)]">
                     Flagged banned/restricted item
                   </p>
-                  <div className="mt-2 flex flex-wrap gap-1.5">
+                  <div className="mt-1.5 flex flex-wrap gap-1.5">
                     {matchedItems.map((matchedItem) => (
                       <span
                         key={`${item.categoryId}-flagged-${matchedItem}`}
-                        className="rounded-full border border-[var(--red-border)] bg-[var(--red-main)] px-2.5 py-1 text-[11px] font-semibold text-white shadow-[0_8px_16px_rgba(200,30,30,0.14)]"
+                        className="rounded-full border border-[var(--red-border)] bg-[var(--red-main)] px-2 py-0.5 text-[10px] font-semibold text-white shadow-[0_8px_16px_rgba(200,30,30,0.14)]"
                       >
                         {matchedItem}
                       </span>
@@ -1324,19 +1324,19 @@ function DeepCheckRow({
                 </div>
               ) : null}
 
-              <div className="rounded-[17px] border border-white/70 bg-white/70 px-3 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${chipToneClasses[tone]}`}>
+              <div className="rounded-[15px] border border-white/70 bg-white/70 px-2.5 py-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <span className={`rounded-full border px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.11em] ${chipToneClasses[tone]}`}>
                     Reason: {item.reason}
                   </span>
-                  <p className="text-[13px] font-semibold leading-5 text-[var(--text-main)]">
+                  <p className="text-[12px] font-semibold leading-5 text-[var(--text-main)]">
                     {item.title}
                   </p>
                 </div>
-                <p className="mt-2 text-[12px] leading-5 text-[var(--text-main)]">
+                <p className="mt-1.5 text-[12px] leading-[1.45] text-[var(--text-main)]">
                   {item.message}
                 </p>
-                <p className="mt-2 rounded-[14px] border border-[var(--border-soft)] bg-[var(--bg-surface)] px-3 py-2 text-[12px] leading-5 text-[var(--text-secondary)]">
+                <p className="mt-1.5 rounded-[12px] border border-[var(--border-soft)] bg-[var(--bg-surface)] px-2.5 py-1.5 text-[12px] leading-[1.45] text-[var(--text-secondary)]">
                   <span className="font-semibold text-[var(--text-main)]">
                     Action:{" "}
                   </span>
@@ -1344,9 +1344,9 @@ function DeepCheckRow({
                 </p>
               </div>
 
-              <div className="mt-3 rounded-[16px] border border-white/70 bg-white/62 px-3 py-2.5">
+              <div className="mt-2.5 rounded-[14px] border border-white/70 bg-white/62 px-2.5 py-2">
                 <div className="flex items-center justify-between gap-3">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--text-secondary)]">
+                  <p className="text-[9px] font-semibold uppercase tracking-[0.13em] text-[var(--text-secondary)]">
                     Matched items
                   </p>
                   <span className="text-[11px] font-semibold text-[var(--text-secondary)]">
