@@ -28,6 +28,8 @@ export type IngredientScanInput = {
   userAllergyProfile?: string[];
   externalSignals?: BarcodeExternalSignal[];
   scanSource?: "manual_paste" | "barcode" | "ocr";
+  productImageUrl?: string;
+  productImageSource?: "product_database" | "captured_scan";
   additionalConfidenceNotes?: string[];
 };
 
@@ -93,6 +95,10 @@ export function runIngredientScan(input: IngredientScanInput): ScanResult {
       : uniqueStrings(input.userAllergyProfile);
   const externalSignals = input.externalSignals ?? [];
   const scanSource = input.scanSource ?? "manual_paste";
+  const productImageUrl = input.productImageUrl?.trim() || undefined;
+  const productImageSource = productImageUrl
+    ? input.productImageSource ?? "captured_scan"
+    : undefined;
   const additionalConfidenceNotes = input.additionalConfidenceNotes ?? [];
   const ingredientCount = countUniqueParsedIngredients(ingredients);
 
@@ -140,6 +146,8 @@ export function runIngredientScan(input: IngredientScanInput): ScanResult {
     userAllergyProfile,
     externalSignals,
     scanSource,
+    productImageUrl,
+    productImageSource,
     additionalConfidenceNotes,
   });
 }

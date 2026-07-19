@@ -1,8 +1,10 @@
 "use client";
+/* eslint-disable @next/next/no-img-element */
 
 import Link from "next/link";
 import {
   type ReactNode,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -73,6 +75,7 @@ type ResultDetail = {
 };
 
 type ScanSourceLabel = ScanResult["productHero"]["scanSource"];
+type ProductImageSourceLabel = ScanResult["productHero"]["imageSource"];
 
 type IngredientGroupCard = {
   id: string;
@@ -211,6 +214,127 @@ function toRowTone(severity: "green" | "yellow" | "red" | null | undefined): Row
 
 function toModalTone(severity: "green" | "yellow" | "red" | null | undefined) {
   return severity ?? "yellow";
+}
+
+function getInitialReducedMotionPreference() {
+  return (
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
+
+function usePrefersReducedMotion() {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(
+    getInitialReducedMotionPreference,
+  );
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const handleChange = () => {
+      setPrefersReducedMotion(mediaQuery.matches);
+    };
+
+    mediaQuery.addEventListener("change", handleChange);
+
+    return () => {
+      mediaQuery.removeEventListener("change", handleChange);
+    };
+  }, []);
+
+  return prefersReducedMotion;
+}
+
+function useCountUp(targetValue: number, enabled: boolean, durationMs = 650) {
+  const [displayValue, setDisplayValue] = useState(() =>
+    enabled && targetValue > 0 ? 0 : targetValue,
+  );
+
+  useEffect(() => {
+    if (!enabled || targetValue <= 0) {
+      const frame = window.requestAnimationFrame(() => {
+        setDisplayValue(targetValue);
+      });
+
+      return () => {
+        window.cancelAnimationFrame(frame);
+      };
+    }
+
+    let frame = 0;
+    const startTime = window.performance.now();
+    const easedOut = (progress: number) => 1 - Math.pow(1 - progress, 3);
+
+    const tick = (now: number) => {
+      const progress = Math.min(1, (now - startTime) / durationMs);
+      setDisplayValue(Math.round(targetValue * easedOut(progress)));
+
+      if (progress < 1) {
+        frame = window.requestAnimationFrame(tick);
+      }
+    };
+
+    frame = window.requestAnimationFrame(tick);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+    };
+  }, [durationMs, enabled, targetValue]);
+
+  return displayValue;
+}
+
+function buildResultMotionKey(args: {
+  barcodeScanKey?: string;
+  manualScanKey?: string;
+  demoProductId?: string;
+  category?: string;
+  latestBarcodeSavedAt?: string;
+  latestManualSavedAt?: string;
+  scanResult: ScanResult;
+}) {
+  const sourceKey = args.barcodeScanKey
+    ? `barcode:${args.latestBarcodeSavedAt ?? args.barcodeScanKey}`
+    : args.manualScanKey
+      ? `manual:${args.latestManualSavedAt ?? args.manualScanKey}`
+      : `demo:${args.demoProductId ?? args.category ?? "sample"}`;
+
+  return [
+    sourceKey,
+    args.scanResult.productHero.productName,
+    args.scanResult.ingredientLoad.score,
+  ].join("|");
+}
+
+function useFreshResultMotion(resultMotionKey: string, freshResult: boolean) {
+  const [freshMotionKey] = useState(() => {
+    if (!freshResult || typeof window === "undefined") {
+      return "";
+    }
+
+    const storageKey = `truthlabel.result-viewed.${resultMotionKey}`;
+
+    try {
+      if (window.sessionStorage.getItem(storageKey)) {
+        return "";
+      }
+
+      window.sessionStorage.setItem(storageKey, "1");
+    } catch {
+      return resultMotionKey;
+    }
+
+    return resultMotionKey;
+  });
+
+  return freshMotionKey === resultMotionKey;
+}
+
+function getRevealStyle(index: number) {
+  return { animationDelay: `${index * 80}ms` };
 }
 
 function buildIssueBadges({
@@ -359,27 +483,58 @@ function getScanSourceBadgeLabel(scanSource: ScanSourceLabel) {
   }
 }
 
+function getProductImageSourceLabel(imageSource?: ProductImageSourceLabel) {
+  switch (imageSource) {
+    case "product_database":
+      return "Open Food Facts";
+    case "captured_scan":
+      return "Scan photo";
+    default:
+      return "Product";
+  }
+}
+
 function ProductVisual({
   productName,
   scanSource,
+  imageUrl,
+  imageSource,
 }: {
   productName: string;
   scanSource: ScanSourceLabel;
+  imageUrl: string;
+  imageSource?: ProductImageSourceLabel;
 }) {
   const sourceLabel = getScanSourceBadgeLabel(scanSource);
+  const imageSourceLabel = getProductImageSourceLabel(imageSource);
+  const [failedImageUrl, setFailedImageUrl] = useState("");
+  const hasImage = Boolean(imageUrl && failedImageUrl !== imageUrl);
 
   return (
-    <div className="relative h-[84px] w-[84px] overflow-hidden rounded-[18px] border border-[var(--border-strong)] bg-[linear-gradient(165deg,var(--bg-page)_0%,var(--bg-soft)_52%,var(--border-strong)_100%)] shadow-[0_14px_28px_rgba(23,20,18,0.08)]">
-      <div className="absolute left-3 top-3 rounded-full border border-white/80 bg-white/88 px-2 py-1 text-[8px] font-semibold uppercase tracking-[0.18em] text-[var(--text-secondary)]">
-        {sourceLabel}
+    <div className="relative h-[96px] w-[96px] overflow-hidden rounded-[20px] border border-[var(--border-strong)] bg-[linear-gradient(165deg,var(--bg-page)_0%,var(--bg-soft)_52%,var(--border-strong)_100%)] shadow-[0_14px_28px_rgba(23,20,18,0.08)]">
+      {hasImage ? (
+        <img
+          src={imageUrl}
+          alt={`${productName} product image`}
+          className="h-full w-full object-cover"
+          loading="lazy"
+          onError={() => setFailedImageUrl(imageUrl)}
+        />
+      ) : (
+        <div className="absolute inset-x-3 bottom-3 rounded-[14px] border border-white/80 bg-white/92 px-2.5 py-2 shadow-[0_10px_18px_rgba(23,20,18,0.08)]">
+          <div className="mx-auto h-2 rounded-full bg-[var(--neutral-text)]" />
+          <div className="mx-auto mt-1 h-2 rounded-full bg-[var(--amber-main)]" />
+          <div className="mx-auto mt-1 h-2 rounded-full bg-[var(--green-main)]" />
+          <p className="mt-2 line-clamp-2 text-center text-[8px] font-semibold uppercase tracking-[0.18em] text-[var(--text-secondary)]">
+            {productName}
+          </p>
+        </div>
+      )}
+      <div className="absolute left-2 top-2 rounded-full border border-white/80 bg-white/90 px-2 py-1 text-[8px] font-semibold uppercase tracking-[0.16em] text-[var(--text-secondary)] shadow-[0_8px_18px_rgba(23,20,18,0.08)]">
+        {hasImage ? imageSourceLabel : sourceLabel}
       </div>
-      <div className="absolute inset-x-3 bottom-3 rounded-[14px] border border-white/80 bg-white/92 px-2.5 py-2 shadow-[0_10px_18px_rgba(23,20,18,0.08)]">
-        <div className="mx-auto h-2 rounded-full bg-[var(--neutral-text)]" />
-        <div className="mx-auto mt-1 h-2 rounded-full bg-[var(--amber-main)]" />
-        <div className="mx-auto mt-1 h-2 rounded-full bg-[var(--green-main)]" />
-        <p className="mt-2 text-center text-[8px] font-semibold uppercase tracking-[0.18em] text-[var(--text-secondary)]">
-          {productName}
-        </p>
+      <div className="absolute bottom-2 right-2 rounded-full border border-white/80 bg-white/90 px-2 py-1 text-[8px] font-semibold uppercase tracking-[0.16em] text-[var(--text-secondary)] shadow-[0_8px_18px_rgba(23,20,18,0.08)]">
+        {sourceLabel}
       </div>
     </div>
   );
@@ -479,12 +634,15 @@ function ScoreRing({
   score,
   scoreLabel,
   tone,
+  animate = false,
 }: {
   score: number;
   scoreLabel: string;
   tone: Exclude<RowTone, "neutral">;
+  animate?: boolean;
 }) {
-  const progress = Math.max(0, Math.min(1, score / 100));
+  const displayedScore = useCountUp(score, animate, 700);
+  const progress = Math.max(0, Math.min(1, displayedScore / 100));
   const degrees = progress * 360;
   const ringColor =
     tone === "red"
@@ -507,7 +665,7 @@ function ScoreRing({
           Ingredient load
         </p>
         <p className="mt-1 font-heading text-[2.15rem] font-semibold leading-none text-[var(--text-main)]">
-          {score}
+          {displayedScore}
         </p>
         <p className="mt-0.5 text-[11px] font-semibold text-[var(--text-secondary)]">/100</p>
         <p
@@ -805,9 +963,11 @@ function SectionHeading({
 function IssueBadgeStack({
   badges,
   className = "",
+  animate = false,
 }: {
   badges: BadgeDescriptor[];
   className?: string;
+  animate?: boolean;
 }) {
   if (badges.length === 0) {
     return null;
@@ -816,13 +976,116 @@ function IssueBadgeStack({
   return (
     <div className={`flex items-center gap-1.5 ${className}`}>
       {badges.map((badge, index) => (
-        <IssueBadge
+        <AnimatedIssueBadge
           key={`${badge.color}-${badge.count ?? badge.label ?? "badge"}-${index}`}
-          color={badge.color}
-          count={badge.count}
-          label={badge.label}
+          badge={badge}
+          animate={animate}
         />
       ))}
+    </div>
+  );
+}
+
+function AnimatedIssueBadge({
+  badge,
+  animate,
+}: {
+  badge: BadgeDescriptor;
+  animate: boolean;
+}) {
+  const displayedCount = useCountUp(
+    badge.count ?? 0,
+    animate && badge.count !== undefined,
+    580,
+  );
+
+  return (
+    <IssueBadge
+      color={badge.color}
+      count={badge.count === undefined ? undefined : displayedCount}
+      label={badge.label}
+    />
+  );
+}
+
+function ResultSummaryCounts({
+  ingredientCount,
+  yellowCount,
+  redCount,
+  watchListMatchCount,
+  animate,
+}: {
+  ingredientCount: number;
+  yellowCount: number;
+  redCount: number;
+  watchListMatchCount: number;
+  animate: boolean;
+}) {
+  const items = [
+    {
+      id: "ingredients",
+      label: "Ingredients reviewed",
+      value: ingredientCount,
+      tone: "green" as RowTone,
+    },
+    {
+      id: "yellow",
+      label: "Yellow findings",
+      value: yellowCount,
+      tone: "yellow" as RowTone,
+    },
+    {
+      id: "red",
+      label: "Red findings",
+      value: redCount,
+      tone: "red" as RowTone,
+    },
+    {
+      id: "watch",
+      label: "Watch List matches",
+      value: watchListMatchCount,
+      tone: watchListMatchCount > 0 ? ("red" as RowTone) : ("green" as RowTone),
+    },
+  ];
+
+  return (
+    <div className="grid grid-cols-2 gap-2">
+      {items.map((item) => (
+        <ResultSummaryCountCard
+          key={item.id}
+          label={item.label}
+          value={item.value}
+          tone={item.tone}
+          animate={animate}
+        />
+      ))}
+    </div>
+  );
+}
+
+function ResultSummaryCountCard({
+  label,
+  value,
+  tone,
+  animate,
+}: {
+  label: string;
+  value: number;
+  tone: RowTone;
+  animate: boolean;
+}) {
+  const displayedValue = useCountUp(value, animate && value > 0, 620);
+
+  return (
+    <div
+      className={`rounded-[18px] border px-3 py-3 ${groupSurfaceClasses[tone]}`}
+    >
+      <p className={`font-heading text-[1.45rem] font-semibold leading-none ${groupTitleClasses[tone]}`}>
+        {displayedValue}
+      </p>
+      <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.11em] text-[var(--text-secondary)]">
+        {label}
+      </p>
     </div>
   );
 }
@@ -1269,8 +1532,12 @@ function getSimpleIngredientSummary(scanResult: ScanResult) {
 
 function OverviewRow({
   item,
+  animate,
+  index,
 }: {
   item: ScanResultOverviewRow;
+  animate: boolean;
+  index: number;
 }) {
   const tone = toRowTone(item.severity);
   const overviewValue =
@@ -1289,7 +1556,10 @@ function OverviewRow({
 
   return (
     <div
-      className="grid min-h-[48px] w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 py-2.5"
+      className={`grid min-h-[48px] w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 py-2.5 ${
+        animate ? "truthlabel-category-enter" : ""
+      }`}
+      style={animate ? getRevealStyle(index) : undefined}
     >
       <RowIcon tone={tone} categoryId={item.categoryId} />
       <div className="min-w-0">
@@ -1297,7 +1567,11 @@ function OverviewRow({
           {item.label}
         </p>
       </div>
-      <IssueBadgeStack badges={badges} className="justify-self-end" />
+      <IssueBadgeStack
+        badges={badges}
+        className="justify-self-end"
+        animate={animate}
+      />
     </div>
   );
 }
@@ -1340,10 +1614,14 @@ function DeepCheckRow({
   item,
   isExpanded,
   onToggle,
+  animate,
+  index,
 }: {
   item: ScanResultDeepExposureCheck;
   isExpanded: boolean;
   onToggle: (categoryId: string) => void;
+  animate: boolean;
+  index: number;
 }) {
   const tone = toRowTone(item.severity);
   const badges = getDeepCheckStatusBadges(item);
@@ -1368,13 +1646,22 @@ function DeepCheckRow({
   });
 
   return (
-    <div>
+    <div
+      className={animate ? "truthlabel-category-enter" : ""}
+      style={animate ? getRevealStyle(index) : undefined}
+    >
       <button
         type="button"
         aria-expanded={isExpanded}
         aria-controls={detailId}
         onClick={() => onToggle(item.categoryId)}
-        className="grid min-h-[52px] w-full grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-3 py-3 text-left transition-colors active:bg-[var(--bg-soft)]"
+        className={`grid min-h-[52px] w-full grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-3 py-3 text-left transition-colors active:bg-[var(--bg-soft)] ${
+          animate && tone === "red"
+            ? "truthlabel-pulse-red"
+            : animate && tone === "yellow"
+              ? "truthlabel-pulse-yellow"
+              : ""
+        }`}
       >
         <div>
           <RowIcon tone={tone} categoryId={item.categoryId} />
@@ -1384,7 +1671,11 @@ function DeepCheckRow({
             {item.label}
           </span>
         </div>
-        <IssueBadgeStack badges={badges} className="justify-self-end" />
+        <IssueBadgeStack
+          badges={badges}
+          className="justify-self-end"
+          animate={animate}
+        />
         <ChevronIcon
           className={`text-[var(--text-secondary)] transition-transform ${
             isExpanded ? "-rotate-90" : "rotate-90"
@@ -1544,11 +1835,13 @@ export default function ProductResult({
   barcodeScanKey,
   category,
   demoProductId,
+  freshResult = false,
   manualScanKey,
 }: {
   barcodeScanKey?: string;
   category?: string;
   demoProductId?: string;
+  freshResult?: boolean;
   manualScanKey?: string;
 }) {
   const userSettings = useUserSettings();
@@ -1588,6 +1881,18 @@ export default function ProductResult({
     [category, demoProductId, savedAllergyProfile],
   );
   const scanResult = barcodeScanResult ?? manualScanResult ?? fallbackScanResult;
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const resultMotionKey = buildResultMotionKey({
+    barcodeScanKey,
+    manualScanKey,
+    demoProductId,
+    category,
+    latestBarcodeSavedAt: latestBarcodeScan?.savedAt,
+    latestManualSavedAt: latestManualScan?.savedAt,
+    scanResult,
+  });
+  const freshMotionEnabled = useFreshResultMotion(resultMotionKey, freshResult);
+  const shouldAnimateFreshResult = freshMotionEnabled && !prefersReducedMotion;
 
   const overviewRows = useMemo(() => {
     const byCategoryId = new Map(
@@ -1658,6 +1963,21 @@ export default function ProductResult({
       badgeTone: hasNeutral ? "neutral" : undefined,
     });
   }, [deepCheckRows]);
+
+  const resultSummaryCounts = useMemo(() => {
+    const redCount = deepCheckRows.filter((row) => row.severity === "red").length;
+    const yellowCount = deepCheckRows.filter((row) => row.severity === "yellow").length;
+    const watchListMatchCount = deepCheckRows
+      .filter((row) => row.categoryId === "allergy_risk" && row.severity === "red")
+      .reduce((total, row) => total + Math.max(1, row.matchCount), 0);
+
+    return {
+      ingredientCount: scanResult.ingredientBreakdown.totalIngredients,
+      yellowCount,
+      redCount,
+      watchListMatchCount,
+    };
+  }, [deepCheckRows, scanResult.ingredientBreakdown.totalIngredients]);
 
   const brandTrustBadges = useMemo(() => {
     const severity = scanResult.brandTrustSafety.severity;
@@ -1823,45 +2143,84 @@ export default function ProductResult({
 
           <BrandMark />
 
-          <section className="mt-6">
+          <section
+            className={`mt-6 ${shouldAnimateFreshResult ? "truthlabel-reveal" : ""}`}
+            style={shouldAnimateFreshResult ? getRevealStyle(0) : undefined}
+          >
             <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
               <div>
                 <ProductVisual
                   productName={scanResult.productHero.productName}
                   scanSource={scanResult.productHero.scanSource}
+                  imageUrl={scanResult.productHero.imageUrl ?? ""}
+                  imageSource={scanResult.productHero.imageSource}
                 />
                 <h2 className="mt-4 font-heading text-[1.45rem] font-semibold leading-tight text-[var(--text-main)]">
                   {scanResult.productHero.productName}
                 </h2>
                 <p className="mt-1 text-[13px] text-[var(--text-secondary)]">
-                  {scanResult.productHero.brandName}
+                  Brand name: {scanResult.productHero.brandName}
                 </p>
               </div>
               <ScoreRing
                 score={scanResult.ingredientLoad.score}
                 scoreLabel={scanResult.ingredientLoad.level}
                 tone={scanResult.ingredientLoad.tone}
+                animate={shouldAnimateFreshResult}
               />
             </div>
           </section>
 
-          <section className="mt-6 border-t border-[var(--border-soft)] pt-5">
+          <section
+            className={`mt-5 ${shouldAnimateFreshResult ? "truthlabel-reveal" : ""}`}
+            style={shouldAnimateFreshResult ? getRevealStyle(3) : undefined}
+            aria-label="Result summary counts"
+          >
+            <ResultSummaryCounts
+              ingredientCount={resultSummaryCounts.ingredientCount}
+              yellowCount={resultSummaryCounts.yellowCount}
+              redCount={resultSummaryCounts.redCount}
+              watchListMatchCount={resultSummaryCounts.watchListMatchCount}
+              animate={shouldAnimateFreshResult}
+            />
+          </section>
+
+          <section
+            className={`mt-6 border-t border-[var(--border-soft)] pt-5 ${
+              shouldAnimateFreshResult ? "truthlabel-reveal" : ""
+            }`}
+            style={shouldAnimateFreshResult ? getRevealStyle(4) : undefined}
+          >
             <SectionHeading
               title="Quick Overview"
               subtitle="Compact checklist of the checks applied to this product."
             />
             <div className="mt-3 divide-y divide-[var(--border-soft)]">
-              {overviewRows.map((item) => (
-                <OverviewRow key={item.categoryId} item={item} />
+              {overviewRows.map((item, index) => (
+                <OverviewRow
+                  key={item.categoryId}
+                  item={item}
+                  animate={shouldAnimateFreshResult}
+                  index={index}
+                />
               ))}
             </div>
           </section>
 
-          <section className="mt-6 border-t border-[var(--border-soft)] pt-5">
+          <section
+            className={`mt-6 border-t border-[var(--border-soft)] pt-5 ${
+              shouldAnimateFreshResult ? "truthlabel-reveal" : ""
+            }`}
+            style={shouldAnimateFreshResult ? getRevealStyle(5) : undefined}
+          >
             <SectionHeading
-              title="Deep Exposure Checks"
-              subtitle="Deep analysis of flagged items."
-              extra={<IssueBadgeStack badges={deepCheckSectionBadges} />}
+              title="A Closer Look"
+              extra={
+                <IssueBadgeStack
+                  badges={deepCheckSectionBadges}
+                  animate={shouldAnimateFreshResult}
+                />
+              }
             />
 
             <div className="mt-4">
@@ -1874,11 +2233,13 @@ export default function ProductResult({
               >
                 {deepCheckRows.length > 0 ? (
                   <div className="divide-y divide-[var(--border-soft)]">
-                    {deepCheckRows.map((item) => (
+                    {deepCheckRows.map((item, index) => (
                       <DeepCheckRow
                         key={item.categoryId}
                         item={item}
                         isExpanded={expandedDeepCheckId === item.categoryId}
+                        animate={shouldAnimateFreshResult}
+                        index={index}
                         onToggle={(categoryId) =>
                           setExpandedDeepCheckId((current) =>
                             current === categoryId ? null : categoryId,
@@ -1921,7 +2282,10 @@ export default function ProductResult({
 
           <section
             ref={ingredientSectionRef}
-            className="mt-6 border-t border-[var(--border-soft)] pt-5"
+            className={`mt-6 border-t border-[var(--border-soft)] pt-5 ${
+              shouldAnimateFreshResult ? "truthlabel-reveal" : ""
+            }`}
+            style={shouldAnimateFreshResult ? getRevealStyle(7) : undefined}
           >
             <div className="rounded-[18px] border border-[var(--border-soft)] bg-[var(--bg-soft)] px-3.5 py-3">
               <p className="mb-3 text-[13px] font-semibold text-[var(--text-main)]">
@@ -1988,7 +2352,10 @@ export default function ProductResult({
                                 {group.label}
                               </p>
                             </div>
-                            <IssueBadgeStack badges={getIngredientGroupBadges(group)} />
+                            <IssueBadgeStack
+                              badges={getIngredientGroupBadges(group)}
+                              animate={shouldAnimateFreshResult}
+                            />
                           </div>
                           <div className="mt-3 flex flex-wrap gap-x-2 gap-y-2">
                             {group.items.map((item) => (
@@ -2064,7 +2431,12 @@ export default function ProductResult({
           </section>
           ) : null}
 
-          <section className="mt-6 border-t border-[var(--border-soft)] pt-5">
+          <section
+            className={`mt-6 border-t border-[var(--border-soft)] pt-5 ${
+              shouldAnimateFreshResult ? "truthlabel-reveal" : ""
+            }`}
+            style={shouldAnimateFreshResult ? getRevealStyle(2) : undefined}
+          >
             <SectionHeading
               title="Final Verdict"
             />

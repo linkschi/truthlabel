@@ -30,6 +30,7 @@ export type BarcodeScanInput = {
   country?: string;
   language?: string;
   region?: string;
+  capturedImageUrl?: string;
   autoRunExternalSafetyLookup?: boolean;
 };
 
@@ -368,30 +369,41 @@ export async function runBarcodeScan(
     }
 
     const productData = normalizeExternalProduct(lookupResult);
+    const capturedImageUrl = input.capturedImageUrl?.trim() || undefined;
+    const productImageUrl = productData.imageUrl || capturedImageUrl;
+    const productImageSource = productData.imageUrl
+      ? "product_database"
+      : capturedImageUrl
+        ? "captured_scan"
+        : undefined;
+    const productDataWithImage = {
+      ...productData,
+      imageUrl: productImageUrl,
+    };
 
-    if (!hasMeaningfulText(productData.ingredientText)) {
+    if (!hasMeaningfulText(productDataWithImage.ingredientText)) {
       return {
         lookupStatus: "found_missing_ingredients",
-        productData,
+        productData: productDataWithImage,
         manualInputNeeded: true,
-        message: buildMissingIngredientsMessage(productData.barcode),
+        message: buildMissingIngredientsMessage(productDataWithImage.barcode),
         dataQualityWarnings: uniqueStrings([
-          ...productData.dataQualityWarnings,
-          ...buildRegionalProductDataWarnings(productData.barcode),
+          ...productDataWithImage.dataQualityWarnings,
+          ...buildRegionalProductDataWarnings(productDataWithImage.barcode),
         ]),
       };
     }
 
-    let mergedExternalSignals = [...productData.externalSignals];
+    let mergedExternalSignals = [...productDataWithImage.externalSignals];
     const externalSafetyWarnings: string[] = [];
     const externalSafetyConfidenceNotes: string[] = [];
 
     if (autoRunExternalSafetyLookup) {
       const externalSafetyResult = await lookupExternalSafety({
-        barcode: productData.barcode,
-        productName: productData.productName,
-        brandName: productData.brandName,
-        productCategory: productData.productCategory,
+        barcode: productDataWithImage.barcode,
+        productName: productDataWithImage.productName,
+        brandName: productDataWithImage.brandName,
+        productCategory: productDataWithImage.productCategory,
         country: resolvedCountry,
         region: resolvedRegion,
       });
@@ -409,37 +421,38 @@ export async function runBarcodeScan(
       );
     }
 
+    const finalProductData = {
+      ...productDataWithImage,
+      externalSignals: mergedExternalSignals,
+    };
+
     const scanResult = applyBarcodeConfidenceNotes(
       runIngredientScan({
-        productName: productData.productName,
-        brandName: productData.brandName,
-        barcode: productData.barcode,
-        productCategory: productData.productCategory,
-        ingredientText: productData.ingredientText,
-        allergenStatement: productData.allergenStatement,
-        packagingText: productData.packagingText,
+        productName: finalProductData.productName,
+        brandName: finalProductData.brandName,
+        barcode: finalProductData.barcode,
+        productCategory: finalProductData.productCategory,
+        ingredientText: finalProductData.ingredientText,
+        allergenStatement: finalProductData.allergenStatement,
+        packagingText: finalProductData.packagingText,
         userAllergyProfile: resolvedUserAllergyProfile,
         externalSignals: mergedExternalSignals,
         scanSource: "barcode",
+        productImageUrl,
+        productImageSource,
         additionalConfidenceNotes: externalSafetyConfidenceNotes,
       }),
-      {
-        ...productData,
-        externalSignals: mergedExternalSignals,
-      },
+      finalProductData,
     );
 
     return {
       lookupStatus: "found",
-      productData: {
-        ...productData,
-        externalSignals: mergedExternalSignals,
-      },
+      productData: finalProductData,
       scanResult,
       manualInputNeeded: false,
       message: "Product found. Truthlabel scanned the available ingredient data.",
       dataQualityWarnings: uniqueStrings([
-        ...productData.dataQualityWarnings,
+        ...finalProductData.dataQualityWarnings,
         ...externalSafetyWarnings,
       ]),
     };

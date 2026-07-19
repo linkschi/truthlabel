@@ -221,6 +221,18 @@ test("runManualScan keeps OCR scanSource and confidence notes in the final resul
   );
 });
 
+test("runManualScan keeps a captured scan image for the result hero", () => {
+  const output = runManualScan({
+    ingredientText: "Water, sugar",
+    scanSource: "ocr",
+    productImageUrl: "data:image/jpeg;base64,c2Nhbg==",
+    productImageSource: "captured_scan",
+  });
+
+  assert.equal(output.productHero.imageUrl, "data:image/jpeg;base64,c2Nhbg==");
+  assert.equal(output.productHero.imageSource, "captured_scan");
+});
+
 test("Red No. 3 extracted through OCR still produces a red warning", () => {
   const output = analyzeManualInput({
     ingredientText: "Water, sugar, Red No. 3",

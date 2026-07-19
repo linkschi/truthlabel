@@ -21,6 +21,7 @@ import {
   type IngredientOcrRunner,
   type OcrProgressUpdate,
 } from "@/lib/localIngredientOcr";
+import { createCapturedImageThumbnail } from "@/lib/createCapturedImageThumbnail";
 
 type OcrCameraState =
   | "idle"
@@ -45,6 +46,7 @@ type OcrImageCaptureConstructor = new (
 export type OcrConfirmedDetails = {
   possibleAllergenStatement?: string;
   confidenceWarnings: string[];
+  capturedImageUrl?: string;
 };
 
 type OcrIngredientScannerProps = {
@@ -245,6 +247,7 @@ export default function OcrIngredientScanner({
 }: OcrIngredientScannerProps) {
   const [cameraState, setCameraState] = useState<OcrCameraState>("idle");
   const [previewUrl, setPreviewUrl] = useState("");
+  const [capturedImageUrl, setCapturedImageUrl] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [ocrErrorMessage, setOcrErrorMessage] = useState("");
   const [editableIngredientText, setEditableIngredientText] = useState("");
@@ -293,6 +296,7 @@ export default function OcrIngredientScanner({
     setEditableIngredientText("");
     setEditableAllergenStatement("");
     setConfidenceWarnings([]);
+    setCapturedImageUrl("");
     setIsReviewReady(false);
     setIsProcessing(false);
     setOcrErrorMessage("");
@@ -319,6 +323,12 @@ export default function OcrIngredientScanner({
       setOcrProgress({ progress: 0, status: "Preparing photo..." });
       setIsReviewReady(false);
       setOcrErrorMessage("");
+      setCapturedImageUrl("");
+      void createCapturedImageThumbnail(image).then((thumbnailUrl) => {
+        if (processingToken === processingTokenRef.current && thumbnailUrl) {
+          setCapturedImageUrl(thumbnailUrl);
+        }
+      });
 
       try {
         const result = await ocrRunner(image, {
@@ -546,6 +556,7 @@ export default function OcrIngredientScanner({
           possibleAllergenStatement:
             editableAllergenStatement.trim() || undefined,
           confidenceWarnings,
+          capturedImageUrl,
         }),
       );
     } finally {
@@ -553,6 +564,7 @@ export default function OcrIngredientScanner({
     }
   }, [
     confidenceWarnings,
+    capturedImageUrl,
     editableAllergenStatement,
     editableIngredientText,
     onTextConfirmed,

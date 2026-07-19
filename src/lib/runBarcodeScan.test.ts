@@ -97,6 +97,32 @@ test("product found with ingredients returns a scan result", async () => {
   assert.ok(output.scanResult);
   assert.equal(output.scanResult?.productHero.scanSource, "barcode");
   assert.equal(output.scanResult?.productHero.productName, "Simple Rolled Oats");
+  assert.equal(
+    output.scanResult?.productHero.imageUrl,
+    "https://images.openfoodfacts.org/mock/simple-rolled-oats.jpg",
+  );
+  assert.equal(output.scanResult?.productHero.imageSource, "product_database");
+});
+
+test("barcode scan uses captured image when product database image is missing", async () => {
+  const output = await runBarcodeScan(
+    {
+      barcode: "1000000000002",
+      capturedImageUrl: "data:image/jpeg;base64,YmFyY29kZQ==",
+    },
+    { lookupProduct: lookupMockProduct },
+  );
+
+  assert.equal(output.lookupStatus, "found");
+  assert.equal(
+    output.scanResult?.productHero.imageUrl,
+    "data:image/jpeg;base64,YmFyY29kZQ==",
+  );
+  assert.equal(output.scanResult?.productHero.imageSource, "captured_scan");
+  assert.equal(
+    output.productData?.imageUrl,
+    "data:image/jpeg;base64,YmFyY29kZQ==",
+  );
 });
 
 test("product found without ingredients returns manual fallback", async () => {
@@ -169,7 +195,7 @@ test("Red Berry Soda from barcode returns a red warning", async () => {
   assert.equal(output.scanResult?.finalVerdict.verdictTone, "red");
 });
 
-test("Zero Sugar Drink from barcode returns sweetener count overload", async () => {
+test("Zero Sugar Drink from barcode returns direct red sweetener warning", async () => {
   const output = await runBarcodeScan(
     { barcode: "1000000000003" },
     { lookupProduct: lookupMockProduct },
@@ -184,7 +210,7 @@ test("Zero Sugar Drink from barcode returns sweetener count overload", async () 
 
   assert.equal(sweetenerOverviewRow, undefined);
   assert.equal(sweetenerDeepRow.severity, "red");
-  assert.equal(sweetenerDeepRow.redReasonType, "count_overload");
+  assert.equal(sweetenerDeepRow.redReasonType, "direct_red_ingredient");
 });
 
 test("Chocolate Milk with milk allergy profile returns Allergy Risk red", async () => {

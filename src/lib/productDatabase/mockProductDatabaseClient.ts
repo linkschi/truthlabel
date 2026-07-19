@@ -13,6 +13,7 @@ const mockProducts: Record<string, ExternalProductLookupResult> = {
     barcode: "1000000000001",
     productName: "Simple Rolled Oats",
     brandName: "Whole Pantry",
+    imageUrl: "https://images.openfoodfacts.org/mock/simple-rolled-oats.jpg",
     productCategory: "oats",
     ingredientsText: "Rolled oats",
     ingredients: ["Rolled oats"],

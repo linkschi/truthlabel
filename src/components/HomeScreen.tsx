@@ -30,7 +30,7 @@ type HomeIconName =
   | "spark"
   | "user";
 
-type AccordionId = "demo" | "how" | "watch" | "developer";
+type AccordionId = "how" | "watch" | "developer";
 type Tint = "green" | "yellow" | "red" | "neutral";
 
 const defaultProductHref = `/product?category=packaged-processed-foods&demo=${defaultDemoProductId}`;
@@ -38,9 +38,9 @@ const defaultDemoProduct = getDemoProductById(defaultDemoProductId);
 const featureFlags = publicAppConfig.flags;
 
 const capabilityPills = [
-  { label: "Barcode", icon: "barcode" as const },
-  { label: "Ingredients", icon: "list" as const },
-  { label: "OCR", icon: "camera" as const },
+  { label: "Barcode", icon: "barcode" as const, tint: "red" as const },
+  { label: "Ingredients", icon: "list" as const, tint: "yellow" as const },
+  { label: "OCR", icon: "camera" as const, tint: "green" as const },
 ];
 
 const valuePreviewItems = [
@@ -315,11 +315,11 @@ function tintClasses(tint: Tint) {
 
 function TruthlabelMark() {
   return (
-    <span className="inline-flex h-[34px] w-[34px] items-center justify-center rounded-[11px] bg-[#0E4C37] shadow-[0_7px_18px_rgba(14,76,55,0.18)]">
+    <span className="inline-flex h-[34px] w-[34px] items-center justify-center rounded-[11px] bg-[linear-gradient(145deg,#B91C1C_0%,#EA580C_100%)] shadow-[0_7px_18px_rgba(185,28,28,0.18)]">
       <span className="grid gap-[3px]">
-        <span className="h-[3px] w-[18px] rounded-full bg-[#E64B4F]" />
-        <span className="h-[3px] w-[18px] rounded-full bg-[#F5C542]" />
-        <span className="h-[3px] w-[18px] rounded-full bg-[#32A66A]" />
+        <span className="h-[3px] w-[18px] rounded-full bg-white" />
+        <span className="h-[3px] w-[18px] rounded-full bg-[#FDE68A]" />
+        <span className="h-[3px] w-[18px] rounded-full bg-[#86EFAC]" />
       </span>
     </span>
   );
@@ -330,19 +330,19 @@ function HomeHeader() {
     <header className="flex min-h-[58px] items-center justify-between gap-4">
       <Link
         href="/"
-        className="flex items-center gap-2.5 rounded-[14px] outline-none transition focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2"
+        className="flex items-center gap-2.5 rounded-[14px] outline-none transition focus-visible:ring-2 focus-visible:ring-[#B91C1C] focus-visible:ring-offset-2"
         aria-label="Truthlabel home"
       >
         <TruthlabelMark />
         <span className="text-[20px] font-extrabold tracking-[-0.02em] text-[#101613]">
-          Truth<span className="text-[#0E5A3F]">label</span>
+          Truth<span className="text-[#B91C1C]">label</span>
         </span>
       </Link>
 
       <Link
         href="/account"
         aria-label="Open Truthlabel account"
-        className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#D7E7DD] bg-[#E8F6EF] text-[#0E5A3F] transition hover:bg-[#DDF0E7] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
+        className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#F3D2D4] bg-[#FDEDEE] text-[#A33A3F] transition hover:bg-[#FBE0E2] focus-visible:ring-2 focus-visible:ring-[#B91C1C] focus-visible:ring-offset-2 active:scale-[0.98]"
       >
         <Icon name="user" className="h-[21px] w-[21px]" />
       </Link>
@@ -355,7 +355,7 @@ function HeroSection() {
     <section className="mt-3">
       <h1 className="max-w-[330px] text-[32px] font-black leading-[1.05] tracking-[-0.025em] text-[#101613] min-[390px]:text-[34px]">
         Scan before you{" "}
-        <span className="text-[#0E5A3F]">trust it.</span>
+        <span className="text-[#B91C1C]">trust it.</span>
       </h1>
       <p className="mt-3 max-w-[360px] text-[14.5px] leading-[1.5] text-[#66716B]">
         Truthlabel scans barcodes and ingredient labels to help you understand what a food product contains.
@@ -364,7 +364,7 @@ function HeroSection() {
         {capabilityPills.map((pill) => (
           <span
             key={pill.label}
-            className="inline-flex h-[30px] items-center gap-1.5 rounded-full bg-[#F3FAF6] px-3 text-[12px] font-semibold text-[#0E5A3F]"
+            className={`inline-flex h-[30px] items-center gap-1.5 rounded-full px-3 text-[12px] font-semibold ${tintClasses(pill.tint)}`}
           >
             <Icon name={pill.icon} className="h-3.5 w-3.5" />
             {pill.label}
@@ -402,16 +402,16 @@ function ScanActionCard({
 }) {
   const isCamera = variant === "camera";
   const cardClasses = isCamera
-    ? "border-transparent bg-[linear-gradient(145deg,#0E5A3F_0%,#16815D_100%)] text-white shadow-[0_9px_24px_rgba(14,90,63,0.18)] hover:shadow-[0_11px_28px_rgba(14,90,63,0.22)] focus-visible:ring-white"
-    : "border-[#CFE5D8] bg-[#F3FAF6] text-[#101613] shadow-[0_5px_18px_rgba(15,40,28,0.07)] hover:border-[#9CCCB5] hover:shadow-[0_8px_22px_rgba(15,40,28,0.09)] focus-visible:ring-[#0E5A3F]";
+    ? "border-transparent bg-[linear-gradient(145deg,#B91C1C_0%,#EA580C_100%)] text-white shadow-[0_9px_24px_rgba(185,28,28,0.18)] hover:shadow-[0_11px_28px_rgba(185,28,28,0.22)] focus-visible:ring-white"
+    : "border-[#F3E4A9] bg-[#FFFBEA] text-[#101613] shadow-[0_5px_18px_rgba(92,60,10,0.07)] hover:border-[#E7C95D] hover:shadow-[0_8px_22px_rgba(92,60,10,0.09)] focus-visible:ring-[#B45309]";
   const iconClasses = isCamera
     ? "bg-white/15 text-white ring-1 ring-white/22"
-    : "bg-[#E8F6EF] text-[#0E5A3F]";
+    : "bg-[#FFF6D8] text-[#8A6500]";
   const arrowClasses = isCamera
-    ? "bg-white/92 text-[#0E5A3F]"
-    : "bg-white text-[#0E5A3F]";
+    ? "bg-white/92 text-[#B91C1C]"
+    : "bg-white text-[#8A6500]";
   const mutedText = isCamera ? "text-white/78" : "text-[#66716B]";
-  const capabilityText = isCamera ? "text-white/86" : "text-[#0E5A3F]";
+  const capabilityText = isCamera ? "text-white/86" : "text-[#8A6500]";
 
   return (
     <Link
@@ -472,66 +472,6 @@ function ScanActionGrid({ onNavigate }: { onNavigate: () => void }) {
   );
 }
 
-function SampleResultCard({ onNavigate }: { onNavigate: () => void }) {
-  return (
-    <Link
-      href={defaultProductHref}
-      onClick={onNavigate}
-      className="mt-4 flex min-h-[92px] flex-wrap items-center gap-3 rounded-[18px] border border-[#E2E8E4] bg-white px-4 py-3.5 shadow-[0_5px_18px_rgba(15,40,28,0.055)] outline-none transition duration-200 ease-out hover:border-[#BFD3C7] hover:shadow-[0_8px_22px_rgba(15,40,28,0.075)] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.99]"
-    >
-      <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] bg-[#FFF6D8] text-[#8A6500]">
-        <Icon name="file" className="h-[21px] w-[21px]" />
-      </span>
-      <span className="min-w-[170px] flex-1">
-        <span className="block text-[15px] font-extrabold text-[#101613]">
-          Explore a Sample Result
-        </span>
-        <span className="mt-1 block text-[12.5px] leading-[1.42] text-[#66716B]">
-          See how Truthlabel explains ingredients, exposure checks, and concerns.
-        </span>
-      </span>
-      <span className="inline-flex h-9 items-center gap-1 rounded-full bg-[#FFF6D8] px-3 text-[12px] font-bold text-[#8A6500]">
-        Open Sample
-        <Icon name="arrow" className="h-3.5 w-3.5" />
-      </span>
-    </Link>
-  );
-}
-
-function AccountPrompt() {
-  return (
-    <section className="mt-4 rounded-[18px] border border-[#F3E4A9] bg-[#FFFBEA] px-4 py-4">
-      <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-3">
-        <span className="inline-flex h-11 w-11 items-center justify-center rounded-[14px] bg-[#FFF6D8] text-[#8A6500]">
-          <Icon name="user" className="h-[21px] w-[21px]" />
-        </span>
-        <div className="min-w-0">
-          <h2 className="text-[15px] font-extrabold text-[#101613]">
-            Save your scans
-          </h2>
-          <p className="mt-1 text-[13px] leading-[1.45] text-[#66716B]">
-            Create a Truthlabel account to keep your results and Watch List across devices.
-          </p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <Link
-              href="/account"
-              className="inline-flex h-9 items-center rounded-full bg-[#0E5A3F] px-4 text-[12px] font-bold text-white transition hover:bg-[#0E4C37] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
-            >
-              Sign in
-            </Link>
-            <Link
-              href="/account"
-              className="inline-flex h-9 items-center rounded-full border border-[#C9DBD1] bg-white px-4 text-[12px] font-bold text-[#0E5A3F] transition hover:bg-[#F3FAF6] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
-            >
-              Create account
-            </Link>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 function ValuePreview() {
   return (
     <section className="mt-6">
@@ -586,7 +526,7 @@ function AccordionCard({
         aria-controls={contentId}
         aria-expanded={isOpen}
         onClick={() => onToggle(id)}
-        className="grid min-h-[62px] w-full grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-3 rounded-[16px] px-3.5 py-3 text-left outline-none transition duration-200 hover:bg-[#F6F8F7] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2"
+        className="grid min-h-[62px] w-full grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-3 rounded-[16px] px-3.5 py-3 text-left outline-none transition duration-200 hover:bg-[#F8F6F2] focus-visible:ring-2 focus-visible:ring-[#B91C1C] focus-visible:ring-offset-2"
       >
         <span
           className={`inline-flex h-10 w-10 items-center justify-center rounded-[13px] ${tintClasses(tint)}`}
@@ -618,50 +558,6 @@ function AccordionCard({
           <div className="border-t border-[#EEF1EF] px-3.5 py-3">{children}</div>
         </div>
       </div>
-    </div>
-  );
-}
-
-function ProductIcon({ category }: { category: string }) {
-  const normalized = category.toLowerCase();
-  const icon: HomeIconName =
-    normalized.includes("drink") || normalized.includes("beverage")
-      ? "activity"
-      : normalized.includes("meat") ||
-          normalized.includes("seafood") ||
-          normalized.includes("baby")
-        ? "shield"
-        : "list";
-
-  return (
-    <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[12px] bg-[#F3FAF6] text-[#0E5A3F]">
-      <Icon name={icon} className="h-[18px] w-[18px]" />
-    </span>
-  );
-}
-
-function DemoLabelList({ onNavigate }: { onNavigate: () => void }) {
-  return (
-    <div className="divide-y divide-[#EEF1EF]">
-      {demoProducts.map((product) => (
-        <Link
-          key={product.id}
-          href={`/product?demo=${product.id}`}
-          onClick={onNavigate}
-          className="grid min-h-[58px] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 py-2.5 outline-none transition hover:bg-[#F6F8F7] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.99]"
-        >
-          <ProductIcon category={product.productCategory} />
-          <span className="min-w-0">
-            <span className="block truncate text-[13.5px] font-bold text-[#101613]">
-              {product.productName}
-            </span>
-            <span className="mt-0.5 block truncate text-[12px] text-[#66716B]">
-              {product.productCategory}
-            </span>
-          </span>
-          <Icon name="arrow" className="h-4 w-4 text-[#879089]" />
-        </Link>
-      ))}
     </div>
   );
 }
@@ -710,7 +606,7 @@ function WatchListPreview({ watchItems }: { watchItems: string[] }) {
 
       <Link
         href="/settings"
-        className="mt-3 flex min-h-[42px] w-full items-center justify-center rounded-[12px] border border-[#D7E7DD] bg-white px-4 text-[13px] font-bold text-[#0E5A3F] transition hover:bg-[#F3FAF6] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.99]"
+        className="mt-3 flex min-h-[42px] w-full items-center justify-center rounded-[12px] border border-[#F3D2D4] bg-white px-4 text-[13px] font-bold text-[#A33A3F] transition hover:bg-[#FDEDEE] focus-visible:ring-2 focus-visible:ring-[#B91C1C] focus-visible:ring-offset-2 active:scale-[0.99]"
       >
         {watchItems.length > 0 ? "Edit Watch List" : "Set Up Watch List"}
       </Link>
@@ -737,7 +633,7 @@ function ToolRow({
     <Link
       href={href}
       onClick={onNavigate}
-      className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-[14px] px-2 py-2.5 outline-none transition hover:bg-[#F6F8F7] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.99]"
+      className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-[14px] px-2 py-2.5 outline-none transition hover:bg-[#F8F6F2] focus-visible:ring-2 focus-visible:ring-[#B91C1C] focus-visible:ring-offset-2 active:scale-[0.99]"
     >
       <span className="inline-flex h-9 w-9 items-center justify-center rounded-[12px] bg-[#F6F8F7] text-[#66716B]">
         <Icon name={icon} className="h-[18px] w-[18px]" />
@@ -762,12 +658,20 @@ function DeveloperDemoTools({ onNavigate }: { onNavigate: () => void }) {
 
   return (
     <div className="space-y-1.5">
+      <ToolRow
+        href="/account"
+        title="Save your scans"
+        detail="Account and cross-device scan history are kept here while sign-in is still being built."
+        meta="Account"
+        icon="user"
+        onNavigate={onNavigate}
+      />
       {featureFlags.enableDemoProducts ? (
         <ToolRow
           href={defaultProductHref}
-          title="Open Sample"
+          title="Explore a Sample Result"
           detail="Open the demo scanner report for this design pass."
-          meta="Design preview"
+          meta="Sample result"
           icon="file"
           onNavigate={onNavigate}
         />
@@ -847,20 +751,6 @@ function ExploreMore({
     <section className="mt-6">
       <h2 className="text-[18px] font-extrabold text-[#101613]">Explore more</h2>
       <div className="mt-3 space-y-3">
-        {featureFlags.enableDemoProducts ? (
-          <AccordionCard
-            id="demo"
-            icon="spark"
-            tint="green"
-            title="Try Demo Labels"
-            summary={`${demoProducts.length} examples`}
-            activeAccordion={activeAccordion}
-            onToggle={onToggle}
-          >
-            <DemoLabelList onNavigate={onNavigate} />
-          </AccordionCard>
-        ) : null}
-
         <AccordionCard
           id="how"
           icon="list"
@@ -905,7 +795,7 @@ function TrustNote() {
   return (
     <section className="mt-6 rounded-[16px] border border-[#E9E1D2] bg-[#FBF8F1] px-4 py-3.5">
       <div className="flex items-start gap-3">
-        <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[12px] bg-white text-[#0E5A3F]">
+        <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[12px] bg-white text-[#A33A3F]">
           <Icon name="shield" className="h-[19px] w-[19px]" />
         </span>
         <div>
@@ -936,12 +826,6 @@ function BottomNavigation() {
       active: false,
     },
     {
-      href: "/product",
-      label: "Results",
-      icon: "file" as const,
-      active: pathname === "/product",
-    },
-    {
       href: "/account",
       label: "Account",
       icon: "user" as const,
@@ -954,19 +838,19 @@ function BottomNavigation() {
       aria-label="Primary navigation"
       className="fixed inset-x-0 bottom-0 z-40 border-t border-[#E2E8E4] bg-white/96 shadow-[0_-8px_22px_rgba(15,40,28,0.06)] backdrop-blur"
     >
-      <div className="mx-auto grid h-[66px] max-w-[480px] grid-cols-5 px-2 pb-[env(safe-area-inset-bottom)]">
+      <div className="mx-auto grid h-[66px] max-w-[480px] grid-cols-4 px-2 pb-[env(safe-area-inset-bottom)]">
         {items.map((item) => (
           <Link
             key={`${item.label}-${item.href}`}
             href={item.href}
             aria-current={item.active ? "page" : undefined}
-            className={`flex min-h-11 flex-col items-center justify-center gap-1 rounded-[12px] text-[11px] font-semibold outline-none transition focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 ${
-              item.active ? "text-[#0E5A3F]" : "text-[#5F6C65] hover:text-[#0E5A3F]"
+            className={`flex min-h-11 flex-col items-center justify-center gap-1 rounded-[12px] text-[11px] font-semibold outline-none transition focus-visible:ring-2 focus-visible:ring-[#B91C1C] focus-visible:ring-offset-2 ${
+              item.active ? "text-[#B91C1C]" : "text-[#5F6C65] hover:text-[#B91C1C]"
             }`}
           >
             <span
               className={`inline-flex h-[30px] w-9 items-center justify-center rounded-[12px] ${
-                item.active ? "bg-[#E8F6EF]" : ""
+                item.active ? "bg-[#FDEDEE]" : ""
               }`}
             >
               <Icon name={item.icon} className="h-[20px] w-[20px]" />
@@ -993,15 +877,11 @@ export default function HomeScreen() {
   }
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-white px-[18px] pt-[calc(12px+env(safe-area-inset-top))] text-[#101613] sm:px-5">
+    <main className="min-h-screen overflow-x-hidden bg-[radial-gradient(circle_at_top_left,rgba(253,237,238,0.78),transparent_34%),radial-gradient(circle_at_top_right,rgba(255,246,216,0.82),transparent_31%),#FFFDFC] px-[18px] pt-[calc(12px+env(safe-area-inset-top))] text-[#101613] sm:px-5">
       <div className="mx-auto w-full max-w-[480px] pb-[calc(100px+env(safe-area-inset-bottom))]">
         <HomeHeader />
         <HeroSection />
         <ScanActionGrid onNavigate={handleNavigate} />
-        {featureFlags.enableDemoProducts ? (
-          <SampleResultCard onNavigate={handleNavigate} />
-        ) : null}
-        <AccountPrompt />
         <ValuePreview />
         <ExploreMore
           activeAccordion={activeAccordion}

@@ -31,6 +31,7 @@ type IngredientGroup =
   | "unknown_review"
   | "unmatched";
 type ScanSource = "manual_paste" | "barcode" | "ocr" | "demo";
+type ProductImageSource = "product_database" | "captured_scan";
 type DeepCheckStatus = "checked" | "not_checked";
 type BrandTrustStatus =
   | "not_checked"
@@ -51,6 +52,8 @@ export type BuildScanResultInput = {
   userAllergyProfile?: string[];
   externalSignals?: IngredientIntelligenceMatcherInput["externalSignals"];
   scanSource: ScanSource;
+  productImageUrl?: string;
+  productImageSource?: ProductImageSource;
   additionalConfidenceNotes?: string[];
 };
 
@@ -64,6 +67,8 @@ export type ScanResultProductHero = {
   verdictLabel: string;
   verdictTone: Severity;
   scanSource: ScanSource;
+  imageUrl: string;
+  imageSource?: ProductImageSource;
   ingredientCount: number;
   ingredientLoadScore: number;
   ingredientLoadLevel: IngredientLoadResult["level"];
@@ -1089,6 +1094,10 @@ export function buildScanResult(input: BuildScanResultInput): ScanResult {
       verdictLabel: input.exposureRiskResult.verdictLabel,
       verdictTone: input.exposureRiskResult.verdictTone,
       scanSource: input.scanSource,
+      imageUrl: input.productImageUrl?.trim() || "",
+      imageSource: input.productImageUrl?.trim()
+        ? input.productImageSource
+        : undefined,
       ingredientCount,
       ingredientLoadScore: ingredientLoad.score,
       ingredientLoadLevel: ingredientLoad.level,

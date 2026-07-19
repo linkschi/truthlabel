@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @next/next/no-img-element */
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
@@ -114,6 +115,37 @@ type RunManualScanModule = typeof import("@/lib/runManualScan");
 let barcodeScanModulePromise: Promise<RunBarcodeScanModule> | null = null;
 let manualScanModulePromise: Promise<RunManualScanModule> | null = null;
 
+type AnalysisStage = {
+  label: string;
+  tone: "green" | "yellow" | "red";
+};
+
+type AnalysisState = {
+  status: "idle" | "running" | "complete" | "failed";
+  stageIndex: number;
+  imageUrl?: string;
+};
+
+const emptyAnalysisState: AnalysisState = {
+  status: "idle",
+  stageIndex: 0,
+};
+
+const analysisStages: AnalysisStage[] = [
+  { label: "Reading product information", tone: "green" },
+  { label: "Extracting ingredient data", tone: "green" },
+  { label: "Matching known ingredients", tone: "green" },
+  { label: "Checking the user's Allergy Watch List", tone: "green" },
+  { label: "Reviewing concern categories", tone: "yellow" },
+  { label: "Preparing the final results", tone: "red" },
+];
+
+function wait(ms: number) {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, ms);
+  });
+}
+
 function loadBarcodeScanModule() {
   if (!barcodeScanModulePromise) {
     barcodeScanModulePromise = import("@/lib/runBarcodeScan");
@@ -152,6 +184,137 @@ function ScannerOverlayLoading({
             {title}
           </h2>
           <p className="mt-2 text-[14px] leading-6 text-white/78">{message}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TruthlabelAnalysisLoader({ state }: { state: AnalysisState }) {
+  const currentStage = analysisStages[state.stageIndex] ?? analysisStages[0];
+  const isComplete = state.status === "complete";
+  const isFailed = state.status === "failed";
+
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      className="fixed inset-0 z-50 bg-[rgba(12,22,18,0.76)] px-4 py-5 backdrop-blur-sm sm:px-5 sm:py-6"
+    >
+      <div className="mx-auto flex h-full w-full max-w-[440px] flex-col justify-center rounded-[30px] border border-white/14 bg-[#102019] p-5 text-white shadow-[0_28px_60px_rgba(0,0,0,0.38)]">
+        <div className="overflow-hidden rounded-[28px] border border-white/14 bg-[radial-gradient(circle_at_top,rgba(30,145,120,0.22),rgba(255,255,255,0.045)_46%,rgba(255,255,255,0.03)_100%)] px-5 py-6 text-center">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#a7f3d0]">
+            Truthlabel
+          </p>
+          <h2 className="mt-2 font-heading text-[1.45rem] font-semibold text-white">
+            {isFailed ? "Analysis paused" : "Analyzing this product"}
+          </h2>
+          <p className="mx-auto mt-2 max-w-[300px] text-[14px] leading-6 text-white/78">
+            {isFailed
+              ? "The scan could not finish. You can review the label text and try again."
+              : "Reading the product data and checking what is inside."}
+          </p>
+
+          <div className="relative mx-auto mt-6 h-[190px] w-full max-w-[320px]">
+            <div className="truthlabel-analysis-ring absolute left-1/2 top-1/2 h-[154px] w-[154px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#6ee7b7]/30" />
+            <div className="truthlabel-analysis-data absolute left-4 top-8 rounded-full border border-[#6ee7b7]/26 bg-[#12372d] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#a7f3d0]">
+              ingredients
+            </div>
+            <div className="truthlabel-analysis-data truthlabel-analysis-data-delayed absolute right-2 top-16 rounded-full border border-[#fcd34d]/28 bg-[#342a12] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#fde68a]">
+              categories
+            </div>
+            <div className="truthlabel-analysis-data truthlabel-analysis-data-slow absolute bottom-8 left-8 rounded-full border border-[#6ee7b7]/22 bg-[#12372d] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#bbf7d0]">
+              labels
+            </div>
+
+            <div className="absolute left-1/2 top-1/2 h-[112px] w-[112px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[26px] border border-white/18 bg-[#0d241c] shadow-[0_24px_60px_rgba(16,185,129,0.16)]">
+              {state.imageUrl ? (
+                <img
+                  src={state.imageUrl}
+                  alt="Product or ingredient label preview"
+                  className="h-full w-full object-cover opacity-88"
+                />
+              ) : (
+                <div className="absolute inset-4 rounded-[18px] border border-white/18 bg-white/10 px-3 py-4">
+                  <div className="h-2 rounded-full bg-white/62" />
+                  <div className="mt-2 h-2 rounded-full bg-[#fcd34d]/82" />
+                  <div className="mt-2 h-2 rounded-full bg-[#6ee7b7]/82" />
+                  <div className="mt-4 h-8 rounded-[12px] border border-white/14 bg-white/8" />
+                </div>
+              )}
+              <div className="truthlabel-analysis-scanline absolute inset-x-0 top-0 h-[2px] bg-[linear-gradient(90deg,transparent,#6ee7b7,transparent)] shadow-[0_0_18px_rgba(110,231,183,0.9)]" />
+            </div>
+
+            {isComplete ? (
+              <div className="truthlabel-complete-pop absolute bottom-4 right-9 inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#86efac] bg-[#16a34a] text-white shadow-[0_0_24px_rgba(34,197,94,0.32)]">
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 16 16"
+                  className="h-5 w-5"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M3.5 8.1 6.5 11 12.5 4.8"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="1.9"
+                  />
+                </svg>
+              </div>
+            ) : null}
+          </div>
+
+          <div className="mt-5 space-y-2 text-left">
+            {analysisStages.map((stage, index) => {
+              const isCurrent = index === state.stageIndex && state.status === "running";
+              const isDone = isComplete || index < state.stageIndex;
+              const isWarm = stage.tone === "yellow";
+              const isHot = stage.tone === "red";
+
+              return (
+                <div
+                  key={stage.label}
+                  className={`grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3 rounded-[16px] border px-3 py-2.5 transition-colors ${
+                    isCurrent
+                      ? "border-[#6ee7b7]/42 bg-white/10"
+                      : "border-white/10 bg-white/[0.045]"
+                  }`}
+                >
+                  <span
+                    className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-bold ${
+                      isDone
+                        ? "bg-[#16a34a] text-white"
+                        : isCurrent && isHot
+                          ? "bg-[#dc2626] text-white"
+                          : isCurrent && isWarm
+                            ? "bg-[#d97706] text-white"
+                            : isCurrent
+                              ? "truthlabel-current-dot bg-[#10b981] text-white"
+                              : "bg-white/12 text-white/54"
+                    }`}
+                  >
+                    {isDone ? "OK" : index + 1}
+                  </span>
+                  <span
+                    className={`text-[13px] font-semibold ${
+                      isDone || isCurrent ? "text-white" : "text-white/54"
+                    }`}
+                  >
+                    {stage.label}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+
+          <p className="mt-4 text-[11px] leading-5 text-white/56">
+            This checks the product label data; it is not searching every scientific database.
+          </p>
+          <p className="mt-1 text-[11px] font-medium text-white/62">
+            Current stage: {isComplete ? "Completed" : currentStage.label}
+          </p>
         </div>
       </div>
     </div>
@@ -307,6 +470,8 @@ export default function ManualScanScreen({
   );
   const [isOcrScannerOpen, setIsOcrScannerOpen] = useState(false);
   const [isLookingUpBarcode, setIsLookingUpBarcode] = useState(false);
+  const [analysisState, setAnalysisState] =
+    useState<AnalysisState>(emptyAnalysisState);
   const [barcodeInput, setBarcodeInput] = useState("");
   const [barcodeFeedback, setBarcodeFeedback] =
     useState<BarcodeFeedbackState | null>(() =>
@@ -354,6 +519,7 @@ export default function ManualScanScreen({
     barcodeFeedback?.status === "found_missing_ingredients"
       ? barcodeFeedback.productData
       : null;
+  const isAnalyzingProduct = analysisState.status !== "idle";
 
   function applyQuickFill(exampleId: (typeof manualExampleIds)[number]) {
     const example = manualQuickFillExamples.find((entry) => entry.id === exampleId);
@@ -375,7 +541,10 @@ export default function ManualScanScreen({
     setBarcodeInput("");
   }
 
-  async function lookupBarcodeValue(barcodeValue: string) {
+  async function lookupBarcodeValue(
+    barcodeValue: string,
+    options?: { capturedImageUrl?: string },
+  ) {
     if (!barcodeLookupEnabled) {
       setBarcodeFeedback({
         status: "error",
@@ -396,6 +565,7 @@ export default function ManualScanScreen({
       const result = await runBarcodeScan({
         barcode: barcodeValue,
         userAllergyProfile: selectedAllergySummary,
+        capturedImageUrl: options?.capturedImageUrl,
       });
 
       if (result.lookupStatus === "found" && result.productData && result.scanResult) {
@@ -413,7 +583,7 @@ export default function ManualScanScreen({
         });
 
         startTransition(() => {
-          router.push("/product?barcode=latest");
+          router.push("/product?barcode=latest&fresh=1");
         });
         return result;
       }
@@ -465,9 +635,14 @@ export default function ManualScanScreen({
     await lookupBarcodeValue(barcodeInput);
   }
 
-  async function handleCameraBarcodeDetected(barcode: string) {
+  async function handleCameraBarcodeDetected(
+    barcode: string,
+    details?: { capturedImageUrl?: string },
+  ) {
     setBarcodeInput(barcode);
-    const result = await lookupBarcodeValue(barcode);
+    const result = await lookupBarcodeValue(barcode, {
+      capturedImageUrl: details?.capturedImageUrl,
+    });
 
     if (result?.lookupStatus === "found") {
       setIsCameraScannerOpen(false);
@@ -476,10 +651,52 @@ export default function ManualScanScreen({
     return result;
   }
 
+  async function moveAnalysisToStage(stageIndex: number, imageUrl?: string) {
+    setAnalysisState((current) => ({
+      status: "running",
+      stageIndex,
+      imageUrl: imageUrl ?? current.imageUrl,
+    }));
+    await wait(85);
+  }
+
+  async function completeAnalysis(startedAt: number, imageUrl?: string) {
+    setAnalysisState((current) => ({
+      status: "running",
+      stageIndex: analysisStages.length - 1,
+      imageUrl: imageUrl ?? current.imageUrl,
+    }));
+
+    const elapsed = window.performance.now() - startedAt;
+    const remainingMinimum = Math.max(0, 900 - elapsed);
+
+    if (remainingMinimum > 0) {
+      await wait(remainingMinimum);
+    }
+
+    setAnalysisState((current) => ({
+      status: "complete",
+      stageIndex: analysisStages.length - 1,
+      imageUrl: imageUrl ?? current.imageUrl,
+    }));
+    await wait(240);
+  }
+
+  async function failAnalysis(imageUrl?: string) {
+    setAnalysisState((current) => ({
+      status: "failed",
+      stageIndex: current.stageIndex,
+      imageUrl: imageUrl ?? current.imageUrl,
+    }));
+    await wait(520);
+    setAnalysisState(emptyAnalysisState);
+  }
+
   async function runConfirmedIngredientScan(options?: {
     ingredientTextOverride?: string;
     allergenStatementOverride?: string;
     scanSource?: "manual_paste" | "barcode" | "ocr";
+    capturedImageUrl?: string;
     additionalConfidenceNotes?: string[];
   }) {
     setErrorMessage("");
@@ -496,55 +713,27 @@ export default function ManualScanScreen({
       customAllergiesText,
     });
 
-    const [{ runManualScan }, barcodeScanModule] = await Promise.all([
-      loadManualScanModule(),
-      barcodeDraftProduct ? loadBarcodeScanModule() : Promise.resolve(null),
-    ]);
-
-    const result = runManualScan({
-      ...input,
-      barcode: barcodeDraftProduct?.barcode,
-      packagingText: barcodeDraftProduct?.packagingText || input.packagingText,
-      allergenStatement:
-        options?.allergenStatementOverride ||
-        barcodeDraftProduct?.allergenStatement ||
-        input.allergenStatement,
-      externalSignals: barcodeDraftProduct?.externalSignals,
-      scanSource:
-        options?.scanSource ?? (barcodeDraftProduct ? "barcode" : "manual_paste"),
-      additionalConfidenceNotes: options?.additionalConfidenceNotes ?? [],
+    const productImageUrl =
+      barcodeDraftProduct?.imageUrl || options?.capturedImageUrl || undefined;
+    const startedAt = window.performance.now();
+    setAnalysisState({
+      status: "running",
+      stageIndex: 0,
+      imageUrl: productImageUrl,
     });
 
-    const finalResult =
-      barcodeDraftProduct && barcodeScanModule
-        ? barcodeScanModule.applyBarcodeConfidenceNotes(result, barcodeDraftProduct)
-        : result;
+    try {
+      await moveAnalysisToStage(1, productImageUrl);
 
-    if (
-      barcodeDraftProduct &&
-      (options?.scanSource ?? "barcode") === "barcode"
-    ) {
-      saveLatestBarcodeScan({
-        input: {
-          barcode: barcodeDraftProduct.barcode,
-          userAllergyProfile: input.userAllergyProfile,
-        },
-        lookupStatus: "found",
-        productData: barcodeDraftProduct,
-        result: finalResult,
-        message: "Product found. Truthlabel scanned the available ingredient data.",
-        dataQualityWarnings: barcodeDraftProduct.dataQualityWarnings,
-        savedAt: new Date().toISOString(),
-      });
+      const [{ runManualScan }, barcodeScanModule] = await Promise.all([
+        loadManualScanModule(),
+        barcodeDraftProduct ? loadBarcodeScanModule() : Promise.resolve(null),
+      ]);
 
-      startTransition(() => {
-        router.push("/product?barcode=latest");
-      });
-      return;
-    }
+      await moveAnalysisToStage(2, productImageUrl);
+      await moveAnalysisToStage(3, productImageUrl);
 
-    saveLatestManualScan({
-      input: {
+      const result = runManualScan({
         ...input,
         barcode: barcodeDraftProduct?.barcode,
         packagingText: barcodeDraftProduct?.packagingText || input.packagingText,
@@ -555,15 +744,78 @@ export default function ManualScanScreen({
         externalSignals: barcodeDraftProduct?.externalSignals,
         scanSource:
           options?.scanSource ?? (barcodeDraftProduct ? "barcode" : "manual_paste"),
+        productImageUrl,
+        productImageSource: barcodeDraftProduct?.imageUrl
+          ? "product_database"
+          : options?.capturedImageUrl
+            ? "captured_scan"
+            : undefined,
         additionalConfidenceNotes: options?.additionalConfidenceNotes ?? [],
-      },
-      result: finalResult,
-      savedAt: new Date().toISOString(),
-    });
+      });
 
-    startTransition(() => {
-      router.push("/product?manual=latest");
-    });
+      await moveAnalysisToStage(4, productImageUrl);
+
+      const finalResult =
+        barcodeDraftProduct && barcodeScanModule
+          ? barcodeScanModule.applyBarcodeConfidenceNotes(result, barcodeDraftProduct)
+          : result;
+
+      await completeAnalysis(startedAt, productImageUrl);
+
+      if (
+        barcodeDraftProduct &&
+        (options?.scanSource ?? "barcode") === "barcode"
+      ) {
+        saveLatestBarcodeScan({
+          input: {
+            barcode: barcodeDraftProduct.barcode,
+            userAllergyProfile: input.userAllergyProfile,
+          },
+          lookupStatus: "found",
+          productData: barcodeDraftProduct,
+          result: finalResult,
+          message: "Product found. Truthlabel scanned the available ingredient data.",
+          dataQualityWarnings: barcodeDraftProduct.dataQualityWarnings,
+          savedAt: new Date().toISOString(),
+        });
+
+        startTransition(() => {
+          router.push("/product?barcode=latest&fresh=1");
+        });
+        return;
+      }
+
+      saveLatestManualScan({
+        input: {
+          ...input,
+          barcode: barcodeDraftProduct?.barcode,
+          packagingText: barcodeDraftProduct?.packagingText || input.packagingText,
+          allergenStatement:
+            options?.allergenStatementOverride ||
+            barcodeDraftProduct?.allergenStatement ||
+            input.allergenStatement,
+          externalSignals: barcodeDraftProduct?.externalSignals,
+          scanSource:
+            options?.scanSource ?? (barcodeDraftProduct ? "barcode" : "manual_paste"),
+          productImageUrl,
+          productImageSource: barcodeDraftProduct?.imageUrl
+            ? "product_database"
+            : options?.capturedImageUrl
+              ? "captured_scan"
+              : undefined,
+          additionalConfidenceNotes: options?.additionalConfidenceNotes ?? [],
+        },
+        result: finalResult,
+        savedAt: new Date().toISOString(),
+      });
+
+      startTransition(() => {
+        router.push("/product?manual=latest&fresh=1");
+      });
+    } catch (error) {
+      await failAnalysis(productImageUrl);
+      throw error;
+    }
   }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -599,6 +851,7 @@ export default function ManualScanScreen({
         ingredientTextOverride: extractedIngredientText,
         allergenStatementOverride: details?.possibleAllergenStatement,
         scanSource: "ocr",
+        capturedImageUrl: details?.capturedImageUrl,
         additionalConfidenceNotes: buildOcrConfidenceNotes(details),
       });
       setIsOcrScannerOpen(false);
@@ -634,6 +887,9 @@ export default function ManualScanScreen({
           onTextConfirmed={handleOcrTextConfirmed}
           onClose={() => setIsOcrScannerOpen(false)}
         />
+      ) : null}
+      {analysisState.status !== "idle" ? (
+        <TruthlabelAnalysisLoader state={analysisState} />
       ) : null}
 
       <div className="mx-auto max-w-[440px] space-y-4">
@@ -708,7 +964,7 @@ export default function ManualScanScreen({
             {cameraBarcodeEnabled ? (
               <button
                 type="button"
-                disabled={isLookingUpBarcode || isPending}
+                disabled={isLookingUpBarcode || isPending || isAnalyzingProduct}
                 onClick={() => {
                   setBarcodeFeedback(null);
                   setIsCameraScannerOpen(true);
@@ -752,7 +1008,7 @@ export default function ManualScanScreen({
               </label>
               <button
                 type="submit"
-                disabled={isLookingUpBarcode || isPending}
+                disabled={isLookingUpBarcode || isPending || isAnalyzingProduct}
                 className="rounded-full border border-transparent bg-[#182b22] px-4 py-2.5 text-[12px] font-semibold uppercase tracking-[0.14em] text-white shadow-[0_18px_36px_rgba(24,43,34,0.18)] transition active:scale-[0.99] disabled:cursor-wait disabled:opacity-70"
               >
                 {isLookingUpBarcode ? "Looking up..." : "Lookup"}
@@ -823,11 +1079,12 @@ export default function ManualScanScreen({
             {ocrEnabled ? (
               <button
                 type="button"
+                disabled={isAnalyzingProduct || isPending}
                 onClick={() => {
                   setErrorMessage("");
                   setIsOcrScannerOpen(true);
                 }}
-                className="rounded-full border border-[#ddd4c3] bg-white/82 px-4 py-2.5 text-[12px] font-semibold uppercase tracking-[0.14em] text-[#22342c] transition active:scale-[0.99]"
+                className="rounded-full border border-[#ddd4c3] bg-white/82 px-4 py-2.5 text-[12px] font-semibold uppercase tracking-[0.14em] text-[#22342c] transition active:scale-[0.99] disabled:cursor-wait disabled:opacity-70"
               >
                 Scan Ingredient Label
               </button>
@@ -1059,10 +1316,12 @@ export default function ManualScanScreen({
             </Link>
             <button
               type="submit"
-              disabled={isPending}
+              disabled={isPending || isAnalyzingProduct}
               className="rounded-full border border-transparent bg-[#182b22] px-5 py-2.5 text-[13px] font-semibold uppercase tracking-[0.14em] text-white shadow-[0_18px_36px_rgba(24,43,34,0.18)] transition active:scale-[0.99] disabled:cursor-wait disabled:opacity-70"
             >
-              {isPending
+              {isAnalyzingProduct
+                ? "Analyzing..."
+                : isPending
                 ? barcodeDraftProduct
                   ? "Completing scan..."
                   : "Scanning label..."

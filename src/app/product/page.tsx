@@ -14,6 +14,7 @@ export default async function ProductPage({
     barcode?: string | string[];
     category?: string | string[];
     demo?: string | string[];
+    fresh?: string | string[];
     manual?: string | string[];
   }>;
 }) {
@@ -25,15 +26,20 @@ export default async function ProductPage({
     ? params.category[0]
     : params.category;
   const demoProductId = Array.isArray(params.demo) ? params.demo[0] : params.demo;
+  const freshParam = Array.isArray(params.fresh)
+    ? params.fresh[0]
+    : params.fresh;
   const manualScanKey = Array.isArray(params.manual)
     ? params.manual[0]
     : params.manual;
+  const freshResult = freshParam === "1" || freshParam === "true";
 
   return (
     <ProductResult
       barcodeScanKey={barcodeScanKey}
       category={category}
       demoProductId={demoProductId}
+      freshResult={freshResult}
       manualScanKey={manualScanKey}
     />
   );

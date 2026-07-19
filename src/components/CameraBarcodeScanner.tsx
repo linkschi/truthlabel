@@ -33,6 +33,7 @@ import {
   type IngredientOcrRunner,
   type OcrProgressUpdate,
 } from "@/lib/localIngredientOcr";
+import { createCapturedImageThumbnail } from "@/lib/createCapturedImageThumbnail";
 
 export type CameraScannerMode = "barcode" | "ingredients";
 
@@ -44,9 +45,14 @@ export type CameraScannerBarcodeOutcome =
   | null
   | void;
 
+export type CameraScannerBarcodeDetails = {
+  capturedImageUrl?: string;
+};
+
 export type CameraScannerOcrDetails = {
   possibleAllergenStatement?: string;
   confidenceWarnings: string[];
+  capturedImageUrl?: string;
 };
 
 type ScannerPhase =
@@ -124,6 +130,7 @@ type BarcodeDecodeResult = {
 type CameraBarcodeScannerProps = {
   onBarcodeDetected: (
     barcode: string,
+    details?: CameraScannerBarcodeDetails,
   ) => CameraScannerBarcodeOutcome | Promise<CameraScannerBarcodeOutcome>;
   onTextConfirmed?: (
     ingredientText: string,
@@ -751,6 +758,27 @@ function drawImageBitmapToCanvas(image: ImageBitmap) {
   return canvas;
 }
 
+async function captureVideoFrameThumbnail(video: HTMLVideoElement | null) {
+  if (!video || !video.videoWidth || !video.videoHeight) {
+    return "";
+  }
+
+  const canvas = createCanvas(video.videoWidth, video.videoHeight);
+  const context = canvas.getContext("2d", { alpha: false });
+
+  if (!context) {
+    return "";
+  }
+
+  try {
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const blob = await canvasToBlob(canvas, "image/jpeg", 0.82);
+    return blob ? createCapturedImageThumbnail(blob) : "";
+  } catch {
+    return "";
+  }
+}
+
 function getDefaultSourceRegion(video: HTMLVideoElement): SourceRegion {
   const width = video.videoWidth || 1280;
   const height = video.videoHeight || 720;
@@ -875,6 +903,7 @@ export default function CameraBarcodeScanner({
   const [currentZoom, setCurrentZoom] = useState<number | null>(null);
   const [diagnosticsText, setDiagnosticsText] = useState("");
   const [previewUrl, setPreviewUrl] = useState("");
+  const [capturedImageUrl, setCapturedImageUrl] = useState("");
   const [editableIngredientText, setEditableIngredientText] = useState("");
   const [editableAllergenStatement, setEditableAllergenStatement] = useState("");
   const [confidenceWarnings, setConfidenceWarnings] = useState<string[]>([]);
@@ -1056,6 +1085,7 @@ export default function CameraBarcodeScanner({
 
       hasLockedBarcodeRef.current = true;
       stopBarcodeScanner();
+      const capturedImageUrl = await captureVideoFrameThumbnail(videoRef.current);
       stopActiveCameraStream();
       setPhase("barcode_detected");
 
@@ -1069,7 +1099,9 @@ export default function CameraBarcodeScanner({
 
       try {
         const outcome = await runWithTimeout(
-          Promise.resolve(onBarcodeDetectedRef.current(barcode)),
+          Promise.resolve(
+            onBarcodeDetectedRef.current(barcode, { capturedImageUrl }),
+          ),
           barcodeLookupTimeoutMsRef.current,
         );
         const status = getOutcomeStatus(outcome);
@@ -1640,6 +1672,7 @@ export default function CameraBarcodeScanner({
     ocrSessionTokenRef.current += 1;
     stopScannerResources();
     replacePreviewUrl("");
+    setCapturedImageUrl("");
     setEditableIngredientText("");
     setEditableAllergenStatement("");
     setConfidenceWarnings([]);
@@ -1668,6 +1701,12 @@ export default function CameraBarcodeScanner({
       setEditableIngredientText("");
       setEditableAllergenStatement("");
       setConfidenceWarnings([]);
+      setCapturedImageUrl("");
+      void createCapturedImageThumbnail(image).then((thumbnailUrl) => {
+        if (ocrSessionToken === ocrSessionTokenRef.current && thumbnailUrl) {
+          setCapturedImageUrl(thumbnailUrl);
+        }
+      });
 
       try {
         const result = await ocrRunner(image, {
@@ -1867,6 +1906,7 @@ export default function CameraBarcodeScanner({
             possibleAllergenStatement:
               editableAllergenStatement.trim() || undefined,
             confidenceWarnings,
+            capturedImageUrl,
           }),
         );
       } else {
@@ -1877,6 +1917,7 @@ export default function CameraBarcodeScanner({
     }
   }, [
     confidenceWarnings,
+    capturedImageUrl,
     editableAllergenStatement,
     editableIngredientText,
     handleManualEntry,
