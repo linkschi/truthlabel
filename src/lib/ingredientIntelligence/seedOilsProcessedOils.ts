@@ -50,18 +50,19 @@ const aliasFields = [
 ] as const;
 
 function itemText(item: SeedOilsProcessedOilsItem) {
+  const identityFields = item as SeedOilsProcessedOilsItem & {
+    canonicalIngredientId?: string;
+    linkedIngredientId?: string;
+  };
+
   return [
+    identityFields.canonicalIngredientId,
+    identityFields.linkedIngredientId,
+    item.id,
     item.mainName,
-    ...item.otherNames,
-    ...item.chemicalNames,
-    ...item.brandNames,
-    ...item.eNumbers,
-    ...item.insNumbers,
-    ...item.abbreviations,
-    ...item.labelVariants,
-    ...item.spellingVariants,
-    ...item.regionalNames,
-  ].join(" ");
+  ]
+    .filter(Boolean)
+    .join(" ");
 }
 
 function buildMatchTerms(item: SeedOilsProcessedOilsItem) {

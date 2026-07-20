@@ -583,7 +583,7 @@ export default function ManualScanScreen({
         });
 
         startTransition(() => {
-          router.push("/product?barcode=latest&fresh=1");
+          router.push("/app/results?barcode=latest&fresh=1");
         });
         return result;
       }
@@ -780,7 +780,7 @@ export default function ManualScanScreen({
         });
 
         startTransition(() => {
-          router.push("/product?barcode=latest&fresh=1");
+          router.push("/app/results?barcode=latest&fresh=1");
         });
         return;
       }
@@ -810,7 +810,7 @@ export default function ManualScanScreen({
       });
 
       startTransition(() => {
-        router.push("/product?manual=latest&fresh=1");
+        router.push("/app/results?manual=latest&fresh=1");
       });
     } catch (error) {
       await failAnalysis(productImageUrl);
@@ -1309,7 +1309,7 @@ export default function ManualScanScreen({
 
           <div className="mt-5 flex items-center justify-between gap-3">
             <Link
-              href="/"
+              href="/app"
               className="text-[13px] font-medium text-[#5f695f] underline-offset-4 hover:underline"
             >
               Back home

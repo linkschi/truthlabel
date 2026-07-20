@@ -23,8 +23,10 @@ test("texture additive summary stays green when no markers are found", () => {
   assert.equal(summary.hasAutomaticRed, false);
 });
 
-test("texture additive summary stays yellow for one to three additives", () => {
-  const matches = findTextureAdditiveMatches("Xanthan gum, guar gum, carrageenan");
+test("texture additive summary stays yellow for one to three yellow additives", () => {
+  const matches = findTextureAdditiveMatches(
+    "Mono- and diglycerides, DATEM, carrageenan",
+  );
   const summary = summarizeTextureAdditiveMatches(matches);
 
   assert.equal(summary.totalCount, 3);
@@ -34,7 +36,7 @@ test("texture additive summary stays yellow for one to three additives", () => {
 
 test("texture additive summary becomes red for four texture additives", () => {
   const matches = findTextureAdditiveMatches(
-    "Mono- and diglycerides, xanthan gum, carrageenan, guar gum",
+    "Mono- and diglycerides, DATEM, carrageenan, polysorbate 80",
   );
   const summary = summarizeTextureAdditiveMatches(matches);
 

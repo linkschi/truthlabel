@@ -33,7 +33,7 @@ type HomeIconName =
 type AccordionId = "how" | "watch" | "developer";
 type Tint = "green" | "yellow" | "red" | "neutral";
 
-const defaultProductHref = `/product?category=packaged-processed-foods&demo=${defaultDemoProductId}`;
+const defaultProductHref = `/app/results?category=packaged-processed-foods&demo=${defaultDemoProductId}`;
 const defaultDemoProduct = getDemoProductById(defaultDemoProductId);
 const featureFlags = publicAppConfig.flags;
 
@@ -329,7 +329,7 @@ function HomeHeader() {
   return (
     <header className="flex min-h-[58px] items-center justify-between gap-4">
       <Link
-        href="/"
+        href="/app"
         className="flex items-center gap-2.5 rounded-[14px] outline-none transition focus-visible:ring-2 focus-visible:ring-[#B91C1C] focus-visible:ring-offset-2"
         aria-label="Truthlabel home"
       >
@@ -340,7 +340,7 @@ function HomeHeader() {
       </Link>
 
       <Link
-        href="/account"
+        href="/app/account"
         aria-label="Open Truthlabel account"
         className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#D7E7DD] bg-[#E8F6EF] text-[#0E5A3F] transition hover:bg-[#DDF0E7] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
       >
@@ -450,7 +450,7 @@ function ScanActionGrid({ onNavigate }: { onNavigate: () => void }) {
       <SectionHeading>Start a scan</SectionHeading>
       <div className="mt-3 grid grid-cols-2 gap-3 max-[349px]:grid-cols-1">
         <ScanActionCard
-          href="/manual?mode=camera"
+          href="/app/manual?mode=camera"
           icon="camera"
           title="Camera Scan"
           description="Scan a barcode or photograph an ingredient label."
@@ -459,7 +459,7 @@ function ScanActionGrid({ onNavigate }: { onNavigate: () => void }) {
           onClick={onNavigate}
         />
         <ScanActionCard
-          href="/manual"
+          href="/app/manual"
           icon="clipboard"
           title="Manual Scan"
           description="Enter a barcode or paste an ingredient list."
@@ -605,7 +605,7 @@ function WatchListPreview({ watchItems }: { watchItems: string[] }) {
       )}
 
       <Link
-        href="/settings"
+        href="/app/settings"
         className="mt-3 flex min-h-[42px] w-full items-center justify-center rounded-[12px] border border-[#D7E7DD] bg-white px-4 text-[13px] font-bold text-[#0E5A3F] transition hover:bg-[#F3FAF6] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.99]"
       >
         {watchItems.length > 0 ? "Edit Watch List" : "Set Up Watch List"}
@@ -659,7 +659,7 @@ function DeveloperDemoTools({ onNavigate }: { onNavigate: () => void }) {
   return (
     <div className="space-y-1.5">
       <ToolRow
-        href="/account"
+        href="/app/account"
         title="Save your scans"
         detail="Account and cross-device scan history are kept here while sign-in is still being built."
         meta="Account"
@@ -677,7 +677,7 @@ function DeveloperDemoTools({ onNavigate }: { onNavigate: () => void }) {
         />
       ) : null}
       <ToolRow
-        href="/manual"
+        href="/app/manual"
         title="Manual Scan"
         detail={manualDetail}
         meta="Live input"
@@ -685,7 +685,7 @@ function DeveloperDemoTools({ onNavigate }: { onNavigate: () => void }) {
         onNavigate={onNavigate}
       />
       <ToolRow
-        href="/manual"
+        href="/app/manual"
         title="Paste Real Label"
         detail="Add product name, brand, category, allergens, and packaging text if you have them."
         meta="Manual flow"
@@ -694,7 +694,7 @@ function DeveloperDemoTools({ onNavigate }: { onNavigate: () => void }) {
       />
       {process.env.NODE_ENV !== "production" ? (
         <ToolRow
-          href="/manual?mode=camera&scannerDebug=1"
+          href="/app/manual?mode=camera&scannerDebug=1"
           title="Scanner Diagnostics"
           detail="Open the real camera scanner with safe stream, lens, focus, zoom, and decoder diagnostics."
           meta="Development only"
@@ -720,7 +720,7 @@ function DeveloperDemoTools({ onNavigate }: { onNavigate: () => void }) {
               {demoProducts.map((product) => (
                 <ToolRow
                   key={`developer-${product.id}`}
-                  href={`/product?demo=${product.id}`}
+                  href={`/app/results?demo=${product.id}`}
                   title={product.productName}
                   detail={product.productCategory}
                   meta="Quick testing"
@@ -812,24 +812,24 @@ function TrustNote() {
 function BottomNavigation() {
   const pathname = usePathname();
   const items = [
-    { href: "/", label: "Home", icon: "home" as const, active: pathname === "/" },
+    { href: "/app", label: "Home", icon: "home" as const, active: pathname === "/app" },
     {
-      href: "/manual",
+      href: "/app/manual",
       label: "Manual",
       icon: "clipboard" as const,
-      active: pathname === "/manual",
+      active: pathname === "/app/manual",
     },
     {
-      href: "/manual?mode=camera",
+      href: "/app/manual?mode=camera",
       label: "Camera",
       icon: "camera" as const,
       active: false,
     },
     {
-      href: "/account",
+      href: "/app/account",
       label: "Account",
       icon: "user" as const,
-      active: pathname === "/account",
+      active: pathname === "/app/account",
     },
   ];
 

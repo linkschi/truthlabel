@@ -620,9 +620,6 @@ export function analyzeArtificialEngineeredFoodConstruction(
   const hasNovelTechnologyEscalationTrigger =
     hasNovelConstructionTechnologyMarker &&
     novelTechnologyCompanionCategoryCount >= 2;
-  const hasNovelTechnologyReviewBoost =
-    hasNovelConstructionTechnologyMarker &&
-    novelTechnologyCompanionCategoryCount >= 1;
   const hasTransparencyRisk =
     hasHeavyConstructionLoad ||
     hasMeatOrSeafoodExtenderTrigger ||

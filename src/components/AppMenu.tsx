@@ -11,31 +11,31 @@ import { saveProfile, useStoredProfile } from "@/lib/profileStorage";
 
 const navItems = [
   {
-    href: "/",
+    href: "/app",
     label: "Home",
     detail: "Start a scan or open the sample flow.",
   },
   {
-    href: "/manual",
+    href: "/app/manual",
     label: "Manual scan",
     detail: "Paste ingredients and run a real label scan.",
   },
   ...(publicAppConfig.flags.enableDemoProducts
     ? [
         {
-          href: "/product",
+          href: "/app/results",
           label: "Sample result",
           detail: "Preview the current demo result screen.",
         },
       ]
     : []),
   {
-    href: "/settings",
+    href: "/app/settings",
     label: "Settings",
     detail: "Edit allergy, region, and scan preferences on this device.",
   },
   {
-    href: "/account",
+    href: "/app/account",
     label: "Account",
     detail: "Open account, saved-scan, and preference information.",
   },

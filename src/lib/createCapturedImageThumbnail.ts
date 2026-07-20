@@ -5,9 +5,15 @@ export async function createCapturedImageThumbnail(
   const maxSize = options.maxSize ?? 360;
   const quality = options.quality ?? 0.72;
   const timeoutMs = 1500;
-  const objectUrl = URL.createObjectURL(image);
+  let objectUrl = "";
 
   try {
+    if (typeof URL === "undefined" || typeof URL.createObjectURL !== "function") {
+      return "";
+    }
+
+    objectUrl = URL.createObjectURL(image);
+
     const img = await new Promise<HTMLImageElement>((resolve, reject) => {
       const element = new Image();
       const timeout = window.setTimeout(
@@ -43,6 +49,16 @@ export async function createCapturedImageThumbnail(
   } catch {
     return "";
   } finally {
-    URL.revokeObjectURL(objectUrl);
+    if (
+      objectUrl &&
+      typeof URL !== "undefined" &&
+      typeof URL.revokeObjectURL === "function"
+    ) {
+      try {
+        URL.revokeObjectURL(objectUrl);
+      } catch {
+        // Preview cleanup should not block camera or OCR recovery.
+      }
+    }
   }
 }

@@ -1,6 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useTruthlabelAuth } from "@/components/auth/AuthProvider";
 
 type AccountIconName =
   | "arrow"
@@ -180,12 +183,27 @@ function TruthlabelMark() {
 }
 
 export default function AccountScreen() {
+  const router = useRouter();
+  const { user, subscription, accessState, refreshAccess, signOut } =
+    useTruthlabelAuth();
+  const [statusMessage, setStatusMessage] = useState("");
+
+  async function handleSignOut() {
+    await signOut();
+    router.replace("/");
+  }
+
+  async function handleRefreshAccess() {
+    await refreshAccess();
+    setStatusMessage("Subscription status refreshed.");
+  }
+
   return (
     <main className="min-h-screen overflow-x-hidden bg-white px-[18px] pt-[calc(14px+env(safe-area-inset-top))] text-[#101613] sm:px-5">
       <div className="mx-auto w-full max-w-[480px] pb-12">
         <header className="flex min-h-[58px] items-center justify-between gap-4">
           <Link
-            href="/"
+            href="/app"
             className="flex items-center gap-2.5 rounded-[14px] outline-none transition focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2"
             aria-label="Truthlabel home"
           >
@@ -195,7 +213,7 @@ export default function AccountScreen() {
             </span>
           </Link>
           <Link
-            href="/"
+            href="/app"
             className="inline-flex h-10 items-center gap-1.5 rounded-full border border-[#D7E7DD] bg-[#F3FAF6] px-3 text-[12px] font-bold text-[#0E5A3F] transition hover:bg-[#E8F6EF] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
           >
             <Icon name="home" className="h-4 w-4" />
@@ -214,15 +232,64 @@ export default function AccountScreen() {
             Save your scans and preferences
           </h1>
           <p className="mt-3 max-w-[360px] text-[14px] leading-[1.5] text-[#66716B]">
-            Create an account to access your Truthlabel history, saved products, and Watch List across devices.
+            Review your signed-in account, subscription status, Watch List, and privacy links.
           </p>
-          <div className="mt-4 rounded-[16px] border border-[#F3D2D4] bg-white/78 px-3 py-3">
+          <div className="mt-4 rounded-[16px] border border-[#D7E7DD] bg-white/78 px-3 py-3">
             <div className="flex items-start gap-2.5">
-              <Icon name="lock" className="mt-0.5 h-4 w-4 shrink-0 text-[#A33A3F]" />
-              <p className="text-[12.5px] leading-[1.45] text-[#66716B]">
-                Sign-in infrastructure is not connected yet. The actual account system will be added later, so this page does not collect passwords or pretend registration works.
-              </p>
+              <Icon name="shield" className="mt-0.5 h-4 w-4 shrink-0 text-[#0E5A3F]" />
+              <div className="min-w-0 text-[12.5px] leading-[1.45] text-[#66716B]">
+                <p>
+                  Signed in as{" "}
+                  <span className="font-semibold text-[#101613]">
+                    {user?.email ?? "Unknown email"}
+                  </span>
+                </p>
+                <p className="mt-1">
+                  Access status:{" "}
+                  <span className="font-semibold text-[#101613]">
+                    {accessState === "active"
+                      ? "Active"
+                      : subscription?.status ?? "Inactive"}
+                  </span>
+                </p>
+              </div>
             </div>
+          </div>
+        </section>
+
+        <section className="mt-4 rounded-[18px] border border-[#E2E8E4] bg-white px-4 py-4">
+          <h2 className="text-[16px] font-extrabold text-[#101613]">
+            Account access
+          </h2>
+          <p className="mt-1 text-[13px] leading-[1.45] text-[#66716B]">
+            Truthlabel uses Supabase for login and reads your subscription status from the protected subscription table.
+          </p>
+          {statusMessage ? (
+            <p className="mt-3 rounded-[14px] border border-[#D7E7DD] bg-[#F3FAF6] px-3 py-2 text-[12px] font-semibold text-[#0E5A3F]">
+              {statusMessage}
+            </p>
+          ) : null}
+          <div className="mt-4 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => void handleRefreshAccess()}
+              className="inline-flex h-10 items-center rounded-full border border-[#D7E7DD] bg-white px-4 text-[12px] font-bold text-[#0E5A3F] transition hover:bg-[#F3FAF6] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
+            >
+              Refresh access
+            </button>
+            <Link
+              href="/activate"
+              className="inline-flex h-10 items-center rounded-full border border-[#D7E7DD] bg-[#F3FAF6] px-4 text-[12px] font-bold text-[#0E5A3F] transition hover:bg-[#E8F6EF] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
+            >
+              Activation
+            </Link>
+            <button
+              type="button"
+              onClick={() => void handleSignOut()}
+              className="inline-flex h-10 items-center rounded-full border border-[#F3D2D4] bg-[#FFF6F6] px-4 text-[12px] font-bold text-[#A33A3F] transition hover:bg-[#FDEDEE] focus-visible:ring-2 focus-visible:ring-[#A33A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
+            >
+              Sign out
+            </button>
           </div>
         </section>
 
@@ -261,13 +328,13 @@ export default function AccountScreen() {
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
             <Link
-              href="/settings"
+              href="/app/settings"
               className="inline-flex h-10 items-center rounded-full bg-[#0E5A3F] px-4 text-[12px] font-bold text-white transition hover:bg-[#0E4C37] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
             >
               Open settings
             </Link>
             <Link
-              href="/manual"
+              href="/app/manual"
               className="inline-flex h-10 items-center rounded-full border border-[#D7E7DD] bg-white px-4 text-[12px] font-bold text-[#0E5A3F] transition hover:bg-[#F3FAF6] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
             >
               Start a scan
@@ -280,7 +347,7 @@ export default function AccountScreen() {
             Signed-in account layout
           </h2>
           <p className="mt-1 text-[13px] leading-[1.45] text-[#66716B]">
-            These sections are reserved for the real account system once authentication is connected.
+            These sections are reserved for later cloud sync and paid account features.
           </p>
           <div className="mt-3 grid gap-3">
             {futureSections.map((section) => (
@@ -309,12 +376,19 @@ export default function AccountScreen() {
 
         <section className="mt-4 rounded-[16px] border border-[#E9E1D2] bg-[#FBF8F1] px-4 py-3.5">
           <div className="flex items-start gap-3">
-            <Icon name="shield" className="mt-0.5 h-5 w-5 shrink-0 text-[#0E5A3F]" />
+              <Icon name="shield" className="mt-0.5 h-5 w-5 shrink-0 text-[#0E5A3F]" />
             <p className="text-[13px] leading-[1.48] text-[#66716B]">
-              Privacy note: your allergy profile and MVP settings currently stay local on this device. Do not share account details until the real sign-in system is connected.
+              Privacy note: your allergy profile should be treated as sensitive preference data. Always check the product label yourself, especially for allergies.
             </p>
           </div>
         </section>
+
+        <div className="mt-4 flex flex-wrap gap-3 px-1 text-[12px] font-semibold text-[#66716B]">
+          <Link href="/privacy">Privacy</Link>
+          <Link href="/terms">Terms</Link>
+          <Link href="/health-disclaimer">Health disclaimer</Link>
+          <Link href="/update-password">Change password</Link>
+        </div>
       </div>
     </main>
   );

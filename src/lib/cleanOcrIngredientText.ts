@@ -12,13 +12,13 @@ const allergenLinePattern =
   /\b(?:contains|may contain|allergen(?: statement| information| advice)?|made in a facility|processed on shared equipment|shared equipment)\b/i;
 
 const headingOnlyPattern =
-  /^(?:ingredients?|ingredient list|ingredlent[s]?|ingredi[e3]nt[s]?|allergen(?: statement| information| advice)?|contains|may contain|trace allergens?)[:\s-]*$/i;
+  /^(?:ingredients?|ingredient list|ingredlent[s]?|ingredi[e3a]nt[s]?|ingred[1i]ents?|ingrediants?|ingrecli?ents?|allergen(?: statement| information| advice)?|contains|may contain|trace allergens?)[:\s-]*$/i;
 
 const nonIngredientHeadingPattern =
   /^(?:nutrition(?: facts?| information)?|serving size|per\s*\d+\s*(?:g|ml)|energy|calories|storage|directions|instructions|best before|manufactured by|distributed by|keep refrigerated|net weight|warning|caution|barcode|recycling|customer care)[:\s-]*$/i;
 
 const ingredientHeadingPattern =
-  /\b(?:ingredients?|ingredient list|ingredlent[s]?|ingredi[e3]nt[s]?|ingre(?:d|cl|ol)ients?|lngredients?)\b/i;
+  /\b(?:ingredients?|ingredient list|ingredlent[s]?|ingredi[e3a]nt[s]?|ingred[1i]ents?|ingrediants?|ingre(?:d|cl|ol)ients?|ingrecli?ents?|lngredients?)\b/i;
 
 const sectionStopPattern =
   /\b(?:nutrition(?: facts?| information)?|typical values|serving size|per\s*\d+\s*(?:g|ml)|energy|calories|kcal|kilojoules?|kj|storage|directions|instructions|best before|expiry|manufactured by|distributed by|packed by|customer care|www\.|barcode|net weight|recycling)\b/i;
@@ -84,6 +84,9 @@ function normalizeRawText(value: string) {
   return value
     .replace(/\r\n?/g, "\n")
     .replace(/\bINGREDIENT[5S]\b/gi, "INGREDIENTS")
+    .replace(/\bINGRED[1I]ENTS\b/gi, "INGREDIENTS")
+    .replace(/\bINGREDIANTS\b/gi, "INGREDIENTS")
+    .replace(/\bINGRECL?IENTS\b/gi, "INGREDIENTS")
     .replace(/\bINGREDI[E3]NTS\b/gi, "INGREDIENTS")
     .replace(
       /[.;]\s*(?=(?:contains|may contain|allergen(?: statement| information| advice)?)\s*:)/gi,
@@ -113,7 +116,7 @@ function cleanIngredientLine(value: string) {
 
 function stripIngredientHeading(value: string) {
   return value.replace(
-    /^.*?\b(?:ingredients?|ingredient list|ingredlent[s]?|ingredi[e3]nt[s]?|ingre(?:d|cl|ol)ients?|lngredients?)\b\s*[:.-]?\s*/i,
+    /^.*?\b(?:ingredients?|ingredient list|ingredlent[s]?|ingredi[e3a]nt[s]?|ingred[1i]ents?|ingrediants?|ingre(?:d|cl|ol)ients?|ingrecli?ents?|lngredients?)\b\s*[:.-]?\s*/i,
     "",
   );
 }

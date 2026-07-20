@@ -1,13 +1,24 @@
-import type { Metadata } from "next";
-import ProductResult from "@/components/ProductResult";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Result",
-  description:
-    "Review the current Truthlabel exposure result, ingredient groups, and safety notes.",
-};
+function appendQuery(path: string, params: Record<string, string | string[] | undefined>) {
+  const query = new URLSearchParams();
 
-export default async function ProductPage({
+  Object.entries(params).forEach(([key, value]) => {
+    if (Array.isArray(value)) {
+      value.forEach((entry) => query.append(key, entry));
+      return;
+    }
+
+    if (value) {
+      query.set(key, value);
+    }
+  });
+
+  const serialized = query.toString();
+  return serialized ? `${path}?${serialized}` : path;
+}
+
+export default async function ProductRedirectPage({
   searchParams,
 }: {
   searchParams: Promise<{
@@ -18,29 +29,5 @@ export default async function ProductPage({
     manual?: string | string[];
   }>;
 }) {
-  const params = await searchParams;
-  const barcodeScanKey = Array.isArray(params.barcode)
-    ? params.barcode[0]
-    : params.barcode;
-  const category = Array.isArray(params.category)
-    ? params.category[0]
-    : params.category;
-  const demoProductId = Array.isArray(params.demo) ? params.demo[0] : params.demo;
-  const freshParam = Array.isArray(params.fresh)
-    ? params.fresh[0]
-    : params.fresh;
-  const manualScanKey = Array.isArray(params.manual)
-    ? params.manual[0]
-    : params.manual;
-  const freshResult = freshParam === "1" || freshParam === "true";
-
-  return (
-    <ProductResult
-      barcodeScanKey={barcodeScanKey}
-      category={category}
-      demoProductId={demoProductId}
-      freshResult={freshResult}
-      manualScanKey={manualScanKey}
-    />
-  );
+  redirect(appendQuery("/app/results", await searchParams));
 }

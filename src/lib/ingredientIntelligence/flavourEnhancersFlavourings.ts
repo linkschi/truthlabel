@@ -31,18 +31,19 @@ const aliasFields = [
 ] as const;
 
 function itemText(item: FlavourEnhancersFlavouringsItem) {
+  const identityFields = item as FlavourEnhancersFlavouringsItem & {
+    canonicalIngredientId?: string;
+    linkedIngredientId?: string;
+  };
+
   return [
+    identityFields.canonicalIngredientId,
+    identityFields.linkedIngredientId,
+    item.id,
     item.mainName,
-    ...item.otherNames,
-    ...item.chemicalNames,
-    ...item.brandNames,
-    ...item.eNumbers,
-    ...item.insNumbers,
-    ...item.abbreviations,
-    ...item.labelVariants,
-    ...item.spellingVariants,
-    ...item.regionalNames,
-  ].join(" ");
+  ]
+    .filter(Boolean)
+    .join(" ");
 }
 
 function buildMatchTerms(item: FlavourEnhancersFlavouringsItem) {

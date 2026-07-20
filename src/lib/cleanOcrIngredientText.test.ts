@@ -81,3 +81,15 @@ test("cleanOcrIngredientText handles common OCR ingredient heading confusion", (
 
   assert.equal(result.ingredientText, "Water, sugar, cocoa");
 });
+
+test("cleanOcrIngredientText handles numeric and spelling OCR mistakes in ingredient headings", () => {
+  const numericResult = cleanOcrIngredientText(
+    "INGRED1ENTS: Water, sugar, sodium benzoate",
+  );
+  const spellingResult = cleanOcrIngredientText(
+    "INGREDIANTS: Wheat flour, salt, yeast",
+  );
+
+  assert.equal(numericResult.ingredientText, "Water, sugar, sodium benzoate");
+  assert.equal(spellingResult.ingredientText, "Wheat flour, salt, yeast");
+});

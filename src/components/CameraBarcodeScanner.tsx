@@ -2204,6 +2204,8 @@ export default function CameraBarcodeScanner({
         ? "Lookup took too long"
       : barcodeLookupStatus === "error"
         ? "Lookup failed"
+      : barcodeLookupStatus === "unknown"
+        ? "Lookup needs another step"
         : "Product not found";
   const barcodeNotFoundMessage =
     barcodeLookupStatus === "found_missing_ingredients"
@@ -2212,6 +2214,8 @@ export default function CameraBarcodeScanner({
         ? "The product lookup took too long. Check your connection, try again, or scan the ingredients instead."
       : barcodeLookupStatus === "error"
         ? "The product lookup did not complete. You can try again, scan the ingredients, or enter the details manually."
+      : barcodeLookupStatus === "unknown"
+        ? "The barcode was read, but Truthlabel did not receive a clear lookup result. Try again, scan the ingredients, or enter the details manually."
         : "This barcode is not in the product data yet. Scan the ingredients to analyse the product another way.";
   const switchableCameraCount = cameraCandidates.filter(
     (candidate) => !candidate.isLikelyFront && candidate.deviceId,

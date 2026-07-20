@@ -48,8 +48,10 @@ test("flavour system summary stays green when no markers are found", () => {
   assert.equal(summary.hasAutomaticRed, false);
 });
 
-test("flavour system summary stays yellow for one to three systems", () => {
-  const matches = findFlavourSystemMatches("Yeast extract, natural flavour, MSG");
+test("flavour system summary stays yellow for one to three yellow systems", () => {
+  const matches = findFlavourSystemMatches(
+    "Hydrolyzed vegetable protein, natural flavour, artificial flavour",
+  );
   const summary = summarizeFlavourSystemMatches(matches);
 
   assert.equal(summary.totalCount, 3);
@@ -59,7 +61,7 @@ test("flavour system summary stays yellow for one to three systems", () => {
 
 test("flavour system summary becomes red for four flavour systems", () => {
   const matches = findFlavourSystemMatches(
-    "Monosodium glutamate, yeast extract, natural flavour, disodium guanylate",
+    "Hydrolyzed vegetable protein, natural flavour, smoke flavour, vanillin",
   );
   const summary = summarizeFlavourSystemMatches(matches);
 

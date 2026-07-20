@@ -47,15 +47,18 @@ test("baby category demo surfaces heavy-metals review markers", () => {
   assert.equal(heavyMetalsRow?.status, "checked");
 });
 
-test("drinks category demo surfaces microplastic review markers", () => {
+test("drinks category demo keeps microplastic packaging context informational", () => {
   const result = getDemoScanResult("drinks-beverages", buildAllergyProfile());
-  const microplasticsRow = result.deepExposureChecks.find(
+  const microplasticsOverviewRow = result.quickOverview.find(
+    (row) => row.categoryId === "microplastics",
+  );
+  const microplasticsDeepRow = result.deepExposureChecks.find(
     (row) => row.categoryId === "microplastics",
   );
 
   assert.equal(result.productHero.productCategory, "Drinks / Beverages");
-  assert.equal(microplasticsRow?.severity, "yellow");
-  assert.equal(microplasticsRow?.status, "checked");
+  assert.equal(microplasticsOverviewRow?.severity, "green");
+  assert.equal(microplasticsDeepRow, undefined);
 });
 
 test("demo result keeps external brand-trust lookup clearly not found without live data", () => {

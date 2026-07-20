@@ -16,18 +16,19 @@ export type EmulsifiersStabilisersGumsCategorySummary = {
 };
 
 function itemText(item: EmulsifiersStabilisersGumsItem) {
+  const identityFields = item as EmulsifiersStabilisersGumsItem & {
+    canonicalIngredientId?: string;
+    linkedIngredientId?: string;
+  };
+
   return [
+    identityFields.canonicalIngredientId,
+    identityFields.linkedIngredientId,
+    item.id,
     item.mainName,
-    ...item.otherNames,
-    ...item.chemicalNames,
-    ...item.brandNames,
-    ...item.eNumbers,
-    ...item.insNumbers,
-    ...item.abbreviations,
-    ...item.labelVariants,
-    ...item.spellingVariants,
-    ...item.regionalNames,
-  ].join(" ");
+  ]
+    .filter(Boolean)
+    .join(" ");
 }
 
 function overlapsBannedRestricted(item: EmulsifiersStabilisersGumsItem) {

@@ -81,8 +81,8 @@ test("real product analysis flags flavour systems as yellow review items", () =>
       brand: "Truthlabel Demo",
       ingredients: [
         {
-          name: "Yeast extract",
-          text: "Yeast extract",
+          name: "Natural flavour",
+          text: "Natural flavour",
         },
       ],
       nutrients: [],
@@ -97,7 +97,7 @@ test("real product analysis flags flavour systems as yellow review items", () =>
   const scanCheck = result.scanChecks.find((item) => item.id === "scan-flavour-systems");
 
   assert.equal(ingredient.level, "yellow");
-  assert.ok(ingredient.badges.includes("FLAVOURING SYSTEM FOUND"));
+  assert.ok(ingredient.badges.includes("VAGUE FLAVOURING FOUND"));
   assert.equal(scanCheck?.tone, "yellow");
   assert.equal(scanCheck?.status, "1");
   assert.ok(result.watchListHits.includes("Flavour systems"));
@@ -111,20 +111,20 @@ test("real product analysis turns three flavour systems into a red load check", 
       brand: "Truthlabel Demo",
       ingredients: [
         {
-          name: "Monosodium glutamate",
-          text: "Monosodium glutamate",
-        },
-        {
-          name: "Yeast extract",
-          text: "Yeast extract",
+          name: "Hydrolyzed vegetable protein",
+          text: "Hydrolyzed vegetable protein",
         },
         {
           name: "Natural flavour",
           text: "Natural flavour",
         },
         {
-          name: "Disodium guanylate",
-          text: "Disodium guanylate",
+          name: "Smoke flavour",
+          text: "Smoke flavour",
+        },
+        {
+          name: "Vanillin",
+          text: "Vanillin",
         },
       ],
       nutrients: [],
@@ -185,8 +185,8 @@ test("real product analysis flags one processed oil as yellow", () => {
       brand: "Truthlabel Demo",
       ingredients: [
         {
-          name: "Canola oil",
-          text: "Canola oil",
+          name: "Frying oil",
+          text: "Frying oil",
         },
       ],
       nutrients: [],
@@ -201,7 +201,7 @@ test("real product analysis flags one processed oil as yellow", () => {
   const scanCheck = result.scanChecks.find((item) => item.id === "scan-processed-oils");
 
   assert.equal(ingredient.level, "yellow");
-  assert.ok(ingredient.badges.includes("SEED OIL FOUND"));
+  assert.ok(ingredient.badges.includes("FRYING OIL FOUND"));
   assert.equal(scanCheck?.tone, "yellow");
   assert.equal(scanCheck?.status, "1");
   assert.ok(result.watchListHits.includes("Processed oils"));
@@ -215,16 +215,16 @@ test("real product analysis turns three processed oils into a red load check", (
       brand: "Truthlabel Demo",
       ingredients: [
         {
-          name: "Canola oil",
-          text: "Canola oil",
+          name: "Frying oil",
+          text: "Frying oil",
         },
         {
-          name: "Soybean oil",
-          text: "Soybean oil",
+          name: "Shortening",
+          text: "Shortening",
         },
         {
-          name: "Sunflower oil",
-          text: "Sunflower oil",
+          name: "Refined oil",
+          text: "Refined oil",
         },
       ],
       nutrients: [],
@@ -340,7 +340,7 @@ test("real product analysis treats partially hydrogenated oil as PHO regulatory 
   assert.ok(result.summary.reasons.includes("Partially hydrogenated oil"));
 });
 
-test("real product analysis flags positive trans fat markers but not trans-fat-free claims", () => {
+test("real product analysis flags positive trans fat markers as yellow review but not trans-fat-free claims", () => {
   const positiveResult = analyzeNormalizedProduct(
     {
       barcode: "10011",
@@ -387,10 +387,10 @@ test("real product analysis flags positive trans fat markers but not trans-fat-f
     (item) => item.id === "scan-hydrogenated-oils",
   );
 
-  assert.equal(positiveIngredient.level, "red");
+  assert.equal(positiveIngredient.level, "yellow");
   assert.equal(positiveIngredient.rowStatusLabel, "Trans fat");
   assert.ok(positiveIngredient.badges.includes("TRANS FAT MARKER FOUND"));
-  assert.equal(positiveCheck?.tone, "red");
+  assert.equal(positiveCheck?.tone, "yellow");
   assert.equal(positiveCheck?.status, "Trans fat found");
   assert.equal(negativeIngredient.level, "green");
   assert.equal(negativeCheck?.tone, "green");

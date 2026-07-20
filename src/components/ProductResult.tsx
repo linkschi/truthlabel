@@ -561,7 +561,7 @@ function ResultStateView({
         <div className="px-5 pb-6 pt-4">
           <header className="grid grid-cols-[1fr_auto_1fr] items-center">
             <Link
-              href="/"
+              href="/app"
               className="justify-self-start text-[15px] font-medium text-[var(--text-secondary)]"
             >
               Done
@@ -2086,8 +2086,8 @@ export default function ProductResult({
   const doneHref =
     scanResult.productHero.scanSource === "manual_paste" ||
     scanResult.productHero.scanSource === "barcode"
-      ? "/manual"
-      : "/";
+      ? "/app/manual"
+      : "/app";
   const feedbackIngredientText =
     latestManualScan?.input.ingredientText ??
     latestBarcodeScan?.productData.ingredientText ??
@@ -2107,9 +2107,9 @@ export default function ProductResult({
       <ResultStateView
         title="Barcode scan not found"
         message="We could not find a saved barcode scan on this device yet. Run a new barcode lookup or open the sample result instead."
-        primaryHref="/manual"
+        primaryHref="/app/manual"
         primaryLabel="Open scan page"
-        secondaryHref="/product"
+        secondaryHref="/app/results"
         secondaryLabel="Open sample result"
       />
     );
@@ -2129,9 +2129,9 @@ export default function ProductResult({
       <ResultStateView
         title="Manual scan not found"
         message="We could not find a saved manual scan on this device yet. Run a new manual scan or open the sample result instead."
-        primaryHref="/manual"
+        primaryHref="/app/manual"
         primaryLabel="Open manual scan"
-        secondaryHref="/product"
+        secondaryHref="/app/results"
         secondaryLabel="Open sample result"
       />
     );

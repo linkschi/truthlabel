@@ -1,17 +1,24 @@
-import type { Metadata } from "next";
-import ManualScanScreen from "@/components/ManualScanScreen";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Scan",
-  description:
-    "Paste an ingredient label, scan a barcode, or use OCR and camera tools in Truthlabel.",
-};
+function appendQuery(path: string, params: Record<string, string | string[] | undefined>) {
+  const query = new URLSearchParams();
 
-function firstSearchParamValue(value?: string | string[]) {
-  return Array.isArray(value) ? value[0] : value;
+  Object.entries(params).forEach(([key, value]) => {
+    if (Array.isArray(value)) {
+      value.forEach((entry) => query.append(key, entry));
+      return;
+    }
+
+    if (value) {
+      query.set(key, value);
+    }
+  });
+
+  const serialized = query.toString();
+  return serialized ? `${path}?${serialized}` : path;
 }
 
-export default async function ManualScanPage({
+export default async function ManualRedirectPage({
   searchParams,
 }: {
   searchParams: Promise<{
@@ -20,15 +27,5 @@ export default async function ManualScanPage({
     scannerDebug?: string | string[];
   }>;
 }) {
-  const params = await searchParams;
-  const initialScanMode =
-    firstSearchParamValue(params.mode) ?? firstSearchParamValue(params.scan);
-  const scannerDebug = firstSearchParamValue(params.scannerDebug) === "1";
-
-  return (
-    <ManualScanScreen
-      initialScanMode={initialScanMode}
-      scannerDebug={scannerDebug}
-    />
-  );
+  redirect(appendQuery("/app/manual", await searchParams));
 }
