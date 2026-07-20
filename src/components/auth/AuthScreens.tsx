@@ -227,7 +227,8 @@ export function CreateAccountScreen() {
 
       setStatus({
         tone: "green",
-        message: "Check your email to confirm your Truthlabel account.",
+        message:
+          "Check your email to confirm your Truthlabel account. Your 7-day trial will be available after confirmation.",
       });
     } catch (error) {
       setStatus({
@@ -246,7 +247,7 @@ export function CreateAccountScreen() {
     <AuthShell
       eyebrow="Create account"
       title="Create your Truthlabel account."
-      message="After subscribing, use this account to activate and access the scanner."
+      message="Create an account to start your 7-day free trial. Subscription access can be added later if Truthlabel fits your shopping flow."
     >
       <form onSubmit={handleSubmit} className="mt-5">
         <label className="block">
@@ -296,6 +297,10 @@ export function CreateAccountScreen() {
         </button>
       </form>
       <p className="mt-5 text-[13px] leading-5 text-[var(--text-secondary)]">
+        Your trial starts when the account is created. No health or safety result
+        is guaranteed; always check the original package label.
+      </p>
+      <p className="mt-3 text-[13px] leading-5 text-[var(--text-secondary)]">
         Already have an account?{" "}
         <Link href="/sign-in" className="font-semibold text-[var(--green-main)]">
           Sign in
@@ -483,17 +488,32 @@ export function UpdatePasswordScreen() {
 }
 
 export function ActivateScreen() {
-  const { accessState, errorMessage, refreshAccess, subscription, user } =
-    useTruthlabelAuth();
+  const {
+    accessKind,
+    accessState,
+    errorMessage,
+    refreshAccess,
+    subscription,
+    trialAccess,
+    trialDaysRemaining,
+    user,
+  } = useTruthlabelAuth();
   const checkoutUrl =
     process.env.NEXT_PUBLIC_GUMROAD_CHECKOUT_URL?.trim() || "https://truthlabel.gumroad.com";
   const isActive = accessState === "active";
+  const trialEndLabel = trialAccess?.trial_ends_at
+    ? new Date(trialAccess.trial_ends_at).toLocaleDateString(undefined, {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      })
+    : "";
 
   return (
     <AuthShell
       eyebrow="Activate"
       title="Activate your Truthlabel access."
-      message="Truthlabel checks your subscription from Supabase. Gumroad license verification is the next backend step."
+      message="New accounts receive a 7-day free trial. Gumroad subscription activation is used to continue access after the trial."
     >
       {errorMessage ? <StatusMessage tone="red" message={errorMessage} /> : null}
 
@@ -514,9 +534,23 @@ export function ActivateScreen() {
           <p className="mt-2 text-[13px] leading-5 text-[var(--text-secondary)]">
             Current access:{" "}
             <span className="font-semibold">
-              {isActive ? "Active" : subscription?.status ?? "Inactive"}
+              {accessKind === "paid"
+                ? "Active subscription"
+                : accessKind === "trial"
+                  ? `Free trial - ${trialDaysRemaining} day${
+                      trialDaysRemaining === 1 ? "" : "s"
+                    } left`
+                  : subscription?.status ?? "Inactive"}
             </span>
           </p>
+          {accessKind === "trial" && trialEndLabel ? (
+            <p className="mt-1 text-[13px] leading-5 text-[var(--text-secondary)]">
+              Trial ends:{" "}
+              <span className="font-semibold text-[var(--text-main)]">
+                {trialEndLabel}
+              </span>
+            </p>
+          ) : null}
         </div>
       ) : null}
 
@@ -525,7 +559,7 @@ export function ActivateScreen() {
           href={checkoutUrl}
           className="inline-flex justify-center rounded-full border border-transparent bg-[var(--text-main)] px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-white"
         >
-          Subscribe on Gumroad
+          Continue with Gumroad
         </a>
         {user ? (
           <button
@@ -533,7 +567,7 @@ export function ActivateScreen() {
             onClick={() => void refreshAccess()}
             className="rounded-full border border-[var(--border-soft)] bg-white px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-[var(--text-main)]"
           >
-            Refresh subscription status
+            Refresh access status
           </button>
         ) : (
           <Link
@@ -555,10 +589,12 @@ export function ActivateScreen() {
 
       <div className="mt-5 rounded-[18px] border border-[var(--border-soft)] bg-white px-4 py-3">
         <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--text-secondary)]">
-          License key activation
+          Trial and license activation
         </p>
         <p className="mt-2 text-[13px] leading-5 text-[var(--text-secondary)]">
-          The license-key verification function is intentionally not implemented in this step. Until it is built, access is only unlocked by a valid active row in `public.subscriptions`.
+          The 7-day trial is created by Supabase when your account is created.
+          Gumroad license-key verification is the next backend step for paid
+          access after the trial.
         </p>
       </div>
     </AuthShell>

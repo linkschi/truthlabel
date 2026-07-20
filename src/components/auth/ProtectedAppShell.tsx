@@ -7,7 +7,7 @@ import { useTruthlabelAuth } from "@/components/auth/AuthProvider";
 
 function FullPageLoading({
   title = "Checking access",
-  message = "Truthlabel is checking your account and subscription status.",
+  message = "Truthlabel is checking your account, free trial, and subscription status.",
 }: {
   title?: string;
   message?: string;
@@ -66,7 +66,7 @@ function ProtectedAppShellInner({ children }: { children: ReactNode }) {
             Account access is not configured yet.
           </h1>
           <p className="mt-2 text-[14px] leading-6 text-[var(--text-secondary)]">
-            Add the Supabase public URL and publishable key in Vercel before opening the paid app.
+            Add the Supabase public URL and publishable key in Vercel before opening the app.
           </p>
           <Link
             href="/"
@@ -85,7 +85,7 @@ function ProtectedAppShellInner({ children }: { children: ReactNode }) {
         title={accessState === "loading" ? "Checking access" : "Redirecting"}
         message={
           errorMessage ||
-          "Truthlabel is checking whether this account has active access."
+          "Truthlabel is checking whether this account has trial or paid access."
         }
       />
     );

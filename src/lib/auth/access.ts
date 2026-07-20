@@ -14,7 +14,24 @@ export type TruthlabelSubscription = {
   last_verified_at?: string | null;
 };
 
+export type TruthlabelTrialAccess = {
+  trial_started_at: string | null;
+  trial_ends_at: string | null;
+};
+
 export type AccessState = "loading" | "signed_out" | "inactive" | "active";
+
+export type AccessKind = "none" | "trial" | "paid";
+
+function isFutureDate(value: string | null | undefined, now = Date.now()) {
+  if (!value) {
+    return false;
+  }
+
+  const timestamp = new Date(value).getTime();
+
+  return Number.isFinite(timestamp) && timestamp > now;
+}
 
 export function hasPaidAccess(subscription: TruthlabelSubscription | null) {
   if (!subscription) {
@@ -29,16 +46,53 @@ export function hasPaidAccess(subscription: TruthlabelSubscription | null) {
     subscription.status === "active_until_end" &&
     subscription.access_ends_at
   ) {
-    return new Date(subscription.access_ends_at).getTime() > Date.now();
+    return isFutureDate(subscription.access_ends_at);
   }
 
   return false;
+}
+
+export function hasTrialAccess(trialAccess: TruthlabelTrialAccess | null) {
+  return isFutureDate(trialAccess?.trial_ends_at);
+}
+
+export function getTrialDaysRemaining(
+  trialAccess: TruthlabelTrialAccess | null,
+  now = Date.now(),
+) {
+  if (!trialAccess?.trial_ends_at) {
+    return 0;
+  }
+
+  const trialEnd = new Date(trialAccess.trial_ends_at).getTime();
+
+  if (!Number.isFinite(trialEnd) || trialEnd <= now) {
+    return 0;
+  }
+
+  return Math.max(1, Math.ceil((trialEnd - now) / 86_400_000));
+}
+
+export function getAccessKind(args: {
+  subscription: TruthlabelSubscription | null;
+  trialAccess: TruthlabelTrialAccess | null;
+}): AccessKind {
+  if (hasPaidAccess(args.subscription)) {
+    return "paid";
+  }
+
+  if (hasTrialAccess(args.trialAccess)) {
+    return "trial";
+  }
+
+  return "none";
 }
 
 export function getAccessState(args: {
   authLoading: boolean;
   userPresent: boolean;
   subscription: TruthlabelSubscription | null;
+  trialAccess: TruthlabelTrialAccess | null;
 }): AccessState {
   if (args.authLoading) {
     return "loading";
@@ -48,5 +102,5 @@ export function getAccessState(args: {
     return "signed_out";
   }
 
-  return hasPaidAccess(args.subscription) ? "active" : "inactive";
+  return getAccessKind(args) === "none" ? "inactive" : "active";
 }

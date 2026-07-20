@@ -8,42 +8,91 @@ export const metadata: Metadata = {
 };
 
 const navLinks = [
-  { href: "#how", label: "How it works" },
   { href: "#checks", label: "What we check" },
-  { href: "#different", label: "Why Truthlabel" },
+  { href: "#how", label: "How it works" },
+  { href: "#pricing", label: "Free trial" },
   { href: "#questions", label: "Questions" },
 ];
 
-const recognitionBadges = [
-  "Banned ingredients",
-  "Allergy matches",
-  "Artificial additives",
-  "Processed oils",
-  "Cancer-related concerns",
-  "Engineered-food markers",
-  "Product safety alerts",
+const checkHighlights = [
+  {
+    title: "Banned or restricted items",
+    copy:
+      "Some ingredients are restricted, revoked, or not permitted in supported regions. Truthlabel brings those signals forward.",
+    tone: "red",
+  },
+  {
+    title: "Personal allergen matches",
+    copy:
+      "Your allergy Watch List changes what matters. A normal ingredient for one person can be a personal red warning for another.",
+    tone: "red",
+  },
+  {
+    title: "Additives and processing load",
+    copy:
+      "Colors, sweeteners, preservatives, processed oils, and engineered-food markers can be easy to miss in a long label.",
+    tone: "yellow",
+  },
+  {
+    title: "Verified safety signals",
+    copy:
+      "When official recall or safety data is available, Truthlabel can help surface it without claiming missing data proves safety.",
+    tone: "yellow",
+  },
 ];
 
-const painCards = [
-  {
-    eyebrow: "Too much to decode",
-    title: "What does that ingredient actually mean?",
-    copy:
-      "Searching every color, preservative, sweetener, oil, and additive takes too long - especially while shopping.",
-  },
-  {
-    eyebrow: "Not personal enough",
-    title: "Your concerns are not the same as everyone else's.",
-    copy:
-      "An ingredient may matter more because of your allergies, Watch List, or the food-production markers you personally avoid.",
-  },
-  {
-    eyebrow: "Easy to miss",
-    title: "Serious findings can disappear inside a long list.",
-    copy:
-      "Truthlabel brings urgent concerns forward instead of making you hunt through every ingredient yourself.",
-  },
-];
+// LANDING PAGE RESEARCH / EVIDENCE NOTES
+// These are intentionally not displayed yet. Before any of this becomes visible
+// copy, collect reputable sources, citations, region context, and product
+// examples. The page direction is serious and protective, but the public wording
+// must stay evidence-backed and avoid unsupported certainty.
+//
+// 1. Second section visual direction:
+//    - Add a compact, high-impact evidence section directly after the hero.
+//    - Use real screenshots or recreated examples showing the kinds of label
+//      signals Truthlabel checks: banned/restricted items, artificial colours,
+//      preservatives, processed oils, bioengineered/cell-cultured markers,
+//      allergen warnings, recalls, and confusing vague terms.
+//    - Add image notes/captions explaining that these are review signals and
+//      not proof every product causes harm.
+//
+// 2. Evidence-backed urgency:
+//    - Research how often consumers misunderstand ingredient labels, skip
+//      ingredient review, or rely on front-of-pack claims.
+//    - Research official or academic sources on long-term diet exposure,
+//      ultra-processed foods, additive exposure, allergens, recalls, industrial
+//      trans fats, and region-specific banned/restricted ingredients.
+//    - Later wording can be emotionally serious, but it must distinguish:
+//      confirmed hazards, possible review signals, regulatory restrictions,
+//      personal allergy risks, and long-term dietary patterns.
+//
+// 3. Company/industry framing:
+//    - User direction: highlight that large food companies may optimize for
+//      shelf life, cost, flavour intensity, and repeat purchasing rather than a
+//      consumer's personal health priorities.
+//    - Needs evidence before public use. Avoid broad visible claims like "all
+//      companies do not care about your health" unless narrowed and sourced.
+//
+// 4. Future carousel:
+//    - Replace the current "App in action" strip with a carousel of screenshots:
+//      scan input, camera barcode, OCR label review, Quick Overview, Deep
+//      Exposure, Final Verdict, Allergy Watch List red warning, and a clean
+//      low-concern product.
+//    - Keep carousel small so the homepage does not become too long.
+//
+// 5. Subscription section tone:
+//    - Later version should connect the price to protection/control: small
+//      monthly cost for faster label understanding while shopping.
+//    - Possible theme after evidence is gathered: protect yourself from
+//      overlooked label risks, not "Truthlabel guarantees health" or "this app
+//      saves your life."
+//
+// 6. Research asset list to gather:
+//    - Official FDA/EFSA/WHO/IARC pages where relevant.
+//    - Region-specific banned/restricted ingredient examples.
+//    - Recall examples with official source links.
+//    - Label photos or recreated examples with permission-safe assets.
+//    - Screenshots of the actual Truthlabel result experience.
 
 const howSteps = [
   {
@@ -133,32 +182,6 @@ const checkGroups = [
   },
 ];
 
-const resultExamples = [
-  {
-    tone: "green",
-    badge: "Green - Clear",
-    title: "No major concerns",
-    copy: "No meaningful ingredient concerns were detected in this category.",
-    action: "Still check the original package label, especially for allergies.",
-  },
-  {
-    tone: "yellow",
-    badge: "Yellow - Moderate",
-    title: "Artificial colors detected",
-    copy:
-      "This product contains artificial colors that Truthlabel flags for moderate review.",
-    action:
-      "You do not need to avoid it completely, but you may want to consume it less often.",
-  },
-  {
-    tone: "red",
-    badge: "Red - Serious",
-    title: "Partially hydrogenated oil detected",
-    copy: "This ingredient is a source of industrial trans fat.",
-    action: "Avoid this product when a simpler alternative is available.",
-  },
-];
-
 const allergyOptions = [
   "Peanut",
   "Milk",
@@ -176,34 +199,6 @@ const preferenceOptions = [
   "Artificial sweeteners",
   "Processed oils",
   "Ultra-processed foods",
-];
-
-const comparisonRows = [
-  {
-    ordinary: "Gives one general score",
-    truthlabel: "Shows the categories behind the result",
-  },
-  {
-    ordinary: "Treats every user the same",
-    truthlabel: "Uses your allergy and Watch List settings",
-  },
-  {
-    ordinary: "Lists unfamiliar ingredient names",
-    truthlabel: "Explains why each important ingredient was flagged",
-  },
-  {
-    ordinary: "Mixes moderate and serious concerns",
-    truthlabel: "Separates yellow concerns from serious red alerts",
-  },
-  {
-    ordinary: "Hides details behind vague ratings",
-    truthlabel: "Shows clear reasons and recommended actions",
-  },
-  {
-    ordinary: "Focuses mainly on nutrition",
-    truthlabel:
-      "Also checks additives, processing, regulatory signals, and food construction",
-  },
 ];
 
 const useCases = [
@@ -232,25 +227,8 @@ const useCases = [
   },
 ];
 
-const trustCards = [
-  {
-    title: "Evidence-aware explanations",
-    copy:
-      "Serious findings should identify the exact ingredient, reason, evidence type, and region when relevant.",
-  },
-  {
-    title: "No hidden certainty",
-    copy:
-      "Possible concerns, confirmed warnings, personal preferences, and category overloads are explained differently.",
-  },
-  {
-    title: "You remain in control",
-    copy:
-      "Truthlabel supports your decision. It does not replace the package label or medical guidance.",
-  },
-];
-
 const planIncludes = [
+  "7-day free trial",
   "Full barcode scanning",
   "Complete ingredient analysis",
   "Personalized allergy Watch List",
@@ -262,6 +240,11 @@ const planIncludes = [
 ];
 
 const faq = [
+  {
+    question: "Is there a free trial?",
+    answer:
+      "Yes. New Truthlabel accounts receive a 7-day free trial so you can test the scanner with real products before continuing with paid access.",
+  },
   {
     question: "What does Truthlabel check?",
     answer:
@@ -290,12 +273,12 @@ const faq = [
   {
     question: "How do I access Truthlabel after joining?",
     answer:
-      "After checkout, create or sign in to your Truthlabel account and follow the activation instructions provided with your purchase.",
+      "Create an account to start the 7-day trial. After the trial, subscription billing and membership management are handled through secure checkout.",
   },
   {
     question: "Can I manage my membership?",
     answer:
-      "Yes. Billing and membership management are handled securely through Gumroad.",
+      "Yes. Billing and membership management are handled through the secure subscription checkout flow.",
   },
 ];
 
@@ -426,6 +409,7 @@ function OptionPill({ children }: { children: React.ReactNode }) {
 
 export default function LandingPage() {
   const checkoutUrl = getCheckoutUrl();
+  const trialUrl = "/create-account";
 
   return (
     <main className="min-h-screen overflow-hidden px-4 py-4 sm:px-6">
@@ -456,7 +440,7 @@ export default function LandingPage() {
             >
               Sign in
             </Link>
-            <PrimaryCta href={checkoutUrl}>Get Truthlabel</PrimaryCta>
+            <PrimaryCta href={trialUrl}>Start free trial</PrimaryCta>
           </div>
 
           <div className="flex items-center gap-2 sm:hidden">
@@ -486,10 +470,10 @@ export default function LandingPage() {
                   </a>
                 ))}
                 <a
-                  href={checkoutUrl}
+                  href={trialUrl}
                   className="rounded-[16px] bg-[var(--green-main)] px-3 py-2 text-center text-[12px] font-bold uppercase tracking-[0.12em] text-white"
                 >
-                  Get Truthlabel
+                  Start free trial
                 </a>
               </div>
             </details>
@@ -516,11 +500,12 @@ export default function LandingPage() {
               deserves your attention.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <PrimaryCta href={checkoutUrl}>Get Truthlabel</PrimaryCta>
+              <PrimaryCta href={trialUrl}>Start free 7-day trial</PrimaryCta>
               <SecondaryCta href="#how">See how it works</SecondaryCta>
             </div>
             <p className="mt-4 text-[13px] font-bold text-[var(--text-secondary)]">
-              Clear findings. Personal Watch Lists. Simple explanations.
+              Clear findings. Personal Watch Lists. Simple explanations. Trial
+              starts when you create an account.
             </p>
           </div>
 
@@ -586,62 +571,76 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="rounded-[34px] border border-[var(--green-border)] bg-white/80 px-5 py-6 shadow-[var(--shadow)] sm:px-8">
-          <p className="mx-auto max-w-4xl text-center font-heading text-[1.35rem] font-semibold leading-8 tracking-[-0.035em] text-[var(--text-main)] sm:text-[1.75rem]">
-            Most people do not have time to research every unfamiliar
-            ingredient. Truthlabel does the checking before you make the choice.
-          </p>
-          <div className="mt-5 flex flex-wrap justify-center gap-2">
-            {recognitionBadges.map((badge) => (
-              <span
-                key={badge}
-                className="rounded-full border border-[var(--border-soft)] bg-[var(--bg-soft)] px-4 py-2 text-[12px] font-bold text-[var(--text-main)]"
-              >
-                {badge}
-              </span>
-            ))}
-          </div>
-        </section>
-
-        <section className="py-14 sm:py-20">
+        <section
+          id="checks"
+          className="rounded-[42px] border border-[var(--border-soft)] bg-white p-5 shadow-[var(--shadow)] sm:p-8"
+        >
+          {/* Future visual note: add compact real screenshots/photos here - banned/restricted examples, confusing labels, bioengineered markers, additive-heavy products, and Truthlabel result screens. Keep it evidence-safe and do not imply every example causes harm. */}
           <SectionIntro
-            eyebrow="The everyday problem"
-            title="A long ingredient list should not leave you guessing."
-            copy="Food labels can contain unfamiliar names, vague terms, hidden sub-ingredients, and additives that are difficult to understand at a glance."
+            eyebrow="What Truthlabel checks"
+            title="The label details that are easy to overlook."
+            copy="Front-of-pack claims can be simple. Ingredient labels are not. Truthlabel scans for the warning signals, personal matches, and processing markers that deserve your attention before a product reaches your basket."
             align="center"
           />
-          <div className="mt-8 grid gap-4 lg:grid-cols-3">
-            {painCards.map((card) => (
+          <div className="mt-8 grid gap-4 lg:grid-cols-4">
+            {checkHighlights.map((highlight) => {
+              const toneClass =
+                highlight.tone === "red"
+                  ? "border-[var(--red-border)] bg-[var(--red-bg)]"
+                  : "border-[var(--amber-border)] bg-[var(--amber-bg)]";
+
+              return (
+                <article
+                  key={highlight.title}
+                  className={`rounded-[28px] border p-5 ${toneClass}`}
+                >
+                  <h3 className="font-heading text-[1.3rem] font-semibold leading-tight tracking-[-0.04em] text-[var(--text-main)]">
+                    {highlight.title}
+                  </h3>
+                  <p className="mt-3 text-[14px] leading-6 text-[var(--text-secondary)]">
+                    {highlight.copy}
+                  </p>
+                </article>
+              );
+            })}
+          </div>
+          <div className="mt-6 grid gap-5 lg:grid-cols-3">
+            {checkGroups.map((group) => (
               <article
-                key={card.title}
-                className="rounded-[32px] border border-[var(--border-soft)] bg-white p-6 shadow-[0_16px_36px_rgba(23,20,18,0.06)]"
+                key={group.title}
+                className="rounded-[28px] border border-[var(--border-soft)] bg-[var(--bg-soft)] p-5"
               >
-                <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[var(--amber-main)]">
-                  {card.eyebrow}
-                </p>
-                <h3 className="mt-4 font-heading text-[1.55rem] font-semibold leading-tight tracking-[-0.04em] text-[var(--text-main)]">
-                  {card.title}
+                <h3 className="font-heading text-[1.35rem] font-semibold tracking-[-0.04em] text-[var(--green-dark)]">
+                  {group.title}
                 </h3>
-                <p className="mt-4 text-[15px] leading-7 text-[var(--text-secondary)]">
-                  {card.copy}
-                </p>
+                <div className="mt-4 grid gap-3">
+                  {group.items.map((item) => (
+                    <div
+                      key={item.title}
+                      className="rounded-[18px] border border-[var(--border-soft)] bg-white px-4 py-3"
+                    >
+                      <p className="text-[14px] font-black text-[var(--text-main)]">
+                        {item.title}
+                      </p>
+                      <p className="mt-2 text-[13px] leading-6 text-[var(--text-secondary)]">
+                        {item.copy}
+                      </p>
+                    </div>
+                  ))}
+                </div>
               </article>
             ))}
           </div>
-          <p className="mx-auto mt-9 max-w-3xl text-center font-heading text-[1.75rem] font-semibold leading-tight tracking-[-0.045em] text-[var(--green-dark)] sm:text-[2.3rem]">
-            You should not need a science degree to understand what you are
-            buying.
-          </p>
         </section>
 
         <section
           id="how"
-          className="rounded-[42px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#ffffff_0%,#f6fbf4_58%,#fff8df_100%)] p-5 shadow-[var(--shadow)] sm:p-8"
+          className="mt-8 rounded-[42px] border border-[var(--border-soft)] bg-[linear-gradient(135deg,#ffffff_0%,#f6fbf4_58%,#fff8df_100%)] p-5 shadow-[var(--shadow)] sm:p-8"
         >
           <SectionIntro
-            eyebrow="The solution"
-            title="Truthlabel checks the label for you."
-            copy="Scan a product and receive a clear breakdown of the ingredients, processing signals, personalized warnings, and reasons behind every important finding."
+            eyebrow="How it works"
+            title="Scan, check, decide."
+            copy="Truthlabel turns a product label into a focused result: what was found, why it was flagged, and what action may make sense."
           />
           <div className="mt-8 grid gap-4 lg:grid-cols-3">
             {howSteps.map((item) => (
@@ -661,103 +660,29 @@ export default function LandingPage() {
               </article>
             ))}
           </div>
-          <div className="mt-6 rounded-[30px] border border-[var(--green-border)] bg-white p-5">
-            <div className="grid gap-3 md:grid-cols-4">
-              {["Barcode", "OCR label photo", "Manual ingredients", "Result page"].map(
-                (item, index) => (
-                  <div key={item} className="flex items-center gap-3">
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--green-bg)] text-[12px] font-black text-[var(--green-dark)]">
-                      {index + 1}
-                    </span>
-                    <span className="text-[13px] font-bold text-[var(--text-main)]">
-                      {item}
-                    </span>
-                  </div>
-                ),
-              )}
+        </section>
+
+        <section className="mt-8 rounded-[34px] border border-[var(--border-soft)] bg-white px-5 py-6 shadow-[0_14px_32px_rgba(23,20,18,0.06)] sm:px-8">
+          {/* Future visual note: replace this compact strip with a carousel of real app screenshots: scan input, Quick Overview, Deep Exposure explanations, Final Verdict, and allergy Watch List result. */}
+          <div className="grid gap-5 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
+            <div>
+              <p className="text-[12px] font-black uppercase tracking-[0.2em] text-[var(--green-main)]">
+                App in action
+              </p>
+              <h2 className="mt-3 font-heading text-[1.85rem] font-semibold leading-tight tracking-[-0.05em] text-[var(--text-main)] sm:text-[2.3rem]">
+                Results should feel quick, visual, and clear.
+              </h2>
             </div>
-          </div>
-        </section>
-
-        <section id="checks" className="py-14 sm:py-20">
-          <SectionIntro
-            eyebrow="More than a basic nutrition score"
-            title="What Truthlabel checks"
-            copy="Truthlabel looks beyond calories and macros to explain the ingredients and safety signals that may affect your decision."
-            align="center"
-          />
-          <div className="mt-8 grid gap-5 lg:grid-cols-3">
-            {checkGroups.map((group) => (
-              <article
-                key={group.title}
-                className="rounded-[34px] border border-[var(--border-soft)] bg-white p-5 shadow-[0_16px_36px_rgba(23,20,18,0.06)]"
-              >
-                <h3 className="font-heading text-[1.55rem] font-semibold tracking-[-0.04em] text-[var(--green-dark)]">
-                  {group.title}
-                </h3>
-                <div className="mt-5 grid gap-3">
-                  {group.items.map((item) => (
-                    <div
-                      key={item.title}
-                      className="rounded-[22px] border border-[var(--border-soft)] bg-[var(--bg-soft)] px-4 py-4"
-                    >
-                      <p className="text-[14px] font-black text-[var(--text-main)]">
-                        {item.title}
-                      </p>
-                      <p className="mt-2 text-[13px] leading-6 text-[var(--text-secondary)]">
-                        {item.copy}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section className="rounded-[42px] border border-[var(--border-soft)] bg-white p-5 shadow-[var(--shadow)] sm:p-8">
-          <SectionIntro
-            eyebrow="The result experience"
-            title="Not just a warning - a clear explanation"
-            copy="Every important finding tells you what was detected, why it was flagged, and what the result means for you."
-            align="center"
-          />
-          <div className="mt-8 grid gap-4 lg:grid-cols-3">
-            {resultExamples.map((example) => {
-              const toneClass =
-                example.tone === "red"
-                  ? "border-[var(--red-border)] bg-[var(--red-bg)] text-[var(--red-dark)]"
-                  : example.tone === "yellow"
-                    ? "border-[var(--amber-border)] bg-[var(--amber-bg)] text-[var(--amber-dark)]"
-                    : "border-[var(--green-border)] bg-[var(--green-bg)] text-[var(--green-dark)]";
-
-              return (
-                <article
-                  key={example.title}
-                  className="rounded-[30px] border border-[var(--border-soft)] bg-white p-5 shadow-[0_14px_34px_rgba(23,20,18,0.06)]"
+            <div className="grid gap-3 sm:grid-cols-3">
+              {["Scan label", "See warnings", "Read action"].map((item) => (
+                <div
+                  key={item}
+                  className="rounded-[22px] border border-[var(--green-border)] bg-[var(--green-bg)] px-4 py-4 text-[13px] font-black text-[var(--green-dark)]"
                 >
-                  <span
-                    className={`inline-flex rounded-full border px-3 py-1 text-[11px] font-black uppercase tracking-[0.14em] ${toneClass}`}
-                  >
-                    {example.badge}
-                  </span>
-                  <h3 className="mt-5 font-heading text-[1.55rem] font-semibold tracking-[-0.04em] text-[var(--text-main)]">
-                    {example.title}
-                  </h3>
-                  <p className="mt-3 text-[14px] leading-7 text-[var(--text-secondary)]">
-                    {example.copy}
-                  </p>
-                  <div className="mt-4 rounded-[20px] border border-[var(--border-soft)] bg-[var(--bg-soft)] px-4 py-3">
-                    <p className="text-[11px] font-black uppercase tracking-[0.16em] text-[var(--text-muted)]">
-                      Action
-                    </p>
-                    <p className="mt-1 text-[13px] font-bold leading-6 text-[var(--text-main)]">
-                      {example.action}
-                    </p>
-                  </div>
-                </article>
-              );
-            })}
+                  {item}
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 
@@ -808,132 +733,55 @@ export default function LandingPage() {
           </p>
         </section>
 
-        <section
-          id="different"
-          className="rounded-[42px] border border-[var(--border-soft)] bg-white p-5 shadow-[var(--shadow)] sm:p-8"
-        >
-          <SectionIntro
-            eyebrow="Why Truthlabel"
-            title="A score alone does not tell you enough"
-            copy="Truthlabel is designed to help you understand the decision - not simply accept a number."
-          />
-          <div className="mt-8 overflow-hidden rounded-[30px] border border-[var(--border-soft)]">
-            <div className="grid bg-[var(--text-main)] text-[12px] font-black uppercase tracking-[0.16em] text-white sm:grid-cols-2">
-              <div className="px-5 py-4">Ordinary scanner experience</div>
-              <div className="border-t border-white/12 px-5 py-4 sm:border-l sm:border-t-0">
-                Truthlabel
-              </div>
-            </div>
-            {comparisonRows.map((row) => (
-              <div
-                key={row.ordinary}
-                className="grid border-t border-[var(--border-soft)] bg-white sm:grid-cols-2"
-              >
-                <div className="px-5 py-4 text-[14px] leading-6 text-[var(--text-secondary)]">
-                  {row.ordinary}
-                </div>
-                <div className="border-t border-[var(--border-soft)] bg-[var(--green-bg)] px-5 py-4 text-[14px] font-bold leading-6 text-[var(--green-dark)] sm:border-l sm:border-t-0">
-                  {row.truthlabel}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="py-14 sm:py-20">
-          <div className="rounded-[44px] border border-[var(--green-border)] bg-[linear-gradient(135deg,#0f3d2d_0%,#15803d_62%,#fcd34d_160%)] p-7 text-white shadow-[0_28px_80px_rgba(21,128,61,0.2)] sm:p-10">
-            <p className="text-[12px] font-black uppercase tracking-[0.22em] text-white/70">
-              Protection layer
-            </p>
-            <h2 className="mt-4 max-w-3xl font-heading text-[2.35rem] font-semibold leading-[1] tracking-[-0.055em] sm:text-[3.6rem]">
-              Bring more confidence to every food choice
-            </h2>
-            <div className="mt-6 grid gap-5 text-[16px] leading-8 text-white/82 lg:grid-cols-2">
-              <p>
-                You cannot control everything used in modern food - but you can
-                become more informed about what you bring home.
+        <section className="rounded-[34px] border border-[var(--border-soft)] bg-white px-5 py-6 shadow-[0_14px_32px_rgba(23,20,18,0.06)] sm:px-8">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="max-w-2xl">
+              <p className="text-[12px] font-black uppercase tracking-[0.2em] text-[var(--green-main)]">
+                Everyday decisions
               </p>
-              <p>
-                Truthlabel gives you a faster way to notice serious warnings,
-                recognize heavily processed products, and stay aware of the
-                ingredients that matter to you.
-              </p>
+              <h2 className="mt-2 font-heading text-[1.85rem] font-semibold leading-tight tracking-[-0.05em] text-[var(--text-main)] sm:text-[2.35rem]">
+                Use it where food choices actually happen.
+              </h2>
             </div>
-            <p className="mt-8 max-w-3xl font-heading text-[1.7rem] font-semibold leading-tight tracking-[-0.04em] sm:text-[2.4rem]">
-              One scan can reveal what the front of the package never
-              explained.
+            <p className="max-w-lg text-[14px] leading-6 text-[var(--text-secondary)]">
+              A quick check can help you notice serious warnings, recognize
+              heavily processed products, and stay aware of ingredients that
+              matter to you.
             </p>
           </div>
-        </section>
-
-        <section>
-          <SectionIntro
-            eyebrow="Everyday decisions"
-            title="Use it wherever food decisions happen"
-            copy="Until real customer stories arrive, Truthlabel focuses on realistic use cases instead of made-up testimonials."
-            align="center"
-          />
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="mt-5 flex flex-wrap gap-2">
             {useCases.map((item) => (
-              <article
+              <div
                 key={item.title}
-                className="rounded-[28px] border border-[var(--border-soft)] bg-white p-5 shadow-[0_14px_32px_rgba(23,20,18,0.05)]"
+                className="rounded-full border border-[var(--green-border)] bg-[var(--green-bg)] px-4 py-2 text-[12px] font-black text-[var(--green-dark)]"
               >
-                <h3 className="font-heading text-[1.25rem] font-semibold tracking-[-0.04em] text-[var(--text-main)]">
-                  {item.title}
-                </h3>
-                <p className="mt-3 text-[13px] leading-6 text-[var(--text-secondary)]">
-                  {item.copy}
-                </p>
-              </article>
+                {item.title}
+              </div>
             ))}
-          </div>
-        </section>
-
-        <section className="py-14 sm:py-20">
-          <div className="rounded-[42px] border border-[var(--border-soft)] bg-[var(--bg-soft)] p-5 shadow-[var(--shadow)] sm:p-8">
-            <SectionIntro
-              eyebrow="Trust and transparency"
-              title="Clear about what Truthlabel can - and cannot - tell you"
-              copy="A food-label app earns trust by being specific, careful, and honest about uncertainty."
-            />
-            <div className="mt-8 grid gap-4 lg:grid-cols-3">
-              {trustCards.map((card) => (
-                <article
-                  key={card.title}
-                  className="rounded-[28px] border border-[var(--border-soft)] bg-white px-5 py-5"
-                >
-                  <h3 className="font-heading text-[1.35rem] font-semibold tracking-[-0.04em] text-[var(--text-main)]">
-                    {card.title}
-                  </h3>
-                  <p className="mt-3 text-[14px] leading-7 text-[var(--text-secondary)]">
-                    {card.copy}
-                  </p>
-                </article>
-              ))}
-            </div>
           </div>
         </section>
 
         <section
           id="pricing"
-          className="grid gap-6 rounded-[44px] border border-[var(--green-border)] bg-white p-5 shadow-[var(--shadow)] sm:p-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center"
+          className="mt-8 grid gap-6 rounded-[44px] border border-[var(--green-border)] bg-white p-5 shadow-[var(--shadow)] sm:p-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center"
         >
           <div>
             <p className="text-[12px] font-black uppercase tracking-[0.22em] text-[var(--green-main)]">
-              Full access
+              Trial then full access
             </p>
             <h2 className="mt-3 font-heading text-[2.25rem] font-semibold leading-[1.02] tracking-[-0.055em] text-[var(--text-main)] sm:text-[3.1rem]">
-              Make Truthlabel part of every shopping trip
+              7 days free, then $3.99/month.
             </h2>
             <p className="mt-4 text-[16px] leading-7 text-[var(--text-secondary)] sm:text-[18px]">
-              Get full access to ingredient scanning, personalized Watch Lists,
-              complete category explanations, saved settings, and future
-              Truthlabel improvements.
+              Use Truthlabel as a protection layer for modern food labels:
+              banned or restricted ingredients, personal allergy matches,
+              additive load, processing markers, and safety signals when data is
+              available.
             </p>
             <p className="mt-4 rounded-[20px] border border-[var(--border-soft)] bg-[var(--bg-soft)] px-4 py-3 text-[13px] font-bold leading-6 text-[var(--text-main)]">
-              Current subscription price is shown clearly on the Gumroad
-              checkout page before payment.
+              Start with the 7-day trial. If Truthlabel helps you shop with
+              more awareness, continue for $3.99/month. Checkout confirms the
+              current price before payment.
             </p>
           </div>
           <div className="rounded-[34px] border border-[var(--green-border)] bg-[var(--green-bg)] p-6">
@@ -941,7 +789,7 @@ export default function LandingPage() {
               Truthlabel Full Access
             </p>
             <h3 className="mt-3 font-heading text-[2rem] font-semibold tracking-[-0.05em] text-[var(--text-main)]">
-              One simple plan
+              Trial access now
             </h3>
             <ul className="mt-5 grid gap-3">
               {planIncludes.map((item) => (
@@ -955,16 +803,17 @@ export default function LandingPage() {
               ))}
             </ul>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-              <PrimaryCta href={checkoutUrl}>Get Truthlabel</PrimaryCta>
+              <PrimaryCta href={trialUrl}>Start free trial</PrimaryCta>
               <Link
-                href="/sign-in"
+                href={checkoutUrl}
                 className="inline-flex items-center justify-center rounded-full border border-[var(--green-border)] bg-white px-5 py-3 text-[12px] font-black uppercase tracking-[0.14em] text-[var(--green-dark)]"
               >
-                Already have access?
+                Subscribe
               </Link>
             </div>
             <p className="mt-4 text-[12px] font-bold leading-5 text-[var(--green-dark)]">
-              Secure subscription checkout through Gumroad.
+              Trial access is created through your Truthlabel account. Secure
+              subscription checkout confirms billing before payment.
             </p>
           </div>
         </section>
@@ -1005,7 +854,7 @@ export default function LandingPage() {
             greater confidence.
           </p>
           <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
-            <PrimaryCta href={checkoutUrl}>Get Truthlabel</PrimaryCta>
+            <PrimaryCta href={trialUrl}>Start free trial</PrimaryCta>
             <Link
               href="/sign-in"
               className="inline-flex items-center justify-center rounded-full border border-white/18 bg-white px-6 py-3 text-[13px] font-bold uppercase tracking-[0.15em] text-[var(--text-main)]"
@@ -1037,7 +886,8 @@ export default function LandingPage() {
               <a href="#how">How it works</a>
               <a href="#checks">What we check</a>
               <Link href="/sign-in">Sign in</Link>
-              <a href={checkoutUrl}>Get Truthlabel</a>
+              <a href={trialUrl}>Start free trial</a>
+              <a href={checkoutUrl}>Subscribe</a>
               <Link href="/privacy">Privacy Policy</Link>
               <Link href="/terms">Terms</Link>
               <Link href="/health-disclaimer">Health disclaimer</Link>

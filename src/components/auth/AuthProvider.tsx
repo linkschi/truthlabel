@@ -11,17 +11,24 @@ import {
 } from "react";
 import type { User } from "@supabase/supabase-js";
 import {
+  getAccessKind,
   getAccessState,
+  getTrialDaysRemaining,
+  type AccessKind,
   type AccessState,
   type TruthlabelSubscription,
+  type TruthlabelTrialAccess,
 } from "@/lib/auth/access";
 import { getSupabaseBrowserClient } from "@/lib/auth/supabaseClient";
 import { getUserSettings } from "@/lib/userSettings/userSettingsStorage";
 
 type AuthContextValue = {
   accessState: AccessState;
+  accessKind: AccessKind;
   user: User | null;
   subscription: TruthlabelSubscription | null;
+  trialAccess: TruthlabelTrialAccess | null;
+  trialDaysRemaining: number;
   isConfigured: boolean;
   errorMessage: string;
   refreshAccess: () => Promise<void>;
@@ -99,10 +106,43 @@ async function loadSubscription(userId: string) {
   return (data ?? null) as TruthlabelSubscription | null;
 }
 
+function isMissingRelationError(error: { code?: string; message?: string }) {
+  return (
+    error.code === "42P01" ||
+    error.message?.toLowerCase().includes("trial_access") === true
+  );
+}
+
+async function loadTrialAccess(userId: string) {
+  const supabase = getSupabaseBrowserClient();
+
+  if (!supabase) {
+    return null;
+  }
+
+  const { data, error } = await supabase
+    .from("trial_access")
+    .select("trial_started_at, trial_ends_at")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (error) {
+    if (isMissingRelationError(error)) {
+      return null;
+    }
+
+    throw error;
+  }
+
+  return (data ?? null) as TruthlabelTrialAccess | null;
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [subscription, setSubscription] =
     useState<TruthlabelSubscription | null>(null);
+  const [trialAccess, setTrialAccess] =
+    useState<TruthlabelTrialAccess | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const supabase = getSupabaseBrowserClient();
@@ -129,13 +169,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (!currentUser) {
         setSubscription(null);
+        setTrialAccess(null);
         return;
       }
 
       await ensureUserSettingsRow(currentUser.id);
-      setSubscription(await loadSubscription(currentUser.id));
+      const [nextSubscription, nextTrialAccess] = await Promise.all([
+        loadSubscription(currentUser.id),
+        loadTrialAccess(currentUser.id),
+      ]);
+      setSubscription(nextSubscription);
+      setTrialAccess(nextTrialAccess);
     } catch (error) {
       setSubscription(null);
+      setTrialAccess(null);
       setErrorMessage(
         error instanceof Error
           ? error.message
@@ -162,18 +209,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (!nextUser) {
         setSubscription(null);
+        setTrialAccess(null);
         setIsLoading(false);
         return;
       }
 
       void ensureUserSettingsRow(nextUser.id)
-        .then(() => loadSubscription(nextUser.id))
-        .then((nextSubscription) => {
+        .then(() =>
+          Promise.all([
+            loadSubscription(nextUser.id),
+            loadTrialAccess(nextUser.id),
+          ]),
+        )
+        .then(([nextSubscription, nextTrialAccess]) => {
           setSubscription(nextSubscription);
+          setTrialAccess(nextTrialAccess);
           setErrorMessage("");
         })
         .catch((error: unknown) => {
           setSubscription(null);
+          setTrialAccess(null);
           setErrorMessage(
             error instanceof Error
               ? error.message
@@ -193,13 +248,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     authLoading: isLoading,
     userPresent: Boolean(user),
     subscription,
+    trialAccess,
   });
+  const accessKind = getAccessKind({ subscription, trialAccess });
+  const trialDaysRemaining = getTrialDaysRemaining(trialAccess);
 
   const value = useMemo<AuthContextValue>(
     () => ({
       accessState,
+      accessKind,
       user,
       subscription,
+      trialAccess,
+      trialDaysRemaining,
       isConfigured: Boolean(supabase),
       errorMessage,
       refreshAccess,
@@ -211,9 +272,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await supabase.auth.signOut();
         setUser(null);
         setSubscription(null);
+        setTrialAccess(null);
       },
     }),
-    [accessState, errorMessage, refreshAccess, subscription, supabase, user],
+    [
+      accessKind,
+      accessState,
+      errorMessage,
+      refreshAccess,
+      subscription,
+      supabase,
+      trialAccess,
+      trialDaysRemaining,
+      user,
+    ],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
