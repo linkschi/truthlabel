@@ -587,6 +587,12 @@ export function ActivateScreen() {
     trialDaysRemaining,
     user,
   } = useTruthlabelAuth();
+  const [licenseKey, setLicenseKey] = useState("");
+  const [activationStatus, setActivationStatus] = useState<{
+    tone: "green" | "yellow" | "red";
+    message: string;
+  } | null>(null);
+  const [isActivatingLicense, setIsActivatingLicense] = useState(false);
   const checkoutUrl =
     process.env.NEXT_PUBLIC_GUMROAD_CHECKOUT_URL?.trim() || "https://truthlabel.gumroad.com";
   const isActive = accessState === "active";
@@ -597,6 +603,74 @@ export function ActivateScreen() {
         year: "numeric",
       })
     : "";
+
+  async function handleLicenseActivation(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setActivationStatus(null);
+
+    if (!user) {
+      setActivationStatus({
+        tone: "red",
+        message: "Sign in before activating a Gumroad license.",
+      });
+      return;
+    }
+
+    const trimmedLicenseKey = licenseKey.trim();
+
+    if (trimmedLicenseKey.length < 8) {
+      setActivationStatus({
+        tone: "red",
+        message: "Enter the Gumroad license key from your purchase email.",
+      });
+      return;
+    }
+
+    setIsActivatingLicense(true);
+
+    try {
+      const supabase = getSupabaseBrowserClient();
+
+      if (!supabase) {
+        throw new Error("Account access is not configured yet.");
+      }
+
+      const { data, error } = await supabase.functions.invoke<{
+        activated?: boolean;
+        message?: string;
+        status?: string;
+      }>("verify-gumroad-license", {
+        body: { licenseKey: trimmedLicenseKey },
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (!data?.activated) {
+        throw new Error(
+          data?.message || "Truthlabel could not activate this license key.",
+        );
+      }
+
+      setLicenseKey("");
+      setActivationStatus({
+        tone: "green",
+        message: data.message || "Paid Truthlabel access is active.",
+      });
+      await refreshAccess();
+    } catch (error) {
+      setActivationStatus({
+        tone: "red",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Truthlabel could not verify this Gumroad license.",
+      });
+    } finally {
+      setIsActivatingLicense(false);
+    }
+  }
 
   return (
     <AuthShell
@@ -679,14 +753,51 @@ export function ActivateScreen() {
         ) : null}
       </div>
 
+      <form
+        onSubmit={handleLicenseActivation}
+        className="mt-5 rounded-[20px] border border-[var(--border-soft)] bg-white px-4 py-4"
+      >
+        <label className="block">
+          <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--text-secondary)]">
+            Gumroad license key
+          </span>
+          <input
+            className={inputClass}
+            type="text"
+            autoComplete="off"
+            inputMode="text"
+            value={licenseKey}
+            onChange={(event) => setLicenseKey(event.target.value)}
+            placeholder="Paste your Gumroad license key"
+          />
+        </label>
+        <p className="mt-2 text-[12px] leading-5 text-[var(--text-secondary)]">
+          Use the license key from your Gumroad purchase email. Truthlabel
+          verifies it securely and stores only a protected license hash.
+        </p>
+        {activationStatus ? (
+          <StatusMessage
+            tone={activationStatus.tone}
+            message={activationStatus.message}
+          />
+        ) : null}
+        <button
+          disabled={isActivatingLicense || !user}
+          className={submitButtonClass(isActivatingLicense || !user)}
+        >
+          {isActivatingLicense ? "Verifying..." : "Activate paid access"}
+        </button>
+      </form>
+
       <div className="mt-5 rounded-[18px] border border-[var(--border-soft)] bg-white px-4 py-3">
         <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--text-secondary)]">
           Trial and license activation
         </p>
         <p className="mt-2 text-[13px] leading-5 text-[var(--text-secondary)]">
           The 7-day trial is created by Supabase when your account is created.
-          Gumroad license-key verification is the next backend step for paid
-          access after the trial. Membership and cancellation are managed
+          Gumroad license-key verification can activate paid access after the
+          trial once the Supabase Edge Function is deployed. Membership and
+          cancellation are managed
           through the secure checkout flow.
         </p>
       </div>
