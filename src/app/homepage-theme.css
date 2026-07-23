@@ -1,0 +1,163 @@
+.landing-urgent {
+  --bg-page: #fff9ed;
+  --bg-surface: #ffffff;
+  --bg-soft: #fff0d7;
+  --text-main: #21100d;
+  --text-secondary: #70443b;
+  --text-muted: #94665b;
+  --border-soft: #ffd6b7;
+  --border-strong: #ffb474;
+  --red-main: #e51d36;
+  --red-dark: #a90e25;
+  --red-bg: #ffe4e8;
+  --red-border: #ff98a7;
+  --amber-main: #ff7a00;
+  --amber-dark: #9b3400;
+  --amber-bg: #fff0ad;
+  --amber-border: #ffc329;
+  --green-main: #16a34a;
+  --green-dark: #15803d;
+  --green-bg: #ecfdf3;
+  --green-border: #86efac;
+  --neutral-bg: #fff2e3;
+  --neutral-text: #5e3a32;
+  --shadow: 0 22px 54px rgba(190, 43, 13, 0.14);
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 8% 4%, rgba(255, 203, 38, 0.55), transparent 24rem),
+    radial-gradient(circle at 94% 13%, rgba(255, 68, 61, 0.25), transparent 26rem),
+    linear-gradient(145deg, #fff9ed 0%, #fff3dc 42%, #ffe4cf 100%);
+}
+
+.landing-urgent::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: linear-gradient(
+    115deg,
+    transparent 0%,
+    transparent 47%,
+    rgba(255, 255, 255, 0.4) 47%,
+    rgba(255, 255, 255, 0.4) 49%,
+    transparent 49%,
+    transparent 100%
+  );
+  background-size: 92px 92px;
+  content: "";
+  opacity: 0.34;
+  pointer-events: none;
+}
+
+.landing-urgent-header {
+  border-color: rgba(255, 116, 55, 0.4);
+  background: rgba(255, 253, 247, 0.9);
+  box-shadow: 0 16px 42px rgba(148, 32, 9, 0.13);
+}
+
+.landing-urgent-brand-mark {
+  background: linear-gradient(145deg, #22c55e 0%, #16a34a 52%, #15803d 100%);
+  box-shadow: 0 14px 30px rgba(21, 128, 61, 0.24);
+}
+
+.landing-urgent-hero {
+  margin-top: 1rem;
+  background:
+    radial-gradient(circle at 14% 24%, rgba(255, 202, 40, 0.75), transparent 13rem),
+    radial-gradient(circle at 88% 72%, rgba(255, 77, 33, 0.25), transparent 18rem),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(255, 238, 205, 0.96));
+  box-shadow: 0 30px 90px rgba(203, 45, 15, 0.16);
+}
+
+.landing-urgent-hero::before,
+.landing-urgent-hero::after {
+  position: absolute;
+  border-radius: 999px;
+  content: "";
+  pointer-events: none;
+}
+
+.landing-urgent-hero::before {
+  top: -6rem;
+  right: -5rem;
+  width: 18rem;
+  height: 18rem;
+  border: 3rem solid rgba(229, 29, 54, 0.1);
+}
+
+.landing-urgent-hero::after {
+  bottom: -7rem;
+  left: -4rem;
+  width: 17rem;
+  height: 17rem;
+  background: rgba(255, 196, 0, 0.18);
+}
+
+.landing-urgent-hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+.landing-urgent-kicker {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.25rem;
+  border: 1px solid rgba(229, 29, 54, 0.22);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+  padding: 0.55rem 1rem;
+  box-shadow: 0 10px 28px rgba(229, 29, 54, 0.12);
+}
+
+.landing-urgent-title {
+  background: linear-gradient(95deg, #b90f29 0%, #e51d36 38%, #ff4d21 68%, #e76400 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+.landing-urgent .landing-urgent-primary-cta {
+  border-color: rgba(21, 128, 61, 0.2);
+  background: linear-gradient(115deg, #22c55e 0%, #16a34a 52%, #0f7a37 100%);
+  box-shadow: 0 18px 42px rgba(21, 128, 61, 0.28);
+}
+
+.landing-urgent .landing-urgent-primary-cta:hover {
+  background: linear-gradient(115deg, #16a34a 0%, #15803d 58%, #0f6b31 100%);
+  box-shadow: 0 22px 48px rgba(21, 128, 61, 0.34);
+}
+
+.landing-urgent .landing-urgent-secondary-cta {
+  border-color: #86efac;
+  background: rgba(255, 255, 255, 0.92);
+  color: #15803d;
+  box-shadow: 0 14px 32px rgba(21, 128, 61, 0.1);
+}
+
+.landing-urgent .landing-urgent-secondary-cta:hover {
+  border-color: #16a34a;
+  background: #f0fdf4;
+}
+
+.landing-urgent section[id="checks"],
+.landing-urgent section[id="pricing"] {
+  box-shadow: 0 24px 60px rgba(183, 52, 16, 0.13);
+}
+
+@media (max-width: 640px) {
+  .landing-urgent-hero {
+    border-radius: 2rem;
+  }
+
+  .landing-urgent-title {
+    font-size: clamp(3rem, 15vw, 3.7rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-urgent .landing-urgent-primary-cta,
+  .landing-urgent .landing-urgent-secondary-cta {
+    transition: none;
+  }
+}

@@ -1,6 +1,7 @@
 import type { ExposureRiskMainReason } from "@/lib/calculateExposureRisk";
 import {
   extractExternalSafetySignals,
+  isMicroplasticSafetySignal,
   normalizeExternalSafetyText,
   type ExternalSafetySignal,
 } from "@/lib/externalSafety/externalSafetyTypes";
@@ -83,7 +84,11 @@ function getStructuredImmediateStopReason(
   }
 
   if (
-    urgentSignals.some((signal) => contaminationSignalTypes.has(signal.signalType))
+    urgentSignals.some(
+      (signal) =>
+        contaminationSignalTypes.has(signal.signalType) ||
+        isMicroplasticSafetySignal(signal),
+    )
   ) {
     return "confirmed_contamination";
   }

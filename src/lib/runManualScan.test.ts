@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { calculateExposureRisk } from "./calculateExposureRisk";
+import type { ExternalSafetySignal } from "./externalSafety/externalSafetyTypes";
 import { applyIngredientCategoryRules } from "./ingredientCategoryRules";
 import {
   matchIngredientIntelligence,
@@ -75,7 +76,7 @@ function analyzeManualInput(input: ManualScanInput) {
     packagingText,
     allergenStatement,
     userAllergyProfile,
-    externalSignals: [],
+    externalSignals: input.externalSignals ?? [],
   });
 
   const categorySummaries = applyIngredientCategoryRules({
@@ -83,7 +84,7 @@ function analyzeManualInput(input: ManualScanInput) {
     productCategory,
     ingredientListAvailable: true,
     userAllergyProfile,
-    externalSignals: [],
+    externalSignals: input.externalSignals ?? [],
     ingredientCount,
   }).categorySummaries;
 
@@ -95,7 +96,7 @@ function analyzeManualInput(input: ManualScanInput) {
     ingredientCount,
     productCategory,
     userAllergyProfile,
-    externalSignals: [],
+    externalSignals: input.externalSignals ?? [],
   });
 
   return {
@@ -103,6 +104,26 @@ function analyzeManualInput(input: ManualScanInput) {
     categorySummaries,
     exposureRiskResult,
     scanResult: runManualScan(input),
+  };
+}
+
+function mockExternalSafetySignal(
+  overrides: Partial<ExternalSafetySignal>,
+): ExternalSafetySignal {
+  return {
+    id: overrides.id ?? "mock-signal",
+    sourceProvider: overrides.sourceProvider ?? "mock",
+    sourceName: overrides.sourceName ?? "Mock official source",
+    region: overrides.region ?? "US",
+    signalType: overrides.signalType ?? "active_recall",
+    status: overrides.status ?? "active",
+    severity: overrides.severity ?? "red",
+    title: overrides.title ?? "Active official recall",
+    reason: overrides.reason ?? "Official safety signal for test product.",
+    matchedBy: overrides.matchedBy ?? ["product_name", "brand_name"],
+    matchConfidence: overrides.matchConfidence ?? "high",
+    userFacingMessage:
+      overrides.userFacingMessage ?? "Official safety signal found.",
   };
 }
 
@@ -255,6 +276,141 @@ test("Milk extracted through OCR still makes Allergy Risk red when the profile m
   assert.equal(allergySummary.severity, "red");
   assert.equal(allergySummary.redReasonType, "allergy_profile_match");
   assert.equal(output.scanResult.finalVerdict.verdictTone, "red");
+});
+
+test("simple olive oil stays natural/simple and does not create a high processed-share warning", () => {
+  const output = analyzeManualInput({
+    productName: "Extra Virgin Olive Oil",
+    productCategory: "Fresh / Simple Foods",
+    ingredientText: "Extra virgin olive oil",
+  });
+  const naturalVsProcessed = findCategorySummary(output, "natural_vs_processed");
+
+  assert.equal(output.scanResult.finalVerdict.verdictTone, "green");
+  assert.equal(output.scanResult.productHero.exposureRisk, 0);
+  assert.equal(naturalVsProcessed.severity, "green");
+  assert.equal(output.scanResult.ingredientBreakdown.naturalPositive.length, 1);
+  assert.equal(output.scanResult.ingredientBreakdown.processedArtificial.length, 0);
+});
+
+test("citric acid in a drink does not create a fry-oil warning without frying context", () => {
+  const output = runManualScan({
+    productName: "Fruit Flavour Drink",
+    productCategory: "Drinks / Beverages",
+    ingredientText: "Water, sugar, fruit flavour, citric acid",
+  });
+  const fryOilRow = output.deepExposureChecks.find(
+    (row) => row.categoryId === "fry_oil_fast_food_oil",
+  );
+
+  assert.equal(fryOilRow, undefined);
+});
+
+test("gums in non-meat products do not create meat-specific concerns", () => {
+  const output = runManualScan({
+    productName: "Shelf Stable Sauce",
+    productCategory: "Sauces / Condiments",
+    ingredientText:
+      "Water, tomato paste, sodium benzoate, potassium sorbate, calcium propionate, xanthan gum",
+  });
+  const meatRow = output.quickOverview.find(
+    (row) => row.categoryId === "meat_specific_concerns",
+  );
+
+  assert.equal(meatRow, undefined);
+});
+
+test("chicken and beef flavour wording does not create meat-specific concerns in snacks", () => {
+  const chickenOutput = runManualScan({
+    productName: "Chicken Flavour Crisps",
+    productCategory: "Processed Snacks",
+    ingredientText:
+      "Potatoes, sunflower oil, chicken flavour, salt, monosodium glutamate",
+  });
+  const beefOutput = runManualScan({
+    productName: "Beef Flavour Noodles",
+    productCategory: "Processed Snacks",
+    ingredientText:
+      "Wheat flour, palm oil, beef flavour, salt, monosodium glutamate",
+  });
+
+  assert.equal(
+    chickenOutput.quickOverview.find(
+      (row) => row.categoryId === "meat_specific_concerns",
+    ),
+    undefined,
+  );
+  assert.equal(
+    beefOutput.quickOverview.find(
+      (row) => row.categoryId === "meat_specific_concerns",
+    ),
+    undefined,
+  );
+});
+
+test("structured medium-confidence external safety signals create a yellow Brand Trust review", () => {
+  const output = runManualScan({
+    productName: "Possible Recall Sauce",
+    productCategory: "Sauces / Condiments",
+    ingredientText: "Tomato, water, salt",
+    externalSignals: [
+      mockExternalSafetySignal({
+        id: "medium-active-recall",
+        title: "Possible active recall match",
+        signalType: "active_recall",
+        severity: "yellow",
+        matchConfidence: "medium",
+      }),
+    ],
+  });
+
+  assert.equal(output.brandTrustSafety.status, "yellow_review");
+  assert.equal(output.brandTrustSafety.severity, "yellow");
+});
+
+test("structured heavy-metal safety signals sync Heavy Metals with Brand Trust", () => {
+  const output = runManualScan({
+    productName: "Mock Lead Applesauce",
+    productCategory: "Baby / Kids Food",
+    ingredientText: "Apple puree, cinnamon",
+    externalSignals: [
+      mockExternalSafetySignal({
+        id: "lead-warning",
+        title: "Official lead warning",
+        signalType: "heavy_metal_warning",
+        reason: "Verified product-specific lead warning.",
+      }),
+    ],
+  });
+
+  assert.equal(output.finalVerdict.headline, "Do not consume");
+  assert.equal(output.productHero.exposureRisk, 90);
+  assert.equal(output.brandTrustSafety.status, "red_warning");
+  assert.equal(output.brandTrustSafety.severity, "red");
+  assert.equal(
+    output.quickOverview.find((row) => row.categoryId === "heavy_metals")?.severity,
+    "red",
+  );
+});
+
+test("structured microplastic safety signals can trigger an urgent external verdict", () => {
+  const output = runManualScan({
+    productName: "Mock Plastic Fragment Water",
+    productCategory: "Drinks / Beverages",
+    ingredientText: "Water",
+    externalSignals: [
+      mockExternalSafetySignal({
+        id: "microplastic-warning",
+        title: "Official microplastic detection warning",
+        signalType: "other_safety_signal",
+        reason: "Verified product-specific microplastic detection warning.",
+      }),
+    ],
+  });
+
+  assert.equal(output.finalVerdict.headline, "Do not consume");
+  assert.equal(output.productHero.exposureRisk, 90);
+  assert.equal(output.brandTrustSafety.status, "red_warning");
 });
 
 test("runManualScan falls back to saved allergy profile and default category from user settings", () => {

@@ -33,6 +33,7 @@ yarn-error.log*
 .next-dev.log
 .codex-next-dev*.log
 .truthlabel-dev*.log
+truthlabel-dev*.log
 
 # OpenNext / Wrangler
 .open-next

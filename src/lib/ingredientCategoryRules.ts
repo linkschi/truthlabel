@@ -18,6 +18,12 @@ import { preservativesShelfLifeSystemsDataPack } from "@/data/ingredientIntellig
 import { seedOilsProcessedOilsDataPack } from "@/data/ingredientIntelligence/seedOilsProcessedOils";
 import { ultraProcessedIndicatorsDataPack } from "@/data/ingredientIntelligence/ultraProcessedIndicators";
 import {
+  isExternalSafetySignal,
+  isHeavyMetalSafetySignal,
+  isMicroplasticSafetySignal,
+  signalHasKeyword,
+} from "@/lib/externalSafety/externalSafetyTypes";
+import {
   mergedArtificialColours,
   type MergedArtificialColour,
 } from "@/lib/ingredientIntelligence/artificialColours";
@@ -191,6 +197,93 @@ const externalLookupKeywords: Record<CategoryId, string[]> = {
   natural_vs_processed: [],
   additives_and_preservatives: [],
 };
+
+const meatSpecificContextTerms = [
+  "meat",
+  "fast food",
+  "poultry",
+  "chicken",
+  "beef",
+  "pork",
+  "ham",
+  "bacon",
+  "sausage",
+  "deli",
+  "burger",
+  "patty",
+  "nugget",
+  "turkey",
+  "seafood",
+  "fish",
+  "shrimp",
+  "prawn",
+  "hot dog",
+  "frankfurter",
+  "luncheon",
+];
+
+const contextDependentMeatSpecificIds = new Set([
+  "carrageenan",
+  "carrageenans",
+  "xanthan_gum",
+  "guar_gum",
+  "locust_bean_gum",
+  "cellulose_gum",
+  "carboxymethylcellulose",
+  "sodium_carboxymethylcellulose",
+  "cmc",
+  "soy_protein",
+  "soya_protein",
+  "soy_protein_isolate",
+  "soya_protein_isolate",
+  "soy_protein_concentrate",
+  "soya_protein_concentrate",
+  "pea_protein",
+  "wheat_protein",
+  "gluten",
+  "potato_starch",
+  "tapioca_starch",
+  "modified_starch",
+  "breadcrumbs",
+  "bread_crumbs",
+  "rusk",
+]);
+
+const fryOilContextTerms = [
+  "fried",
+  "deep fried",
+  "frying",
+  "fryer",
+  "fast food",
+  "fries",
+  "chips",
+  "crisps",
+  "hash brown",
+  "onion ring",
+  "nugget",
+  "fried chicken",
+  "fish finger",
+  "fish stick",
+  "breaded",
+  "battered",
+  "coated",
+  "crumbed",
+  "shortening",
+  "frying fat",
+  "oil",
+  "processed snack",
+  "snack",
+];
+
+const fryOilContextDependentIds = new Set([
+  "tbhq",
+  "bha",
+  "bht",
+  "tocopherols",
+  "mixed_tocopherols",
+  "rosemary_extract",
+  "citric_acid",
+]);
 
 const artificialColourRedIds = new Set(
   mergedArtificialColours
@@ -548,6 +641,67 @@ function getMatchLookupTexts(match: IngredientIntelligenceDuplicateSafeMatch) {
   ])
     .map((value) => normalizeIngredientIntelligenceText(value))
     .filter(Boolean);
+}
+
+function getRulesProductContext(input: Pick<IngredientCategoryRulesInput, "productCategory">) {
+  return normalizeIngredientIntelligenceText(input.productCategory ?? "");
+}
+
+function hasAnyContextTerm(context: string, terms: string[]) {
+  return terms.some((term) =>
+    containsWholeTerm(context, normalizeIngredientIntelligenceText(term)),
+  );
+}
+
+function matchHasAnyIdOrText(
+  match: IngredientIntelligenceDuplicateSafeMatch,
+  idsOrTerms: Set<string>,
+) {
+  const normalizedIdsOrTerms = new Set(
+    [...idsOrTerms].map(normalizeIngredientIntelligenceText),
+  );
+  const lookupTexts = [
+    match.canonicalIngredientId,
+    ...getMatchLookupTexts(match),
+  ].map(normalizeIngredientIntelligenceText);
+
+  return lookupTexts.some((text) => normalizedIdsOrTerms.has(text));
+}
+
+function filterMeatSpecificMatchesForContext(
+  matches: IngredientIntelligenceDuplicateSafeMatch[],
+  input: Pick<IngredientCategoryRulesInput, "productCategory">,
+) {
+  const context = getRulesProductContext(input);
+  const hasMeatContext = hasAnyContextTerm(context, meatSpecificContextTerms);
+
+  if (hasMeatContext) {
+    return matches;
+  }
+
+  return matches.filter(
+    (match) => !matchHasAnyIdOrText(match, contextDependentMeatSpecificIds),
+  );
+}
+
+function filterFryOilMatchesForContext(
+  matches: IngredientIntelligenceDuplicateSafeMatch[],
+  input: Pick<IngredientCategoryRulesInput, "productCategory">,
+) {
+  const context = getRulesProductContext(input);
+  const hasFryContext =
+    hasAnyContextTerm(context, fryOilContextTerms) ||
+    matches.some(
+      (match) => !matchHasAnyIdOrText(match, fryOilContextDependentIds),
+    );
+
+  if (hasFryContext) {
+    return matches;
+  }
+
+  return matches.filter(
+    (match) => !matchHasAnyIdOrText(match, fryOilContextDependentIds),
+  );
 }
 
 const constructionGroupMarkerLookup = artificialEngineeredFoodConstructionGroups.map(
@@ -969,7 +1123,8 @@ function buildHeavyMetalsSummary(
   input: IngredientCategoryRulesInput,
 ) {
   const lookupState = getExternalLookupState("heavy_metals", input.externalSignals);
-  const verifiedRed = matches.some(isHeavyMetalsVerifiedRed);
+  const verifiedRed =
+    matches.some(isHeavyMetalsVerifiedRed) || lookupState.verifiedRed;
   const concernMatches = getConcernMatches(matches, "heavy_metals");
 
   if (verifiedRed) {
@@ -1032,7 +1187,8 @@ function buildMicroplasticsSummary(
   input: IngredientCategoryRulesInput,
 ) {
   const lookupState = getExternalLookupState("microplastics", input.externalSignals);
-  const verifiedRed = matches.some(isMicroplasticsVerifiedRed);
+  const verifiedRed =
+    matches.some(isMicroplasticsVerifiedRed) || lookupState.verifiedRed;
   const concernMatches = getConcernMatches(matches, "microplastics");
 
   if (verifiedRed) {
@@ -1108,7 +1264,7 @@ function buildBrandTrustSummary(
     getMatchLookupTexts(match).some((text) => containsWholeTerm(text, "historical recall")),
   );
 
-  if (redMatch) {
+  if (redMatch || lookupState.verifiedRed) {
     const message =
       "Official recall or public health alert found for this product or batch. Check the affected lot/date details.";
     return buildBaseSummary("brand_trust_safety", matches, {
@@ -1131,7 +1287,7 @@ function buildBrandTrustSummary(
     });
   }
 
-  if (lawsuitMatch) {
+  if (lawsuitMatch || lookupState.lawsuit) {
     const message =
       "Lawsuit allegation found. This is not proof unless confirmed by court decision, settlement, or official finding.";
     return buildBaseSummary("brand_trust_safety", matches, {
@@ -1142,9 +1298,20 @@ function buildBrandTrustSummary(
     });
   }
 
-  if (historicalRecallMatch) {
+  if (historicalRecallMatch || lookupState.historical) {
     const message =
       "Historical recall found. This may not apply to the current product or batch.";
+    return buildBaseSummary("brand_trust_safety", matches, {
+      severity: "yellow",
+      displayLabel: "Review",
+      shortMessage: message,
+      userFacingReason: message,
+    });
+  }
+
+  if (lookupState.yellowReview) {
+    const message =
+      "Possible safety alert match found. Check product, brand, lot code, date, and region.";
     return buildBaseSummary("brand_trust_safety", matches, {
       severity: "yellow",
       displayLabel: "Review",
@@ -1375,10 +1542,15 @@ function getExternalLookupState(
   const keywords = externalLookupKeywords[categoryId];
   let lookupPerformed = false;
   let clean = false;
+  let verifiedRed = false;
+  let yellowReview = false;
+  let historical = false;
+  let lawsuit = false;
 
   (externalSignals ?? []).forEach((signal) => {
     const flattened = flattenExternalSignalInput(signal);
     const normalized = normalizeIngredientIntelligenceText(flattened);
+    const structuredSignal = isExternalSafetySignal(signal) ? signal : null;
     const signalObject =
       signal && typeof signal === "object" && !Array.isArray(signal)
         ? (signal as Record<string, unknown>)
@@ -1394,6 +1566,16 @@ function getExternalLookupState(
           ),
         )
       : "";
+    const signalTypeText = signalObject
+      ? normalizeIngredientIntelligenceText(
+          String(signalObject.signalType ?? signalObject.type ?? ""),
+        )
+      : "";
+    const confidenceText = signalObject
+      ? normalizeIngredientIntelligenceText(
+          String(signalObject.matchConfidence ?? signalObject.confidence ?? ""),
+        )
+      : "";
     const statusText = signalObject
       ? normalizeIngredientIntelligenceText(
           flattenExternalSignalInput([
@@ -1403,12 +1585,25 @@ function getExternalLookupState(
             signalObject.outcome,
             signalObject.state,
             signalObject.severity,
+            signalObject.signalType,
+            signalObject.matchConfidence,
+            signalObject.title,
+            signalObject.reason,
           ]),
         )
       : normalized;
+    const appliesByStructuredSignal =
+      structuredSignal &&
+      ((categoryId === "brand_trust_safety" &&
+        structuredSignal.matchConfidence !== "low") ||
+        (categoryId === "heavy_metals" &&
+          isHeavyMetalSafetySignal(structuredSignal)) ||
+        (categoryId === "microplastics" &&
+          isMicroplasticSafetySignal(structuredSignal)));
     const applies =
       explicitCategory === normalizeIngredientIntelligenceText(categoryId) ||
-      keywords.some((keyword) => containsWholeTerm(normalized, keyword));
+      keywords.some((keyword) => containsWholeTerm(normalized, keyword)) ||
+      Boolean(appliesByStructuredSignal);
 
     if (!applies) {
       return;
@@ -1422,8 +1617,64 @@ function getExternalLookupState(
       containsWholeTerm(normalized, "checked") ||
       containsWholeTerm(normalized, "database");
 
-    if (hasLookupMarker) {
+    if (hasLookupMarker || structuredSignal) {
       lookupPerformed = true;
+    }
+
+    const isHighConfidence =
+      confidenceText === "high" || structuredSignal?.matchConfidence === "high";
+    const isMediumConfidence =
+      confidenceText === "medium" ||
+      structuredSignal?.matchConfidence === "medium";
+    const isRedSignal =
+      statusText.includes(" red ") ||
+      containsWholeTerm(statusText, "red") ||
+      structuredSignal?.severity === "red";
+    const isYellowSignal =
+      statusText.includes(" yellow ") ||
+      containsWholeTerm(statusText, "yellow") ||
+      structuredSignal?.severity === "yellow";
+    const isCurrentSignal =
+      containsWholeTerm(statusText, "active") ||
+      containsWholeTerm(statusText, "unknown") ||
+      structuredSignal?.status === "active" ||
+      structuredSignal?.status === "unknown";
+    const isHistoricalSignal =
+      containsWholeTerm(statusText, "historical") ||
+      containsWholeTerm(statusText, "resolved") ||
+      signalTypeText === "historical recall" ||
+      structuredSignal?.signalType === "historical_recall" ||
+      structuredSignal?.status === "historical" ||
+      structuredSignal?.status === "resolved";
+    const isLawsuitSignal =
+      containsWholeTerm(normalized, "lawsuit") ||
+      signalTypeText === "lawsuit allegation" ||
+      structuredSignal?.signalType === "other_safety_signal" &&
+        signalHasKeyword(structuredSignal, ["lawsuit"]);
+
+    if (isHistoricalSignal) {
+      lookupPerformed = true;
+      historical = true;
+    }
+
+    if (isLawsuitSignal) {
+      lookupPerformed = true;
+      lawsuit = true;
+    }
+
+    if (isRedSignal && isCurrentSignal && (!structuredSignal || isHighConfidence)) {
+      lookupPerformed = true;
+      verifiedRed = true;
+    }
+
+    if (
+      (isYellowSignal && isCurrentSignal) ||
+      (isMediumConfidence && isCurrentSignal) ||
+      containsWholeTerm(normalized, "possible safety alert") ||
+      containsWholeTerm(normalized, "possible active recall")
+    ) {
+      lookupPerformed = true;
+      yellowReview = true;
     }
 
     if (
@@ -1440,7 +1691,7 @@ function getExternalLookupState(
     }
   });
 
-  return { lookupPerformed, clean };
+  return { lookupPerformed, clean, verifiedRed, yellowReview, historical, lawsuit };
 }
 
 function summarizeConstructionCategory(
@@ -1605,8 +1856,14 @@ function summarizeUltraProcessedCategory(
 
 function summarizeMeatSpecificCategory(
   matches: IngredientIntelligenceDuplicateSafeMatch[],
-  ingredientListAvailable: boolean,
+  input: IngredientCategoryRulesInput,
 ) {
+  const ingredientListAvailable = input.ingredientListAvailable;
+  const contextFilteredMatches = filterMeatSpecificMatchesForContext(
+    matches,
+    input,
+  );
+
   if (!ingredientListAvailable && matches.length === 0) {
     return buildBaseSummary("meat_specific_concerns", matches, {
       displayAllowed: false,
@@ -1616,10 +1873,10 @@ function summarizeMeatSpecificCategory(
     });
   }
 
-  const concernMatches = matches.filter(
+  const concernMatches = contextFilteredMatches.filter(
     (match) => !isDirectRedIdMatch(match, meatSpecificGreenIds),
   );
-  const informationalMatches = matches.filter((match) =>
+  const informationalMatches = contextFilteredMatches.filter((match) =>
     isDirectRedIdMatch(match, meatSpecificGreenIds),
   );
 
@@ -1672,7 +1929,7 @@ function summarizeMeatSpecificCategory(
     });
   }
 
-  return buildBaseSummary("meat_specific_concerns", matches, {
+  return buildBaseSummary("meat_specific_concerns", contextFilteredMatches, {
     severity: "green",
     displayLabel: "No",
     shortMessage: "No meat-specific processing marker found from available label data.",
@@ -1899,11 +2156,14 @@ export function summarizeCategoryMatches(
     }),
     summarizeMeatSpecificCategory(
       getCategoryMatches(allMatches, "meat_specific_concerns"),
-      ingredientListAvailable,
+      input,
     ),
     buildCountCategorySummary({
       categoryId: "fry_oil_fast_food_oil",
-      matches: getCategoryMatches(allMatches, "fry_oil_fast_food_oil"),
+      matches: filterFryOilMatchesForContext(
+        getCategoryMatches(allMatches, "fry_oil_fast_food_oil"),
+        input,
+      ),
       ingredientListAvailable,
       redThreshold: 3,
       greenMessage:

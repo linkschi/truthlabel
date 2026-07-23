@@ -7,6 +7,7 @@ import {
 
 import { buildScanResult } from "./buildScanResult";
 import { calculateExposureRisk } from "./calculateExposureRisk";
+import { normalizeExternalSignalsForIngredientScan } from "./externalSafety/deriveExternalSafetySignals";
 import { applyIngredientCategoryRules } from "./ingredientCategoryRules";
 import {
   matchIngredientIntelligence,
@@ -93,7 +94,9 @@ export function runIngredientScan(input: IngredientScanInput): ScanResult {
     input.userAllergyProfile === undefined
       ? getSavedAllergyProfile(userSettings)
       : uniqueStrings(input.userAllergyProfile);
-  const externalSignals = input.externalSignals ?? [];
+  const externalSignals = normalizeExternalSignalsForIngredientScan(
+    input.externalSignals,
+  );
   const scanSource = input.scanSource ?? "manual_paste";
   const productImageUrl = input.productImageUrl?.trim() || undefined;
   const productImageSource = productImageUrl

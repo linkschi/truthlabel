@@ -13,16 +13,18 @@ function AuthShell({
   eyebrow,
   title,
   message,
+  wide = false,
   children,
 }: {
   eyebrow: string;
   title: string;
   message: string;
+  wide?: boolean;
   children: React.ReactNode;
 }) {
   return (
     <main className="min-h-screen px-4 py-6 sm:px-5">
-      <section className="mx-auto max-w-[440px]">
+      <section className={`mx-auto ${wide ? "max-w-4xl" : "max-w-[440px]"}`}>
         <Link
           href="/"
           className="inline-flex items-center gap-2 rounded-full border border-[var(--border-soft)] bg-white px-3 py-2 text-[12px] font-semibold uppercase tracking-[0.14em] text-[var(--text-secondary)]"
@@ -185,9 +187,11 @@ export function SignInScreen() {
 }
 
 export function CreateAccountScreen() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [status, setStatus] = useState<{
     tone: "green" | "yellow" | "red";
     message: string;
@@ -203,6 +207,14 @@ export function CreateAccountScreen() {
       return;
     }
 
+    if (!acceptedTerms) {
+      setStatus({
+        tone: "red",
+        message: "Please accept the Terms and Privacy Policy to continue.",
+      });
+      return;
+    }
+
     setIsBusy(true);
 
     try {
@@ -212,7 +224,7 @@ export function CreateAccountScreen() {
         throw new Error("Account access is not configured yet.");
       }
 
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -225,10 +237,19 @@ export function CreateAccountScreen() {
         throw error;
       }
 
+      if (data.session) {
+        router.replace("/app");
+        router.refresh();
+        return;
+      }
+
+      setPassword("");
+      setConfirmPassword("");
+      setAcceptedTerms(false);
       setStatus({
         tone: "green",
         message:
-          "Check your email to confirm your Truthlabel account. Your 7-day trial will be available after confirmation.",
+          "Check your email to confirm your Truthlabel account. Your 7-day trial is created with the account and will be waiting after confirmation.",
       });
     } catch (error) {
       setStatus({
@@ -246,66 +267,134 @@ export function CreateAccountScreen() {
   return (
     <AuthShell
       eyebrow="Create account"
-      title="Create your Truthlabel account."
-      message="Create an account to start your 7-day free trial. Subscription access can be added later if Truthlabel fits your shopping flow."
+      title="Start your 7-day Truthlabel trial."
+      message="Create your account, confirm your email, then start scanning ingredient labels with your personal Watch List."
+      wide
     >
-      <form onSubmit={handleSubmit} className="mt-5">
-        <label className="block">
-          <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--text-secondary)]">
-            Email
-          </span>
-          <input
-            className={inputClass}
-            type="email"
-            autoComplete="email"
-            required
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-          />
-        </label>
-        <label className="mt-4 block">
-          <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--text-secondary)]">
-            Password
-          </span>
-          <input
-            className={inputClass}
-            type="password"
-            autoComplete="new-password"
-            minLength={8}
-            required
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-          />
-        </label>
-        <label className="mt-4 block">
-          <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--text-secondary)]">
-            Confirm password
-          </span>
-          <input
-            className={inputClass}
-            type="password"
-            autoComplete="new-password"
-            minLength={8}
-            required
-            value={confirmPassword}
-            onChange={(event) => setConfirmPassword(event.target.value)}
-          />
-        </label>
-        {status ? <StatusMessage tone={status.tone} message={status.message} /> : null}
-        <button disabled={isBusy} className={submitButtonClass(isBusy)}>
-          {isBusy ? "Creating account..." : "Create account"}
-        </button>
-      </form>
-      <p className="mt-5 text-[13px] leading-5 text-[var(--text-secondary)]">
-        Your trial starts when the account is created. No health or safety result
-        is guaranteed; always check the original package label.
-      </p>
-      <p className="mt-3 text-[13px] leading-5 text-[var(--text-secondary)]">
-        Already have an account?{" "}
-        <Link href="/sign-in" className="font-semibold text-[var(--green-main)]">
-          Sign in
-        </Link>
-      </p>
+      <div className="mt-6 grid gap-5 lg:grid-cols-[0.88fr_1.12fr]">
+        <aside className="rounded-[26px] border border-[var(--green-border)] bg-[var(--green-bg)]/72 p-5">
+          <p className="text-[12px] font-black uppercase tracking-[0.16em] text-[var(--green-dark)]">
+            Included in trial
+          </p>
+          <ul className="mt-4 grid gap-3 text-[13px] font-semibold leading-5 text-[var(--text-main)]">
+            {[
+              "Barcode, camera, OCR, and manual label checks",
+              "Personal allergy Watch List warnings",
+              "Green, yellow, and red ingredient explanations",
+              "No payment required to create the trial account",
+              "If you continue after the free trial, cancel anytime",
+            ].map((item) => (
+              <li key={item} className="flex gap-2">
+                <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[var(--green-main)]" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-5 rounded-[18px] border border-white/80 bg-white/72 px-4 py-3 text-[12px] font-semibold leading-5 text-[var(--green-dark)]">
+            Your trial access is created by the account system. Paid access can
+            be added later after the trial, and you can cancel anytime.
+          </p>
+        </aside>
+
+        <div>
+          <form onSubmit={handleSubmit}>
+            <label className="block">
+              <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--text-secondary)]">
+                Email
+              </span>
+              <input
+                className={inputClass}
+                type="email"
+                autoComplete="email"
+                required
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+              />
+            </label>
+            <label className="mt-4 block">
+              <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--text-secondary)]">
+                Password
+              </span>
+              <input
+                className={inputClass}
+                type="password"
+                autoComplete="new-password"
+                minLength={8}
+                required
+                aria-describedby="signup-password-help"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+              />
+              <span
+                id="signup-password-help"
+                className="mt-2 block text-[12px] leading-5 text-[var(--text-muted)]"
+              >
+                Use at least 8 characters.
+              </span>
+            </label>
+            <label className="mt-4 block">
+              <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--text-secondary)]">
+                Confirm password
+              </span>
+              <input
+                className={inputClass}
+                type="password"
+                autoComplete="new-password"
+                minLength={8}
+                required
+                value={confirmPassword}
+                onChange={(event) => setConfirmPassword(event.target.value)}
+              />
+            </label>
+            <label className="mt-4 flex gap-3 rounded-[18px] border border-[var(--border-soft)] bg-white px-4 py-3 text-[12px] leading-5 text-[var(--text-secondary)]">
+              <input
+                type="checkbox"
+                required
+                checked={acceptedTerms}
+                onChange={(event) => setAcceptedTerms(event.target.checked)}
+                className="mt-1 h-4 w-4 shrink-0 accent-[var(--green-main)]"
+              />
+              <span>
+                I agree to the{" "}
+                <Link
+                  href="/terms"
+                  className="font-semibold text-[var(--green-main)]"
+                >
+                  Terms
+                </Link>{" "}
+                and{" "}
+                <Link
+                  href="/privacy"
+                  className="font-semibold text-[var(--green-main)]"
+                >
+                  Privacy Policy
+                </Link>
+                .
+              </span>
+            </label>
+            {status ? (
+              <StatusMessage tone={status.tone} message={status.message} />
+            ) : null}
+            <button disabled={isBusy} className={submitButtonClass(isBusy)}>
+              {isBusy ? "Creating account..." : "Start free trial"}
+            </button>
+          </form>
+          <p className="mt-5 text-[13px] leading-5 text-[var(--text-secondary)]">
+            Truthlabel helps explain labels; it does not replace the original
+            package label or medical advice. If you continue after the free
+            trial, you can cancel anytime.
+          </p>
+          <p className="mt-3 text-[13px] leading-5 text-[var(--text-secondary)]">
+            Already have an account?{" "}
+            <Link
+              href="/sign-in"
+              className="font-semibold text-[var(--green-main)]"
+            >
+              Sign in
+            </Link>
+          </p>
+        </div>
+      </div>
     </AuthShell>
   );
 }
@@ -513,7 +602,7 @@ export function ActivateScreen() {
     <AuthShell
       eyebrow="Activate"
       title="Activate your Truthlabel access."
-      message="New accounts receive a 7-day free trial. Gumroad subscription activation is used to continue access after the trial."
+      message="New accounts receive a 7-day free trial. Gumroad subscription activation is used to continue access after the trial, and you can cancel anytime."
     >
       {errorMessage ? <StatusMessage tone="red" message={errorMessage} /> : null}
 
@@ -561,6 +650,9 @@ export function ActivateScreen() {
         >
           Continue with Gumroad
         </a>
+        <p className="text-center text-[12px] font-semibold leading-5 text-[var(--text-secondary)]">
+          If you continue after the free trial, you can cancel anytime.
+        </p>
         {user ? (
           <button
             type="button"
@@ -594,7 +686,8 @@ export function ActivateScreen() {
         <p className="mt-2 text-[13px] leading-5 text-[var(--text-secondary)]">
           The 7-day trial is created by Supabase when your account is created.
           Gumroad license-key verification is the next backend step for paid
-          access after the trial.
+          access after the trial. Membership and cancellation are managed
+          through the secure checkout flow.
         </p>
       </div>
     </AuthShell>

@@ -668,8 +668,15 @@ function buildIngredientBreakdown(input: BuildScanResultInput): ScanResultIngred
       "unknown_review",
     )
       ? "unknown_review"
-      : sourcePacks.some(
-          (packId) => packId !== "natural_positive" && packId !== "unknown_review",
+      : matches.some(
+          (match) =>
+            match.highestSeveritySuggestion !== "green" &&
+            match.sourcePacks.some(
+              (packId) =>
+                packId !== "natural_positive" &&
+                packId !== "unknown_review" &&
+                packId !== "allergy_risk",
+            ),
         )
         ? "processed_artificial"
         : "natural_positive";
@@ -790,6 +797,9 @@ function hasContextTerm(context: string, terms: string[]) {
 function getProductTypeContext(input: BuildScanResultInput) {
   return normalizeIngredientIntelligenceText(
     [input.productCategory, input.productName].filter(Boolean).join(" "),
+  ).replace(
+    /\b(?:chicken|beef|pork|bacon|ham|turkey|fish|shrimp|prawn)\s+(?:flavour|flavor|flavoured|flavored)\b/g,
+    "",
   );
 }
 

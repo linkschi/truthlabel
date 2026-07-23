@@ -1443,11 +1443,15 @@ function buildIngredientGroups(matches: IngredientIntelligenceMatch[]) {
 
   groupedByIngredient.forEach((ingredientMatches) => {
     const sourcePackIds = ingredientMatches.flatMap((match) => match.sourcePacks);
-    const processingSourcePackIds = sourcePackIds.filter(
-      (packId) =>
-        packId !== "natural_positive" &&
-        packId !== "unknown_review" &&
-        packId !== "allergy_risk",
+    const processingSourcePackIds = ingredientMatches.flatMap((match) =>
+      match.basicSeveritySuggestion === "green"
+        ? []
+        : match.sourcePacks.filter(
+            (packId) =>
+              packId !== "natural_positive" &&
+              packId !== "unknown_review" &&
+              packId !== "allergy_risk",
+          ),
     );
     const bucket: IngredientGroupKey = processingSourcePackIds.length > 0
       ? "processed_artificial"
