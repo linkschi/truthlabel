@@ -49,6 +49,9 @@ truthlabel-dev*.log
 # vercel
 .vercel
 
+# Supabase CLI local link/cache files
+supabase/.temp/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

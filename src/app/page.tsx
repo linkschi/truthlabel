@@ -229,14 +229,14 @@ const useCases = [
 ];
 
 const planIncludes = [
-  "7-day free trial",
+  "7-day Gumroad trial with card details first",
   "Full barcode scanning",
   "Complete ingredient analysis",
   "Personalized allergy Watch List",
   "Food-preference settings",
   "Green, yellow, and red explanations",
   "Serious ingredient alerts",
-  "Cancel anytime after the free trial",
+  "Cancel anytime through Gumroad",
   "Sign-in based account access",
   "Future improvements included",
 ];
@@ -245,7 +245,7 @@ const faq = [
   {
     question: "Is there a free trial?",
     answer:
-      "Yes. New Truthlabel accounts receive a 7-day free trial so you can test the scanner with real products before continuing with paid access. If you continue after the free trial, you can cancel anytime.",
+      "Yes. Truthlabel uses a 7-day Gumroad membership trial. You enter card details at checkout before the trial starts, then you can cancel anytime before the first charge if you do not want to continue.",
   },
   {
     question: "What does Truthlabel check?",
@@ -275,7 +275,7 @@ const faq = [
   {
     question: "How do I access Truthlabel after joining?",
     answer:
-      "Create an account to start the 7-day trial. After the trial, subscription billing and membership management are handled through secure checkout, and you can cancel anytime.",
+      "Start the Gumroad trial first, then create or sign into your Truthlabel account and paste the Gumroad license key on the activation page.",
   },
   {
     question: "Can I manage my membership?",
@@ -400,7 +400,7 @@ function CreatorNotes({
 
 export default function LandingPage() {
   const checkoutUrl = getCheckoutUrl();
-  const trialUrl = "/create-account";
+  const trialUrl = checkoutUrl;
 
   return (
     <main className="landing-urgent min-h-screen overflow-hidden px-4 py-4 sm:px-6">
@@ -759,10 +759,10 @@ export default function LandingPage() {
               available.
             </p>
             <p className="mt-4 rounded-[20px] border border-[var(--border-soft)] bg-[var(--bg-soft)] px-4 py-3 text-[13px] font-bold leading-6 text-[var(--text-main)]">
-              Start with the 7-day trial. If Truthlabel helps you shop with
-              more awareness, continue for $3.99/month. Checkout confirms the
-              current price before payment, and you can cancel anytime after
-              the free trial.
+              Start with the 7-day Gumroad trial. Card details are entered
+              before the trial begins, checkout confirms the current price, and
+              you can cancel anytime before the first charge if you do not want
+              to continue.
             </p>
           </div>
           <div className="rounded-[34px] border border-[var(--green-border)] bg-[var(--green-bg)] p-6">
@@ -786,16 +786,16 @@ export default function LandingPage() {
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <PrimaryCta href={trialUrl}>Start free trial</PrimaryCta>
               <Link
-                href={checkoutUrl}
+                href="/create-account"
                 className="inline-flex items-center justify-center rounded-full border border-[var(--green-border)] bg-white px-5 py-3 text-[12px] font-black uppercase tracking-[0.14em] text-[var(--green-dark)]"
               >
-                Subscribe
+                Create account
               </Link>
             </div>
             <p className="mt-4 text-[12px] font-bold leading-5 text-[var(--green-dark)]">
-              Trial access is created through your Truthlabel account. Secure
-              subscription checkout confirms billing before payment. If you
-              continue after the free trial, cancel anytime.
+              Trial access is created through Gumroad checkout, then connected
+              to your Truthlabel account with the license key from your purchase
+              email.
             </p>
           </div>
         </section>
@@ -805,6 +805,7 @@ export default function LandingPage() {
           items={[
             "Position the price as a small monthly cost for faster label understanding and more control while shopping.",
             "Current planned offer: 7-day free trial, then $3.99/month.",
+            "Important business rule: trial starts through Gumroad checkout with card details first. Do not restore no-card account-created trials unless the business model changes again.",
             "Future emotional angle after evidence is ready: protect yourself from overlooked label risks and from formulation choices that prioritize shelf life, cost, or taste intensity over your personal priorities.",
             "Add independence as a sales factor near the trial CTA: Truthlabel should be presented as an independent research-led tool, not funded by food brands, manufacturers, or advertisers whose products are being checked.",
             "Create a future section about independence and research standards: explain that Truthlabel aims to evaluate labels from the consumer side, cite sources, separate evidence levels, and avoid sponsored product rankings.",
@@ -859,8 +860,8 @@ export default function LandingPage() {
             </Link>
           </div>
           <p className="mx-auto mt-4 max-w-xl text-[13px] font-bold leading-6 text-white/72">
-            Start with 7 days free. If you continue after the trial, you can
-            cancel anytime.
+            Start with 7 days free through Gumroad checkout. Card details are
+            entered before the trial begins, and you can cancel anytime.
           </p>
           <p className="mt-7 font-heading text-[1.4rem] font-semibold tracking-[-0.04em] text-white/72">
             Scan before you trust it.
@@ -898,7 +899,7 @@ export default function LandingPage() {
               <a href="#checks">What we check</a>
               <Link href="/sign-in">Sign in</Link>
               <a href={trialUrl}>Start free trial</a>
-              <a href={checkoutUrl}>Subscribe</a>
+              <Link href="/create-account">Create account</Link>
               <Link href="/privacy">Privacy Policy</Link>
               <Link href="/terms">Terms</Link>
               <Link href="/health-disclaimer">Health disclaimer</Link>

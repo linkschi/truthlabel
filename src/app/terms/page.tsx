@@ -20,9 +20,10 @@ export default function TermsPage() {
           Truthlabel provides ingredient and safety-signal information for educational review. Product data can be incomplete, user-submitted, or unavailable. Always check the package label before making a food decision.
         </p>
         <p className="mt-3 text-[14px] leading-7 text-[var(--text-secondary)]">
-          Paid subscription purchases, renewals, cancellations, and card
-          handling are managed by Gumroad. If you continue after the free trial,
-          you can cancel anytime through the secure subscription checkout flow.
+          Trial signup, paid subscription purchases, renewals, cancellations,
+          and card handling are managed by Gumroad. Gumroad collects card
+          details before the free trial starts, and you can cancel anytime
+          through the secure subscription checkout flow.
         </p>
       </article>
     </main>

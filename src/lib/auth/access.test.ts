@@ -25,10 +25,10 @@ function subscription(status: TruthlabelSubscription["status"]) {
   } satisfies TruthlabelSubscription;
 }
 
-test("active trial grants app access without a subscription", () => {
+test("account-created trial rows do not grant app access without Gumroad access", () => {
   const activeTrial = trial(7);
 
-  assert.equal(hasTrialAccess(activeTrial), true);
+  assert.equal(hasTrialAccess(activeTrial), false);
   assert.equal(
     getAccessState({
       authLoading: false,
@@ -36,7 +36,7 @@ test("active trial grants app access without a subscription", () => {
       subscription: null,
       trialAccess: activeTrial,
     }),
-    "active",
+    "inactive",
   );
 });
 
@@ -58,7 +58,7 @@ test("expired trial without paid access is inactive", () => {
   );
 });
 
-test("paid access overrides an expired trial", () => {
+test("paid access grants access even when an account trial row is expired", () => {
   assert.equal(
     getAccessKind({
       subscription: subscription("active"),

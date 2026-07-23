@@ -53,7 +53,11 @@ export function hasPaidAccess(subscription: TruthlabelSubscription | null) {
 }
 
 export function hasTrialAccess(trialAccess: TruthlabelTrialAccess | null) {
-  return isFutureDate(trialAccess?.trial_ends_at);
+  void trialAccess;
+
+  // Truthlabel now uses Gumroad's card-backed membership trial as the source of
+  // trial access. Legacy account-created trial rows must not unlock the app.
+  return false;
 }
 
 export function getTrialDaysRemaining(
@@ -79,10 +83,6 @@ export function getAccessKind(args: {
 }): AccessKind {
   if (hasPaidAccess(args.subscription)) {
     return "paid";
-  }
-
-  if (hasTrialAccess(args.trialAccess)) {
-    return "trial";
   }
 
   return "none";

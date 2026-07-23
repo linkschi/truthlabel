@@ -197,19 +197,10 @@ export default function AccountScreen() {
 
   const accessLabel =
     accessKind === "paid"
-      ? "Active subscription"
-      : accessKind === "trial"
-        ? `Free trial - ${trialDaysRemaining} day${
-            trialDaysRemaining === 1 ? "" : "s"
-          } left`
-        : subscription?.status ?? "Inactive";
-  const trialEndLabel = trialAccess?.trial_ends_at
-    ? new Date(trialAccess.trial_ends_at).toLocaleDateString(undefined, {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      })
-    : "";
+      ? "Active Gumroad subscription or trial"
+      : subscription?.status ?? "Inactive";
+  void trialAccess;
+  void trialDaysRemaining;
 
   async function handleSignOut() {
     await signOut();
@@ -255,7 +246,7 @@ export default function AccountScreen() {
             Save your scans and preferences
           </h1>
           <p className="mt-3 max-w-[360px] text-[14px] leading-[1.5] text-[#66716B]">
-            Review your signed-in account, trial or subscription status, Watch List, and privacy links.
+            Review your signed-in account, Gumroad access status, Watch List, and privacy links.
           </p>
           <div className="mt-4 rounded-[16px] border border-[#D7E7DD] bg-white/78 px-3 py-3">
             <div className="flex items-start gap-2.5">
@@ -273,14 +264,6 @@ export default function AccountScreen() {
                     {accessLabel}
                   </span>
                 </p>
-                {accessKind === "trial" && trialEndLabel ? (
-                  <p className="mt-1">
-                    Trial ends:{" "}
-                    <span className="font-semibold text-[#101613]">
-                      {trialEndLabel}
-                    </span>
-                  </p>
-                ) : null}
               </div>
             </div>
           </div>
@@ -291,7 +274,7 @@ export default function AccountScreen() {
             Account access
           </h2>
           <p className="mt-1 text-[13px] leading-[1.45] text-[#66716B]">
-            Truthlabel uses Supabase for login and reads your free-trial and subscription status from protected access tables.
+            Truthlabel uses Supabase for login and reads activated Gumroad subscription or trial status from protected access tables.
           </p>
           {statusMessage ? (
             <p className="mt-3 rounded-[14px] border border-[#D7E7DD] bg-[#F3FAF6] px-3 py-2 text-[12px] font-semibold text-[#0E5A3F]">

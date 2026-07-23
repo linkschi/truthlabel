@@ -249,7 +249,7 @@ export function CreateAccountScreen() {
       setStatus({
         tone: "green",
         message:
-          "Check your email to confirm your Truthlabel account. Your 7-day trial is created with the account and will be waiting after confirmation.",
+          "Check your email to confirm your Truthlabel account. After checkout, paste your Gumroad license key on the activation page to unlock access.",
       });
     } catch (error) {
       setStatus({
@@ -267,22 +267,22 @@ export function CreateAccountScreen() {
   return (
     <AuthShell
       eyebrow="Create account"
-      title="Start your 7-day Truthlabel trial."
-      message="Create your account, confirm your email, then start scanning ingredient labels with your personal Watch List."
+      title="Create your Truthlabel account."
+      message="Create your account after starting the Gumroad trial, then activate access with the license key from your purchase email."
       wide
     >
       <div className="mt-6 grid gap-5 lg:grid-cols-[0.88fr_1.12fr]">
         <aside className="rounded-[26px] border border-[var(--green-border)] bg-[var(--green-bg)]/72 p-5">
           <p className="text-[12px] font-black uppercase tracking-[0.16em] text-[var(--green-dark)]">
-            Included in trial
+            After checkout
           </p>
           <ul className="mt-4 grid gap-3 text-[13px] font-semibold leading-5 text-[var(--text-main)]">
             {[
               "Barcode, camera, OCR, and manual label checks",
               "Personal allergy Watch List warnings",
               "Green, yellow, and red ingredient explanations",
-              "No payment required to create the trial account",
-              "If you continue after the free trial, cancel anytime",
+              "Gumroad collects card details before the 7-day trial starts",
+              "If you continue after the Gumroad trial, cancel anytime",
             ].map((item) => (
               <li key={item} className="flex gap-2">
                 <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[var(--green-main)]" />
@@ -291,8 +291,8 @@ export function CreateAccountScreen() {
             ))}
           </ul>
           <p className="mt-5 rounded-[18px] border border-white/80 bg-white/72 px-4 py-3 text-[12px] font-semibold leading-5 text-[var(--green-dark)]">
-            Your trial access is created by the account system. Paid access can
-            be added later after the trial, and you can cancel anytime.
+            Truthlabel access is activated after Gumroad checkout. Account
+            creation alone does not start a no-card app trial.
           </p>
         </aside>
 
@@ -376,13 +376,13 @@ export function CreateAccountScreen() {
               <StatusMessage tone={status.tone} message={status.message} />
             ) : null}
             <button disabled={isBusy} className={submitButtonClass(isBusy)}>
-              {isBusy ? "Creating account..." : "Start free trial"}
+              {isBusy ? "Creating account..." : "Create account"}
             </button>
           </form>
           <p className="mt-5 text-[13px] leading-5 text-[var(--text-secondary)]">
             Truthlabel helps explain labels; it does not replace the original
-            package label or medical advice. If you continue after the free
-            trial, you can cancel anytime.
+            package label or medical advice. Your Gumroad checkout controls the
+            trial, billing, and cancellation.
           </p>
           <p className="mt-3 text-[13px] leading-5 text-[var(--text-secondary)]">
             Already have an account?{" "}
@@ -583,8 +583,6 @@ export function ActivateScreen() {
     errorMessage,
     refreshAccess,
     subscription,
-    trialAccess,
-    trialDaysRemaining,
     user,
   } = useTruthlabelAuth();
   const [licenseKey, setLicenseKey] = useState("");
@@ -596,13 +594,6 @@ export function ActivateScreen() {
   const checkoutUrl =
     process.env.NEXT_PUBLIC_GUMROAD_CHECKOUT_URL?.trim() || "https://truthlabel.gumroad.com";
   const isActive = accessState === "active";
-  const trialEndLabel = trialAccess?.trial_ends_at
-    ? new Date(trialAccess.trial_ends_at).toLocaleDateString(undefined, {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      })
-    : "";
 
   async function handleLicenseActivation(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -676,7 +667,7 @@ export function ActivateScreen() {
     <AuthShell
       eyebrow="Activate"
       title="Activate your Truthlabel access."
-      message="New accounts receive a 7-day free trial. Gumroad subscription activation is used to continue access after the trial, and you can cancel anytime."
+      message="Start the 7-day Gumroad trial first, add card details at checkout, then activate Truthlabel with the license key from your purchase email."
     >
       {errorMessage ? <StatusMessage tone="red" message={errorMessage} /> : null}
 
@@ -698,22 +689,10 @@ export function ActivateScreen() {
             Current access:{" "}
             <span className="font-semibold">
               {accessKind === "paid"
-                ? "Active subscription"
-                : accessKind === "trial"
-                  ? `Free trial - ${trialDaysRemaining} day${
-                      trialDaysRemaining === 1 ? "" : "s"
-                    } left`
-                  : subscription?.status ?? "Inactive"}
+                ? "Active Gumroad subscription or trial"
+                : subscription?.status ?? "Inactive"}
             </span>
           </p>
-          {accessKind === "trial" && trialEndLabel ? (
-            <p className="mt-1 text-[13px] leading-5 text-[var(--text-secondary)]">
-              Trial ends:{" "}
-              <span className="font-semibold text-[var(--text-main)]">
-                {trialEndLabel}
-              </span>
-            </p>
-          ) : null}
         </div>
       ) : null}
 
@@ -722,10 +701,11 @@ export function ActivateScreen() {
           href={checkoutUrl}
           className="inline-flex justify-center rounded-full border border-transparent bg-[var(--text-main)] px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-white"
         >
-          Continue with Gumroad
+          Start Gumroad trial
         </a>
         <p className="text-center text-[12px] font-semibold leading-5 text-[var(--text-secondary)]">
-          If you continue after the free trial, you can cancel anytime.
+          Gumroad collects card details before the 7-day trial starts. If you
+          continue after the trial, you can cancel anytime.
         </p>
         {user ? (
           <button
@@ -794,11 +774,9 @@ export function ActivateScreen() {
           Trial and license activation
         </p>
         <p className="mt-2 text-[13px] leading-5 text-[var(--text-secondary)]">
-          The 7-day trial is created by Supabase when your account is created.
-          Gumroad license-key verification can activate paid access after the
-          trial once the Supabase Edge Function is deployed. Membership and
-          cancellation are managed
-          through the secure checkout flow.
+          The 7-day trial is created by Gumroad checkout, not by account
+          creation alone. After checkout, paste the Gumroad license key here to
+          connect the subscription or trial to your Truthlabel account.
         </p>
       </div>
     </AuthShell>

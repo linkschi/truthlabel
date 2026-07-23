@@ -7,7 +7,7 @@ import { useTruthlabelAuth } from "@/components/auth/AuthProvider";
 
 function FullPageLoading({
   title = "Checking access",
-  message = "Truthlabel is checking your account, free trial, and subscription status.",
+  message = "Truthlabel is checking your account and Gumroad access status.",
 }: {
   title?: string;
   message?: string;
@@ -85,7 +85,7 @@ function ProtectedAppShellInner({ children }: { children: ReactNode }) {
         title={accessState === "loading" ? "Checking access" : "Redirecting"}
         message={
           errorMessage ||
-          "Truthlabel is checking whether this account has trial or paid access."
+          "Truthlabel is checking whether this account has activated Gumroad access."
         }
       />
     );
