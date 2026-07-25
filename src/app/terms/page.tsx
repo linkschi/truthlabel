@@ -21,9 +21,8 @@ export default function TermsPage() {
         </p>
         <p className="mt-3 text-[14px] leading-7 text-[var(--text-secondary)]">
           Trial signup, paid subscription purchases, renewals, cancellations,
-          and card handling are managed through checkout. Card details are
-          entered before the free trial starts, and you can cancel anytime
-          through the subscription checkout flow.
+          and card handling are managed through checkout. Checkout shows the
+          current trial, billing, and cancellation terms before you start.
         </p>
       </article>
     </main>

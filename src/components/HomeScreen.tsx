@@ -38,6 +38,7 @@ type Tint = "green" | "yellow" | "red" | "neutral";
 const defaultProductHref = `/app/results?category=packaged-processed-foods&demo=${defaultDemoProductId}`;
 const defaultDemoProduct = getDemoProductById(defaultDemoProductId);
 const featureFlags = publicAppConfig.flags;
+const showLocalInternalTools = featureFlags.enableLocalDevBypass;
 
 const capabilityPills = [
   { label: "Barcode", icon: "barcode" as const, tint: "red" as const },
@@ -796,17 +797,19 @@ function ExploreMore({
           <WatchListPreview watchItems={watchItems} />
         </AccordionCard>
 
-        <AccordionCard
-          id="developer"
-          icon="code"
-          tint="neutral"
-          title="Developer & Demo Tools"
-          summary="Internal tools"
-          activeAccordion={activeAccordion}
-          onToggle={onToggle}
-        >
-          <DeveloperDemoTools onNavigate={onNavigate} />
-        </AccordionCard>
+        {showLocalInternalTools ? (
+          <AccordionCard
+            id="developer"
+            icon="code"
+            tint="neutral"
+            title="Developer & Demo Tools"
+            summary="Local only"
+            activeAccordion={activeAccordion}
+            onToggle={onToggle}
+          >
+            <DeveloperDemoTools onNavigate={onNavigate} />
+          </AccordionCard>
+        ) : null}
       </div>
     </section>
   );

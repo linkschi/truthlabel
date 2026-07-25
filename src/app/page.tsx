@@ -229,14 +229,14 @@ const useCases = [
 ];
 
 const planIncludes = [
-  "7-day trial with card details first",
+  "7-day trial access",
   "Full barcode scanning",
   "Complete ingredient analysis",
   "Personalized allergy Watch List",
   "Food-preference settings",
-  "Green, yellow, and red explanations",
+  "Plain-English ingredient warnings",
   "Serious ingredient alerts",
-  "Cancel anytime before the first charge",
+  "Independent, consumer-first label review",
   "Sign-in based account access",
   "Future improvements included",
 ];
@@ -245,7 +245,7 @@ const faq = [
   {
     question: "Is there a free trial?",
     answer:
-      "Yes. Start with 7 days free. Card details are entered before the trial starts, and you can cancel anytime before the first charge.",
+      "Yes. Start with 7 days free. Trial details are confirmed at checkout, and you can cancel anytime.",
   },
   {
     question: "What does Truthlabel check?",
@@ -752,9 +752,8 @@ export default function LandingPage() {
             </p>
             <p className="mt-4 rounded-[20px] border border-[var(--border-soft)] bg-[var(--bg-soft)] px-4 py-3 text-[13px] font-bold leading-6 text-[var(--text-main)]">
               Create your Truthlabel account first, then continue to the 7-day
-              trial checkout. Card details are entered before the trial
-              begins, checkout confirms the current price, and you can cancel
-              anytime before the first charge if you do not want to continue.
+              trial checkout. Checkout confirms the current price and trial
+              details before you start.
             </p>
           </div>
           <div className="rounded-[34px] border border-[var(--green-border)] bg-[var(--green-bg)] p-6">
@@ -797,7 +796,7 @@ export default function LandingPage() {
           items={[
             "Position the price as a small monthly cost for faster label understanding and more control while shopping.",
             "Current planned offer: 7-day free trial, then $3.99/month.",
-            "Important business rule: create account first, then secure checkout starts the card-backed 7-day trial. Do not restore no-card account-created trials unless the business model changes again.",
+            "Important business rule: create account first, then checkout starts the 7-day trial. Do not restore account-created trials unless the business model changes again.",
             "Future emotional angle after evidence is ready: protect yourself from overlooked label risks and from formulation choices that prioritize shelf life, cost, or taste intensity over your personal priorities.",
             "Add independence as a sales factor near the trial CTA: Truthlabel should be presented as an independent research-led tool, not funded by food brands, manufacturers, or advertisers whose products are being checked.",
             "Create a future section about independence and research standards: explain that Truthlabel aims to evaluate labels from the consumer side, cite sources, separate evidence levels, and avoid sponsored product rankings.",
@@ -852,8 +851,8 @@ export default function LandingPage() {
             </Link>
           </div>
           <p className="mx-auto mt-4 max-w-xl text-[13px] font-bold leading-6 text-white/72">
-            Create your account first, then start 7 days free. Card details are
-            entered before the trial begins, and you can cancel anytime.
+            Create your account first, then start 7 days free. Trial details
+            are confirmed at checkout, and you can cancel anytime.
           </p>
           <p className="mt-7 font-heading text-[1.4rem] font-semibold tracking-[-0.04em] text-white/72">
             Scan before you trust it.

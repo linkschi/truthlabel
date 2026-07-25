@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="truthlabelMarkTitle truthlabelMarkDesc">
+  <title id="truthlabelMarkTitle">Truthlabel mark</title>
+  <desc id="truthlabelMarkDesc">A compact Truthlabel mark with red, yellow, and green ingredient-signal bars.</desc>
+  <rect width="512" height="512" rx="132" fill="#12261D"/>
+  <rect x="74" y="74" width="364" height="364" rx="92" fill="#FFFDF5"/>
+  <rect x="136" y="184" width="240" height="38" rx="19" fill="#DC2626"/>
+  <rect x="136" y="248" width="240" height="38" rx="19" fill="#F4C430"/>
+  <rect x="136" y="312" width="240" height="38" rx="19" fill="#15803D"/>
+  <circle cx="166" cy="124" r="18" fill="#DC2626"/>
+  <circle cx="256" cy="124" r="18" fill="#F4C430"/>
+  <circle cx="346" cy="124" r="18" fill="#22A65A"/>
+</svg>

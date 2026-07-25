@@ -83,7 +83,7 @@ function submitButtonClass(isBusy: boolean) {
 function getGumroadCheckoutUrl() {
   return (
     process.env.NEXT_PUBLIC_GUMROAD_CHECKOUT_URL?.trim() ||
-    "https://truthlabel.gumroad.com"
+    "https://truthlabel.gumroad.com/l/fnoakd?wanted=true"
   );
 }
 
@@ -205,6 +205,63 @@ export function SignInScreen() {
   );
 }
 
+function TrialActivationLoadingScreen({ email }: { email: string }) {
+  return (
+    <main className="min-h-screen px-4 py-6 sm:px-5">
+      <section className="mx-auto flex min-h-[76vh] max-w-[520px] items-center justify-center">
+        <div className="relative w-full overflow-hidden rounded-[34px] border border-[var(--green-border)] bg-[linear-gradient(145deg,#F4FBF6_0%,#FFFFFF_48%,#FFF8D7_100%)] px-6 py-7 text-center shadow-[0_26px_80px_rgba(23,20,18,0.14)]">
+          <div className="absolute -right-14 -top-16 h-40 w-40 rounded-full bg-[rgba(21,128,61,0.13)] blur-2xl" />
+          <div className="absolute -bottom-16 -left-14 h-44 w-44 rounded-full bg-[rgba(244,196,48,0.2)] blur-2xl" />
+
+          <div className="relative mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-white shadow-[0_16px_38px_rgba(21,128,61,0.16)]">
+            <span className="absolute h-24 w-24 animate-spin rounded-full border-4 border-[rgba(21,128,61,0.15)] border-t-[var(--green-main)]" />
+            <span className="flex h-14 w-14 items-center justify-center rounded-[20px] bg-[var(--green-main)] text-[24px] font-black text-white">
+              T
+            </span>
+          </div>
+
+          <p className="mt-6 text-[11px] font-black uppercase tracking-[0.22em] text-[var(--green-main)]">
+            Account created
+          </p>
+          <h1 className="mt-2 font-heading text-[2.2rem] font-semibold leading-tight tracking-[-0.05em] text-[var(--text-main)]">
+            Activating your free trial.
+          </h1>
+          <p className="mx-auto mt-3 max-w-[390px] text-[14px] leading-6 text-[var(--text-secondary)]">
+            Truthlabel is preparing your free trial access and opening
+            checkout.
+          </p>
+
+          {email ? (
+            <p className="mx-auto mt-4 max-w-[360px] rounded-[18px] border border-white/80 bg-white/72 px-4 py-3 text-[12px] font-semibold leading-5 text-[var(--green-dark)]">
+              Account email: {email}
+            </p>
+          ) : null}
+
+          <div className="mt-6 grid gap-2 text-left">
+            {["Creating your account", "Preparing trial access", "Opening checkout"].map(
+              (item, index) => (
+                <div
+                  key={item}
+                  className="flex items-center gap-3 rounded-[18px] border border-white/80 bg-white/72 px-4 py-3 text-[13px] font-bold text-[var(--text-main)]"
+                >
+                  <span
+                    className={`h-2.5 w-2.5 rounded-full ${
+                      index === 2
+                        ? "animate-pulse bg-[var(--amber-main)]"
+                        : "bg-[var(--green-main)]"
+                    }`}
+                  />
+                  <span>{item}</span>
+                </div>
+              ),
+            )}
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}
+
 export function CreateAccountScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -215,6 +272,7 @@ export function CreateAccountScreen() {
     message: string;
   } | null>(null);
   const [isBusy, setIsBusy] = useState(false);
+  const [isRedirectingToCheckout, setIsRedirectingToCheckout] = useState(false);
   const checkoutUrl = getGumroadCheckoutUrl();
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -262,6 +320,7 @@ export function CreateAccountScreen() {
       setPassword("");
       setConfirmPassword("");
       setAcceptedTerms(false);
+      setIsRedirectingToCheckout(true);
       setStatus({
         tone: "green",
         message: "Account created. Taking you to checkout.",
@@ -269,7 +328,7 @@ export function CreateAccountScreen() {
 
       window.setTimeout(() => {
         window.location.assign(checkoutUrl);
-      }, 1200);
+      }, 1900);
     } catch (error) {
       setStatus({
         tone: "red",
@@ -281,6 +340,10 @@ export function CreateAccountScreen() {
     } finally {
       setIsBusy(false);
     }
+  }
+
+  if (isRedirectingToCheckout) {
+    return <TrialActivationLoadingScreen email={email} />;
   }
 
   return (
@@ -299,9 +362,10 @@ export function CreateAccountScreen() {
             {[
               "Barcode, camera, OCR, and manual label checks",
               "Personal allergy Watch List warnings",
-              "Green, yellow, and red ingredient explanations",
-              "Card details are entered before the 7-day trial starts",
-              "Cancel anytime before the first charge",
+              "Independent, consumer-first ingredient review",
+              "Clear warnings before products reach your basket",
+              "Built to help you question confusing food labels",
+              "Cancel anytime",
             ].map((item) => (
               <li key={item} className="flex gap-2">
                 <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[var(--green-main)]" />
@@ -751,8 +815,7 @@ export function ActivateScreen() {
           </Link>
         )}
         <p className="text-center text-[12px] font-semibold leading-5 text-[var(--text-secondary)]">
-          Card details are entered before the 7-day trial starts. If you
-          continue after the trial, you can cancel anytime.
+          Trial details are confirmed at checkout. You can cancel anytime.
         </p>
         {user ? (
           <button

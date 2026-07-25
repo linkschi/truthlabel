@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="truthlabelIconTitle truthlabelIconDesc">
+  <title id="truthlabelIconTitle">Truthlabel app icon</title>
+  <desc id="truthlabelIconDesc">Truthlabel app icon with a dark green background and red, yellow, and green scan bars.</desc>
+  <rect width="512" height="512" rx="116" fill="#0E4C37"/>
+  <path d="M132 110h248c24 0 44 20 44 44v204c0 24-20 44-44 44H132c-24 0-44-20-44-44V154c0-24 20-44 44-44Z" fill="#FFF9E8"/>
+  <path d="M154 198h204c14 0 26 12 26 26s-12 26-26 26H154c-14 0-26-12-26-26s12-26 26-26Z" fill="#DC2626"/>
+  <path d="M154 266h204c14 0 26 12 26 26s-12 26-26 26H154c-14 0-26-12-26-26s12-26 26-26Z" fill="#F4C430"/>
+  <path d="M154 334h204c14 0 26 12 26 26s-12 26-26 26H154c-14 0-26-12-26-26s12-26 26-26Z" fill="#22A65A"/>
+  <circle cx="168" cy="154" r="16" fill="#DC2626"/>
+  <circle cx="256" cy="154" r="16" fill="#F4C430"/>
+  <circle cx="344" cy="154" r="16" fill="#22A65A"/>
+</svg>

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 420" role="img" aria-labelledby="truthlabelLogoTitle truthlabelLogoDesc">
+  <title id="truthlabelLogoTitle">Truthlabel logo</title>
+  <desc id="truthlabelLogoDesc">Truthlabel wordmark with a red, yellow, and green ingredient-signal mark.</desc>
+  <rect width="1400" height="420" rx="72" fill="#F7F4EC"/>
+  <g transform="translate(80 60)">
+    <rect width="300" height="300" rx="78" fill="#12261D"/>
+    <rect x="42" y="42" width="216" height="216" rx="56" fill="#FFFDF5"/>
+    <rect x="78" y="104" width="144" height="22" rx="11" fill="#DC2626"/>
+    <rect x="78" y="141" width="144" height="22" rx="11" fill="#F4C430"/>
+    <rect x="78" y="178" width="144" height="22" rx="11" fill="#15803D"/>
+    <circle cx="96" cy="72" r="10" fill="#DC2626"/>
+    <circle cx="150" cy="72" r="10" fill="#F4C430"/>
+    <circle cx="204" cy="72" r="10" fill="#22A65A"/>
+  </g>
+  <g transform="translate(430 134)">
+    <text x="0" y="82" fill="#12261D" font-family="Georgia, 'Times New Roman', serif" font-size="106" font-weight="700" letter-spacing="-5">Truth</text>
+    <text x="282" y="82" fill="#15803D" font-family="Georgia, 'Times New Roman', serif" font-size="106" font-weight="700" letter-spacing="-5">label</text>
+    <text x="4" y="136" fill="#506159" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" letter-spacing="6">SCAN BEFORE YOU TRUST IT</text>
+  </g>
+</svg>

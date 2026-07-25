@@ -21,6 +21,7 @@ const localNavigationLinks = [
   { href: "/sign-in", label: "Sign In" },
   { href: "/create-account", label: "Create Account" },
   { href: "/activate", label: "Activate" },
+  { href: "/brand-assets", label: "Brand Assets" },
   { href: "/privacy", label: "Privacy" },
   { href: "/terms", label: "Terms" },
 ] as const;
