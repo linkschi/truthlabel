@@ -52,7 +52,6 @@ export const categoryProfiles: CategoryProfile[] = [
       "seed_oil",
       "total_ingredients",
       "ultra_processed",
-      "natural_vs_processed",
       "allergy_risk",
     ],
   },
@@ -66,7 +65,6 @@ export const categoryProfiles: CategoryProfile[] = [
       "seed_oil",
       "total_ingredients",
       "ultra_processed",
-      "natural_vs_processed",
       "meat_feed_source",
       "fry_oil_seed_oils",
     ],
@@ -114,7 +112,6 @@ export const categoryProfiles: CategoryProfile[] = [
       "allergy_risk",
       "total_ingredients",
       "ultra_processed",
-      "natural_vs_processed",
     ],
   },
   {
@@ -128,7 +125,6 @@ export const categoryProfiles: CategoryProfile[] = [
       "banned_restricted_items",
       "total_ingredients",
       "ultra_processed",
-      "natural_vs_processed",
     ],
   },
   {
@@ -139,7 +135,6 @@ export const categoryProfiles: CategoryProfile[] = [
     quickOverviewIds: [
       "total_ingredients",
       "ultra_processed",
-      "natural_vs_processed",
       "harmful_additives",
       "banned_restricted_items",
       "allergy_risk",
@@ -155,7 +150,6 @@ export const categoryProfiles: CategoryProfile[] = [
       "banned_restricted_items",
       "total_ingredients",
       "ultra_processed",
-      "natural_vs_processed",
       "allergy_risk",
     ],
   },

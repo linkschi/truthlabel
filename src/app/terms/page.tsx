@@ -21,9 +21,9 @@ export default function TermsPage() {
         </p>
         <p className="mt-3 text-[14px] leading-7 text-[var(--text-secondary)]">
           Trial signup, paid subscription purchases, renewals, cancellations,
-          and card handling are managed by Gumroad. Gumroad collects card
-          details before the free trial starts, and you can cancel anytime
-          through the secure subscription checkout flow.
+          and card handling are managed through checkout. Card details are
+          entered before the free trial starts, and you can cancel anytime
+          through the subscription checkout flow.
         </p>
       </article>
     </main>

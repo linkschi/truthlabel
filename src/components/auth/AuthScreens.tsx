@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { type FormEvent, Suspense, useState } from "react";
+import { type FormEvent, Suspense, useEffect, useState } from "react";
 import { useTruthlabelAuth } from "@/components/auth/AuthProvider";
 import { getSupabaseBrowserClient } from "@/lib/auth/supabaseClient";
 
@@ -78,6 +78,25 @@ function submitButtonClass(isBusy: boolean) {
   return `mt-5 w-full rounded-full border border-transparent bg-[var(--text-main)] px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-white shadow-[0_18px_36px_rgba(23,20,18,0.16)] transition active:scale-[0.99] ${
     isBusy ? "cursor-wait opacity-70" : ""
   }`;
+}
+
+function getGumroadCheckoutUrl() {
+  return (
+    process.env.NEXT_PUBLIC_GUMROAD_CHECKOUT_URL?.trim() ||
+    "https://truthlabel.gumroad.com"
+  );
+}
+
+function storePendingCheckoutEmail(email: string) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    window.sessionStorage.setItem("truthlabel.pendingCheckoutEmail", email);
+  } catch {
+    // Browsers can block storage. Checkout should still continue.
+  }
 }
 
 function SignInFormInner() {
@@ -187,7 +206,6 @@ export function SignInScreen() {
 }
 
 export function CreateAccountScreen() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -197,6 +215,7 @@ export function CreateAccountScreen() {
     message: string;
   } | null>(null);
   const [isBusy, setIsBusy] = useState(false);
+  const checkoutUrl = getGumroadCheckoutUrl();
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -224,12 +243,14 @@ export function CreateAccountScreen() {
         throw new Error("Account access is not configured yet.");
       }
 
-      const { data, error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           emailRedirectTo:
-            typeof window === "undefined" ? undefined : `${window.location.origin}/app`,
+            typeof window === "undefined"
+              ? undefined
+              : `${window.location.origin}/activate`,
         },
       });
 
@@ -237,20 +258,18 @@ export function CreateAccountScreen() {
         throw error;
       }
 
-      if (data.session) {
-        router.replace("/app");
-        router.refresh();
-        return;
-      }
-
+      storePendingCheckoutEmail(email);
       setPassword("");
       setConfirmPassword("");
       setAcceptedTerms(false);
       setStatus({
         tone: "green",
-        message:
-          "Check your email to confirm your Truthlabel account. After checkout, paste your Gumroad license key on the activation page to unlock access.",
+        message: "Account created. Taking you to checkout.",
       });
+
+      window.setTimeout(() => {
+        window.location.assign(checkoutUrl);
+      }, 1200);
     } catch (error) {
       setStatus({
         tone: "red",
@@ -268,7 +287,7 @@ export function CreateAccountScreen() {
     <AuthShell
       eyebrow="Create account"
       title="Create your Truthlabel account."
-      message="Create your account after starting the Gumroad trial, then activate access with the license key from your purchase email."
+      message="Create your account, then continue to checkout to start your 7-day trial."
       wide
     >
       <div className="mt-6 grid gap-5 lg:grid-cols-[0.88fr_1.12fr]">
@@ -281,8 +300,8 @@ export function CreateAccountScreen() {
               "Barcode, camera, OCR, and manual label checks",
               "Personal allergy Watch List warnings",
               "Green, yellow, and red ingredient explanations",
-              "Gumroad collects card details before the 7-day trial starts",
-              "If you continue after the Gumroad trial, cancel anytime",
+              "Card details are entered before the 7-day trial starts",
+              "Cancel anytime before the first charge",
             ].map((item) => (
               <li key={item} className="flex gap-2">
                 <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[var(--green-main)]" />
@@ -290,10 +309,6 @@ export function CreateAccountScreen() {
               </li>
             ))}
           </ul>
-          <p className="mt-5 rounded-[18px] border border-white/80 bg-white/72 px-4 py-3 text-[12px] font-semibold leading-5 text-[var(--green-dark)]">
-            Truthlabel access is activated after Gumroad checkout. Account
-            creation alone does not start a no-card app trial.
-          </p>
         </aside>
 
         <div>
@@ -381,8 +396,7 @@ export function CreateAccountScreen() {
           </form>
           <p className="mt-5 text-[13px] leading-5 text-[var(--text-secondary)]">
             Truthlabel helps explain labels; it does not replace the original
-            package label or medical advice. Your Gumroad checkout controls the
-            trial, billing, and cancellation.
+            package label or medical advice.
           </p>
           <p className="mt-3 text-[13px] leading-5 text-[var(--text-secondary)]">
             Already have an account?{" "}
@@ -591,9 +605,33 @@ export function ActivateScreen() {
     message: string;
   } | null>(null);
   const [isActivatingLicense, setIsActivatingLicense] = useState(false);
-  const checkoutUrl =
-    process.env.NEXT_PUBLIC_GUMROAD_CHECKOUT_URL?.trim() || "https://truthlabel.gumroad.com";
+  const checkoutUrl = getGumroadCheckoutUrl();
   const isActive = accessState === "active";
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const licenseFromUrl =
+      params.get("license_key") || params.get("license") || "";
+
+    if (!licenseFromUrl.trim()) {
+      return;
+    }
+
+    const cleanedLicenseKey = licenseFromUrl.trim();
+
+    void Promise.resolve().then(() => {
+      setLicenseKey(cleanedLicenseKey);
+      setActivationStatus({
+        tone: "yellow",
+        message:
+          "License key found from the activation link. Review it, then activate access.",
+      });
+    });
+  }, []);
 
   async function handleLicenseActivation(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -602,7 +640,7 @@ export function ActivateScreen() {
     if (!user) {
       setActivationStatus({
         tone: "red",
-        message: "Sign in before activating a Gumroad license.",
+        message: "Sign in before activating your access.",
       });
       return;
     }
@@ -612,7 +650,7 @@ export function ActivateScreen() {
     if (trimmedLicenseKey.length < 8) {
       setActivationStatus({
         tone: "red",
-        message: "Enter the Gumroad license key from your purchase email.",
+        message: "Enter the license key from your purchase email.",
       });
       return;
     }
@@ -656,7 +694,7 @@ export function ActivateScreen() {
         message:
           error instanceof Error
             ? error.message
-            : "Truthlabel could not verify this Gumroad license.",
+            : "Truthlabel could not verify this license key.",
       });
     } finally {
       setIsActivatingLicense(false);
@@ -667,7 +705,7 @@ export function ActivateScreen() {
     <AuthShell
       eyebrow="Activate"
       title="Activate your Truthlabel access."
-      message="Start the 7-day Gumroad trial first, add card details at checkout, then activate Truthlabel with the license key from your purchase email."
+      message="Access not active yet. If you used a different email at checkout, paste the license key from your purchase email to link access to this account."
     >
       {errorMessage ? <StatusMessage tone="red" message={errorMessage} /> : null}
 
@@ -689,7 +727,7 @@ export function ActivateScreen() {
             Current access:{" "}
             <span className="font-semibold">
               {accessKind === "paid"
-                ? "Active Gumroad subscription or trial"
+                ? "Active subscription or trial"
                 : subscription?.status ?? "Inactive"}
             </span>
           </p>
@@ -697,14 +735,23 @@ export function ActivateScreen() {
       ) : null}
 
       <div className="mt-5 grid gap-2.5">
-        <a
-          href={checkoutUrl}
-          className="inline-flex justify-center rounded-full border border-transparent bg-[var(--text-main)] px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-white"
-        >
-          Start Gumroad trial
-        </a>
+        {user ? (
+          <a
+            href={checkoutUrl}
+            className="inline-flex justify-center rounded-full border border-transparent bg-[var(--text-main)] px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-white"
+          >
+            Start 7-day trial
+          </a>
+        ) : (
+          <Link
+            href="/create-account"
+            className="inline-flex justify-center rounded-full border border-transparent bg-[var(--text-main)] px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-white"
+          >
+            Create account to start trial
+          </Link>
+        )}
         <p className="text-center text-[12px] font-semibold leading-5 text-[var(--text-secondary)]">
-          Gumroad collects card details before the 7-day trial starts. If you
+          Card details are entered before the 7-day trial starts. If you
           continue after the trial, you can cancel anytime.
         </p>
         {user ? (
@@ -713,7 +760,7 @@ export function ActivateScreen() {
             onClick={() => void refreshAccess()}
             className="rounded-full border border-[var(--border-soft)] bg-white px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-[var(--text-main)]"
           >
-            Refresh access status
+            I finished checkout - check access
           </button>
         ) : (
           <Link
@@ -739,7 +786,7 @@ export function ActivateScreen() {
       >
         <label className="block">
           <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--text-secondary)]">
-            Gumroad license key
+            License key
           </span>
           <input
             className={inputClass}
@@ -748,12 +795,11 @@ export function ActivateScreen() {
             inputMode="text"
             value={licenseKey}
             onChange={(event) => setLicenseKey(event.target.value)}
-            placeholder="Paste your Gumroad license key"
+            placeholder="Paste your license key"
           />
         </label>
         <p className="mt-2 text-[12px] leading-5 text-[var(--text-secondary)]">
-          Use the license key from your Gumroad purchase email. Truthlabel
-          verifies it securely and stores only a protected license hash.
+          Paste the key from your purchase email to activate this account.
         </p>
         {activationStatus ? (
           <StatusMessage
@@ -765,20 +811,9 @@ export function ActivateScreen() {
           disabled={isActivatingLicense || !user}
           className={submitButtonClass(isActivatingLicense || !user)}
         >
-          {isActivatingLicense ? "Verifying..." : "Activate paid access"}
+          {isActivatingLicense ? "Verifying..." : "Activate access"}
         </button>
       </form>
-
-      <div className="mt-5 rounded-[18px] border border-[var(--border-soft)] bg-white px-4 py-3">
-        <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--text-secondary)]">
-          Trial and license activation
-        </p>
-        <p className="mt-2 text-[13px] leading-5 text-[var(--text-secondary)]">
-          The 7-day trial is created by Gumroad checkout, not by account
-          creation alone. After checkout, paste the Gumroad license key here to
-          connect the subscription or trial to your Truthlabel account.
-        </p>
-      </div>
     </AuthShell>
   );
 }

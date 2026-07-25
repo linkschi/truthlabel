@@ -4,10 +4,11 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { type ReactNode, Suspense, useEffect } from "react";
 import { useTruthlabelAuth } from "@/components/auth/AuthProvider";
+import { publicAppConfig } from "@/lib/appConfig";
 
 function FullPageLoading({
   title = "Checking access",
-  message = "Truthlabel is checking your account and Gumroad access status.",
+  message = "Truthlabel is checking your account access status.",
 }: {
   title?: string;
   message?: string;
@@ -36,9 +37,10 @@ function ProtectedAppShellInner({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const router = useRouter();
+  const allowLocalDevBypass = publicAppConfig.flags.enableLocalDevBypass;
 
   useEffect(() => {
-    if (accessState === "loading" || !isConfigured) {
+    if (allowLocalDevBypass || accessState === "loading" || !isConfigured) {
       return;
     }
 
@@ -53,7 +55,11 @@ function ProtectedAppShellInner({ children }: { children: ReactNode }) {
     if (accessState === "inactive") {
       router.replace("/activate");
     }
-  }, [accessState, isConfigured, pathname, router, searchParams]);
+  }, [accessState, allowLocalDevBypass, isConfigured, pathname, router, searchParams]);
+
+  if (allowLocalDevBypass) {
+    return children;
+  }
 
   if (!isConfigured) {
     return (
@@ -85,7 +91,7 @@ function ProtectedAppShellInner({ children }: { children: ReactNode }) {
         title={accessState === "loading" ? "Checking access" : "Redirecting"}
         message={
           errorMessage ||
-          "Truthlabel is checking whether this account has activated Gumroad access."
+          "Truthlabel is checking whether this account has active access."
         }
       />
     );

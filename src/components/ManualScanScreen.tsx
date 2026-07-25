@@ -19,6 +19,7 @@ import { saveLatestManualScan } from "@/lib/manualScanStorage";
 import type { NormalizedProductForScan } from "@/lib/productDatabase/productDatabaseTypes";
 import type { BarcodeScanLookupStatus } from "@/lib/runBarcodeScan";
 import type { ManualScanInput } from "@/lib/runManualScan";
+import { saveCompletedScanToHistory } from "@/lib/scanHistory/scanHistoryClient";
 import {
   getSavedAllergyProfile,
   useUserSettings,
@@ -143,6 +144,14 @@ const analysisStages: AnalysisStage[] = [
 function wait(ms: number) {
   return new Promise((resolve) => {
     window.setTimeout(resolve, ms);
+  });
+}
+
+function saveHistoryWithoutBlocking(
+  input: Parameters<typeof saveCompletedScanToHistory>[0],
+) {
+  void saveCompletedScanToHistory(input).catch(() => {
+    // History should never block the completed scan result.
   });
 }
 
@@ -582,6 +591,13 @@ export default function ManualScanScreen({
           savedAt: new Date().toISOString(),
         });
 
+        saveHistoryWithoutBlocking({
+          scanResult: result.scanResult,
+          ingredientText: result.productData.ingredientText,
+          parsedIngredients: result.productData.ingredients,
+          source: "product_database",
+        });
+
         startTransition(() => {
           router.push("/app/results?barcode=latest&fresh=1");
         });
@@ -779,6 +795,13 @@ export default function ManualScanScreen({
           savedAt: new Date().toISOString(),
         });
 
+        saveHistoryWithoutBlocking({
+          scanResult: finalResult,
+          ingredientText: barcodeDraftProduct.ingredientText,
+          parsedIngredients: barcodeDraftProduct.ingredients,
+          source: "product_database",
+        });
+
         startTransition(() => {
           router.push("/app/results?barcode=latest&fresh=1");
         });
@@ -807,6 +830,12 @@ export default function ManualScanScreen({
         },
         result: finalResult,
         savedAt: new Date().toISOString(),
+      });
+
+      saveHistoryWithoutBlocking({
+        scanResult: finalResult,
+        ingredientText: input.ingredientText,
+        source: options?.scanSource ?? "manual_paste",
       });
 
       startTransition(() => {

@@ -775,13 +775,6 @@ function shouldShowAsDeepExposure(
   summary: IngredientCategorySummary,
   input: BuildScanResultInput,
 ) {
-  if (
-    summary.categoryId === "allergy_risk" &&
-    summary.redReasonType !== "allergy_profile_match"
-  ) {
-    return false;
-  }
-
   return (
     summary.displayAllowed &&
     (summary.severity === "yellow" || summary.severity === "red") &&

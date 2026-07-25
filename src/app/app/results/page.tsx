@@ -15,6 +15,7 @@ export default async function AppResultsPage({
     category?: string | string[];
     demo?: string | string[];
     fresh?: string | string[];
+    history?: string | string[];
     manual?: string | string[];
   }>;
 }) {
@@ -29,6 +30,9 @@ export default async function AppResultsPage({
   const freshParam = Array.isArray(params.fresh)
     ? params.fresh[0]
     : params.fresh;
+  const historyScanId = Array.isArray(params.history)
+    ? params.history[0]
+    : params.history;
   const manualScanKey = Array.isArray(params.manual)
     ? params.manual[0]
     : params.manual;
@@ -40,6 +44,7 @@ export default async function AppResultsPage({
       category={category}
       demoProductId={demoProductId}
       freshResult={freshResult}
+      historyScanId={historyScanId}
       manualScanKey={manualScanKey}
     />
   );

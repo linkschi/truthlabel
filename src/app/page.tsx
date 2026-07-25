@@ -229,14 +229,14 @@ const useCases = [
 ];
 
 const planIncludes = [
-  "7-day Gumroad trial with card details first",
+  "7-day trial with card details first",
   "Full barcode scanning",
   "Complete ingredient analysis",
   "Personalized allergy Watch List",
   "Food-preference settings",
   "Green, yellow, and red explanations",
   "Serious ingredient alerts",
-  "Cancel anytime through Gumroad",
+  "Cancel anytime before the first charge",
   "Sign-in based account access",
   "Future improvements included",
 ];
@@ -245,7 +245,7 @@ const faq = [
   {
     question: "Is there a free trial?",
     answer:
-      "Yes. Truthlabel uses a 7-day Gumroad membership trial. You enter card details at checkout before the trial starts, then you can cancel anytime before the first charge if you do not want to continue.",
+      "Yes. Start with 7 days free. Card details are entered before the trial starts, and you can cancel anytime before the first charge.",
   },
   {
     question: "What does Truthlabel check?",
@@ -275,7 +275,7 @@ const faq = [
   {
     question: "How do I access Truthlabel after joining?",
     answer:
-      "Start the Gumroad trial first, then create or sign into your Truthlabel account and paste the Gumroad license key on the activation page.",
+      "Create your Truthlabel account first, then continue to checkout. If access does not connect automatically, paste the license key from your purchase email on the activation page.",
   },
   {
     question: "Can I manage my membership?",
@@ -283,13 +283,6 @@ const faq = [
       "Yes. Billing, membership management, and cancellation are handled through the secure subscription checkout flow.",
   },
 ];
-
-function getCheckoutUrl() {
-  return (
-    process.env.NEXT_PUBLIC_GUMROAD_CHECKOUT_URL?.trim() ||
-    "https://truthlabel.gumroad.com"
-  );
-}
 
 function BrandMark() {
   return (
@@ -399,8 +392,7 @@ function CreatorNotes({
 }
 
 export default function LandingPage() {
-  const checkoutUrl = getCheckoutUrl();
-  const trialUrl = checkoutUrl;
+  const trialUrl = "/create-account";
 
   return (
     <main className="landing-urgent min-h-screen overflow-hidden px-4 py-4 sm:px-6">
@@ -759,10 +751,10 @@ export default function LandingPage() {
               available.
             </p>
             <p className="mt-4 rounded-[20px] border border-[var(--border-soft)] bg-[var(--bg-soft)] px-4 py-3 text-[13px] font-bold leading-6 text-[var(--text-main)]">
-              Start with the 7-day Gumroad trial. Card details are entered
-              before the trial begins, checkout confirms the current price, and
-              you can cancel anytime before the first charge if you do not want
-              to continue.
+              Create your Truthlabel account first, then continue to the 7-day
+              trial checkout. Card details are entered before the trial
+              begins, checkout confirms the current price, and you can cancel
+              anytime before the first charge if you do not want to continue.
             </p>
           </div>
           <div className="rounded-[34px] border border-[var(--green-border)] bg-[var(--green-bg)] p-6">
@@ -793,9 +785,9 @@ export default function LandingPage() {
               </Link>
             </div>
             <p className="mt-4 text-[12px] font-bold leading-5 text-[var(--green-dark)]">
-              Trial access is created through Gumroad checkout, then connected
-              to your Truthlabel account with the license key from your purchase
-              email.
+              Account creation comes first. Trial access is created through
+              checkout, then connected to your Truthlabel account with
+              the license key from your purchase email.
             </p>
           </div>
         </section>
@@ -805,7 +797,7 @@ export default function LandingPage() {
           items={[
             "Position the price as a small monthly cost for faster label understanding and more control while shopping.",
             "Current planned offer: 7-day free trial, then $3.99/month.",
-            "Important business rule: trial starts through Gumroad checkout with card details first. Do not restore no-card account-created trials unless the business model changes again.",
+            "Important business rule: create account first, then secure checkout starts the card-backed 7-day trial. Do not restore no-card account-created trials unless the business model changes again.",
             "Future emotional angle after evidence is ready: protect yourself from overlooked label risks and from formulation choices that prioritize shelf life, cost, or taste intensity over your personal priorities.",
             "Add independence as a sales factor near the trial CTA: Truthlabel should be presented as an independent research-led tool, not funded by food brands, manufacturers, or advertisers whose products are being checked.",
             "Create a future section about independence and research standards: explain that Truthlabel aims to evaluate labels from the consumer side, cite sources, separate evidence levels, and avoid sponsored product rankings.",
@@ -860,7 +852,7 @@ export default function LandingPage() {
             </Link>
           </div>
           <p className="mx-auto mt-4 max-w-xl text-[13px] font-bold leading-6 text-white/72">
-            Start with 7 days free through Gumroad checkout. Card details are
+            Create your account first, then start 7 days free. Card details are
             entered before the trial begins, and you can cancel anytime.
           </p>
           <p className="mt-7 font-heading text-[1.4rem] font-semibold tracking-[-0.04em] text-white/72">

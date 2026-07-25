@@ -1,5 +1,6 @@
 const truthyPattern = /^(1|true|yes|on)$/i;
 const falsyPattern = /^(0|false|no|off)$/i;
+const isDevelopmentRuntime = process.env.NODE_ENV !== "production";
 
 function readStringEnv(name: string, fallback = "") {
   const value = process.env[name]?.trim();
@@ -69,6 +70,9 @@ export const publicAppConfig = {
       true,
     ),
     enableDebugOutput: readBooleanEnv("NEXT_PUBLIC_ENABLE_DEBUG_OUTPUT", false),
+    enableLocalDevBypass:
+      isDevelopmentRuntime &&
+      readBooleanEnv("NEXT_PUBLIC_ENABLE_LOCAL_DEV_BYPASS", true),
   },
 } as const;
 

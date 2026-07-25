@@ -20,6 +20,11 @@ const navItems = [
     label: "Manual scan",
     detail: "Paste ingredients and run a real label scan.",
   },
+  {
+    href: "/app/history",
+    label: "History",
+    detail: "Review previous completed scans saved under this account.",
+  },
   ...(publicAppConfig.flags.enableDemoProducts
     ? [
         {
@@ -37,7 +42,7 @@ const navItems = [
   {
     href: "/app/account",
     label: "Account",
-    detail: "Open account, saved-scan, and preference information.",
+    detail: "Open account, access, and preference information.",
   },
 ] as const;
 

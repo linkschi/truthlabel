@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { AuthProvider } from "@/components/auth/AuthProvider";
+import LocalDevNavigation from "@/components/LocalDevNavigation";
 import PwaServiceWorkerRegistration from "@/components/PwaServiceWorkerRegistration";
 import "./globals.css";
 
@@ -52,6 +53,7 @@ export default function RootLayout({
       <body suppressHydrationWarning className="min-h-full">
         <AuthProvider>
           <PwaServiceWorkerRegistration />
+          <LocalDevNavigation />
           {children}
         </AuthProvider>
       </body>

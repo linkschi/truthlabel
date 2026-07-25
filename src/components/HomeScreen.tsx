@@ -12,6 +12,7 @@ import {
 import { publicAppConfig } from "@/lib/appConfig";
 import { saveProfile, useStoredProfile } from "@/lib/profileStorage";
 import PwaInstallPrompt from "@/components/PwaInstallPrompt";
+import RecentScansSection from "@/components/scanHistory/RecentScansSection";
 
 type HomeIconName =
   | "activity"
@@ -22,6 +23,7 @@ type HomeIconName =
   | "clipboard"
   | "code"
   | "file"
+  | "history"
   | "home"
   | "list"
   | "search"
@@ -199,6 +201,25 @@ function Icon({ name, className = "" }: { name: HomeIconName; className?: string
           <path
             d="M4 10.8 12 4l8 6.8V20a1 1 0 0 1-1 1h-4.2v-5.6H9.2V21H5a1 1 0 0 1-1-1v-9.2Z"
             stroke="currentColor"
+            strokeLinejoin="round"
+            strokeWidth="1.7"
+          />
+        </svg>
+      );
+    case "history":
+      return (
+        <svg {...commonProps}>
+          <path
+            d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3L4.5 8.9"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.7"
+          />
+          <path
+            d="M4.5 5v4h4M12 8v4.3l3 1.7"
+            stroke="currentColor"
+            strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth="1.7"
           />
@@ -659,11 +680,11 @@ function DeveloperDemoTools({ onNavigate }: { onNavigate: () => void }) {
   return (
     <div className="space-y-1.5">
       <ToolRow
-        href="/app/account"
+        href="/app/history"
         title="Save your scans"
-        detail="Account and cross-device scan history are kept here while sign-in is still being built."
-        meta="Account"
-        icon="user"
+        detail="Open the private scan history list for this account."
+        meta="History"
+        icon="history"
         onNavigate={onNavigate}
       />
       {featureFlags.enableDemoProducts ? (
@@ -826,6 +847,12 @@ function BottomNavigation() {
       active: false,
     },
     {
+      href: "/app/history",
+      label: "History",
+      icon: "history" as const,
+      active: pathname === "/app/history",
+    },
+    {
       href: "/app/account",
       label: "Account",
       icon: "user" as const,
@@ -838,7 +865,7 @@ function BottomNavigation() {
       aria-label="Primary navigation"
       className="fixed inset-x-0 bottom-0 z-40 border-t border-[#E2E8E4] bg-white/96 shadow-[0_-8px_22px_rgba(15,40,28,0.06)] backdrop-blur"
     >
-      <div className="mx-auto grid h-[66px] max-w-[480px] grid-cols-4 px-2 pb-[env(safe-area-inset-bottom)]">
+      <div className="mx-auto grid h-[66px] max-w-[480px] grid-cols-5 px-2 pb-[env(safe-area-inset-bottom)]">
         {items.map((item) => (
           <Link
             key={`${item.label}-${item.href}`}
@@ -882,6 +909,7 @@ export default function HomeScreen() {
         <HomeHeader />
         <HeroSection />
         <ScanActionGrid onNavigate={handleNavigate} />
+        <RecentScansSection onScanProduct={handleNavigate} />
         <ValuePreview />
         <ExploreMore
           activeAccordion={activeAccordion}

@@ -2,6 +2,7 @@
 /* eslint-disable @next/next/no-img-element */
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   type ReactNode,
   useEffect,
@@ -23,6 +24,12 @@ import type {
 import { loadLatestBarcodeScan } from "@/lib/barcodeScanStorage";
 import { getDemoScanResult } from "@/lib/getDemoScanResult";
 import { loadLatestManualScan } from "@/lib/manualScanStorage";
+import {
+  deleteScanHistoryRecord,
+  getScanHistoryRecord,
+} from "@/lib/scanHistory/scanHistoryClient";
+import { formatFullScanDate } from "@/lib/scanHistory/scanHistoryDisplay";
+import type { ScanHistoryRecord } from "@/lib/scanHistory/scanHistoryTypes";
 import {
   getSavedAllergyProfile,
   useUserSettings,
@@ -290,17 +297,21 @@ function useCountUp(targetValue: number, enabled: boolean, durationMs = 650) {
 function buildResultMotionKey(args: {
   barcodeScanKey?: string;
   manualScanKey?: string;
+  historyScanId?: string;
   demoProductId?: string;
   category?: string;
   latestBarcodeSavedAt?: string;
   latestManualSavedAt?: string;
+  historyScannedAt?: string;
   scanResult: ScanResult;
 }) {
   const sourceKey = args.barcodeScanKey
     ? `barcode:${args.latestBarcodeSavedAt ?? args.barcodeScanKey}`
     : args.manualScanKey
       ? `manual:${args.latestManualSavedAt ?? args.manualScanKey}`
-      : `demo:${args.demoProductId ?? args.category ?? "sample"}`;
+      : args.historyScanId
+        ? `history:${args.historyScannedAt ?? args.historyScanId}`
+        : `demo:${args.demoProductId ?? args.category ?? "sample"}`;
 
   return [
     sourceKey,
@@ -1858,16 +1869,26 @@ export default function ProductResult({
   category,
   demoProductId,
   freshResult = false,
+  historyScanId,
   manualScanKey,
 }: {
   barcodeScanKey?: string;
   category?: string;
   demoProductId?: string;
   freshResult?: boolean;
+  historyScanId?: string;
   manualScanKey?: string;
 }) {
+  const router = useRouter();
   const userSettings = useUserSettings();
   const [saved, setSaved] = useState(false);
+  const [historyRecord, setHistoryRecord] = useState<ScanHistoryRecord | null>(
+    null,
+  );
+  const [historyStatus, setHistoryStatus] = useState<
+    "idle" | "loading" | "loaded" | "not_found" | "error"
+  >(historyScanId ? "loading" : "idle");
+  const [historyActionError, setHistoryActionError] = useState("");
   const [isIngredientsOpen, setIsIngredientsOpen] = useState(false);
   const [isDeepChecksExpanded, setIsDeepChecksExpanded] = useState(false);
   const [expandedDeepCheckId, setExpandedDeepCheckId] = useState<string | null>(
@@ -1891,6 +1912,7 @@ export default function ProductResult({
   const manualScanResult: ScanResult | null = manualScanKey
     ? latestManualScan?.result ?? null
     : null;
+  const historyScanResult = historyRecord?.resultSnapshot.scanResult ?? null;
   const barcodeScanResolved = !barcodeScanKey || typeof window !== "undefined";
   const manualScanResolved = !manualScanKey || typeof window !== "undefined";
   const savedAllergyProfile = useMemo(
@@ -1902,15 +1924,58 @@ export default function ProductResult({
     () => getDemoScanResult(category, savedAllergyProfile, demoProductId),
     [category, demoProductId, savedAllergyProfile],
   );
-  const scanResult = barcodeScanResult ?? manualScanResult ?? fallbackScanResult;
+  const scanResult =
+    historyScanResult ?? barcodeScanResult ?? manualScanResult ?? fallbackScanResult;
+
+  useEffect(() => {
+    if (!historyScanId) {
+      return;
+    }
+
+    let active = true;
+
+    void Promise.resolve()
+      .then(() => {
+        if (!active) {
+          return null;
+        }
+
+        setHistoryStatus("loading");
+        setHistoryActionError("");
+        return getScanHistoryRecord(historyScanId);
+      })
+      .then((record) => {
+        if (!active) {
+          return;
+        }
+
+        setHistoryRecord(record);
+        setHistoryStatus(record ? "loaded" : "not_found");
+      })
+      .catch(() => {
+        if (!active) {
+          return;
+        }
+
+        setHistoryRecord(null);
+        setHistoryStatus("error");
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [historyScanId]);
+
   const prefersReducedMotion = usePrefersReducedMotion();
   const resultMotionKey = buildResultMotionKey({
     barcodeScanKey,
     manualScanKey,
+    historyScanId,
     demoProductId,
     category,
     latestBarcodeSavedAt: latestBarcodeScan?.savedAt,
     latestManualSavedAt: latestManualScan?.savedAt,
+    historyScannedAt: historyRecord?.scannedAt,
     scanResult,
   });
   const freshMotionEnabled = useFreshResultMotion(resultMotionKey, freshResult);
@@ -2084,14 +2149,67 @@ export default function ProductResult({
   const brandTrustTone = toRowTone(scanResult.brandTrustSafety.severity);
   const showBrandTrustSafety = shouldShowBrandTrustSafety(scanResult, userSettings);
   const doneHref =
-    scanResult.productHero.scanSource === "manual_paste" ||
-    scanResult.productHero.scanSource === "barcode"
+    historyScanId
+      ? "/app/history"
+      : scanResult.productHero.scanSource === "manual_paste" ||
+          scanResult.productHero.scanSource === "barcode"
       ? "/app/manual"
       : "/app";
   const feedbackIngredientText =
+    historyRecord?.resultSnapshot.ingredientsText ??
     latestManualScan?.input.ingredientText ??
     latestBarcodeScan?.productData.ingredientText ??
     "";
+
+  async function handleDeleteHistoryScan() {
+    if (!historyScanId) {
+      return;
+    }
+
+    setHistoryActionError("");
+
+    try {
+      await deleteScanHistoryRecord(historyScanId);
+      router.push("/app/history");
+    } catch {
+      setHistoryActionError("We couldn't delete this saved scan.");
+    }
+  }
+
+  if (historyScanId && historyStatus === "loading") {
+    return (
+      <ResultStateView
+        title="Opening saved scan"
+        message="Loading the saved scan snapshot from your history."
+      />
+    );
+  }
+
+  if (historyScanId && historyStatus === "not_found") {
+    return (
+      <ResultStateView
+        title="Saved scan not found"
+        message="We could not find that saved scan in this account."
+        primaryHref="/app/history"
+        primaryLabel="Open history"
+        secondaryHref="/app/manual"
+        secondaryLabel="Start a new scan"
+      />
+    );
+  }
+
+  if (historyScanId && historyStatus === "error") {
+    return (
+      <ResultStateView
+        title="History unavailable"
+        message="We couldn't load this saved scan. Try again, or start a new scan."
+        primaryHref="/app/history"
+        primaryLabel="Open history"
+        secondaryHref="/app/manual"
+        secondaryLabel="Start a new scan"
+      />
+    );
+  }
 
   if (barcodeScanKey && !barcodeScanResolved) {
     return (
@@ -2149,21 +2267,64 @@ export default function ProductResult({
               Done
             </Link>
             <h1 className="text-[15px] font-semibold text-[var(--text-main)]">Results</h1>
-            <button
-              type="button"
-              onClick={() => setSaved((current) => !current)}
-              className={`justify-self-end rounded-full border p-2.5 transition-colors ${
-                saved
-                  ? "border-[var(--red-border)] bg-[var(--red-bg)] text-[var(--red-dark)]"
-                  : "border-[var(--border-soft)] bg-[var(--bg-surface)] text-[var(--text-secondary)]"
-              }`}
-              aria-label={saved ? "Remove saved result" : "Save result"}
-            >
-              <HeartIcon filled={saved} />
-            </button>
+            {historyScanId ? (
+              <button
+                type="button"
+                onClick={() => void handleDeleteHistoryScan()}
+                className="justify-self-end rounded-full border border-[var(--red-border)] bg-[var(--red-bg)] px-3 py-2 text-[12px] font-bold text-[var(--red-dark)] transition-colors"
+              >
+                Delete
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setSaved((current) => !current)}
+                className={`justify-self-end rounded-full border p-2.5 transition-colors ${
+                  saved
+                    ? "border-[var(--red-border)] bg-[var(--red-bg)] text-[var(--red-dark)]"
+                    : "border-[var(--border-soft)] bg-[var(--bg-surface)] text-[var(--text-secondary)]"
+                }`}
+                aria-label={saved ? "Remove saved result" : "Save result"}
+              >
+                <HeartIcon filled={saved} />
+              </button>
+            )}
           </header>
 
           <BrandMark />
+
+          {historyRecord ? (
+            <section className="mt-4 rounded-[22px] border border-[#D7E7DD] bg-[#F6FBF8] px-4 py-3">
+              <p className="text-[11px] font-black uppercase tracking-[0.16em] text-[#0E5A3F]">
+                Saved scan
+              </p>
+              <p className="mt-1 text-[13px] leading-5 text-[#4F5D56]">
+                Scanned {formatFullScanDate(historyRecord.scannedAt)}.
+              </p>
+              <p className="mt-2 text-[12px] leading-5 text-[#66716B]">
+                This is the original saved snapshot. Truthlabel will not silently recalculate it.
+              </p>
+              {historyActionError ? (
+                <p className="mt-2 text-[12px] font-bold text-[var(--red-dark)]">
+                  {historyActionError}
+                </p>
+              ) : null}
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <Link
+                  href="/app/manual"
+                  className="flex min-h-10 items-center justify-center rounded-full border border-[#D7E7DD] bg-white px-3 text-center text-[12px] font-extrabold text-[#0E5A3F]"
+                >
+                  Scan again
+                </Link>
+                <Link
+                  href="/app/manual"
+                  className="flex min-h-10 items-center justify-center rounded-full bg-[#0E5A3F] px-3 text-center text-[12px] font-extrabold text-white"
+                >
+                  Check for updated information
+                </Link>
+              </div>
+            </section>
+          ) : null}
 
           <section
             className={`mt-6 ${shouldAnimateFreshResult ? "truthlabel-reveal" : ""}`}
