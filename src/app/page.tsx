@@ -44,48 +44,23 @@ const checkHighlights = [
 
 const labelInsightSlides = [
   {
-    title: "Banned and restricted signals",
-    tag: "Red checks",
     imagePrompt: "Add a restricted ingredient or result screenshot",
-    copy:
-      "Truthlabel brings serious ingredient signals forward, including items that are banned, restricted, revoked, or not permitted in supported regions.",
-    action: "Check the ingredient and region before trusting the product.",
     tone: "red",
   },
   {
-    title: "Allergy Watch List matches",
-    tag: "Personal alerts",
     imagePrompt: "Add an allergy warning screen or label close-up",
-    copy:
-      "A product can look normal until it matches something you personally avoid. Truthlabel can turn selected allergens into direct personal warnings.",
-    action: "Always confirm allergy information on the package label.",
     tone: "green",
   },
   {
-    title: "Additive-heavy labels",
-    tag: "Yellow load",
     imagePrompt: "Add an additive-heavy label or quick overview screen",
-    copy:
-      "Colours, preservatives, sweeteners, and flavour systems can stack up quickly. Truthlabel separates one moderate concern from a high additive load.",
-    action: "See when multiple moderate signals become worth reviewing.",
     tone: "yellow",
   },
   {
-    title: "Processed oils and fats",
-    tag: "Oil review",
     imagePrompt: "Add an oil/fat ingredient label example",
-    copy:
-      "Oil wording can be vague or easy to skim past. Truthlabel highlights processed oils, frying-oil systems, and hydrogenated fat markers when they appear.",
-    action: "Know whether the oil is simple, processed, or a serious fat concern.",
     tone: "yellow",
   },
   {
-    title: "Label photo to result",
-    tag: "OCR scan",
     imagePrompt: "Add a label photo beside a Truthlabel result",
-    copy:
-      "Scan or upload a label photo, review the extracted ingredients, then run the same Truthlabel checks through the existing result page.",
-    action: "OCR can make mistakes, so the user reviews the text first.",
     tone: "green",
   },
 ];
@@ -558,13 +533,8 @@ export default function LandingPage() {
                 id="label-insights-title"
                 className="mt-2 font-heading text-[2rem] font-semibold leading-[1.03] tracking-[-0.055em] text-[var(--text-main)] sm:text-[2.8rem]"
               >
-                The checks you will see before you buy.
+                Swipe through the checks Truthlabel brings forward.
               </h2>
-              <p className="mt-3 text-[15px] leading-7 text-[var(--text-secondary)] sm:text-[17px]">
-                This section is ready for real Truthlabel screenshots and label
-                examples. Each slide is shaped like a portrait social carousel
-                so the images stay bold on mobile.
-              </p>
             </div>
             <p className="rounded-full border border-[var(--green-border)] bg-[var(--green-bg)] px-4 py-2 text-[12px] font-black uppercase tracking-[0.14em] text-[var(--green-dark)]">
               Swipe sideways
@@ -585,48 +555,21 @@ export default function LandingPage() {
 
               return (
                 <article
-                  key={slide.title}
-                  className="landing-label-slide shrink-0 overflow-hidden rounded-[30px] border border-[var(--border-soft)] bg-[var(--bg-surface)] p-4 shadow-[0_16px_34px_rgba(23,20,18,0.08)]"
+                  key={slide.imagePrompt}
+                  className="landing-label-slide shrink-0 overflow-hidden rounded-[30px] border border-[var(--border-soft)] bg-[var(--bg-surface)] p-3 shadow-[0_16px_34px_rgba(23,20,18,0.08)]"
                   style={{ aspectRatio: "4 / 5" }}
+                  aria-label={`Truthlabel image slide ${index + 1}`}
                 >
-                  <div className="flex h-full flex-col">
-                    <div className="flex items-start justify-between gap-3">
-                      <span
-                        className={`rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em] ${frameClass}`}
-                      >
-                        {slide.tag}
-                      </span>
-                      <span className="text-[11px] font-black uppercase tracking-[0.14em] text-[var(--text-muted)]">
-                        {String(index + 1).padStart(2, "0")}
-                      </span>
-                    </div>
-
-                    <h3 className="mt-4 font-heading text-[1.75rem] font-semibold leading-[0.98] tracking-[-0.06em] text-[var(--text-main)]">
-                      {slide.title}
-                    </h3>
-
-                    <div
-                      className={`relative mt-4 min-h-0 flex-1 overflow-hidden rounded-[24px] border ${frameClass}`}
-                    >
-                      <div className="absolute inset-0 opacity-70 [background-image:radial-gradient(circle_at_26%_20%,rgba(255,255,255,0.68),transparent_28%),linear-gradient(135deg,rgba(255,255,255,0.28),transparent_48%)]" />
-                      <div className="relative grid h-full place-items-center p-4 text-center">
-                        <div>
-                          <p className="text-[11px] font-black uppercase tracking-[0.18em] opacity-75">
-                            Image slot
-                          </p>
-                          <p className="mx-auto mt-2 max-w-[15rem] text-[13px] font-black leading-5">
-                            {slide.imagePrompt}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="pt-4">
-                      <p className="text-[13px] font-semibold leading-5 text-[var(--text-secondary)]">
-                        {slide.copy}
-                      </p>
-                      <p className="mt-2 rounded-[16px] border border-[var(--border-soft)] bg-[var(--bg-soft)] px-3 py-2 text-[12px] font-black leading-5 text-[var(--text-main)]">
-                        {slide.action}
+                  <div
+                    className={`relative h-full overflow-hidden rounded-[24px] border ${frameClass}`}
+                  >
+                    <div className="absolute inset-0 opacity-70 [background-image:radial-gradient(circle_at_26%_20%,rgba(255,255,255,0.68),transparent_28%),linear-gradient(135deg,rgba(255,255,255,0.28),transparent_48%)]" />
+                    <span className="absolute right-4 top-4 rounded-full bg-white/75 px-3 py-1 text-[11px] font-black uppercase tracking-[0.14em]">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <div className="relative grid h-full place-items-center p-5 text-center">
+                      <p className="mx-auto max-w-[15rem] text-[13px] font-black leading-5">
+                        {slide.imagePrompt}
                       </p>
                     </div>
                   </div>
@@ -634,6 +577,12 @@ export default function LandingPage() {
               );
             })}
           </div>
+
+          <p className="mx-auto mt-4 max-w-3xl text-center text-[15px] font-semibold leading-7 text-[var(--text-secondary)] sm:text-[17px]">
+            These portrait slides are reserved for your edited screenshots and
+            label examples. The images move sideways, while this explanation
+            stays fixed so the section feels clean and easy to read.
+          </p>
         </section>
 
         <CreatorNotes
