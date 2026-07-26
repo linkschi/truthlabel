@@ -9,7 +9,6 @@ const localNavigationLinks = [
   { href: "/app/manual", label: "Manual" },
   { href: "/app/manual?mode=camera", label: "Camera" },
   { href: "/app/history", label: "History" },
-  { href: "/app/settings", label: "Settings" },
   { href: "/app/account", label: "Account" },
   {
     href: "/app/results?category=packaged-processed-foods&demo=red-berry-soda",

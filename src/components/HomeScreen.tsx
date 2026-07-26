@@ -627,7 +627,7 @@ function WatchListPreview({ watchItems }: { watchItems: string[] }) {
       )}
 
       <Link
-        href="/app/settings"
+        href="/app/account"
         className="mt-3 flex min-h-[42px] w-full items-center justify-center rounded-[12px] border border-[#D7E7DD] bg-white px-4 text-[13px] font-bold text-[#0E5A3F] transition hover:bg-[#F3FAF6] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.99]"
       >
         {watchItems.length > 0 ? "Edit Watch List" : "Set Up Watch List"}

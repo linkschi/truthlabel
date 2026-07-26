@@ -3,7 +3,17 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import AllergyProfileSettings from "@/components/AllergyProfileSettings";
+import ScanPreferencesSettings from "@/components/ScanPreferencesSettings";
 import { useTruthlabelAuth } from "@/components/auth/AuthProvider";
+import { getBrowserStorageNotice } from "@/lib/browserStorage";
+import {
+  clearUserSettings,
+  resetUserSettings,
+  updateAllergyProfile,
+  updateScanPreferences,
+  useUserSettings,
+} from "@/lib/userSettings/userSettingsStorage";
 
 type AccountIconName =
   | "arrow"
@@ -11,7 +21,6 @@ type AccountIconName =
   | "clipboard"
   | "home"
   | "lock"
-  | "settings"
   | "shield"
   | "user";
 
@@ -20,21 +29,6 @@ const benefits = [
   "Save products for later",
   "Sync your Watch List",
   "Access Truthlabel on another device",
-] as const;
-
-const futureSections = [
-  {
-    title: "Your activity",
-    items: ["Scan history", "Saved products", "Recent results"],
-  },
-  {
-    title: "Personalisation",
-    items: ["Watch List", "Ingredient preferences", "Notifications"],
-  },
-  {
-    title: "Application",
-    items: ["Appearance", "Privacy and data", "Help and feedback", "About Truthlabel"],
-  },
 ] as const;
 
 function Icon({
@@ -121,22 +115,6 @@ function Icon({
           />
         </svg>
       );
-    case "settings":
-      return (
-        <svg {...commonProps}>
-          <path
-            d="M12 15.3a3.3 3.3 0 1 0 0-6.6 3.3 3.3 0 0 0 0 6.6Z"
-            stroke="currentColor"
-            strokeWidth="1.7"
-          />
-          <path
-            d="M19.2 13.6v-3.2l-2-.5a6.6 6.6 0 0 0-.7-1.6l1.1-1.7-2.2-2.2-1.7 1.1a6.6 6.6 0 0 0-1.6-.7l-.5-2H10.4l-.5 2a6.6 6.6 0 0 0-1.6.7L6.6 4.4 4.4 6.6l1.1 1.7a6.6 6.6 0 0 0-.7 1.6l-2 .5v3.2l2 .5c.2.6.4 1.1.7 1.6l-1.1 1.7 2.2 2.2 1.7-1.1c.5.3 1 .5 1.6.7l.5 2h3.2l.5-2c.6-.2 1.1-.4 1.6-.7l1.7 1.1 2.2-2.2-1.1-1.7c.3-.5.5-1 .7-1.6l2-.5Z"
-            stroke="currentColor"
-            strokeLinejoin="round"
-            strokeWidth="1.45"
-          />
-        </svg>
-      );
     case "shield":
       return (
         <svg {...commonProps}>
@@ -195,6 +173,7 @@ function getAccountFirstName(metadata: unknown) {
 
 export default function AccountScreen() {
   const router = useRouter();
+  const settings = useUserSettings();
   const {
     accessKind,
     subscription,
@@ -205,6 +184,7 @@ export default function AccountScreen() {
     signOut,
   } = useTruthlabelAuth();
   const [statusMessage, setStatusMessage] = useState("");
+  const storageNotice = getBrowserStorageNotice();
 
   const accessLabel =
     accessKind === "paid"
@@ -347,63 +327,85 @@ export default function AccountScreen() {
           </div>
         </section>
 
-        <section className="mt-4 rounded-[18px] border border-[#E2E8E4] bg-white px-4 py-4">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <h2 className="text-[16px] font-extrabold text-[#101613]">
-                Available now
-              </h2>
-              <p className="mt-1 text-[13px] leading-[1.45] text-[#66716B]">
-                You can still personalise local scan settings for MVP testing.
-              </p>
-            </div>
-            <Icon name="settings" className="h-5 w-5 shrink-0 text-[#0E5A3F]" />
-          </div>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <Link
-              href="/app/settings"
-              className="inline-flex h-10 items-center rounded-full bg-[#0E5A3F] px-4 text-[12px] font-bold text-white transition hover:bg-[#0E4C37] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
-            >
-              Open settings
-            </Link>
-            <Link
-              href="/app/manual"
-              className="inline-flex h-10 items-center rounded-full border border-[#D7E7DD] bg-white px-4 text-[12px] font-bold text-[#0E5A3F] transition hover:bg-[#F3FAF6] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
-            >
-              Start a scan
-            </Link>
-          </div>
-        </section>
+        {storageNotice ? (
+          <section
+            role="status"
+            aria-live="polite"
+            className="mt-4 rounded-[18px] border border-[#F3D2D4] bg-[#FFF6F6] px-4 py-3 text-[#7A3D41]"
+          >
+            <p className="text-[11px] font-bold uppercase tracking-[0.14em]">
+              Storage note
+            </p>
+            <p className="mt-1.5 text-[13px] leading-5">{storageNotice}</p>
+          </section>
+        ) : null}
 
         <section className="mt-4 rounded-[18px] border border-[#E2E8E4] bg-[#F6F8F7] px-4 py-4">
           <h2 className="text-[16px] font-extrabold text-[#101613]">
-            Signed-in account layout
+            Personal scan controls
           </h2>
           <p className="mt-1 text-[13px] leading-[1.45] text-[#66716B]">
-            These sections are reserved for later cloud sync and paid account features.
+            Manage allergy and scan preferences here. Region detection can be
+            handled automatically later.
           </p>
-          <div className="mt-3 grid gap-3">
-            {futureSections.map((section) => (
-              <div
-                key={section.title}
-                className="rounded-[16px] border border-[#E2E8E4] bg-white px-3 py-3"
-              >
-                <h3 className="text-[13px] font-extrabold text-[#101613]">
-                  {section.title}
-                </h3>
-                <div className="mt-2 divide-y divide-[#EEF1EF]">
-                  {section.items.map((item) => (
-                    <div
-                      key={item}
-                      className="flex min-h-[36px] items-center justify-between gap-3 py-1.5 text-[13px] font-semibold text-[#66716B]"
-                    >
-                      <span>{item}</span>
-                      <Icon name="arrow" className="h-3.5 w-3.5 text-[#879089]" />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
+          <div className="mt-4 grid gap-4">
+            <AllergyProfileSettings
+              key={`account-allergy-${settings.allergyProfile.lastUpdated ?? settings.updatedAt}`}
+              profile={settings.allergyProfile}
+              onSave={(profile) => {
+                updateAllergyProfile(profile);
+                setStatusMessage("Allergy Watch List saved on this device.");
+              }}
+              onClear={() => {
+                updateAllergyProfile({
+                  allergens: [],
+                  customAllergens: [],
+                  lastUpdated: new Date().toISOString(),
+                });
+                setStatusMessage("Allergy Watch List cleared on this device.");
+              }}
+            />
+
+            <ScanPreferencesSettings
+              key={`account-scan-preferences-${settings.scanPreferences.defaultProductCategory}-${settings.scanPreferences.showNotCheckedExternalSections}-${settings.scanPreferences.showConfidenceNotes}-${settings.scanPreferences.autoRunExternalSafetyLookup}`}
+              value={settings.scanPreferences}
+              onSave={(scanPreferences) => {
+                updateScanPreferences(scanPreferences);
+                setStatusMessage("Result preferences saved on this device.");
+              }}
+            />
+          </div>
+        </section>
+
+        <section className="mt-4 rounded-[18px] border border-[#E2E8E4] bg-white px-4 py-4">
+          <h2 className="text-[16px] font-extrabold text-[#101613]">
+            Local data
+          </h2>
+          <p className="mt-1 text-[13px] leading-[1.45] text-[#66716B]">
+            Clear or reset the local Watch List and scan preferences saved on
+            this device.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                clearUserSettings();
+                setStatusMessage("Local preferences cleared on this device.");
+              }}
+              className="inline-flex h-10 items-center rounded-full border border-[#D7E7DD] bg-white px-4 text-[12px] font-bold text-[#0E5A3F] transition hover:bg-[#F3FAF6] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
+            >
+              Clear local data
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                resetUserSettings();
+                setStatusMessage("Preferences reset to Truthlabel defaults.");
+              }}
+              className="inline-flex h-10 items-center rounded-full border border-[#F3D2D4] bg-[#FFF6F6] px-4 text-[12px] font-bold text-[#A33A3F] transition hover:bg-[#FDEDEE] focus-visible:ring-2 focus-visible:ring-[#A33A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
+            >
+              Reset preferences
+            </button>
           </div>
         </section>
 

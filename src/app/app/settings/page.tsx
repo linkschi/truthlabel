@@ -1,5 +1,5 @@
-import SettingsScreen from "@/components/SettingsScreen";
+import { redirect } from "next/navigation";
 
 export default function AppSettingsPage() {
-  return <SettingsScreen />;
+  redirect("/app/account");
 }

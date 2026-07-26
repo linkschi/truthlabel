@@ -265,6 +265,14 @@
   scroll-snap-align: start;
 }
 
+.landing-label-carousel--category {
+  scroll-padding-inline: 0;
+}
+
+.landing-label-slide--category {
+  width: min(72vw, 17.5rem);
+}
+
 @media (max-width: 640px) {
   .landing-urgent-hero {
     border-radius: 2rem;
@@ -276,6 +284,10 @@
 
   .landing-label-slide {
     width: min(82vw, 19rem);
+  }
+
+  .landing-label-slide--category {
+    width: min(76vw, 16.5rem);
   }
 }
 

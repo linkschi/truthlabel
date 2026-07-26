@@ -35,14 +35,9 @@ const navItems = [
       ]
     : []),
   {
-    href: "/app/settings",
-    label: "Settings",
-    detail: "Edit allergy, region, and scan preferences on this device.",
-  },
-  {
     href: "/app/account",
     label: "Account",
-    detail: "Open account, access, and preference information.",
+    detail: "Open account, access, allergy, and scan preference controls.",
   },
 ] as const;
 
@@ -214,7 +209,7 @@ export default function AppMenu({
             </div>
 
             <p className="mt-4 text-[12px] leading-5 text-[#6a776f]">
-              Quick allergy toggles stay saved on this device. Open Settings for the full allergy profile, region, and scan preferences.
+              Quick allergy toggles stay saved on this device. Open Account for the full allergy profile and scan preferences.
             </p>
           </aside>
         </div>

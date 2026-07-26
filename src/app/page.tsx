@@ -15,26 +15,61 @@ const navLinks = [
   { href: "#questions", label: "Questions" },
 ];
 
-const labelInsightSlides = [
+const labelInsightCategories = [
   {
-    imagePrompt: "Banned or restricted ingredient examples",
+    number: "01",
+    title: "Banned or Restricted Ingredients",
+    copy:
+      "Some foods or ingredients are restricted in one country for safety concerns while still being sold in another. Truthlabel brings those signals forward for review.",
     tone: "red",
+    imagePrompts: [
+      "Add banned/restricted ingredient screenshot",
+      "Add region warning or result example",
+    ],
   },
   {
-    imagePrompt: "Cancer-linked Watch examples",
+    number: "02",
+    title: "Cancer-Linked Ingredients and Foods",
+    copy:
+      "Some everyday foods and ingredients carry serious long-term review warnings. Truthlabel flags these as review signals, not proof that one product causes disease.",
     tone: "red",
+    imagePrompts: [
+      "Add Cancer-linked Watch result",
+      "Add food or ingredient evidence visual",
+    ],
   },
   {
-    imagePrompt: "Lab-made and bioengineered food markers",
+    number: "03",
+    title: "Lab-Made and Bioengineered Food",
+    copy:
+      "Truthlabel highlights bioengineered, lab-made, cell-cultured, or genetically modified wording when it appears, so you can decide if it fits your preferences.",
     tone: "yellow",
+    imagePrompts: [
+      "Add bioengineered food label",
+      "Add lab-made marker result",
+    ],
   },
   {
-    imagePrompt: "Ultra-processing and cheaper substitute signals",
+    number: "04",
+    title: "Ultra-Processed Formulas and Cheaper Substitutes",
+    copy:
+      "Truthlabel looks for heavily processed formulas, artificial additives, substitute ingredients, and food-construction markers that can be buried in small print.",
     tone: "yellow",
+    imagePrompts: [
+      "Add ultra-processed label example",
+      "Add substitute ingredient example",
+    ],
   },
   {
-    imagePrompt: "Misleading-label and safety-record examples",
+    number: "05",
+    title: "Misleading Labels and Troubling Company Records",
+    copy:
+      "Truthlabel can surface documented recalls, warning letters, lawsuits, undeclared allergens, contamination issues, and safety actions when verified data is available.",
     tone: "red",
+    imagePrompts: [
+      "Add warning letter or recall example",
+      "Add misleading-label result example",
+    ],
   },
 ];
 
@@ -114,64 +149,17 @@ const howSteps = [
   {
     step: "01",
     title: "Scan",
-    copy: "Scan the barcode, use the camera, upload a label photo, or enter ingredients manually.",
+    copy: "Scan a barcode, upload a label photo, or paste ingredients.",
   },
   {
     step: "02",
     title: "Check",
-    copy:
-      "Truthlabel checks ingredient, allergy, processing, regulatory, and safety rules where data is available.",
+    copy: "Truthlabel checks ingredients, alerts, and safety signals.",
   },
   {
     step: "03",
     title: "Decide",
-    copy:
-      "See what was found, why it was flagged, and whether you may want to limit or avoid the product.",
-  },
-];
-
-const allergyOptions = [
-  "Peanut",
-  "Milk",
-  "Egg",
-  "Sesame",
-  "Wheat",
-  "Shellfish",
-];
-
-const preferenceOptions = [
-  "GMO or bioengineered ingredients",
-  "Cell-cultured ingredients",
-  "Precision-fermented proteins",
-  "Artificial colors",
-  "Artificial sweeteners",
-  "Processed oils",
-  "Ultra-processed foods",
-];
-
-const useCases = [
-  {
-    title: "Grocery shopping",
-    copy: "Check unfamiliar products before putting them in your basket.",
-  },
-  {
-    title: "At home",
-    copy: "Review products already stored in your kitchen.",
-  },
-  {
-    title: "Managing allergies",
-    copy:
-      "Bring selected allergens forward instead of searching through the entire label.",
-  },
-  {
-    title: "Choosing between products",
-    copy:
-      "Compare which option has fewer concerns and a simpler ingredient profile.",
-  },
-  {
-    title: "Shopping for family",
-    copy:
-      "Make more informed decisions about the packaged foods brought into your home.",
+    copy: "See what was found and what action may make sense.",
   },
 ];
 
@@ -219,7 +207,7 @@ const faq = [
   {
     question: "How do I access Truthlabel after joining?",
     answer:
-      "Create your Truthlabel account first, then continue to checkout. If access does not connect automatically, paste the license key from your purchase email on the activation page.",
+      "Start the trial, complete checkout, then sign in or use the activation link from your purchase email. If access does not connect automatically, paste the license key on the activation page.",
   },
   {
     question: "Can I manage my membership?",
@@ -293,14 +281,6 @@ function PrimaryCta({
   );
 }
 
-function OptionPill({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="rounded-full border border-[var(--green-border)] bg-white px-3 py-2 text-[12px] font-bold text-[var(--green-dark)] shadow-[0_8px_18px_rgba(21,128,61,0.06)]">
-      {children}
-    </span>
-  );
-}
-
 const showCreatorNotes =
   process.env.NODE_ENV !== "production" ||
   process.env.TRUTHLABEL_SHOW_CREATOR_NOTES === "true";
@@ -336,7 +316,9 @@ function CreatorNotes({
 }
 
 export default function LandingPage() {
-  const trialUrl = "/create-account";
+  const trialUrl =
+    process.env.NEXT_PUBLIC_GUMROAD_CHECKOUT_URL?.trim() ||
+    "https://truthlabel.gumroad.com/l/fnoakd?wanted=true";
 
   return (
     <main className="landing-urgent min-h-screen overflow-hidden px-4 py-4 sm:px-6">
@@ -492,48 +474,74 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div
-            className="landing-label-carousel mt-7 flex gap-4 overflow-x-auto pb-4"
-            aria-label="Truthlabel example carousel"
-          >
-            {labelInsightSlides.map((slide, index) => {
+          <p className="mt-8 max-w-3xl text-[15px] font-black uppercase tracking-[0.14em] text-[var(--text-main)]">
+            These are the ingredients and practices becoming disturbingly
+            common in everyday food.
+          </p>
+
+          <div className="mt-6 grid gap-8">
+            {labelInsightCategories.map((category) => {
               const frameClass =
-                slide.tone === "red"
+                category.tone === "red"
                   ? "border-[var(--red-border)] bg-[var(--red-bg)] text-[var(--red-dark)]"
-                  : slide.tone === "yellow"
+                  : category.tone === "yellow"
                     ? "border-[var(--amber-border)] bg-[var(--amber-bg)] text-[var(--amber-dark)]"
                     : "border-[var(--green-border)] bg-[var(--green-bg)] text-[var(--green-dark)]";
 
               return (
                 <article
-                  key={slide.imagePrompt}
-                  className="landing-label-slide shrink-0 overflow-hidden rounded-[30px] border border-[var(--border-soft)] bg-[var(--bg-surface)] p-3 shadow-[0_16px_34px_rgba(23,20,18,0.08)]"
-                  style={{ aspectRatio: "4 / 5" }}
-                  aria-label={`Truthlabel image slide ${index + 1}`}
+                  key={category.title}
+                  className="landing-label-category rounded-[34px] border border-[var(--border-soft)] bg-[var(--bg-soft)]/72 p-4 sm:p-5"
                 >
-                  <div
-                    className={`relative h-full overflow-hidden rounded-[24px] border ${frameClass}`}
-                  >
-                    <div className="absolute inset-0 opacity-70 [background-image:radial-gradient(circle_at_26%_20%,rgba(255,255,255,0.68),transparent_28%),linear-gradient(135deg,rgba(255,255,255,0.28),transparent_48%)]" />
-                    <span className="absolute right-4 top-4 rounded-full bg-white/75 px-3 py-1 text-[11px] font-black uppercase tracking-[0.14em]">
-                      {String(index + 1).padStart(2, "0")}
+                  <div className="flex items-start gap-3">
+                    <span className="mt-1 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--text-main)] text-[12px] font-black text-white">
+                      {category.number}
                     </span>
-                    <div className="relative grid h-full place-items-center p-5 text-center">
-                      <p className="mx-auto max-w-[15rem] text-[13px] font-black leading-5">
-                        {slide.imagePrompt}
-                      </p>
-                    </div>
+                    <h3 className="font-heading text-[1.65rem] font-semibold leading-[1.02] tracking-[-0.055em] text-[var(--text-main)] sm:text-[2.15rem]">
+                      {category.title}
+                    </h3>
                   </div>
+
+                  <div
+                    className="landing-label-carousel landing-label-carousel--category mt-5 flex gap-4 overflow-x-auto pb-4"
+                    aria-label={`${category.title} image carousel`}
+                  >
+                    {category.imagePrompts.map((imagePrompt, imageIndex) => (
+                      <div
+                        key={imagePrompt}
+                        className="landing-label-slide landing-label-slide--category shrink-0 overflow-hidden rounded-[30px] border border-[var(--border-soft)] bg-[var(--bg-surface)] p-3 shadow-[0_16px_34px_rgba(23,20,18,0.08)]"
+                        style={{ aspectRatio: "4 / 5" }}
+                        aria-label={`${category.title} image slot ${imageIndex + 1}`}
+                      >
+                        <div
+                          className={`relative h-full overflow-hidden rounded-[24px] border ${frameClass}`}
+                        >
+                          <div className="absolute inset-0 opacity-70 [background-image:radial-gradient(circle_at_26%_20%,rgba(255,255,255,0.68),transparent_28%),linear-gradient(135deg,rgba(255,255,255,0.28),transparent_48%)]" />
+                          <span className="absolute right-4 top-4 rounded-full bg-white/75 px-3 py-1 text-[11px] font-black uppercase tracking-[0.14em]">
+                            {category.number}.{imageIndex + 1}
+                          </span>
+                          <div className="relative grid h-full place-items-center p-5 text-center">
+                            <p className="mx-auto max-w-[15rem] text-[13px] font-black leading-5">
+                              {imagePrompt}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <p className="max-w-3xl text-[15px] font-semibold leading-7 text-[var(--text-secondary)] sm:text-[17px]">
+                    {category.copy}
+                  </p>
                 </article>
               );
             })}
           </div>
 
-          <p className="mx-auto mt-4 max-w-3xl text-center text-[15px] font-semibold leading-7 text-[var(--text-secondary)] sm:text-[17px]">
-            Some foods are restricted in one country while still being sold in
-            another. Some labels hide the real concern in small print, behind
-            health claims, or away from the front of the package. Truthlabel
-            brings those warning signals forward so they are easier to review.
+          <p className="mx-auto mt-8 max-w-3xl text-center text-[15px] font-semibold leading-7 text-[var(--text-secondary)] sm:text-[17px]">
+            The warning is not always visible. It can be hidden in small print,
+            buried behind health claims, or missing from the front completely.
+            Truthlabel brings the warning forward.
           </p>
         </section>
 
@@ -555,31 +563,33 @@ export default function LandingPage() {
             title="Scan, check, decide."
             copy="Truthlabel turns a product label into a focused result: what was found, why it was flagged, and what action may make sense."
           />
-          <div className="mt-8 grid gap-4 lg:grid-cols-3">
+          <div className="mt-6 grid gap-3 rounded-[28px] border border-white bg-white/78 p-3 shadow-[0_14px_32px_rgba(23,20,18,0.05)] lg:grid-cols-3">
             {howSteps.map((item) => (
               <article
                 key={item.title}
-                className="rounded-[30px] border border-white bg-white/82 p-6 shadow-[0_14px_32px_rgba(23,20,18,0.06)]"
+                className="flex items-start gap-3 rounded-[22px] border border-[var(--border-soft)] bg-white px-4 py-3"
               >
-                <span className="inline-flex h-12 w-12 items-center justify-center rounded-[18px] bg-[var(--green-main)] font-heading text-[1rem] font-bold text-white">
+                <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[14px] bg-[var(--green-main)] text-[12px] font-black text-white">
                   {item.step}
                 </span>
-                <h3 className="mt-5 font-heading text-[1.65rem] font-semibold tracking-[-0.04em] text-[var(--text-main)]">
-                  {item.title}
-                </h3>
-                <p className="mt-3 text-[15px] leading-7 text-[var(--text-secondary)]">
-                  {item.copy}
-                </p>
+                <div>
+                  <h3 className="font-heading text-[1.15rem] font-semibold tracking-[-0.035em] text-[var(--text-main)]">
+                    {item.title}
+                  </h3>
+                  <p className="mt-1 text-[13px] leading-5 text-[var(--text-secondary)]">
+                    {item.copy}
+                  </p>
+                </div>
               </article>
             ))}
           </div>
-          <div className="mt-8 overflow-hidden rounded-[34px] border border-[var(--green-border)] bg-white/78 p-3 shadow-[0_16px_34px_rgba(21,128,61,0.08)]">
-            <div className="grid min-h-[240px] place-items-center rounded-[26px] border border-dashed border-[var(--green-border)] bg-[var(--green-bg)] px-5 py-10 text-center">
+          <div className="mt-5 overflow-hidden rounded-[28px] border border-[var(--green-border)] bg-white/78 p-3 shadow-[0_16px_34px_rgba(21,128,61,0.08)]">
+            <div className="grid min-h-[170px] place-items-center rounded-[22px] border border-dashed border-[var(--green-border)] bg-[var(--green-bg)] px-5 py-7 text-center">
               <div>
                 <p className="text-[12px] font-black uppercase tracking-[0.18em] text-[var(--green-dark)]">
                   Image slot
                 </p>
-                <p className="mx-auto mt-3 max-w-xl font-heading text-[1.55rem] font-semibold leading-tight tracking-[-0.045em] text-[var(--text-main)]">
+                <p className="mx-auto mt-2 max-w-xl font-heading text-[1.25rem] font-semibold leading-tight tracking-[-0.04em] text-[var(--text-main)]">
                   Add a screenshot or visual showing scan, check, decide in
                   action.
                 </p>
@@ -597,88 +607,28 @@ export default function LandingPage() {
           ]}
         />
 
-        <section className="py-14 sm:py-20">
-          <SectionIntro
-            eyebrow="Personal protection"
-            title="Built around what matters to you"
-            copy="Truthlabel does not treat every user as if they have the same concerns."
-            align="center"
-          />
-          <div className="mt-8 grid gap-5 lg:grid-cols-2">
-            <article className="rounded-[36px] border border-[var(--green-border)] bg-[var(--green-bg)] p-6 shadow-[0_16px_36px_rgba(21,128,61,0.08)]">
-              <h3 className="font-heading text-[1.85rem] font-semibold tracking-[-0.045em] text-[var(--text-main)]">
-                Your allergy Watch List
-              </h3>
-              <p className="mt-3 text-[15px] leading-7 text-[var(--text-secondary)]">
-                Select the allergens that affect you. Truthlabel can bring
-                direct matches forward as personal red warnings.
-              </p>
-              <div className="mt-5 flex flex-wrap gap-2">
-                {allergyOptions.map((item) => (
-                  <OptionPill key={item}>{item}</OptionPill>
-                ))}
-              </div>
-              <p className="mt-5 text-[13px] font-bold leading-6 text-[var(--green-dark)]">
-                Always confirm the original package label when managing
-                allergies.
-              </p>
-            </article>
-            <article className="rounded-[36px] border border-[var(--border-soft)] bg-white p-6 shadow-[0_16px_36px_rgba(23,20,18,0.06)]">
-              <h3 className="font-heading text-[1.85rem] font-semibold tracking-[-0.045em] text-[var(--text-main)]">
-                Your food preferences
-              </h3>
-              <p className="mt-3 text-[15px] leading-7 text-[var(--text-secondary)]">
-                Choose which food-production and ingredient markers you want
-                Truthlabel to highlight.
-              </p>
-              <div className="mt-5 flex flex-wrap gap-2">
-                {preferenceOptions.map((item) => (
-                  <OptionPill key={item}>{item}</OptionPill>
-                ))}
-              </div>
-            </article>
-          </div>
-          <p className="mx-auto mt-8 max-w-3xl text-center font-heading text-[1.5rem] font-semibold leading-tight tracking-[-0.04em] text-[var(--green-dark)] sm:text-[2rem]">
-            The same product can mean something different depending on what you
-            personally avoid.
-          </p>
-        </section>
-
         <CreatorNotes
-          title="Personal protection"
+          title="Personal protection - paused"
           items={[
-            "This is one of the strongest conversion sections because it explains that Truthlabel is personal, not just a generic scanner.",
-            "Future evidence/copy angle: the same product can be low concern for one user and serious for another because of allergies or selected Watch List preferences.",
+            "Paused from the public page for now: a future section can show allergy Watch List and food-preference settings once the account flow is fully polished.",
+            "This remains a strong conversion angle because it explains that Truthlabel can become personal, not just a generic scanner.",
+            "Future copy angle: the same product can be low concern for one user and serious for another because of allergies or selected Watch List preferences.",
             "Keep allergy wording strict and safe: always tell users to check the original package label and follow medical advice for known allergies.",
           ]}
         />
 
-        <section className="rounded-[34px] border border-[var(--border-soft)] bg-white px-5 py-6 shadow-[0_14px_32px_rgba(23,20,18,0.06)] sm:px-8">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div className="max-w-2xl">
-              <p className="text-[12px] font-black uppercase tracking-[0.2em] text-[var(--green-main)]">
-                Everyday decisions
-              </p>
-              <h2 className="mt-2 font-heading text-[1.85rem] font-semibold leading-tight tracking-[-0.05em] text-[var(--text-main)] sm:text-[2.35rem]">
-                Use it where food choices actually happen.
-              </h2>
-            </div>
-            <p className="max-w-lg text-[14px] leading-6 text-[var(--text-secondary)]">
-              A quick check can help you notice serious warnings, recognize
-              heavily processed products, and stay aware of ingredients that
-              matter to you.
-            </p>
-          </div>
-          <div className="mt-5 flex flex-wrap gap-2">
-            {useCases.map((item) => (
-              <div
-                key={item.title}
-                className="rounded-full border border-[var(--green-border)] bg-[var(--green-bg)] px-4 py-2 text-[12px] font-black text-[var(--green-dark)]"
-              >
-                {item.title}
-              </div>
-            ))}
-          </div>
+        <section className="rounded-[30px] border border-[var(--border-soft)] bg-white px-5 py-5 shadow-[0_14px_32px_rgba(23,20,18,0.06)] sm:px-8">
+          <p className="text-[12px] font-black uppercase tracking-[0.2em] text-[var(--green-main)]">
+            Everyday decisions
+          </p>
+          <h2 className="mt-2 font-heading text-[1.7rem] font-semibold leading-tight tracking-[-0.05em] text-[var(--text-main)] sm:text-[2.15rem]">
+            Use it where food choices actually happen.
+          </h2>
+          <p className="mt-3 max-w-4xl text-[14px] font-semibold leading-6 text-[var(--text-secondary)] sm:text-[15px]">
+            Check products while grocery shopping, reviewing food at home,
+            managing allergies, comparing options, or choosing packaged foods
+            for your family.
+          </p>
         </section>
 
         <CreatorNotes
@@ -691,57 +641,38 @@ export default function LandingPage() {
 
         <section
           id="pricing"
-          className="mt-8 grid gap-6 rounded-[44px] border border-[var(--green-border)] bg-white p-5 shadow-[var(--shadow)] sm:p-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center"
+          className="mt-8 rounded-[44px] border border-[var(--green-border)] bg-[var(--green-bg)] p-6 shadow-[var(--shadow)] sm:p-9"
         >
-          <div>
-            <p className="text-[12px] font-black uppercase tracking-[0.22em] text-[var(--green-main)]">
+          <div className="mx-auto max-w-4xl text-center">
+            <p className="text-[12px] font-black uppercase tracking-[0.18em] text-[var(--green-dark)]">
               Try Truthlabel free for 7 days
             </p>
-            <h2 className="mt-3 font-heading text-[2.25rem] font-semibold leading-[1.02] tracking-[-0.055em] text-[var(--text-main)] sm:text-[3.1rem]">
+            <h2 className="mt-3 font-heading text-[2.25rem] font-semibold leading-[1.02] tracking-[-0.055em] text-[var(--text-main)] sm:text-[3.2rem]">
               Protect yourself from profit-first food labels.
             </h2>
-            <p className="mt-4 text-[16px] leading-7 text-[var(--text-secondary)] sm:text-[18px]">
-              Truthlabel helps you spot products with banned or restricted
-              ingredients, harmful additive signals, ultra-processing,
-              serious safety warnings, allergen matches, and documented label
-              or brand concerns where data is available.
-            </p>
-            <p className="mt-4 rounded-[20px] border border-[var(--border-soft)] bg-[var(--bg-soft)] px-4 py-3 text-[13px] font-bold leading-6 text-[var(--text-main)]">
-              Join 200,000+ people choosing clearer food-label decisions. Start
-              with 7 days free, then continue for $4.99/month if Truthlabel is
-              right for you.
+            <p className="mx-auto mt-4 max-w-2xl text-[15px] font-bold leading-7 text-[var(--green-dark)] sm:text-[17px]">
+              See clearer warnings before products reach your basket.
             </p>
           </div>
-          <div className="rounded-[34px] border border-[var(--green-border)] bg-[var(--green-bg)] p-6">
-            <p className="text-[12px] font-black uppercase tracking-[0.18em] text-[var(--green-dark)]">
-              Truthlabel Full Access
-            </p>
-            <h3 className="mt-3 font-heading text-[2rem] font-semibold tracking-[-0.05em] text-[var(--text-main)]">
-              Try Truthlabel Free for 7 Days
-            </h3>
-            <ul className="mt-5 grid gap-3">
-              {planIncludes.map((item) => (
-                <li
-                  key={item}
-                  className="flex items-start gap-3 text-[14px] font-bold leading-6 text-[var(--text-main)]"
-                >
-                  <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-[var(--green-main)]" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-              <PrimaryCta href={trialUrl}>Try free for 7 days</PrimaryCta>
-              <Link
-                href="/create-account"
-                className="inline-flex items-center justify-center rounded-full border border-[var(--green-border)] bg-white px-5 py-3 text-[12px] font-black uppercase tracking-[0.14em] text-[var(--green-dark)]"
+          <ul className="mx-auto mt-7 grid max-w-3xl gap-3 sm:grid-cols-2">
+            {planIncludes.map((item) => (
+              <li
+                key={item}
+                className="flex items-start gap-3 rounded-[20px] border border-white/70 bg-white/72 px-4 py-3 text-left text-[14px] font-bold leading-6 text-[var(--text-main)] shadow-[0_10px_22px_rgba(21,128,61,0.06)]"
               >
-                Create account
-              </Link>
-            </div>
-            <p className="mt-4 text-[12px] font-bold leading-5 text-[var(--green-dark)]">
-              Account creation comes first. Trial access is confirmed through
-              checkout, then connected to your Truthlabel account.
+                <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-[var(--green-main)]" />
+                {item}
+              </li>
+            ))}
+          </ul>
+          <div className="mt-7 flex flex-col items-center justify-center gap-3">
+            <PrimaryCta href={trialUrl}>Try free for 7 days</PrimaryCta>
+            <p className="text-[12px] font-black uppercase tracking-[0.14em] text-[var(--green-dark)]">
+              Cancel anytime
+            </p>
+            <p className="max-w-lg text-center text-[12px] font-bold leading-5 text-[var(--green-dark)]">
+              Join 200,000+ people choosing to understand what is really inside
+              their food.
             </p>
           </div>
         </section>
@@ -751,7 +682,7 @@ export default function LandingPage() {
           items={[
             "Position the price as a small monthly cost for faster label understanding and more control while shopping.",
             "Current planned offer: 7-day free trial, then $4.99/month.",
-            "Important business rule: create account first, then checkout starts the 7-day trial. Do not restore account-created trials unless the business model changes again.",
+            "Current business rule: all free-trial buttons go straight to checkout. Account setup and activation happen after checkout through sign-in, activation link, or license key.",
             "Future emotional angle after evidence is ready: protect yourself from overlooked label risks and from formulation choices that prioritize shelf life, cost, or taste intensity over your personal priorities.",
             "Add independence as a sales factor near the trial CTA: Truthlabel should be presented as an independent research-led tool, not funded by food brands, manufacturers, or advertisers whose products are being checked.",
             "Create a future section about independence and research standards: explain that Truthlabel aims to evaluate labels from the consumer side, cite sources, separate evidence levels, and avoid sponsored product rankings.",
@@ -788,32 +719,6 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="rounded-[44px] border border-[var(--border-soft)] bg-[var(--text-main)] p-7 text-center text-white shadow-[0_28px_80px_rgba(23,20,18,0.22)] sm:p-10">
-          <h2 className="font-heading text-[2.55rem] font-semibold leading-[0.98] tracking-[-0.06em] sm:text-[4rem]">
-            Try Truthlabel free for 7 days.
-          </h2>
-          <p className="mx-auto mt-5 max-w-2xl text-[17px] leading-8 text-white/78">
-            Join 200,000+ people choosing to understand ingredients, see the
-            concerns, and make food choices with greater confidence.
-          </p>
-          <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
-            <PrimaryCta href={trialUrl}>Try free for 7 days</PrimaryCta>
-            <Link
-              href="/sign-in"
-              className="inline-flex items-center justify-center rounded-full border border-white/18 bg-white px-6 py-3 text-[13px] font-bold uppercase tracking-[0.15em] text-[var(--text-main)]"
-            >
-              Already subscribed? Sign in
-            </Link>
-          </div>
-          <p className="mx-auto mt-4 max-w-xl text-[13px] font-bold leading-6 text-white/72">
-            Create your account first, then start the 7-day trial. Trial
-            details are confirmed at checkout, and you can cancel anytime.
-          </p>
-          <p className="mt-7 font-heading text-[1.4rem] font-semibold tracking-[-0.04em] text-white/72">
-            Scan before you trust it.
-          </p>
-        </section>
-
         <CreatorNotes
           title="Independence and research trust"
           items={[
@@ -845,7 +750,6 @@ export default function LandingPage() {
               <a href="#checks">What we check</a>
               <Link href="/sign-in">Sign in</Link>
               <a href={trialUrl}>Start free trial</a>
-              <Link href="/create-account">Create account</Link>
               <Link href="/privacy">Privacy Policy</Link>
               <Link href="/terms">Terms</Link>
               <Link href="/health-disclaimer">Health disclaimer</Link>
