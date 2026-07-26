@@ -141,7 +141,7 @@ async function verifyGumroadLicense(licenseKey: string) {
   const productPermalink = env("GUMROAD_PRODUCT_PERMALINK");
 
   if (!productId && !productPermalink) {
-    throw new Error("Gumroad product identifier is not configured.");
+    throw new Error("License activation is not configured.");
   }
 
   const body = new URLSearchParams();
@@ -167,11 +167,11 @@ async function verifyGumroadLicense(licenseKey: string) {
   try {
     payload = (await response.json()) as GumroadVerifyResponse;
   } catch {
-    throw new Error("Gumroad returned an unreadable response.");
+    throw new Error("License verification returned an unreadable response.");
   }
 
   if (!response.ok) {
-    throw new Error(payload.message || "Gumroad license verification failed.");
+    throw new Error(payload.message || "License verification failed.");
   }
 
   return payload;
@@ -203,10 +203,10 @@ Deno.serve(async (request) => {
 
   if (!authHeader) {
     return json(
-      {
-        activated: false,
-        message: "Sign in before activating a Gumroad license.",
-      },
+        {
+          activated: false,
+          message: "Sign in before activating a license.",
+        },
       401,
     );
   }
@@ -230,7 +230,7 @@ Deno.serve(async (request) => {
     return json(
       {
         activated: false,
-        message: "Enter the Gumroad license key from your purchase email.",
+        message: "Enter the license key from your purchase email.",
       },
       400,
     );
@@ -265,28 +265,16 @@ Deno.serve(async (request) => {
           activated: false,
           message:
             gumroad.message ||
-            "Gumroad could not verify this license key for Truthlabel.",
+            "Truthlabel could not verify this license key.",
         },
         400,
       );
     }
 
-    const purchaseEmail = normalizeEmail(gumroad.purchase.email);
-    const userEmail = normalizeEmail(user.email);
-
-    if (purchaseEmail && userEmail && purchaseEmail !== userEmail) {
-      return json(
-        {
-          activated: false,
-          message:
-            "This Gumroad license belongs to a different email. Sign in with the purchase email or contact support.",
-        },
-        403,
-      );
-    }
-
     const licenseKeyHash = await hashLicenseKey(licenseKey);
     const { status, accessEndsAt } = inferSubscriptionStatus(gumroad.purchase);
+    const purchaseEmail = normalizeEmail(gumroad.purchase.email);
+    const userEmail = normalizeEmail(user.email);
 
     if (
       status === "refunded" ||
@@ -300,30 +288,9 @@ Deno.serve(async (request) => {
           activated: false,
           status,
           message:
-            "This Gumroad license was found, but it is not currently eligible for paid Truthlabel access.",
+            "This license was found, but it is not currently eligible for paid Truthlabel access.",
         },
         402,
-      );
-    }
-
-    const { data: existingClaim, error: claimReadError } = await serviceClient
-      .from("subscriptions")
-      .select("user_id")
-      .eq("license_key_hash", licenseKeyHash)
-      .maybeSingle();
-
-    if (claimReadError) {
-      throw claimReadError;
-    }
-
-    if (existingClaim && existingClaim.user_id !== user.id) {
-      return json(
-        {
-          activated: false,
-          message:
-            "This Gumroad license has already been linked to another Truthlabel account.",
-        },
-        409,
       );
     }
 
@@ -334,23 +301,89 @@ Deno.serve(async (request) => {
       gumroad.purchase.permalink ||
       env("GUMROAD_PRODUCT_PERMALINK");
 
+    const subscriptionPayload = {
+      user_id: user.id,
+      provider: "gumroad",
+      gumroad_product_id: productId,
+      gumroad_sale_id: gumroad.purchase.id ?? null,
+      gumroad_subscription_id: gumroad.purchase.subscription_id ?? null,
+      gumroad_email: purchaseEmail || userEmail || null,
+      license_key_hash: licenseKeyHash,
+      status,
+      access_ends_at: accessEndsAt,
+      last_verified_at: new Date().toISOString(),
+    };
+
+    const { data: existingLicenseClaim, error: claimReadError } = await serviceClient
+      .from("subscriptions")
+      .select("user_id")
+      .eq("license_key_hash", licenseKeyHash)
+      .maybeSingle();
+
+    if (claimReadError) {
+      throw claimReadError;
+    }
+
+    let existingPurchaseClaim = existingLicenseClaim;
+
+    if (!existingPurchaseClaim && gumroad.purchase.id) {
+      const { data: existingSaleClaim, error: saleReadError } = await serviceClient
+        .from("subscriptions")
+        .select("user_id")
+        .eq("gumroad_sale_id", gumroad.purchase.id)
+        .maybeSingle();
+
+      if (saleReadError) {
+        throw saleReadError;
+      }
+
+      existingPurchaseClaim = existingSaleClaim;
+    }
+
+    if (!existingPurchaseClaim && gumroad.purchase.subscription_id) {
+      const { data: existingSubscriptionClaim, error: subscriptionReadError } =
+        await serviceClient
+          .from("subscriptions")
+          .select("user_id")
+          .eq("gumroad_subscription_id", gumroad.purchase.subscription_id)
+          .maybeSingle();
+
+      if (subscriptionReadError) {
+        throw subscriptionReadError;
+      }
+
+      existingPurchaseClaim = existingSubscriptionClaim;
+    }
+
+    if (existingPurchaseClaim && existingPurchaseClaim.user_id !== user.id) {
+      const { error: removeCurrentError } = await serviceClient
+        .from("subscriptions")
+        .delete()
+        .eq("user_id", user.id);
+
+      if (removeCurrentError) {
+        throw removeCurrentError;
+      }
+
+      const { error: transferError } = await serviceClient
+        .from("subscriptions")
+        .update(subscriptionPayload)
+        .eq("user_id", existingPurchaseClaim.user_id);
+
+      if (transferError) {
+        throw transferError;
+      }
+
+      return json({
+        activated: true,
+        status,
+        message: "Truthlabel access has been restored on this account.",
+      });
+    }
+
     const { error: writeError } = await serviceClient
       .from("subscriptions")
-      .upsert(
-        {
-          user_id: user.id,
-          provider: "gumroad",
-          gumroad_product_id: productId,
-          gumroad_sale_id: gumroad.purchase.id ?? null,
-          gumroad_subscription_id: gumroad.purchase.subscription_id ?? null,
-          gumroad_email: purchaseEmail || userEmail || null,
-          license_key_hash: licenseKeyHash,
-          status,
-          access_ends_at: accessEndsAt,
-          last_verified_at: new Date().toISOString(),
-        },
-        { onConflict: "user_id" },
-      );
+      .upsert(subscriptionPayload, { onConflict: "user_id" });
 
     if (writeError) {
       throw writeError;
@@ -368,7 +401,7 @@ Deno.serve(async (request) => {
         message:
           error instanceof Error
             ? error.message
-            : "Truthlabel could not verify this Gumroad license.",
+            : "Truthlabel could not verify this license.",
       },
       500,
     );

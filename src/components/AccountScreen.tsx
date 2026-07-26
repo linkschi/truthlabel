@@ -182,6 +182,17 @@ function TruthlabelMark() {
   );
 }
 
+function getAccountFirstName(metadata: unknown) {
+  if (!metadata || typeof metadata !== "object") {
+    return "";
+  }
+
+  const values = metadata as Record<string, unknown>;
+  const firstName = values.first_name || values.name || values.full_name;
+
+  return typeof firstName === "string" ? firstName.trim() : "";
+}
+
 export default function AccountScreen() {
   const router = useRouter();
   const {
@@ -199,6 +210,7 @@ export default function AccountScreen() {
     accessKind === "paid"
       ? "Active subscription or trial"
       : subscription?.status ?? "Inactive";
+  const accountFirstName = getAccountFirstName(user?.user_metadata);
   void trialAccess;
   void trialDaysRemaining;
 
@@ -252,6 +264,14 @@ export default function AccountScreen() {
             <div className="flex items-start gap-2.5">
               <Icon name="shield" className="mt-0.5 h-4 w-4 shrink-0 text-[#0E5A3F]" />
               <div className="min-w-0 text-[12.5px] leading-[1.45] text-[#66716B]">
+                {accountFirstName ? (
+                  <p>
+                    First name{" "}
+                    <span className="font-semibold text-[#101613]">
+                      {accountFirstName}
+                    </span>
+                  </p>
+                ) : null}
                 <p>
                   Signed in as{" "}
                   <span className="font-semibold text-[#101613]">
@@ -274,7 +294,8 @@ export default function AccountScreen() {
             Account access
           </h2>
           <p className="mt-1 text-[13px] leading-[1.45] text-[#66716B]">
-            Truthlabel checks your account access from protected subscription tables.
+            Truthlabel keeps you signed in on this device unless you sign out
+            or clear the app's browser data.
           </p>
           {statusMessage ? (
             <p className="mt-3 rounded-[14px] border border-[#D7E7DD] bg-[#F3FAF6] px-3 py-2 text-[12px] font-semibold text-[#0E5A3F]">

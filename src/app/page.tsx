@@ -42,6 +42,44 @@ const checkHighlights = [
   },
 ];
 
+const labelInsightSlides = [
+  {
+    title: "Banned and restricted signals",
+    tag: "Red checks",
+    copy:
+      "Use this slide for a real example of a product label where Truthlabel highlights a restricted or serious ingredient signal.",
+    tone: "red",
+  },
+  {
+    title: "Allergy Watch List matches",
+    tag: "Personal alerts",
+    copy:
+      "Use this slide for an app screenshot showing how a selected allergen becomes a direct personal warning.",
+    tone: "green",
+  },
+  {
+    title: "Additive-heavy labels",
+    tag: "Yellow load",
+    copy:
+      "Use this slide for a label photo or result screen showing colours, preservatives, sweeteners, or additive count overload.",
+    tone: "yellow",
+  },
+  {
+    title: "Processed oils and fats",
+    tag: "Oil review",
+    copy:
+      "Use this slide for a product example where processed oils or hydrogenated fat wording is easy to miss.",
+    tone: "yellow",
+  },
+  {
+    title: "Label photo to result",
+    tag: "OCR scan",
+    copy:
+      "Use this slide for a before-and-after: ingredient label photo, editable OCR text, then a Truthlabel result.",
+    tone: "green",
+  },
+];
+
 // LANDING PAGE RESEARCH / EVIDENCE NOTES
 // These are intentionally not displayed yet. Before any of this becomes visible
 // copy, collect reputable sources, citations, region context, and product
@@ -498,6 +536,86 @@ export default function LandingPage() {
         />
 
         <section
+          aria-labelledby="label-insights-title"
+          className="mt-8 rounded-[42px] border border-[var(--border-soft)] bg-white/88 px-5 py-7 shadow-[var(--shadow)] sm:px-8"
+        >
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div className="max-w-2xl">
+              <p className="text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--green-main)]">
+                Truthlabel in action
+              </p>
+              <h2
+                id="label-insights-title"
+                className="mt-2 font-heading text-[2rem] font-semibold leading-[1.03] tracking-[-0.055em] text-[var(--text-main)] sm:text-[2.8rem]"
+              >
+                The checks you will see before you buy.
+              </h2>
+              <p className="mt-3 text-[15px] leading-7 text-[var(--text-secondary)] sm:text-[17px]">
+                This section is ready for real Truthlabel screenshots and label
+                examples. Each slide is shaped like a portrait social carousel
+                so the images stay bold on mobile.
+              </p>
+            </div>
+            <p className="rounded-full border border-[var(--green-border)] bg-[var(--green-bg)] px-4 py-2 text-[12px] font-black uppercase tracking-[0.14em] text-[var(--green-dark)]">
+              Swipe sideways
+            </p>
+          </div>
+
+          <div
+            className="landing-label-carousel mt-7 flex gap-4 overflow-x-auto pb-4"
+            aria-label="Truthlabel example carousel"
+          >
+            {labelInsightSlides.map((slide, index) => {
+              const frameClass =
+                slide.tone === "red"
+                  ? "border-[var(--red-border)] bg-[var(--red-bg)] text-[var(--red-dark)]"
+                  : slide.tone === "yellow"
+                    ? "border-[var(--amber-border)] bg-[var(--amber-bg)] text-[var(--amber-dark)]"
+                    : "border-[var(--green-border)] bg-[var(--green-bg)] text-[var(--green-dark)]";
+
+              return (
+                <article
+                  key={slide.title}
+                  className="landing-label-slide shrink-0 rounded-[30px] border border-[var(--border-soft)] bg-[var(--bg-surface)] p-3 shadow-[0_16px_34px_rgba(23,20,18,0.08)]"
+                >
+                  <div
+                    className={`relative grid overflow-hidden rounded-[24px] border ${frameClass}`}
+                    style={{ aspectRatio: "4 / 5" }}
+                  >
+                    <div className="absolute inset-0 opacity-70 [background-image:radial-gradient(circle_at_26%_20%,rgba(255,255,255,0.68),transparent_28%),linear-gradient(135deg,rgba(255,255,255,0.28),transparent_48%)]" />
+                    <div className="relative flex h-full flex-col justify-between p-5">
+                      <span className="w-fit rounded-full bg-white/75 px-3 py-1 text-[11px] font-black uppercase tracking-[0.14em]">
+                        {slide.tag}
+                      </span>
+                      <div>
+                        <p className="text-[12px] font-black uppercase tracking-[0.18em] opacity-80">
+                          Image slot {String(index + 1).padStart(2, "0")}
+                        </p>
+                        <h3 className="mt-2 font-heading text-[1.55rem] font-semibold leading-[1.02] tracking-[-0.05em]">
+                          {slide.title}
+                        </h3>
+                      </div>
+                    </div>
+                  </div>
+                  <p className="px-2 pt-4 text-[13.5px] font-semibold leading-6 text-[var(--text-secondary)]">
+                    {slide.copy}
+                  </p>
+                </article>
+              );
+            })}
+          </div>
+        </section>
+
+        <CreatorNotes
+          title="Truthlabel visual carousel"
+          items={[
+            "Replace each portrait image slot with real screenshots or permission-safe label photos. Keep the 4:5 shape for a social-carousel feel.",
+            "Potential slide assets: restricted ingredient result, allergy Watch List red warning, additive-heavy product, processed oil warning, OCR label photo to result flow.",
+            "Keep captions evidence-safe: show what Truthlabel flags for review, but avoid claiming a product causes disease unless a verified source supports that exact claim.",
+          ]}
+        />
+
+        <section
           id="checks"
           className="rounded-[42px] border border-[var(--border-soft)] bg-white p-5 shadow-[var(--shadow)] sm:p-8"
         >
@@ -742,7 +860,7 @@ export default function LandingPage() {
               Trial then full access
             </p>
             <h2 className="mt-3 font-heading text-[2.25rem] font-semibold leading-[1.02] tracking-[-0.055em] text-[var(--text-main)] sm:text-[3.1rem]">
-              7 days free, then $3.99/month.
+              7 days free, then $4.99/month.
             </h2>
             <p className="mt-4 text-[16px] leading-7 text-[var(--text-secondary)] sm:text-[18px]">
               Use Truthlabel as a protection layer for modern food labels:
@@ -795,7 +913,7 @@ export default function LandingPage() {
           title="Pricing and trial"
           items={[
             "Position the price as a small monthly cost for faster label understanding and more control while shopping.",
-            "Current planned offer: 7-day free trial, then $3.99/month.",
+            "Current planned offer: 7-day free trial, then $4.99/month.",
             "Important business rule: create account first, then checkout starts the 7-day trial. Do not restore account-created trials unless the business model changes again.",
             "Future emotional angle after evidence is ready: protect yourself from overlooked label risks and from formulation choices that prioritize shelf life, cost, or taste intensity over your personal priorities.",
             "Add independence as a sales factor near the trial CTA: Truthlabel should be presented as an independent research-led tool, not funded by food brands, manufacturers, or advertisers whose products are being checked.",

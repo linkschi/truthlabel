@@ -145,6 +145,31 @@
   box-shadow: 0 24px 60px rgba(23, 20, 18, 0.08);
 }
 
+.landing-label-carousel {
+  scroll-padding-inline: 0.25rem;
+  scroll-snap-type: x mandatory;
+  scrollbar-color: rgba(21, 128, 61, 0.42) rgba(228, 221, 211, 0.68);
+}
+
+.landing-label-carousel::-webkit-scrollbar {
+  height: 0.55rem;
+}
+
+.landing-label-carousel::-webkit-scrollbar-track {
+  border-radius: 999px;
+  background: rgba(228, 221, 211, 0.72);
+}
+
+.landing-label-carousel::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(21, 128, 61, 0.46);
+}
+
+.landing-label-slide {
+  width: min(76vw, 20.5rem);
+  scroll-snap-align: start;
+}
+
 @media (max-width: 640px) {
   .landing-urgent-hero {
     border-radius: 2rem;
@@ -152,6 +177,10 @@
 
   .landing-urgent-title {
     font-size: clamp(3rem, 15vw, 3.7rem);
+  }
+
+  .landing-label-slide {
+    width: min(82vw, 19rem);
   }
 }
 

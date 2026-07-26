@@ -80,6 +80,22 @@ function submitButtonClass(isBusy: boolean) {
   }`;
 }
 
+function getPasswordResetErrorMessage(error: unknown) {
+  const message = error instanceof Error ? error.message : "";
+  const normalized = message.toLowerCase();
+
+  if (
+    normalized.includes("rate limit") ||
+    normalized.includes("rate_limit") ||
+    normalized.includes("too many") ||
+    normalized.includes("email rate")
+  ) {
+    return "Password reset is temporarily busy. Try again later, or create a new account and activate access with your license key.";
+  }
+
+  return message || "Truthlabel could not send the reset email.";
+}
+
 function getGumroadCheckoutUrl() {
   return (
     process.env.NEXT_PUBLIC_GUMROAD_CHECKOUT_URL?.trim() ||
@@ -263,6 +279,7 @@ function TrialActivationLoadingScreen({ email }: { email: string }) {
 }
 
 export function CreateAccountScreen() {
+  const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -278,6 +295,13 @@ export function CreateAccountScreen() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setStatus(null);
+
+    const trimmedFirstName = firstName.trim();
+
+    if (trimmedFirstName.length < 2) {
+      setStatus({ tone: "red", message: "Enter your first name to continue." });
+      return;
+    }
 
     if (password !== confirmPassword) {
       setStatus({ tone: "red", message: "Passwords do not match." });
@@ -305,6 +329,10 @@ export function CreateAccountScreen() {
         email,
         password,
         options: {
+          data: {
+            first_name: trimmedFirstName,
+            name: trimmedFirstName,
+          },
           emailRedirectTo:
             typeof window === "undefined"
               ? undefined
@@ -317,6 +345,7 @@ export function CreateAccountScreen() {
       }
 
       storePendingCheckoutEmail(email);
+      setFirstName("");
       setPassword("");
       setConfirmPassword("");
       setAcceptedTerms(false);
@@ -378,6 +407,19 @@ export function CreateAccountScreen() {
         <div>
           <form onSubmit={handleSubmit}>
             <label className="block">
+              <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--text-secondary)]">
+                First name
+              </span>
+              <input
+                className={inputClass}
+                type="text"
+                autoComplete="given-name"
+                required
+                value={firstName}
+                onChange={(event) => setFirstName(event.target.value)}
+              />
+            </label>
+            <label className="mt-4 block">
               <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--text-secondary)]">
                 Email
               </span>
@@ -510,15 +552,12 @@ export function ForgotPasswordScreen() {
 
       setStatus({
         tone: "green",
-        message: "If this email exists, Supabase will send a password reset link.",
+        message: "If this email exists, Truthlabel will send a password reset link.",
       });
     } catch (error) {
       setStatus({
         tone: "red",
-        message:
-          error instanceof Error
-            ? error.message
-            : "Truthlabel could not send the reset email.",
+        message: getPasswordResetErrorMessage(error),
       });
     } finally {
       setIsBusy(false);
@@ -529,7 +568,7 @@ export function ForgotPasswordScreen() {
     <AuthShell
       eyebrow="Password reset"
       title="Reset your password."
-      message="Enter your account email and Truthlabel will request a reset link from Supabase."
+      message="Enter your account email and Truthlabel will send a reset link."
     >
       <form onSubmit={handleSubmit} className="mt-5">
         <label className="block">
@@ -556,6 +595,29 @@ export function ForgotPasswordScreen() {
       >
         Back to sign in
       </Link>
+      <div className="mt-5 rounded-[20px] border border-[var(--border-soft)] bg-[var(--bg-soft)] px-4 py-4">
+        <p className="text-[13px] font-semibold text-[var(--text-main)]">
+          Need access sooner?
+        </p>
+        <p className="mt-1 text-[13px] leading-5 text-[var(--text-secondary)]">
+          If reset email is unavailable, create a new account or sign in, then
+          activate access with the license key from your purchase email.
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <Link
+            href="/create-account"
+            className="rounded-full border border-[var(--green-border)] bg-[var(--green-bg)] px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--green-dark)]"
+          >
+            Create account
+          </Link>
+          <Link
+            href="/activate"
+            className="rounded-full border border-[var(--border-soft)] bg-white px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--text-main)]"
+          >
+            Activate access
+          </Link>
+        </div>
+      </div>
     </AuthShell>
   );
 }
@@ -614,7 +676,7 @@ export function UpdatePasswordScreen() {
     <AuthShell
       eyebrow="Update password"
       title="Choose a new password."
-      message="This page works after opening a valid Supabase password reset link."
+      message="This page works after opening a valid Truthlabel password reset link."
     >
       <form onSubmit={handleSubmit} className="mt-5">
         <label className="block">
