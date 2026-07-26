@@ -46,36 +46,46 @@ const labelInsightSlides = [
   {
     title: "Banned and restricted signals",
     tag: "Red checks",
+    imagePrompt: "Add a restricted ingredient or result screenshot",
     copy:
-      "Use this slide for a real example of a product label where Truthlabel highlights a restricted or serious ingredient signal.",
+      "Truthlabel brings serious ingredient signals forward, including items that are banned, restricted, revoked, or not permitted in supported regions.",
+    action: "Check the ingredient and region before trusting the product.",
     tone: "red",
   },
   {
     title: "Allergy Watch List matches",
     tag: "Personal alerts",
+    imagePrompt: "Add an allergy warning screen or label close-up",
     copy:
-      "Use this slide for an app screenshot showing how a selected allergen becomes a direct personal warning.",
+      "A product can look normal until it matches something you personally avoid. Truthlabel can turn selected allergens into direct personal warnings.",
+    action: "Always confirm allergy information on the package label.",
     tone: "green",
   },
   {
     title: "Additive-heavy labels",
     tag: "Yellow load",
+    imagePrompt: "Add an additive-heavy label or quick overview screen",
     copy:
-      "Use this slide for a label photo or result screen showing colours, preservatives, sweeteners, or additive count overload.",
+      "Colours, preservatives, sweeteners, and flavour systems can stack up quickly. Truthlabel separates one moderate concern from a high additive load.",
+    action: "See when multiple moderate signals become worth reviewing.",
     tone: "yellow",
   },
   {
     title: "Processed oils and fats",
     tag: "Oil review",
+    imagePrompt: "Add an oil/fat ingredient label example",
     copy:
-      "Use this slide for a product example where processed oils or hydrogenated fat wording is easy to miss.",
+      "Oil wording can be vague or easy to skim past. Truthlabel highlights processed oils, frying-oil systems, and hydrogenated fat markers when they appear.",
+    action: "Know whether the oil is simple, processed, or a serious fat concern.",
     tone: "yellow",
   },
   {
     title: "Label photo to result",
     tag: "OCR scan",
+    imagePrompt: "Add a label photo beside a Truthlabel result",
     copy:
-      "Use this slide for a before-and-after: ingredient label photo, editable OCR text, then a Truthlabel result.",
+      "Scan or upload a label photo, review the extracted ingredients, then run the same Truthlabel checks through the existing result page.",
+    action: "OCR can make mistakes, so the user reviews the text first.",
     tone: "green",
   },
 ];
@@ -576,30 +586,50 @@ export default function LandingPage() {
               return (
                 <article
                   key={slide.title}
-                  className="landing-label-slide shrink-0 rounded-[30px] border border-[var(--border-soft)] bg-[var(--bg-surface)] p-3 shadow-[0_16px_34px_rgba(23,20,18,0.08)]"
+                  className="landing-label-slide shrink-0 overflow-hidden rounded-[30px] border border-[var(--border-soft)] bg-[var(--bg-surface)] p-4 shadow-[0_16px_34px_rgba(23,20,18,0.08)]"
+                  style={{ aspectRatio: "4 / 5" }}
                 >
-                  <div
-                    className={`relative grid overflow-hidden rounded-[24px] border ${frameClass}`}
-                    style={{ aspectRatio: "4 / 5" }}
-                  >
-                    <div className="absolute inset-0 opacity-70 [background-image:radial-gradient(circle_at_26%_20%,rgba(255,255,255,0.68),transparent_28%),linear-gradient(135deg,rgba(255,255,255,0.28),transparent_48%)]" />
-                    <div className="relative flex h-full flex-col justify-between p-5">
-                      <span className="w-fit rounded-full bg-white/75 px-3 py-1 text-[11px] font-black uppercase tracking-[0.14em]">
+                  <div className="flex h-full flex-col">
+                    <div className="flex items-start justify-between gap-3">
+                      <span
+                        className={`rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em] ${frameClass}`}
+                      >
                         {slide.tag}
                       </span>
-                      <div>
-                        <p className="text-[12px] font-black uppercase tracking-[0.18em] opacity-80">
-                          Image slot {String(index + 1).padStart(2, "0")}
-                        </p>
-                        <h3 className="mt-2 font-heading text-[1.55rem] font-semibold leading-[1.02] tracking-[-0.05em]">
-                          {slide.title}
-                        </h3>
+                      <span className="text-[11px] font-black uppercase tracking-[0.14em] text-[var(--text-muted)]">
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                    </div>
+
+                    <h3 className="mt-4 font-heading text-[1.75rem] font-semibold leading-[0.98] tracking-[-0.06em] text-[var(--text-main)]">
+                      {slide.title}
+                    </h3>
+
+                    <div
+                      className={`relative mt-4 min-h-0 flex-1 overflow-hidden rounded-[24px] border ${frameClass}`}
+                    >
+                      <div className="absolute inset-0 opacity-70 [background-image:radial-gradient(circle_at_26%_20%,rgba(255,255,255,0.68),transparent_28%),linear-gradient(135deg,rgba(255,255,255,0.28),transparent_48%)]" />
+                      <div className="relative grid h-full place-items-center p-4 text-center">
+                        <div>
+                          <p className="text-[11px] font-black uppercase tracking-[0.18em] opacity-75">
+                            Image slot
+                          </p>
+                          <p className="mx-auto mt-2 max-w-[15rem] text-[13px] font-black leading-5">
+                            {slide.imagePrompt}
+                          </p>
+                        </div>
                       </div>
                     </div>
+
+                    <div className="pt-4">
+                      <p className="text-[13px] font-semibold leading-5 text-[var(--text-secondary)]">
+                        {slide.copy}
+                      </p>
+                      <p className="mt-2 rounded-[16px] border border-[var(--border-soft)] bg-[var(--bg-soft)] px-3 py-2 text-[12px] font-black leading-5 text-[var(--text-main)]">
+                        {slide.action}
+                      </p>
+                    </div>
                   </div>
-                  <p className="px-2 pt-4 text-[13.5px] font-semibold leading-6 text-[var(--text-secondary)]">
-                    {slide.copy}
-                  </p>
                 </article>
               );
             })}
