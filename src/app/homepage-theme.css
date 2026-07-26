@@ -145,6 +145,101 @@
   box-shadow: 0 24px 60px rgba(23, 20, 18, 0.08);
 }
 
+.trust-metrics {
+  position: relative;
+  left: 50%;
+  width: 100vw;
+  margin: 1.75rem 0 0;
+  transform: translateX(-50%);
+  background:
+    radial-gradient(circle at 18% 22%, rgba(255, 255, 255, 0.34), transparent 16rem),
+    radial-gradient(circle at 86% 78%, rgba(21, 128, 61, 0.035), transparent 18rem),
+    #f4f3ed;
+  overflow: hidden;
+}
+
+.trust-metrics::before {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle, rgba(23, 20, 18, 0.035) 0 1px, transparent 1px);
+  background-size: 18px 18px;
+  content: "";
+  opacity: 0.2;
+  pointer-events: none;
+}
+
+.trust-metrics__inner {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 72rem);
+  margin: 0 auto;
+  padding: 72px 28px;
+}
+
+.trust-metrics__divider {
+  width: min(100%, 64rem);
+  height: 1px;
+  margin: 0 auto;
+  background: rgba(20, 20, 20, 0.09);
+}
+
+.trust-metrics__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 24px;
+  row-gap: 54px;
+  padding: 56px 0;
+}
+
+.trust-metrics__item {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  min-height: 6.5rem;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: trustMetricReveal 560ms ease forwards;
+}
+
+.trust-metrics__item:nth-child(2) {
+  animation-delay: 90ms;
+}
+
+.trust-metrics__item:nth-child(3) {
+  animation-delay: 180ms;
+}
+
+.trust-metrics__item:nth-child(4) {
+  animation-delay: 270ms;
+}
+
+.trust-metrics__value {
+  color: #171717;
+  font-size: clamp(2.3rem, 8vw, 3.4rem);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.trust-metrics__label {
+  margin-top: 0.75rem;
+  color: #74746f;
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+@keyframes trustMetricReveal {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .landing-label-carousel {
   scroll-padding-inline: 0.25rem;
   scroll-snap-type: x mandatory;
@@ -184,9 +279,22 @@
   }
 }
 
+@media (min-width: 900px) {
+  .trust-metrics__grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    padding: 62px 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .landing-urgent .landing-urgent-primary-cta,
   .landing-urgent .landing-urgent-secondary-cta {
     transition: none;
+  }
+
+  .trust-metrics__item {
+    opacity: 1;
+    transform: none;
+    animation: none;
   }
 }

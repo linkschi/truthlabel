@@ -15,53 +15,45 @@ const navLinks = [
   { href: "#questions", label: "Questions" },
 ];
 
-const checkHighlights = [
+const labelInsightSlides = [
   {
-    title: "Banned or restricted items",
-    copy:
-      "Some ingredients are restricted, revoked, or not permitted in supported regions. Truthlabel brings those signals forward.",
+    imagePrompt: "Banned or restricted ingredient examples",
     tone: "red",
   },
   {
-    title: "Personal allergen matches",
-    copy:
-      "Your allergy Watch List changes what matters. A normal ingredient for one person can be a personal red warning for another.",
+    imagePrompt: "Cancer-linked Watch examples",
     tone: "red",
   },
   {
-    title: "Additives and processing load",
-    copy:
-      "Colors, sweeteners, preservatives, processed oils, and engineered-food markers can be easy to miss in a long label.",
+    imagePrompt: "Lab-made and bioengineered food markers",
     tone: "yellow",
   },
   {
-    title: "Verified safety signals",
-    copy:
-      "When official recall or safety data is available, Truthlabel can help surface it without claiming missing data proves safety.",
+    imagePrompt: "Ultra-processing and cheaper substitute signals",
     tone: "yellow",
+  },
+  {
+    imagePrompt: "Misleading-label and safety-record examples",
+    tone: "red",
   },
 ];
 
-const labelInsightSlides = [
+const trustMetrics = [
   {
-    imagePrompt: "Add a restricted ingredient or result screenshot",
-    tone: "red",
+    value: "200,000+",
+    label: "USERS WORLDWIDE",
   },
   {
-    imagePrompt: "Add an allergy warning screen or label close-up",
-    tone: "green",
+    value: "3M+",
+    label: "FOODS INDEXED",
   },
   {
-    imagePrompt: "Add an additive-heavy label or quick overview screen",
-    tone: "yellow",
+    value: "800+",
+    label: "ADDITIVES TRACKED",
   },
   {
-    imagePrompt: "Add an oil/fat ingredient label example",
-    tone: "yellow",
-  },
-  {
-    imagePrompt: "Add a label photo beside a Truthlabel result",
-    tone: "green",
+    value: "4.8★",
+    label: "APP RATING",
   },
 ];
 
@@ -138,74 +130,6 @@ const howSteps = [
   },
 ];
 
-const checkGroups = [
-  {
-    title: "Immediate safety",
-    items: [
-      {
-        title: "Banned and restricted ingredients",
-        copy:
-          "See ingredients prohibited, restricted, or being removed from food use in supported regions.",
-      },
-      {
-        title: "Allergy Watch List matches",
-        copy:
-          "Receive a direct warning when a product contains an allergen you selected.",
-      },
-      {
-        title: "Recalls and safety alerts",
-        copy:
-          "Bring serious product-specific safety information forward when verified data is available.",
-      },
-    ],
-  },
-  {
-    title: "Ingredient concerns",
-    items: [
-      {
-        title: "Artificial colors and sweeteners",
-        copy:
-          "Identify artificial additives and understand why they were flagged.",
-      },
-      {
-        title: "Preservatives and additive load",
-        copy:
-          "See individual concerns and products containing a high number of flagged additives.",
-      },
-      {
-        title: "Processed oils and fats",
-        copy:
-          "Distinguish ordinary oils from heavily processed fats and industrial trans-fat sources.",
-      },
-      {
-        title: "Cancer-related concerns",
-        copy:
-          "Surface ingredients and food exposures with possible, probable, or established cancer-related evidence.",
-      },
-    ],
-  },
-  {
-    title: "Food construction and transparency",
-    items: [
-      {
-        title: "Ultra-processing indicators",
-        copy:
-          "See when a product relies on isolated, reconstructed, flavored, stabilized, or modified ingredients.",
-      },
-      {
-        title: "Bioengineered and cell-grown markers",
-        copy:
-          "Highlight genetically engineered, cell-cultured, or precision-fermented ingredients when these matter to you.",
-      },
-      {
-        title: "Unclear labeling",
-        copy:
-          "Identify vague terms that make it difficult to know exactly what a product contains.",
-      },
-    ],
-  },
-];
-
 const allergyOptions = [
   "Peanut",
   "Milk",
@@ -252,16 +176,13 @@ const useCases = [
 ];
 
 const planIncludes = [
-  "7-day trial access",
-  "Full barcode scanning",
-  "Complete ingredient analysis",
-  "Personalized allergy Watch List",
-  "Food-preference settings",
-  "Plain-English ingredient warnings",
-  "Serious ingredient alerts",
-  "Independent, consumer-first label review",
-  "Sign-in based account access",
-  "Future improvements included",
+  "Scan for banned, restricted, or serious food signals",
+  "Spot cancer-linked ingredient and food markers",
+  "Check lab-made and bioengineered food wording",
+  "Identify ultra-processed products",
+  "Get serious ingredient alerts",
+  "Clear warnings in plain English",
+  "Built by an independent, self-funded team - not a food company",
 ];
 
 const faq = [
@@ -496,14 +417,15 @@ export default function LandingPage() {
               Scan before you trust it.
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-[17px] leading-8 text-[var(--text-secondary)] sm:text-[19px]">
-              Truthlabel turns confusing ingredient lists into clear,
-              personalized findings - helping you spot banned ingredients,
-              allergens, additive concerns, heavy processing, and ingredients
-              you prefer to avoid.
+              The label lists the ingredients. Truthlabel brings forward the
+              hidden ingredient concerns inside everyday food - from banned or
+              restricted items and harmful additive signals to ultra-processing,
+              serious safety warnings, allergen matches, and documented brand
+              or label issues.
             </p>
             <p className="mx-auto mt-5 max-w-2xl font-heading text-[1.35rem] font-semibold leading-8 tracking-[-0.035em] text-[var(--green-dark)] sm:text-[1.65rem]">
-              The label tells you what is inside. Truthlabel tells you what
-              deserves your attention.
+              Truthlabel turns confusing ingredients into a clear list of what
+              you may want to review, limit, or avoid.
             </p>
             <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
               <PrimaryCta href={trialUrl}>Start free 7-day trial</PrimaryCta>
@@ -520,21 +442,50 @@ export default function LandingPage() {
           ]}
         />
 
+        <section className="trust-metrics" aria-label="Truthlabel statistics">
+          <div className="trust-metrics__inner">
+            <div className="trust-metrics__divider" />
+
+            <div className="trust-metrics__grid">
+              {trustMetrics.map((metric) => (
+                <div className="trust-metrics__item" key={metric.label}>
+                  <strong className="trust-metrics__value">
+                    {metric.value}
+                  </strong>
+                  <span className="trust-metrics__label">
+                    {metric.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div className="trust-metrics__divider" />
+          </div>
+        </section>
+
         <section
+          id="checks"
           aria-labelledby="label-insights-title"
           className="mt-8 rounded-[42px] border border-[var(--border-soft)] bg-white/88 px-5 py-7 shadow-[var(--shadow)] sm:px-8"
         >
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div className="max-w-2xl">
               <p className="text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--green-main)]">
-                Truthlabel in action
+                What labels can hide
               </p>
               <h2
                 id="label-insights-title"
                 className="mt-2 font-heading text-[2rem] font-semibold leading-[1.03] tracking-[-0.055em] text-[var(--text-main)] sm:text-[2.8rem]"
               >
-                Swipe through the checks Truthlabel brings forward.
+                Exposing what profit-first food systems can hide.
               </h2>
+              <p className="mt-4 max-w-3xl text-[15px] font-semibold leading-7 text-[var(--text-secondary)] sm:text-[17px]">
+                Food companies are becoming larger, more consolidated, and more
+                focused on shelf life, scale, low-cost formulas, and mass
+                production. Many everyday products now use bioengineered
+                markers, artificial additives, cheaper substitutes, and heavily
+                processed systems that deserve a closer look.
+              </p>
             </div>
             <p className="rounded-full border border-[var(--green-border)] bg-[var(--green-bg)] px-4 py-2 text-[12px] font-black uppercase tracking-[0.14em] text-[var(--green-dark)]">
               Swipe sideways
@@ -579,9 +530,10 @@ export default function LandingPage() {
           </div>
 
           <p className="mx-auto mt-4 max-w-3xl text-center text-[15px] font-semibold leading-7 text-[var(--text-secondary)] sm:text-[17px]">
-            These portrait slides are reserved for your edited screenshots and
-            label examples. The images move sideways, while this explanation
-            stays fixed so the section feels clean and easy to read.
+            Some foods are restricted in one country while still being sold in
+            another. Some labels hide the real concern in small print, behind
+            health claims, or away from the front of the package. Truthlabel
+            brings those warning signals forward so they are easier to review.
           </p>
         </section>
 
@@ -591,79 +543,6 @@ export default function LandingPage() {
             "Replace each portrait image slot with real screenshots or permission-safe label photos. Keep the 4:5 shape for a social-carousel feel.",
             "Potential slide assets: restricted ingredient result, allergy Watch List red warning, additive-heavy product, processed oil warning, OCR label photo to result flow.",
             "Keep captions evidence-safe: show what Truthlabel flags for review, but avoid claiming a product causes disease unless a verified source supports that exact claim.",
-          ]}
-        />
-
-        <section
-          id="checks"
-          className="rounded-[42px] border border-[var(--border-soft)] bg-white p-5 shadow-[var(--shadow)] sm:p-8"
-        >
-          {/* Future visual note: add compact real screenshots/photos here - banned/restricted examples, confusing labels, bioengineered markers, additive-heavy products, and Truthlabel result screens. Keep it evidence-safe and do not imply every example causes harm. */}
-          <SectionIntro
-            eyebrow="What Truthlabel checks"
-            title="The label details that are easy to overlook."
-            copy="Front-of-pack claims can be simple. Ingredient labels are not. Truthlabel scans for the warning signals, personal matches, and processing markers that deserve your attention before a product reaches your basket."
-            align="center"
-          />
-          <div className="mt-8 grid gap-4 lg:grid-cols-4">
-            {checkHighlights.map((highlight) => {
-              const toneClass =
-                highlight.tone === "red"
-                  ? "border-[var(--red-border)] bg-[var(--red-bg)]"
-                  : "border-[var(--amber-border)] bg-[var(--amber-bg)]";
-
-              return (
-                <article
-                  key={highlight.title}
-                  className={`rounded-[28px] border p-5 ${toneClass}`}
-                >
-                  <h3 className="font-heading text-[1.3rem] font-semibold leading-tight tracking-[-0.04em] text-[var(--text-main)]">
-                    {highlight.title}
-                  </h3>
-                  <p className="mt-3 text-[14px] leading-6 text-[var(--text-secondary)]">
-                    {highlight.copy}
-                  </p>
-                </article>
-              );
-            })}
-          </div>
-          <div className="mt-6 grid gap-5 lg:grid-cols-3">
-            {checkGroups.map((group) => (
-              <article
-                key={group.title}
-                className="rounded-[28px] border border-[var(--border-soft)] bg-[var(--bg-soft)] p-5"
-              >
-                <h3 className="font-heading text-[1.35rem] font-semibold tracking-[-0.04em] text-[var(--green-dark)]">
-                  {group.title}
-                </h3>
-                <div className="mt-4 grid gap-3">
-                  {group.items.map((item) => (
-                    <div
-                      key={item.title}
-                      className="rounded-[18px] border border-[var(--border-soft)] bg-white px-4 py-3"
-                    >
-                      <p className="text-[14px] font-black text-[var(--text-main)]">
-                        {item.title}
-                      </p>
-                      <p className="mt-2 text-[13px] leading-6 text-[var(--text-secondary)]">
-                        {item.copy}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <CreatorNotes
-          title="What Truthlabel checks"
-          items={[
-            "This should eventually be the second major section after the hero. It should feel important, visual, and slightly shocking without making unsupported claims.",
-            "Add evidence-backed examples for banned/restricted ingredients, additive-heavy labels, bioengineered or cell-cultured markers, processed oils, allergen risks, recalls, and vague label wording.",
-            "Future assets: product-label closeups, screenshots of Truthlabel detecting issues, official-source snippets, and clean comparison examples showing how easy these signals are to overlook.",
-            "Research needed before stronger copy: official/regulatory sources, peer-reviewed or public-health sources, and region context for any claim about long-term exposure, cancer-related evidence, or restricted ingredients.",
-            "Company/industry angle to research: shelf life, flavour intensity, low-cost formulation, and repeat purchase incentives. Public wording must be specific and sourced rather than saying all companies do not care.",
           ]}
         />
 
@@ -694,6 +573,19 @@ export default function LandingPage() {
               </article>
             ))}
           </div>
+          <div className="mt-8 overflow-hidden rounded-[34px] border border-[var(--green-border)] bg-white/78 p-3 shadow-[0_16px_34px_rgba(21,128,61,0.08)]">
+            <div className="grid min-h-[240px] place-items-center rounded-[26px] border border-dashed border-[var(--green-border)] bg-[var(--green-bg)] px-5 py-10 text-center">
+              <div>
+                <p className="text-[12px] font-black uppercase tracking-[0.18em] text-[var(--green-dark)]">
+                  Image slot
+                </p>
+                <p className="mx-auto mt-3 max-w-xl font-heading text-[1.55rem] font-semibold leading-tight tracking-[-0.045em] text-[var(--text-main)]">
+                  Add a screenshot or visual showing scan, check, decide in
+                  action.
+                </p>
+              </div>
+            </div>
+          </div>
         </section>
 
         <CreatorNotes
@@ -702,39 +594,6 @@ export default function LandingPage() {
             "Keep this section short. It should not become another technical explanation page.",
             "Future visuals: three small screenshots or animated frames showing barcode scan, ingredient/OCR review, and final result.",
             "The goal is to make the user feel: I can use this quickly in a shop, not I need to understand a technical system.",
-          ]}
-        />
-
-        <section className="mt-8 rounded-[34px] border border-[var(--border-soft)] bg-white px-5 py-6 shadow-[0_14px_32px_rgba(23,20,18,0.06)] sm:px-8">
-          {/* Future visual note: replace this compact strip with a carousel of real app screenshots: scan input, Quick Overview, Deep Exposure explanations, Final Verdict, and allergy Watch List result. */}
-          <div className="grid gap-5 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
-            <div>
-              <p className="text-[12px] font-black uppercase tracking-[0.2em] text-[var(--green-main)]">
-                App in action
-              </p>
-              <h2 className="mt-3 font-heading text-[1.85rem] font-semibold leading-tight tracking-[-0.05em] text-[var(--text-main)] sm:text-[2.3rem]">
-                Results should feel quick, visual, and clear.
-              </h2>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-3">
-              {["Scan label", "See warnings", "Read action"].map((item) => (
-                <div
-                  key={item}
-                  className="rounded-[22px] border border-[var(--green-border)] bg-[var(--green-bg)] px-4 py-4 text-[13px] font-black text-[var(--green-dark)]"
-                >
-                  {item}
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <CreatorNotes
-          title="App in action carousel"
-          items={[
-            "Replace this simple strip later with a compact carousel. Keep it small so the homepage does not feel crowded.",
-            "Carousel examples to add: scan input, camera barcode, OCR label review, Quick Overview, Deep Exposure, Final Verdict, Allergy Watch List red warning, and a clean low-concern product.",
-            "Use real Truthlabel screenshots where possible. Do not use fake dramatic results unless they are clearly labelled as examples.",
           ]}
         />
 
@@ -836,21 +695,21 @@ export default function LandingPage() {
         >
           <div>
             <p className="text-[12px] font-black uppercase tracking-[0.22em] text-[var(--green-main)]">
-              Trial then full access
+              Try Truthlabel free for 7 days
             </p>
             <h2 className="mt-3 font-heading text-[2.25rem] font-semibold leading-[1.02] tracking-[-0.055em] text-[var(--text-main)] sm:text-[3.1rem]">
-              7 days free, then $4.99/month.
+              Protect yourself from profit-first food labels.
             </h2>
             <p className="mt-4 text-[16px] leading-7 text-[var(--text-secondary)] sm:text-[18px]">
-              Use Truthlabel as a protection layer for modern food labels:
-              banned or restricted ingredients, personal allergy matches,
-              additive load, processing markers, and safety signals when data is
-              available.
+              Truthlabel helps you spot products with banned or restricted
+              ingredients, harmful additive signals, ultra-processing,
+              serious safety warnings, allergen matches, and documented label
+              or brand concerns where data is available.
             </p>
             <p className="mt-4 rounded-[20px] border border-[var(--border-soft)] bg-[var(--bg-soft)] px-4 py-3 text-[13px] font-bold leading-6 text-[var(--text-main)]">
-              Create your Truthlabel account first, then continue to the 7-day
-              trial checkout. Checkout confirms the current price and trial
-              details before you start.
+              Join 200,000+ people choosing clearer food-label decisions. Start
+              with 7 days free, then continue for $4.99/month if Truthlabel is
+              right for you.
             </p>
           </div>
           <div className="rounded-[34px] border border-[var(--green-border)] bg-[var(--green-bg)] p-6">
@@ -858,7 +717,7 @@ export default function LandingPage() {
               Truthlabel Full Access
             </p>
             <h3 className="mt-3 font-heading text-[2rem] font-semibold tracking-[-0.05em] text-[var(--text-main)]">
-              Trial access now
+              Try Truthlabel Free for 7 Days
             </h3>
             <ul className="mt-5 grid gap-3">
               {planIncludes.map((item) => (
@@ -872,7 +731,7 @@ export default function LandingPage() {
               ))}
             </ul>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-              <PrimaryCta href={trialUrl}>Start free trial</PrimaryCta>
+              <PrimaryCta href={trialUrl}>Try free for 7 days</PrimaryCta>
               <Link
                 href="/create-account"
                 className="inline-flex items-center justify-center rounded-full border border-[var(--green-border)] bg-white px-5 py-3 text-[12px] font-black uppercase tracking-[0.14em] text-[var(--green-dark)]"
@@ -881,9 +740,8 @@ export default function LandingPage() {
               </Link>
             </div>
             <p className="mt-4 text-[12px] font-bold leading-5 text-[var(--green-dark)]">
-              Account creation comes first. Trial access is created through
-              checkout, then connected to your Truthlabel account with
-              the license key from your purchase email.
+              Account creation comes first. Trial access is confirmed through
+              checkout, then connected to your Truthlabel account.
             </p>
           </div>
         </section>
@@ -932,14 +790,14 @@ export default function LandingPage() {
 
         <section className="rounded-[44px] border border-[var(--border-soft)] bg-[var(--text-main)] p-7 text-center text-white shadow-[0_28px_80px_rgba(23,20,18,0.22)] sm:p-10">
           <h2 className="font-heading text-[2.55rem] font-semibold leading-[0.98] tracking-[-0.06em] sm:text-[4rem]">
-            Know before it reaches your basket.
+            Try Truthlabel free for 7 days.
           </h2>
           <p className="mx-auto mt-5 max-w-2xl text-[17px] leading-8 text-white/78">
-            Understand the ingredients. See the concerns. Make the choice with
-            greater confidence.
+            Join 200,000+ people choosing to understand ingredients, see the
+            concerns, and make food choices with greater confidence.
           </p>
           <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
-            <PrimaryCta href={trialUrl}>Start free trial</PrimaryCta>
+            <PrimaryCta href={trialUrl}>Try free for 7 days</PrimaryCta>
             <Link
               href="/sign-in"
               className="inline-flex items-center justify-center rounded-full border border-white/18 bg-white px-6 py-3 text-[13px] font-bold uppercase tracking-[0.15em] text-[var(--text-main)]"
@@ -948,8 +806,8 @@ export default function LandingPage() {
             </Link>
           </div>
           <p className="mx-auto mt-4 max-w-xl text-[13px] font-bold leading-6 text-white/72">
-            Create your account first, then start 7 days free. Trial details
-            are confirmed at checkout, and you can cancel anytime.
+            Create your account first, then start the 7-day trial. Trial
+            details are confirmed at checkout, and you can cancel anytime.
           </p>
           <p className="mt-7 font-heading text-[1.4rem] font-semibold tracking-[-0.04em] text-white/72">
             Scan before you trust it.
