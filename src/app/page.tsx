@@ -27,83 +27,65 @@ const navLinks = [
   { href: "#questions", label: "Questions" },
 ];
 
-const seriousWarnings = [
-  {
-    label: "Banned",
-    title: "Banned ingredient detected",
-    copy: "This ingredient is prohibited for food use in a supported region.",
-  },
-  {
-    label: "Allergen",
-    title: "Your allergen is present",
-    copy: "This product directly contains an allergen on your Watch List.",
-  },
-  {
-    label: "Recall",
-    title: "Active product recall",
-    copy: "This product or batch is connected to an official safety alert.",
-  },
-];
-
 const checkCards = [
   {
-    title: "Banned and restricted ingredients",
-    copy: "See ingredients prohibited, revoked, or restricted for food use in supported regions.",
+    title: "Banned ingredients",
+    copy: "Items banned or restricted in supported regions.",
     icon: "ban",
   },
   {
-    title: "Allergy Watch List",
-    copy: "Bring selected allergens forward as direct personal warnings when found.",
+    title: "Allergy matches",
+    copy: "Ingredients matching your allergy list.",
     icon: "shield",
   },
   {
-    title: "Cancer-related concerns",
-    copy: "Separate possible, probable, and established evidence instead of mixing them together.",
+    title: "Cancer-linked warnings",
+    copy: "Ingredients with serious long-term concern signals.",
     icon: "alert",
   },
   {
     title: "Artificial colors",
-    copy: "Identify synthetic color additives and understand why they were flagged.",
+    copy: "Synthetic colors added to food.",
     icon: "color",
   },
   {
-    title: "Sweeteners",
-    copy: "Spot artificial and non-sugar sweetener systems in drinks, snacks, and packaged foods.",
+    title: "Artificial sweeteners",
+    copy: "Non-sugar sweetener systems.",
     icon: "drop",
   },
   {
-    title: "Preservatives and additives",
-    copy: "Review shelf-life systems, additive load, and ingredients used for stability.",
+    title: "Preservatives",
+    copy: "Shelf-life and stability additives.",
     icon: "plus",
   },
   {
-    title: "Heavy-metal evidence",
-    copy: "Use verified external data and category review markers without overclaiming contamination.",
+    title: "Heavy-metal review",
+    copy: "Category or verified safety signals.",
     icon: "lab",
   },
   {
-    title: "Processed oils and fats",
-    copy: "Distinguish ordinary oils from processed-oil systems and industrial fat markers.",
+    title: "Processed oils",
+    copy: "Seed oils and processed fat markers.",
     icon: "oil",
   },
   {
-    title: "Ultra-processing",
-    copy: "Surface isolated, modified, reconstructed, flavored, and highly structured food markers.",
+    title: "Ultra-processed foods",
+    copy: "Modified, isolated, or reconstructed ingredients.",
     icon: "layers",
   },
   {
-    title: "Ingredient integrity and fillers",
-    copy: "Highlight extenders, binders, fillers, and food-construction signals when relevant.",
+    title: "Fillers and binders",
+    copy: "Extenders and food-construction markers.",
     icon: "grid",
   },
   {
-    title: "Engineered-food markers",
-    copy: "Identify bioengineered, cell-cultured, precision-fermented, and lab-made wording.",
+    title: "Lab-made food",
+    copy: "Bioengineered or cell-cultured wording.",
     icon: "dna",
   },
   {
-    title: "Brand and recall signals",
-    copy: "Bring verified official safety alerts forward when product-specific data is available.",
+    title: "Brand warnings",
+    copy: "Recalls, alerts, and safety actions.",
     icon: "signal",
   },
 ];
@@ -128,48 +110,28 @@ const howSteps = [
   },
 ];
 
-const allergyChips = ["Peanut", "Milk", "Egg", "Wheat", "Sesame", "Shellfish"];
-
-const preferenceChips = [
-  "GMO and bioengineered",
-  "Cell-cultured",
-  "Precision-fermented",
-  "Artificial colors",
-  "Artificial sweeteners",
-  "Processed oils",
-  "Ultra-processed food",
+const protectionChips = [
+  "Allergy alerts",
+  "Watch List matches",
+  "Food preferences",
+  "Avoid-list ingredients",
+  "Personal red warnings",
 ];
 
-const historyRows = [
-  {
-    product: "Organic Rolled Oats",
-    score: "94",
-    verdict: "No major concerns",
-    tone: "green",
-  },
-  {
-    product: "Peanut Butter",
-    score: "61",
-    verdict: "Consume in moderation",
-    tone: "yellow",
-  },
-  {
-    product: "Nacho Cheese Chips",
-    score: "22",
-    verdict: "Recommended to avoid",
-    tone: "red",
-  },
+const launchMetrics = [
+  { label: "Independent", value: "Self-funded" },
+  { label: "Trial", value: "7 days free" },
+  { label: "Access", value: "$4.99/month" },
 ];
 
 const planIncludes = [
-  "Full barcode scanning",
-  "Complete ingredient analysis",
-  "Personalized allergy Watch List",
-  "Serious ingredient warnings",
-  "Food-preference settings",
-  "Scan history",
-  "Full explanations",
-  "Future improvements",
+  "Scan for banned or dangerous food",
+  "Spot cancer-linked ingredients",
+  "Check lab-made and bioengineered foods",
+  "Identify ultra-processed products",
+  "Get serious ingredient alerts",
+  "Clear warnings in plain English",
+  "Built by an independent, self-funded team - not a food company",
 ];
 
 const trustItems = [
@@ -458,41 +420,24 @@ export default function LandingPage() {
         <LandingConcernCarousel />
       </section>
 
-      <section className="landing-serious">
-        <SectionIntro
-          centered
-          title="Serious findings should look serious."
-          copy="Red warnings are reserved for stronger signals, not ordinary label noise."
-        />
-        <div className="landing-serious-grid">
-          {seriousWarnings.map((warning) => (
-            <article key={warning.title}>
-              <span>{warning.label}</span>
-              <h3>{warning.title}</h3>
-              <p>{warning.copy}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
       <section id="checks-grid" className="landing-checks">
         <SectionIntro
           centered
           eyebrow="What Truthlabel checks"
-          title="More than a basic nutrition score"
-          copy="Truthlabel looks beyond calories and macros to explain ingredient and safety signals that may affect your decision."
+          title="More than basic ingredients"
+          copy="Fast checks for the food warnings people usually miss."
         />
-        <div className="landing-check-grid">
+        <ul className="landing-check-list" aria-label="Truthlabel check categories">
           {checkCards.map((card) => (
-            <article key={card.title}>
-              <span>
+            <li key={card.title}>
+              <span className="landing-check-list__icon">
                 <Icon name={card.icon} />
               </span>
-              <h3>{card.title}</h3>
-              <p>{card.copy}</p>
-            </article>
+              <strong>{card.title}</strong>
+              <span>{card.copy}</span>
+            </li>
           ))}
-        </div>
+        </ul>
       </section>
 
       <section id="how" className="landing-how">
@@ -541,60 +486,27 @@ export default function LandingPage() {
       <section className="landing-personal">
         <SectionIntro
           centered
-          eyebrow="Personalized protection"
-          title="Built around what matters to you"
-          copy="Truthlabel does not treat every user as if they have the same concerns."
+          eyebrow="Personal protection"
+          title="Set what matters to you"
+          copy="Choose allergies, ingredients, and food markers you want Truthlabel to bring forward."
         />
-        <div className="landing-personal-grid">
-          <article>
-            <h3>Allergy Watch List</h3>
-            <p>
-              Selected allergens receive direct personal warnings when found in
-              a product.
-            </p>
-            <div className="landing-chip-list">
-              {allergyChips.map((chip) => (
-                <span key={chip}>{chip}</span>
-              ))}
-            </div>
-          </article>
-          <article>
-            <h3>Food preferences</h3>
-            <p>
-              Choose which food-production and ingredient markers you personally
-              want highlighted.
-            </p>
-            <div className="landing-chip-list landing-chip-list--yellow">
-              {preferenceChips.map((chip) => (
-                <span key={chip}>{chip}</span>
-              ))}
-            </div>
-          </article>
+        <div className="landing-chip-list landing-chip-list--centered">
+          {protectionChips.map((chip) => (
+            <span key={chip}>{chip}</span>
+          ))}
         </div>
       </section>
 
-      <section className="landing-history">
-        <div>
-          <SectionIntro
-            eyebrow="Scan history"
-            title="Keep track of what you scan"
-            copy="This is a marketing preview only. A real signed-in user's private history is never shown on the public page."
-          />
-          <a className="landing-text-link" href="/sign-in">
-            View your scan history
-          </a>
-        </div>
-        <div className="landing-history-card" aria-label="Scan history example">
-          {historyRows.map((row) => (
-            <article className={`landing-history-row landing-history-row--${row.tone}`} key={row.product}>
-              <div>
-                <strong>{row.product}</strong>
-                <span>{row.verdict}</span>
-              </div>
-              <p>{row.score}</p>
-            </article>
-          ))}
-        </div>
+      <section className="landing-history landing-history--compact">
+        <SectionIntro
+          centered
+          eyebrow="Scan history"
+          title="Save what you scan"
+          copy="Reopen previous scans inside your private account when you want to compare products later."
+        />
+        <a className="landing-text-link" href="/sign-in">
+          View your scan history
+        </a>
       </section>
 
       {genuineReviews.length > 0 ? (
@@ -621,10 +533,10 @@ export default function LandingPage() {
         <div className="landing-pricing__card">
           <div>
             <p className="landing-eyebrow">Truthlabel Full Access</p>
-            <h2>Begin your 7-day free trial</h2>
+            <h2>Protect yourself from evil brands that put profit first</h2>
             <p>
-              Get full access to Truthlabel and start checking the food you buy,
-              eat, and bring home.
+              Try Truthlabel free for 7 days and start checking the food you
+              buy, eat, and bring home.
             </p>
           </div>
           <div className="landing-price">
@@ -642,8 +554,16 @@ export default function LandingPage() {
           </div>
           <PrimaryCta>Begin my 7-day free trial</PrimaryCta>
           <p className="landing-trust-line">
-            7 days free - Cancel anytime - Secure checkout through Gumroad
+            7 days free - Cancel anytime - No long-term commitment
           </p>
+          <div className="landing-launch-metrics" aria-label="Truthlabel launch facts">
+            {launchMetrics.map((metric) => (
+              <span key={metric.label}>
+                <strong>{metric.value}</strong>
+                {metric.label}
+              </span>
+            ))}
+          </div>
         </div>
       </section>
 
