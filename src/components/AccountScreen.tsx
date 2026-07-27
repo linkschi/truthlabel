@@ -275,7 +275,7 @@ export default function AccountScreen() {
           </h2>
           <p className="mt-1 text-[13px] leading-[1.45] text-[#66716B]">
             Truthlabel keeps you signed in on this device unless you sign out
-            or clear the app's browser data.
+            or clear the app&apos;s browser data.
           </p>
           {statusMessage ? (
             <p className="mt-3 rounded-[14px] border border-[#D7E7DD] bg-[#F3FAF6] px-3 py-2 text-[12px] font-semibold text-[#0E5A3F]">
