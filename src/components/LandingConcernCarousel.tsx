@@ -42,6 +42,13 @@ const concernCards: ConcernCard[] = [
       "Truthlabel can show warning letters, lawsuits, and safety actions when verified data is available.",
     tone: "green",
   },
+  {
+    label: "Hundreds More Review Signals",
+    headline: "Truthlabel scans far beyond the obvious ingredients.",
+    copy:
+      "The app checks many more additives, processing markers, safety signals, and product warnings as the database grows.",
+    tone: "yellow",
+  },
 ];
 
 function ConcernIllustration({ tone }: { tone: ConcernTone }) {
@@ -144,7 +151,6 @@ export default function LandingConcernCarousel() {
               <p>{card.label}</p>
               <h3>{card.headline}</h3>
               <span>{card.copy}</span>
-              <a href="#checks-grid">See why</a>
             </div>
           </article>
         ))}

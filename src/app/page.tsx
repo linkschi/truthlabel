@@ -90,26 +90,6 @@ const checkCards = [
   },
 ];
 
-const howSteps = [
-  {
-    number: "01",
-    title: "Scan",
-    copy: "Scan the barcode or enter it manually.",
-  },
-  {
-    number: "02",
-    title: "Check",
-    copy:
-      "Truthlabel analyzes the product using ingredient, allergy, processing, and safety rules.",
-  },
-  {
-    number: "03",
-    title: "Decide",
-    copy:
-      "Review what was found, why it matters, and whether you may want to limit or avoid it.",
-  },
-];
-
 const protectionChips = [
   "Allergy alerts",
   "Watch List matches",
@@ -125,6 +105,7 @@ const launchMetrics = [
 ];
 
 const planIncludes = [
+  "Shop with Truthlabel: pick up a product, scan it, and see instant warnings",
   "Scan for banned or dangerous food",
   "Spot cancer-linked ingredients",
   "Check lab-made and bioengineered foods",
@@ -366,56 +347,78 @@ export default function LandingPage() {
             to avoid.
           </p>
         </div>
-        <div className="landing-proof-visuals">
-          <article className="landing-scan-proof" aria-label="image of scan">
-            <div className="landing-scan-proof__screen">
-              <div className="landing-scan-proof__beam" />
-              <span />
-              <span />
-              <span />
-              <strong>Scan reading label</strong>
-            </div>
-          </article>
-          <article
-            className="landing-brand-proof"
-            aria-label="image of a scan of brands trust score"
-          >
-            <span>Brand Trust Score</span>
-            <strong>Warning found</strong>
-            <p>Misleading label history</p>
-            <div>
-              <span />
-              <span />
-              <span />
-            </div>
-          </article>
+        <div className="landing-media-slot landing-media-slot--scan">
+          <span>Screenshot placeholder</span>
+          <strong>Truthlabel scan result image goes here</strong>
+          <p>Use this space for a real app scan screenshot or brand-trust result.</p>
+        </div>
+      </section>
+
+      <section id="pricing" className="landing-pricing">
+        <div className="landing-pricing__card">
+          <div>
+            <p className="landing-eyebrow">Truthlabel Full Access</p>
+            <h2>Protect yourself from evil brands that put profit first</h2>
+            <p>
+              Try Truthlabel free for 7 days and start checking the food you
+              buy, eat, and bring home.
+            </p>
+          </div>
+          <div className="landing-price">
+            <strong>$4.99</strong>
+            <span>/ month after trial</span>
+          </div>
+          <ul>
+            {planIncludes.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+          <div className="landing-guarantee">
+            <strong>Cancel Anytime Guarantee</strong>
+            <p>No long-term commitment. Cancel future renewals whenever you choose.</p>
+          </div>
+          <PrimaryCta>Begin my 7-day free trial</PrimaryCta>
+          <p className="landing-trust-line">
+            7 days free - Cancel anytime - No long-term commitment
+          </p>
+          <div className="landing-launch-metrics" aria-label="Truthlabel launch facts">
+            {launchMetrics.map((metric) => (
+              <span key={metric.label}>
+                <strong>{metric.value}</strong>
+                {metric.label}
+              </span>
+            ))}
+          </div>
         </div>
       </section>
 
       <section className="landing-profit-section">
-        <SectionIntro
-          eyebrow="heading"
-          title="Exposing evil brands that only care about profits"
-          copy="Food companies are becoming more focused on profit and mass production. Many everyday products now contain lab-made ingredients, harmful cheaper substitutes, and heavily processed formulas that can raise serious health concerns."
-        />
+        <div className="landing-profit-lead">
+          <SectionIntro
+            eyebrow="Evidence and shopping context"
+            title="Exposing evil brands that only care about profits"
+            copy="Food companies are becoming more focused on profit and mass production. Many everyday products now contain lab-made ingredients, harmful cheaper substitutes, and heavily processed formulas that can raise serious health concerns."
+          />
+          <div className="landing-media-slot landing-media-slot--brands">
+            <span>Image placeholder</span>
+            <strong>Popular brands and people shopping</strong>
+            <p>Add a visual showing everyday supermarket choices and brand evidence.</p>
+          </div>
+        </div>
         <div className="landing-profit-copy">
           <p>
             Some of these items are banned in other countries or states because
             of safety concerns. Through legal loopholes, they can still be sold
             to everyday families with little protection.
           </p>
-          <p>
-            These are the items and practices becoming disturbingly common in
-            everyday food.
-          </p>
         </div>
       </section>
 
       <section className="landing-concerns">
         <SectionIntro
-          eyebrow="carousel"
-          title="The warning can be hidden in the small print."
-          copy="The danger is not always visible. It can be hidden in small print, buried behind health claims or missing from the front completely. Truthlabel brings the warning forward."
+          eyebrow="What is becoming common"
+          title="Items and practices appearing more often in everyday food."
+          copy="The danger is not always visible. It can be hidden in small print, buried behind health claims, or missing from the front completely."
         />
         <LandingConcernCarousel />
       </section>
@@ -447,39 +450,15 @@ export default function LandingPage() {
             title="Scan, check, decide."
             copy="Truthlabel turns a product label into a focused result. It shows what was found, why it was flagged, and what action may make sense."
           />
-          <div className="landing-how-steps">
-            {howSteps.map((step) => (
-              <article key={step.title}>
-                <span>{step.number}</span>
-                <div>
-                  <h3>{step.title}</h3>
-                  <p>{step.copy}</p>
-                </div>
-              </article>
-            ))}
-          </div>
+          <p className="landing-shopping-copy">
+            Use it while shopping: pick up a product, scan it in the aisle, and
+            get instant ingredient labels, warnings, and clear next steps.
+          </p>
         </div>
-        <div className="landing-interface-preview" aria-label="Truthlabel scan flow preview">
-          <div className="landing-interface-preview__phone">
-            <div className="landing-interface-preview__bar" />
-            <div className="landing-interface-preview__scan">
-              <span />
-              <strong>Barcode detected</strong>
-              <p>Checking ingredients and safety signals</p>
-            </div>
-            <div className="landing-interface-preview__row landing-interface-preview__row--red">
-              <span>Red</span>
-              <p>Banned ingredient detected</p>
-            </div>
-            <div className="landing-interface-preview__row landing-interface-preview__row--yellow">
-              <span>Yellow</span>
-              <p>Processing markers found</p>
-            </div>
-            <div className="landing-interface-preview__row landing-interface-preview__row--green">
-              <span>Green</span>
-              <p>Simple ingredients found</p>
-            </div>
-          </div>
+        <div className="landing-video-slot" aria-label="Video placeholder for Truthlabel scanning process">
+          <span>Video placeholder</span>
+          <strong>Truthlabel scanning process video goes here</strong>
+          <p>Show the app scanning a real product and opening the result.</p>
         </div>
       </section>
 
@@ -528,44 +507,6 @@ export default function LandingPage() {
           </div>
         </section>
       ) : null}
-
-      <section id="pricing" className="landing-pricing">
-        <div className="landing-pricing__card">
-          <div>
-            <p className="landing-eyebrow">Truthlabel Full Access</p>
-            <h2>Protect yourself from evil brands that put profit first</h2>
-            <p>
-              Try Truthlabel free for 7 days and start checking the food you
-              buy, eat, and bring home.
-            </p>
-          </div>
-          <div className="landing-price">
-            <strong>$4.99</strong>
-            <span>/ month after trial</span>
-          </div>
-          <ul>
-            {planIncludes.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-          <div className="landing-guarantee">
-            <strong>Cancel Anytime Guarantee</strong>
-            <p>No long-term commitment. Cancel future renewals whenever you choose.</p>
-          </div>
-          <PrimaryCta>Begin my 7-day free trial</PrimaryCta>
-          <p className="landing-trust-line">
-            7 days free - Cancel anytime - No long-term commitment
-          </p>
-          <div className="landing-launch-metrics" aria-label="Truthlabel launch facts">
-            {launchMetrics.map((metric) => (
-              <span key={metric.label}>
-                <strong>{metric.value}</strong>
-                {metric.label}
-              </span>
-            ))}
-          </div>
-        </div>
-      </section>
 
       <section className="landing-trust">
         <SectionIntro
