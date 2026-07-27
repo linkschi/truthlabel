@@ -7,7 +7,7 @@ import "./homepage-theme.css";
 export const metadata: Metadata = {
   title: "Truthlabel - Scan before you trust it",
   description:
-    "Truthlabel checks food ingredients for serious warnings, allergens, additives, heavy processing, and product safety signals before you buy.",
+    "Truthlabel helps expose hidden ingredient and safety signals in everyday food, including banned ingredients, harmful additives, ultra-processing, and brand warnings.",
 };
 
 const genuineReviews: Array<{
@@ -18,38 +18,13 @@ const genuineReviews: Array<{
   verified: boolean;
 }> = [];
 
-const gumroadCheckoutUrl =
-  process.env.NEXT_PUBLIC_GUMROAD_CHECKOUT_URL?.trim() ||
-  "https://truthlabel.gumroad.com/l/fnoakd?wanted=true";
+const truthlabelCheckoutUrl = "https://truthlabel.gumroad.com/l/fnoakd?wanted=true";
 
 const navLinks = [
   { href: "#how", label: "How it works" },
   { href: "#checks-grid", label: "What we check" },
   ...(genuineReviews.length > 0 ? [{ href: "#reviews", label: "Reviews" }] : []),
   { href: "#questions", label: "Questions" },
-];
-
-const credibilityItems = [
-  {
-    title: "Banned ingredient checks",
-    copy: "Regulatory restriction signals are separated from ordinary review notes.",
-    icon: "ban",
-  },
-  {
-    title: "Personal allergy alerts",
-    copy: "Selected allergens can become direct personal warnings.",
-    icon: "shield",
-  },
-  {
-    title: "Clear ingredient reasons",
-    copy: "Every important finding explains what was detected and why.",
-    icon: "list",
-  },
-  {
-    title: "Private scan history",
-    copy: "Your product history is built for your account, not the public page.",
-    icon: "lock",
-  },
 ];
 
 const seriousWarnings = [
@@ -320,7 +295,7 @@ function PrimaryCta({
   className?: string;
 }) {
   return (
-    <a className={`landing-button landing-button--primary ${className}`} href={gumroadCheckoutUrl}>
+    <a className={`landing-button landing-button--primary ${className}`} href={truthlabelCheckoutUrl}>
       {children}
     </a>
   );
@@ -342,45 +317,6 @@ function SectionIntro({
       {eyebrow ? <p className="landing-eyebrow">{eyebrow}</p> : null}
       <h2>{title}</h2>
       {copy ? <p>{copy}</p> : null}
-    </div>
-  );
-}
-
-function ResultPreview() {
-  return (
-    <div className="landing-result-preview" aria-label="Example Truthlabel result preview">
-      <div className="landing-result-preview__top">
-        <div className="landing-product-image" aria-hidden="true">
-          <span>TL</span>
-        </div>
-        <div>
-          <p>Truthlabel result</p>
-          <h3>Chocolate Cereal</h3>
-        </div>
-      </div>
-
-      <div className="landing-score-ring">
-        <strong>42</strong>
-        <span>/ 100</span>
-      </div>
-
-      <div className="landing-verdict-card">
-        <p>Final verdict</p>
-        <strong>Recommended to avoid</strong>
-      </div>
-
-      <div className="landing-finding landing-finding--red">
-        <span>RED - BANNED</span>
-        <strong>Red No. 3 detected</strong>
-      </div>
-      <div className="landing-finding landing-finding--yellow">
-        <span>YELLOW - PROCESSING</span>
-        <strong>High additive load</strong>
-      </div>
-      <div className="landing-finding landing-finding--yellow">
-        <span>YELLOW - ADDITIVES</span>
-        <strong>Artificial flavor system</strong>
-      </div>
     </div>
   );
 }
@@ -435,10 +371,6 @@ export default function LandingPage() {
         <div className="landing-hero__copy">
           <p className="landing-eyebrow">Know what is really in your food</p>
           <h1>Scan before you trust it.</h1>
-          <p>
-            Truthlabel checks food ingredients for serious warnings, allergens,
-            additives, heavy processing, and ingredients you may prefer to avoid.
-          </p>
           <div className="landing-hero__actions">
             <PrimaryCta className="landing-hero__primary">
               Begin my 7-day free trial
@@ -451,42 +383,25 @@ export default function LandingPage() {
             7 days free - Cancel anytime - No long-term commitment
           </p>
         </div>
-        <div className="landing-hero__visual">
-          <ResultPreview />
-        </div>
-      </section>
-
-      <section className="landing-credibility" aria-label="Truthlabel credibility highlights">
-        {credibilityItems.map((item) => (
-          <article key={item.title}>
-            <span className="landing-credibility__icon">
-              <Icon name={item.icon} />
-            </span>
-            <div>
-              <h2>{item.title}</h2>
-              <p>{item.copy}</p>
-            </div>
-          </article>
-        ))}
       </section>
 
       <section className="landing-exposure-intro">
         <div className="landing-exposure-copy">
-          <p className="landing-eyebrow">Scan before you trust it.</p>
           <h2>
-            Truthlabel exposes the hidden dangrous ingridients hidden in our
-            everyday food
+            Truthlabel exposes dangerous ingredients hidden in everyday food.
           </h2>
           <p>
-            Helping spot products &quot;banned&quot;in other countries,&quot;
-            harmful additives, ultra-processing,
+            Truthlabel helps spot products &quot;banned&quot; in other
+            countries, harmful additives, ultra-processing, and warning signals
+            that are easy to miss.
           </p>
           <p>
-            We expose brands with a history of &quot; misleading labels&quot;or
-            safety violations.
+            We expose brands with a history of &quot;misleading labels&quot;,
+            safety violations, or serious product warnings.
           </p>
           <p>
-            we turn incidents in clears list of things u might want to avoid.
+            Then we turn those incidents into clear lists of things you may want
+            to avoid.
           </p>
         </div>
         <div className="landing-proof-visuals">
@@ -518,18 +433,17 @@ export default function LandingPage() {
       <section className="landing-profit-section">
         <SectionIntro
           eyebrow="heading"
-          title="Exposing evil brands that only care about proffits"
-          copy="Food companies are becoming more focused on profit and mass production. Many everyday products now contain lab made ingredients, harmful cheaper substitutes, and heavily processed formulas-that causes serious health issues,"
+          title="Exposing evil brands that only care about profits"
+          copy="Food companies are becoming more focused on profit and mass production. Many everyday products now contain lab-made ingredients, harmful cheaper substitutes, and heavily processed formulas that can raise serious health concerns."
         />
         <div className="landing-profit-copy">
           <p>
-            but for some reason, though some of thse stuff are literally banned
-            in other countries and states because they are dangerous . through
-            some legal loopholes these are being sold to everday families with
-            no laws to protect them
+            Some of these items are banned in other countries or states because
+            of safety concerns. Through legal loopholes, they can still be sold
+            to everyday families with little protection.
           </p>
           <p>
-            these are the items and practices becoming disturbingly common in
+            These are the items and practices becoming disturbingly common in
             everyday food.
           </p>
         </div>
@@ -586,7 +500,7 @@ export default function LandingPage() {
           <SectionIntro
             eyebrow="How our app works"
             title="Scan, check, decide."
-            copy="Truthlabel turns a product label into a focused resul. it shows: what was found, why it was flagged, and what action may make sense."
+            copy="Truthlabel turns a product label into a focused result. It shows what was found, why it was flagged, and what action may make sense."
           />
           <div className="landing-how-steps">
             {howSteps.map((step) => (

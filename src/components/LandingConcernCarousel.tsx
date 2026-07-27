@@ -13,31 +13,33 @@ type ConcernCard = {
 
 const concernCards: ConcernCard[] = [
   {
-    label: "Banned or Restricted I",
-    headline: "So manfy food are banned in other counties but fo safety concern but still sold in another",
+    label: "Banned or Restricted Ingredients",
+    headline:
+      "Some foods are banned in one country for safety concerns but still sold in another.",
     copy:
       "Truthlabel brings those warnings forward when a product or ingredient matches a supported restriction signal.",
     tone: "red",
   },
   {
     label: "Cancer-Linked Ingredients and Foods",
-    headline: "Some everyday foods carry serious long-term warnings",
-    copy: "Truthlabel shows these as warning signals so they are not buried inside the label.",
+    headline: "Some everyday foods carry serious long-term warnings.",
+    copy:
+      "Truthlabel shows these as warning signals so they are not buried inside the label.",
     tone: "red",
   },
   {
     label: "Lab-Made and Bioengineered Food",
-    headline: "4 lab mad and Bioengineered food",
+    headline: "Lab-made and bioengineered food.",
     copy:
-      "contains fake genetic material changed using laboratory techniques. This way u get genetically made food without the ingredients",
+      "Truthlabel highlights ingredients or disclosures linked to genetic changes, bioengineering, or laboratory food-production methods.",
     tone: "yellow",
   },
   {
-    label: "5Misleading Labels and Troubling Company Records",
+    label: "Misleading Labels and Troubling Company Records",
     headline:
-      "Truthlable shoes Some company's warning letters for misbranding, undeclared allergens, contamination and misleading claims.",
+      "Truthlabel shows some companies' warning letters for misbranding, undeclared allergens, contamination, and misleading claims.",
     copy:
-      "Truthlabel show warning letters, lawsuits and safety actions-.",
+      "Truthlabel can show warning letters, lawsuits, and safety actions when verified data is available.",
     tone: "green",
   },
 ];

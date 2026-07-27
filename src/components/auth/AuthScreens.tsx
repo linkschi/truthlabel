@@ -97,10 +97,7 @@ function getPasswordResetErrorMessage(error: unknown) {
 }
 
 function getGumroadCheckoutUrl() {
-  return (
-    process.env.NEXT_PUBLIC_GUMROAD_CHECKOUT_URL?.trim() ||
-    "https://truthlabel.gumroad.com/l/fnoakd?wanted=true"
-  );
+  return "https://truthlabel.gumroad.com/l/fnoakd?wanted=true";
 }
 
 function storePendingCheckoutEmail(email: string) {
