@@ -13,33 +13,31 @@ type ConcernCard = {
 
 const concernCards: ConcernCard[] = [
   {
-    label: "Banned and restricted ingredients",
-    headline: "Banned elsewhere. Still found in some foods.",
+    label: "Banned or Restricted I",
+    headline: "So manfy food are banned in other counties but fo safety concern but still sold in another",
     copy:
-      "Truthlabel highlights verified regulatory restrictions and explains where and why they apply.",
+      "Truthlabel brings those warnings forward when a product or ingredient matches a supported restriction signal.",
     tone: "red",
   },
   {
-    label: "Cancer-related concerns",
-    headline:
-      "Research has raised serious concerns about some everyday ingredients.",
-    copy:
-      "Truthlabel separates possible, probable, and established concerns instead of treating them as identical.",
+    label: "Cancer-Linked Ingredients and Foods",
+    headline: "Some everyday foods carry serious long-term warnings",
+    copy: "Truthlabel shows these as warning signals so they are not buried inside the label.",
     tone: "red",
   },
   {
-    label: "Engineered and lab-made food",
-    headline:
-      "Know when food has been genetically engineered, cell-grown, or heavily reconstructed.",
+    label: "Lab-Made and Bioengineered Food",
+    headline: "4 lab mad and Bioengineered food",
     copy:
-      "These markers are clearly identified for users who prefer conventionally produced food.",
+      "contains fake genetic material changed using laboratory techniques. This way u get genetically made food without the ingredients",
     tone: "yellow",
   },
   {
-    label: "Brand and product safety",
-    headline: "See recalls, warnings, and serious product-safety signals.",
+    label: "5Misleading Labels and Troubling Company Records",
+    headline:
+      "Truthlable shoes Some company's warning letters for misbranding, undeclared allergens, contamination and misleading claims.",
     copy:
-      "Verified alerts are brought forward instead of being hidden behind a general score.",
+      "Truthlabel show warning letters, lawsuits and safety actions-.",
     tone: "green",
   },
 ];

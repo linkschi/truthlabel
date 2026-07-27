@@ -52,24 +52,6 @@ const credibilityItems = [
   },
 ];
 
-const problemCards = [
-  {
-    title: "Unfamiliar ingredients",
-    copy:
-      "Most shoppers do not have time to research every additive, color, oil, and preservative.",
-  },
-  {
-    title: "Important warnings get buried",
-    copy:
-      "Serious findings can disappear inside long ingredient lists and vague labeling.",
-  },
-  {
-    title: "Everyone has different concerns",
-    copy:
-      "Allergies, food preferences, and ingredients to avoid are not the same for everyone.",
-  },
-];
-
 const seriousWarnings = [
   {
     label: "Banned",
@@ -488,28 +470,76 @@ export default function LandingPage() {
         ))}
       </section>
 
-      <section className="landing-problem">
-        <SectionIntro
-          centered
-          title="Food labels should not leave you guessing."
-          copy="Truthlabel brings the most important information forward."
-        />
-        <div className="landing-problem-grid">
-          {problemCards.map((card) => (
-            <article key={card.title}>
+      <section className="landing-exposure-intro">
+        <div className="landing-exposure-copy">
+          <p className="landing-eyebrow">Scan before you trust it.</p>
+          <h2>
+            Truthlabel exposes the hidden dangrous ingridients hidden in our
+            everyday food
+          </h2>
+          <p>
+            Helping spot products &quot;banned&quot;in other countries,&quot;
+            harmful additives, ultra-processing,
+          </p>
+          <p>
+            We expose brands with a history of &quot; misleading labels&quot;or
+            safety violations.
+          </p>
+          <p>
+            we turn incidents in clears list of things u might want to avoid.
+          </p>
+        </div>
+        <div className="landing-proof-visuals">
+          <article className="landing-scan-proof" aria-label="image of scan">
+            <div className="landing-scan-proof__screen">
+              <div className="landing-scan-proof__beam" />
               <span />
-              <h3>{card.title}</h3>
-              <p>{card.copy}</p>
-            </article>
-          ))}
+              <span />
+              <span />
+              <strong>Scan reading label</strong>
+            </div>
+          </article>
+          <article
+            className="landing-brand-proof"
+            aria-label="image of a scan of brands trust score"
+          >
+            <span>Brand Trust Score</span>
+            <strong>Warning found</strong>
+            <p>Misleading label history</p>
+            <div>
+              <span />
+              <span />
+              <span />
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section className="landing-profit-section">
+        <SectionIntro
+          eyebrow="heading"
+          title="Exposing evil brands that only care about proffits"
+          copy="Food companies are becoming more focused on profit and mass production. Many everyday products now contain lab made ingredients, harmful cheaper substitutes, and heavily processed formulas-that causes serious health issues,"
+        />
+        <div className="landing-profit-copy">
+          <p>
+            but for some reason, though some of thse stuff are literally banned
+            in other countries and states because they are dangerous . through
+            some legal loopholes these are being sold to everday families with
+            no laws to protect them
+          </p>
+          <p>
+            these are the items and practices becoming disturbingly common in
+            everyday food.
+          </p>
         </div>
       </section>
 
       <section className="landing-concerns">
         <SectionIntro
-          eyebrow="Consumer protection layer"
-          title="Spot the warnings that are easy to miss."
-          copy="Truthlabel turns hidden label signals into clear, focused findings before a product reaches your basket."
+          eyebrow="carousel"
+          title="The warning can be hidden in the small print."
+          copy="The danger is not always visible. It can be hidden in small print, buried behind health claims or missing from the front completely. Truthlabel brings the warning forward."
         />
         <LandingConcernCarousel />
       </section>
@@ -554,9 +584,9 @@ export default function LandingPage() {
       <section id="how" className="landing-how">
         <div className="landing-how__copy">
           <SectionIntro
-            eyebrow="How it works"
-            title="Scan. Check. Decide."
-            copy="Truthlabel turns a product label into a focused result: what was found, why it was flagged, and what action may make sense."
+            eyebrow="How our app works"
+            title="Scan, check, decide."
+            copy="Truthlabel turns a product label into a focused resul. it shows: what was found, why it was flagged, and what action may make sense."
           />
           <div className="landing-how-steps">
             {howSteps.map((step) => (
