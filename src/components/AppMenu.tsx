@@ -39,6 +39,15 @@ const navItems = [
     label: "Account",
     detail: "Open account, access, allergy, and scan preference controls.",
   },
+  ...(publicAppConfig.flags.enableInternalAnalyticsDashboard
+    ? [
+        {
+          href: "/app/admin/analytics",
+          label: "Internal analytics",
+          detail: "Review private MVP reliability, funnel, and business signals.",
+        },
+      ]
+    : []),
 ] as const;
 
 function toggleSelection<T extends string>(values: T[], value: T) {

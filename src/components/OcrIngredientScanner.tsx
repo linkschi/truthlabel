@@ -22,6 +22,8 @@ import {
   type OcrProgressUpdate,
 } from "@/lib/localIngredientOcr";
 import { createCapturedImageThumbnail } from "@/lib/createCapturedImageThumbnail";
+import { trackTruthlabelEvent } from "@/lib/analytics/analyticsClient";
+import { normalizeAnalyticsError } from "@/lib/analytics/analyticsEvents";
 
 type OcrCameraState =
   | "idle"
@@ -74,6 +76,24 @@ function uniqueStrings(values: Array<string | null | undefined>) {
   });
 
   return result;
+}
+
+function getOcrImageSource(image: Blob | File) {
+  return typeof File !== "undefined" && image instanceof File
+    ? "upload"
+    : "camera_capture";
+}
+
+function getImageSizeBucket(image: Blob | File) {
+  if (image.size < 400_000) {
+    return "small";
+  }
+
+  if (image.size < 1_500_000) {
+    return "medium";
+  }
+
+  return "large";
 }
 
 function getOcrCameraMessage(state: OcrCameraState) {
@@ -319,11 +339,16 @@ export default function OcrIngredientScanner({
     async (image: Blob | File) => {
       const processingToken = processingTokenRef.current + 1;
       processingTokenRef.current = processingToken;
+      const imageSource = getOcrImageSource(image);
       setIsProcessing(true);
       setOcrProgress({ progress: 0, status: "Preparing photo..." });
       setIsReviewReady(false);
       setOcrErrorMessage("");
       setCapturedImageUrl("");
+      trackTruthlabelEvent("ocr_scan_started", {
+        source: imageSource,
+        image_size_bucket: getImageSizeBucket(image),
+      });
       void createCapturedImageThumbnail(image).then((thumbnailUrl) => {
         if (processingToken === processingTokenRef.current && thumbnailUrl) {
           setCapturedImageUrl(thumbnailUrl);
@@ -344,6 +369,10 @@ export default function OcrIngredientScanner({
         }
 
         if (!result.ingredientText.trim()) {
+          trackTruthlabelEvent("ocr_no_text_detected", {
+            source: imageSource,
+            confidence_warning_count: result.confidenceWarnings.length,
+          });
           setOcrErrorMessage(
             "We could not read the ingredient label clearly. Try another photo or paste the ingredients manually.",
           );
@@ -360,11 +389,29 @@ export default function OcrIngredientScanner({
         setEditableAllergenStatement(result.possibleAllergenStatement);
         setConfidenceWarnings(result.confidenceWarnings);
         setIsReviewReady(true);
+        trackTruthlabelEvent("ocr_text_extracted", {
+          source: imageSource,
+          confidence_warning_count: result.confidenceWarnings.length,
+          has_allergen_statement: Boolean(result.possibleAllergenStatement),
+          extracted_length_bucket:
+            result.ingredientText.length < 80
+              ? "short"
+              : result.ingredientText.length < 400
+                ? "medium"
+                : "long",
+        });
       } catch (error) {
         if (processingToken !== processingTokenRef.current) {
           return;
         }
 
+        trackTruthlabelEvent("ocr_scan_failed", {
+          source: imageSource,
+          error_type:
+            error instanceof IngredientOcrTimeoutError
+              ? "ocr_timeout"
+              : normalizeAnalyticsError(error),
+        });
         setOcrErrorMessage(
           error instanceof IngredientOcrTimeoutError
             ? "Reading the label took too long on this device. Try a closer photo or paste the ingredients manually."

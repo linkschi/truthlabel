@@ -14,6 +14,7 @@ import {
 import InfoModal from "@/components/InfoModal";
 import IssueBadge from "@/components/IssueBadge";
 import TestingFeedbackPanel from "@/components/TestingFeedbackPanel";
+import { useTruthlabelAuth } from "@/components/auth/AuthProvider";
 import type {
   ScanResult,
   ScanResultBrandTrustSafety,
@@ -21,6 +22,8 @@ import type {
   ScanResultIngredientItem,
   ScanResultOverviewRow,
 } from "@/lib/buildScanResult";
+import { trackTruthlabelEvent } from "@/lib/analytics/analyticsClient";
+import { buildScanResultAnalytics } from "@/lib/analytics/analyticsEvents";
 import { loadLatestBarcodeScan } from "@/lib/barcodeScanStorage";
 import { getDemoScanResult } from "@/lib/getDemoScanResult";
 import { loadLatestManualScan } from "@/lib/manualScanStorage";
@@ -1880,6 +1883,7 @@ export default function ProductResult({
   manualScanKey?: string;
 }) {
   const router = useRouter();
+  const { user } = useTruthlabelAuth();
   const userSettings = useUserSettings();
   const [saved, setSaved] = useState(false);
   const [historyRecord, setHistoryRecord] = useState<ScanHistoryRecord | null>(
@@ -1896,6 +1900,7 @@ export default function ProductResult({
   );
   const [activeDetail, setActiveDetail] = useState<ResultDetail | null>(null);
   const ingredientSectionRef = useRef<HTMLElement | null>(null);
+  const trackedResultRef = useRef("");
   const latestBarcodeScan = useSyncExternalStore(
     subscribeToStoredScanStore,
     getBarcodeScanStoreSnapshot,
@@ -1978,6 +1983,46 @@ export default function ProductResult({
     historyScannedAt: historyRecord?.scannedAt,
     scanResult,
   });
+  useEffect(() => {
+    if (historyScanId && historyStatus === "loading") {
+      return;
+    }
+
+    if (trackedResultRef.current === resultMotionKey) {
+      return;
+    }
+
+    trackedResultRef.current = resultMotionKey;
+    trackTruthlabelEvent(
+      "result_page_loaded",
+      {
+        result_source: historyScanId
+          ? "history"
+          : barcodeScanKey
+            ? "barcode"
+            : manualScanKey
+              ? "manual"
+              : demoProductId || category
+                ? "demo"
+                : "fallback_demo",
+        fresh_result: freshResult,
+        history_status: historyStatus,
+        ...buildScanResultAnalytics(scanResult),
+      },
+      { userId: user?.id },
+    );
+  }, [
+    barcodeScanKey,
+    category,
+    demoProductId,
+    freshResult,
+    historyScanId,
+    historyStatus,
+    manualScanKey,
+    resultMotionKey,
+    scanResult,
+    user?.id,
+  ]);
   const freshMotionEnabled = useFreshResultMotion(resultMotionKey, freshResult);
   const shouldAnimateFreshResult = freshMotionEnabled && !prefersReducedMotion;
 

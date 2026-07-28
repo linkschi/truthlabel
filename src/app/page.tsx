@@ -233,12 +233,19 @@ function Icon({ name }: { name: string }) {
 function PrimaryCta({
   children = "Begin my 7-day free trial",
   className = "",
+  analyticsSource = "landing_cta",
 }: {
   children?: React.ReactNode;
   className?: string;
+  analyticsSource?: string;
 }) {
   return (
-    <a className={`landing-button landing-button--primary ${className}`} href={truthlabelTrialStartUrl}>
+    <a
+      className={`landing-button landing-button--primary ${className}`}
+      href={truthlabelTrialStartUrl}
+      data-analytics-event="trial_cta_clicked"
+      data-analytics-source={analyticsSource}
+    >
       {children}
     </a>
   );
@@ -285,7 +292,7 @@ export default function LandingPage() {
           <Link href="/sign-in" className="landing-sign-in">
             Sign in
           </Link>
-          <PrimaryCta>Begin free trial</PrimaryCta>
+          <PrimaryCta analyticsSource="landing_header">Begin free trial</PrimaryCta>
         </div>
 
         <div className="landing-mobile-actions">
@@ -304,7 +311,9 @@ export default function LandingPage() {
                   {link.label}
                 </a>
               ))}
-              <PrimaryCta>Begin free trial</PrimaryCta>
+              <PrimaryCta analyticsSource="landing_mobile_menu">
+                Begin free trial
+              </PrimaryCta>
             </div>
           </details>
         </div>
@@ -365,7 +374,9 @@ export default function LandingPage() {
             <strong>Cancel Anytime Guarantee</strong>
             <p>No long-term commitment. Cancel future renewals whenever you choose.</p>
           </div>
-          <PrimaryCta>Begin my 7-day free trial</PrimaryCta>
+          <PrimaryCta analyticsSource="pricing_section">
+            Begin my 7-day free trial
+          </PrimaryCta>
           <p className="landing-trust-line">
             7 days free - Cancel anytime - No long-term commitment
           </p>
@@ -526,7 +537,7 @@ export default function LandingPage() {
           Understand the ingredients, see the warnings, and make the choice with
           greater confidence.
         </p>
-        <PrimaryCta>Begin my 7-day free trial</PrimaryCta>
+        <PrimaryCta analyticsSource="final_cta">Begin my 7-day free trial</PrimaryCta>
         <span>Cancel anytime - No long-term commitment</span>
       </section>
 

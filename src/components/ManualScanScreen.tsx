@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import AppMenu from "@/components/AppMenu";
+import { useTruthlabelAuth } from "@/components/auth/AuthProvider";
 import {
   getNextSelectedAllergiesOverride,
   splitSavedAllergyProfile,
@@ -26,6 +27,11 @@ import {
 } from "@/lib/userSettings/userSettingsStorage";
 import type { CameraScannerMode } from "./CameraBarcodeScanner";
 import type { OcrConfirmedDetails } from "./OcrIngredientScanner";
+import { trackTruthlabelEvent } from "@/lib/analytics/analyticsClient";
+import {
+  buildScanResultAnalytics,
+  normalizeAnalyticsError,
+} from "@/lib/analytics/analyticsEvents";
 
 const CameraBarcodeScanner = dynamic(
   () => import("@/components/CameraBarcodeScanner"),
@@ -472,6 +478,7 @@ export default function ManualScanScreen({
   scannerDebug?: boolean;
 }) {
   const router = useRouter();
+  const { user } = useTruthlabelAuth();
   const userSettings = useUserSettings();
   const [isPending, startTransition] = useTransition();
   const [isCameraScannerOpen, setIsCameraScannerOpen] = useState(
@@ -554,7 +561,17 @@ export default function ManualScanScreen({
     barcodeValue: string,
     options?: { capturedImageUrl?: string },
   ) {
+    const barcodeSource = options?.capturedImageUrl ? "camera" : "typed";
+
     if (!barcodeLookupEnabled) {
+      trackTruthlabelEvent(
+        "barcode_lookup_failed",
+        {
+          source: barcodeSource,
+          error_type: "feature_disabled",
+        },
+        { userId: user?.id },
+      );
       setBarcodeFeedback({
         status: "error",
         message:
@@ -568,6 +585,14 @@ export default function ManualScanScreen({
     setErrorMessage("");
     setIsLookingUpBarcode(true);
     setBarcodeFeedback(null);
+    trackTruthlabelEvent(
+      "barcode_scan_started",
+      {
+        source: barcodeSource,
+        barcode_length: barcodeValue.replace(/\D/g, "").length,
+      },
+      { userId: user?.id },
+    );
 
     try {
       const { runBarcodeScan } = await loadBarcodeScanModule();
@@ -578,6 +603,16 @@ export default function ManualScanScreen({
       });
 
       if (result.lookupStatus === "found" && result.productData && result.scanResult) {
+        trackTruthlabelEvent(
+          "barcode_lookup_success",
+          {
+            source: barcodeSource,
+            lookup_status: result.lookupStatus,
+            warning_count: result.dataQualityWarnings.length,
+            ...buildScanResultAnalytics(result.scanResult),
+          },
+          { userId: user?.id },
+        );
         saveLatestBarcodeScan({
           input: {
             barcode: result.productData.barcode,
@@ -612,16 +647,52 @@ export default function ManualScanScreen({
       });
 
       if (result.lookupStatus === "found_missing_ingredients" && result.productData) {
+        trackTruthlabelEvent(
+          "barcode_missing_ingredients",
+          {
+            source: barcodeSource,
+            lookup_status: result.lookupStatus,
+            warning_count: result.dataQualityWarnings.length,
+            product_category: result.productData.productCategory || "unknown",
+          },
+          { userId: user?.id },
+        );
         setProductName(result.productData.productName);
         setBrandName(result.productData.brandName);
         setProductCategoryOverride(result.productData.productCategory);
         setIngredientText("");
         setAllergenStatement(result.productData.allergenStatement);
         setPackagingText(result.productData.packagingText);
+      } else if (result.lookupStatus === "not_found") {
+        trackTruthlabelEvent(
+          "barcode_no_product_found",
+          {
+            source: barcodeSource,
+            lookup_status: result.lookupStatus,
+          },
+          { userId: user?.id },
+        );
+      } else if (result.lookupStatus === "error") {
+        trackTruthlabelEvent(
+          "barcode_lookup_failed",
+          {
+            source: barcodeSource,
+            lookup_status: result.lookupStatus,
+          },
+          { userId: user?.id },
+        );
       }
 
       return result;
     } catch (error) {
+      trackTruthlabelEvent(
+        "barcode_lookup_failed",
+        {
+          source: barcodeSource,
+          error_type: normalizeAnalyticsError(error),
+        },
+        { userId: user?.id },
+      );
       if (hasErrorName(error, "BarcodeValidationError")) {
         setBarcodeFeedback({
           status: "validation",
@@ -656,6 +727,15 @@ export default function ManualScanScreen({
     details?: { capturedImageUrl?: string },
   ) {
     setBarcodeInput(barcode);
+    trackTruthlabelEvent(
+      "barcode_detected",
+      {
+        source: "camera",
+        barcode_length: barcode.replace(/\D/g, "").length,
+        has_captured_image: Boolean(details?.capturedImageUrl),
+      },
+      { userId: user?.id },
+    );
     const result = await lookupBarcodeValue(barcode, {
       capturedImageUrl: details?.capturedImageUrl,
     });
@@ -716,6 +796,18 @@ export default function ManualScanScreen({
     additionalConfidenceNotes?: string[];
   }) {
     setErrorMessage("");
+    const scanSource =
+      options?.scanSource ?? (barcodeDraftProduct ? "barcode" : "manual_paste");
+    trackTruthlabelEvent(
+      "manual_scan_started",
+      {
+        scan_source: scanSource,
+        has_product_name: Boolean(productName.trim()),
+        has_brand_name: Boolean(brandName.trim()),
+        has_barcode_draft: Boolean(barcodeDraftProduct),
+      },
+      { userId: user?.id },
+    );
 
     const input = buildManualScanInput({
       productName,
@@ -758,8 +850,7 @@ export default function ManualScanScreen({
           barcodeDraftProduct?.allergenStatement ||
           input.allergenStatement,
         externalSignals: barcodeDraftProduct?.externalSignals,
-        scanSource:
-          options?.scanSource ?? (barcodeDraftProduct ? "barcode" : "manual_paste"),
+        scanSource,
         productImageUrl,
         productImageSource: barcodeDraftProduct?.imageUrl
           ? "product_database"
@@ -780,8 +871,16 @@ export default function ManualScanScreen({
 
       if (
         barcodeDraftProduct &&
-        (options?.scanSource ?? "barcode") === "barcode"
+        scanSource === "barcode"
       ) {
+        trackTruthlabelEvent(
+          "manual_scan_success",
+          {
+            ...buildScanResultAnalytics(finalResult),
+            completed_from: "barcode_missing_ingredients",
+          },
+          { userId: user?.id },
+        );
         saveLatestBarcodeScan({
           input: {
             barcode: barcodeDraftProduct.barcode,
@@ -818,8 +917,7 @@ export default function ManualScanScreen({
             barcodeDraftProduct?.allergenStatement ||
             input.allergenStatement,
           externalSignals: barcodeDraftProduct?.externalSignals,
-          scanSource:
-            options?.scanSource ?? (barcodeDraftProduct ? "barcode" : "manual_paste"),
+          scanSource,
           productImageUrl,
           productImageSource: barcodeDraftProduct?.imageUrl
             ? "product_database"
@@ -832,16 +930,29 @@ export default function ManualScanScreen({
         savedAt: new Date().toISOString(),
       });
 
+      trackTruthlabelEvent(
+        "manual_scan_success",
+        buildScanResultAnalytics(finalResult),
+        { userId: user?.id },
+      );
       saveHistoryWithoutBlocking({
         scanResult: finalResult,
         ingredientText: input.ingredientText,
-        source: options?.scanSource ?? "manual_paste",
+        source: scanSource,
       });
 
       startTransition(() => {
         router.push("/app/results?manual=latest&fresh=1");
       });
     } catch (error) {
+      trackTruthlabelEvent(
+        "manual_scan_failed",
+        {
+          scan_source: scanSource,
+          error_type: normalizeAnalyticsError(error),
+        },
+        { userId: user?.id },
+      );
       await failAnalysis(productImageUrl);
       throw error;
     }
@@ -871,6 +982,21 @@ export default function ManualScanScreen({
     details?: OcrConfirmedDetails,
   ) {
     setIngredientText(extractedIngredientText);
+    trackTruthlabelEvent(
+      "ocr_review_confirmed",
+      {
+        confidence_warning_count: details?.confidenceWarnings.length ?? 0,
+        has_allergen_statement: Boolean(details?.possibleAllergenStatement),
+        has_captured_image: Boolean(details?.capturedImageUrl),
+        extracted_length_bucket:
+          extractedIngredientText.length < 80
+            ? "short"
+            : extractedIngredientText.length < 400
+              ? "medium"
+              : "long",
+      },
+      { userId: user?.id },
+    );
     if (details?.possibleAllergenStatement) {
       setAllergenStatement(details.possibleAllergenStatement);
     }
@@ -886,6 +1012,14 @@ export default function ManualScanScreen({
       setIsOcrScannerOpen(false);
       setIsCameraScannerOpen(false);
     } catch (error) {
+      trackTruthlabelEvent(
+        "ocr_scan_failed",
+        {
+          stage: "confirmed_scan",
+          error_type: normalizeAnalyticsError(error),
+        },
+        { userId: user?.id },
+      );
       if (hasErrorName(error, "ManualScanValidationError")) {
         setErrorMessage(
           error instanceof Error
@@ -996,6 +1130,13 @@ export default function ManualScanScreen({
                 disabled={isLookingUpBarcode || isPending || isAnalyzingProduct}
                 onClick={() => {
                   setBarcodeFeedback(null);
+                  trackTruthlabelEvent(
+                    "barcode_scan_started",
+                    {
+                      source: "camera_opened",
+                    },
+                    { userId: user?.id },
+                  );
                   setIsCameraScannerOpen(true);
                 }}
                 className="rounded-full border border-[#ddd4c3] bg-white/82 px-4 py-2.5 text-[12px] font-semibold uppercase tracking-[0.14em] text-[#22342c] transition active:scale-[0.99] disabled:cursor-wait disabled:opacity-70"
@@ -1111,6 +1252,13 @@ export default function ManualScanScreen({
                 disabled={isAnalyzingProduct || isPending}
                 onClick={() => {
                   setErrorMessage("");
+                  trackTruthlabelEvent(
+                    "ocr_scan_started",
+                    {
+                      source: "scanner_opened",
+                    },
+                    { userId: user?.id },
+                  );
                   setIsOcrScannerOpen(true);
                 }}
                 className="rounded-full border border-[#ddd4c3] bg-white/82 px-4 py-2.5 text-[12px] font-semibold uppercase tracking-[0.14em] text-[#22342c] transition active:scale-[0.99] disabled:cursor-wait disabled:opacity-70"

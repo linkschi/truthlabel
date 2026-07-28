@@ -50,6 +50,10 @@ export const publicAppConfig = {
     "NEXT_PUBLIC_EXTERNAL_SAFETY_ROUTE_PATH",
     "/api/external-safety",
   ),
+  analyticsRoutePath: readStringEnv(
+    "NEXT_PUBLIC_ANALYTICS_ROUTE_PATH",
+    "/api/analytics/events",
+  ),
   flags: {
     enableBarcodeLookup: readBooleanEnv(
       "NEXT_PUBLIC_ENABLE_BARCODE_LOOKUP",
@@ -70,6 +74,11 @@ export const publicAppConfig = {
       true,
     ),
     enableDebugOutput: readBooleanEnv("NEXT_PUBLIC_ENABLE_DEBUG_OUTPUT", false),
+    enableAnalytics: readBooleanEnv("NEXT_PUBLIC_ENABLE_ANALYTICS", true),
+    enableInternalAnalyticsDashboard: readBooleanEnv(
+      "NEXT_PUBLIC_ENABLE_INTERNAL_ANALYTICS_DASHBOARD",
+      isDevelopmentRuntime,
+    ),
     enableLocalDevBypass:
       isDevelopmentRuntime &&
       readBooleanEnv("NEXT_PUBLIC_ENABLE_LOCAL_DEV_BYPASS", true),

@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import AnalyticsPageTracker from "@/components/analytics/AnalyticsPageTracker";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import LocalDevNavigation from "@/components/LocalDevNavigation";
 import PwaServiceWorkerRegistration from "@/components/PwaServiceWorkerRegistration";
@@ -53,6 +54,7 @@ export default function RootLayout({
       <body suppressHydrationWarning className="min-h-full">
         <AuthProvider>
           <PwaServiceWorkerRegistration />
+          <AnalyticsPageTracker />
           <LocalDevNavigation />
           {children}
         </AuthProvider>

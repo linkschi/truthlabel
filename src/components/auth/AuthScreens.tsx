@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { type FormEvent, Suspense, useEffect, useState } from "react";
+import { type FormEvent, Suspense, useEffect, useRef, useState } from "react";
 import { useTruthlabelAuth } from "@/components/auth/AuthProvider";
+import { trackTruthlabelEvent } from "@/lib/analytics/analyticsClient";
+import { normalizeAnalyticsError } from "@/lib/analytics/analyticsEvents";
 import { getSupabaseBrowserClient } from "@/lib/auth/supabaseClient";
 
 const inputClass =
@@ -127,6 +129,9 @@ function SignInFormInner() {
     event.preventDefault();
     setStatus(null);
     setIsBusy(true);
+    trackTruthlabelEvent("forgot_password_started", {
+      source: "forgot_password_page",
+    });
 
     try {
       const supabase = getSupabaseBrowserClient();
@@ -135,7 +140,7 @@ function SignInFormInner() {
         throw new Error("Account access is not configured yet.");
       }
 
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -144,9 +149,20 @@ function SignInFormInner() {
         throw error;
       }
 
+      trackTruthlabelEvent(
+        "login_success",
+        {
+          next_path: nextPath,
+        },
+        { userId: data.user?.id },
+      );
       router.replace(nextPath);
       router.refresh();
     } catch (error) {
+      trackTruthlabelEvent("login_failed", {
+        error_type: normalizeAnalyticsError(error),
+        next_path: nextPath,
+      });
       setStatus({
         tone: "red",
         message:
@@ -288,6 +304,12 @@ export function CreateAccountScreen() {
   const [isRedirectingToCheckout, setIsRedirectingToCheckout] = useState(false);
   const checkoutUrl = getGumroadCheckoutUrl();
 
+  useEffect(() => {
+    trackTruthlabelEvent("signup_started", {
+      source: "create_account_page",
+    });
+  }, []);
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setStatus(null);
@@ -313,7 +335,7 @@ export function CreateAccountScreen() {
         throw new Error("Account access is not configured yet.");
       }
 
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -332,6 +354,21 @@ export function CreateAccountScreen() {
         throw error;
       }
 
+      trackTruthlabelEvent(
+        "signup_success",
+        {
+          source: "create_account_page",
+          has_first_name: true,
+        },
+        { userId: data.user?.id },
+      );
+      trackTruthlabelEvent(
+        "checkout_handoff_shown",
+        {
+          source: "create_account_page",
+        },
+        { userId: data.user?.id },
+      );
       storePendingCheckoutEmail(email);
       setFirstName("");
       setPassword("");
@@ -343,9 +380,19 @@ export function CreateAccountScreen() {
       });
 
       window.setTimeout(() => {
+        trackTruthlabelEvent(
+          "checkout_started",
+          {
+            source: "create_account_auto_redirect",
+          },
+          { userId: data.user?.id },
+        );
         window.location.assign(checkoutUrl);
       }, 1900);
     } catch (error) {
+      trackTruthlabelEvent("signup_failed", {
+        error_type: normalizeAnalyticsError(error),
+      });
       setStatus({
         tone: "red",
         message:
@@ -515,7 +562,13 @@ export function ForgotPasswordScreen() {
         tone: "green",
         message: "If this email exists, Truthlabel will send a password reset link.",
       });
+      trackTruthlabelEvent("password_reset_requested", {
+        source: "forgot_password_page",
+      });
     } catch (error) {
+      trackTruthlabelEvent("password_reset_failed", {
+        error_type: normalizeAnalyticsError(error),
+      });
       setStatus({
         tone: "red",
         message: getPasswordResetErrorMessage(error),
@@ -620,7 +673,13 @@ export function UpdatePasswordScreen() {
         tone: "green",
         message: "Password updated. You can now sign in.",
       });
+      trackTruthlabelEvent("password_update_success", {
+        source: "update_password_page",
+      });
     } catch (error) {
+      trackTruthlabelEvent("password_update_failed", {
+        error_type: normalizeAnalyticsError(error),
+      });
       setStatus({
         tone: "red",
         message:
@@ -692,8 +751,26 @@ export function ActivateScreen() {
     message: string;
   } | null>(null);
   const [isActivatingLicense, setIsActivatingLicense] = useState(false);
+  const activationViewTrackedRef = useRef(false);
   const checkoutUrl = getGumroadCheckoutUrl();
   const isActive = accessState === "active";
+
+  useEffect(() => {
+    if (activationViewTrackedRef.current) {
+      return;
+    }
+
+    activationViewTrackedRef.current = true;
+    trackTruthlabelEvent(
+      "activation_viewed",
+      {
+        access_state: accessState,
+        access_kind: accessKind,
+        signed_in: Boolean(user),
+      },
+      { userId: user?.id },
+    );
+  }, [accessKind, accessState, user]);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -725,6 +802,9 @@ export function ActivateScreen() {
     setActivationStatus(null);
 
     if (!user) {
+      trackTruthlabelEvent("activation_failed", {
+        error_type: "signed_out",
+      });
       setActivationStatus({
         tone: "red",
         message: "Sign in before activating your access.",
@@ -735,6 +815,13 @@ export function ActivateScreen() {
     const trimmedLicenseKey = licenseKey.trim();
 
     if (trimmedLicenseKey.length < 8) {
+      trackTruthlabelEvent(
+        "activation_failed",
+        {
+          error_type: "missing_license_key",
+        },
+        { userId: user.id },
+      );
       setActivationStatus({
         tone: "red",
         message: "Enter the license key from your purchase email.",
@@ -774,8 +861,24 @@ export function ActivateScreen() {
         tone: "green",
         message: data.message || "Paid Truthlabel access is active.",
       });
+      trackTruthlabelEvent(
+        "activation_success",
+        {
+          activation_method: "license_key",
+          status: data.status || "active",
+        },
+        { userId: user.id },
+      );
       await refreshAccess();
     } catch (error) {
+      trackTruthlabelEvent(
+        "activation_failed",
+        {
+          activation_method: "license_key",
+          error_type: normalizeAnalyticsError(error),
+        },
+        { userId: user.id },
+      );
       setActivationStatus({
         tone: "red",
         message:
@@ -825,6 +928,15 @@ export function ActivateScreen() {
         {user ? (
           <a
             href={checkoutUrl}
+            onClick={() =>
+              trackTruthlabelEvent(
+                "checkout_started",
+                {
+                  source: "activation_page",
+                },
+                { userId: user.id },
+              )
+            }
             className="inline-flex justify-center rounded-full border border-transparent bg-[var(--text-main)] px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-white"
           >
             Start 7-day trial
@@ -843,7 +955,16 @@ export function ActivateScreen() {
         {user ? (
           <button
             type="button"
-            onClick={() => void refreshAccess()}
+            onClick={() => {
+              trackTruthlabelEvent(
+                "checkout_returned",
+                {
+                  source: "activation_page_check_access",
+                },
+                { userId: user.id },
+              );
+              void refreshAccess();
+            }}
             className="rounded-full border border-[var(--border-soft)] bg-white px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-[var(--text-main)]"
           >
             I finished checkout - check access
