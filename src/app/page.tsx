@@ -279,7 +279,8 @@ function QuickTrialSection() {
         <h2>Protect yourself from evil brands that put profit first</h2>
         <p>
           Try Truthlabel free for 7 days and start checking the food you buy,
-          eat, and bring home.
+          eat, and bring home. Use it while shopping to see warning signals
+          before a product reaches your basket.
         </p>
       </div>
       <div className="landing-quick-trial__action">
@@ -403,10 +404,6 @@ export default function LandingPage() {
           <p>
             We expose brands with a history of &quot;misleading labels&quot;,
             safety violations, or serious product warnings.
-          </p>
-          <p>
-            Then we turn those incidents into clear lists of things you may want
-            to avoid.
           </p>
         </div>
         <div className="landing-media-slot landing-media-slot--scan">
