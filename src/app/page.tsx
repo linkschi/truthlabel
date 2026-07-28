@@ -271,6 +271,71 @@ function SectionIntro({
   );
 }
 
+function QuickTrialSection() {
+  return (
+    <section className="landing-quick-trial" aria-label="Start Truthlabel trial">
+      <div className="landing-quick-trial__copy">
+        <p className="landing-eyebrow">Start here</p>
+        <h2>Begin your 7-day free trial.</h2>
+        <p>
+          Create your account, continue to checkout, then start scanning food
+          labels with Truthlabel.
+        </p>
+      </div>
+      <div className="landing-quick-trial__action">
+        <PrimaryCta analyticsSource="quick_trial_section">
+          Begin my 7-day free trial
+        </PrimaryCta>
+        <span>7 days free - $4.99/month after trial - Cancel anytime</span>
+      </div>
+    </section>
+  );
+}
+
+function FullPricingSection() {
+  return (
+    <section id="pricing" className="landing-pricing">
+      <div className="landing-pricing__card">
+        <div>
+          <p className="landing-eyebrow">Truthlabel Full Access</p>
+          <h2>Protect yourself from evil brands that put profit first</h2>
+          <p>
+            Try Truthlabel free for 7 days and start checking the food you buy,
+            eat, and bring home.
+          </p>
+        </div>
+        <div className="landing-price">
+          <strong>$4.99</strong>
+          <span>/ month after trial</span>
+        </div>
+        <ul>
+          {planIncludes.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+        <div className="landing-guarantee">
+          <strong>Cancel Anytime Guarantee</strong>
+          <p>No long-term commitment. Cancel future renewals whenever you choose.</p>
+        </div>
+        <PrimaryCta analyticsSource="pricing_section">
+          Begin my 7-day free trial
+        </PrimaryCta>
+        <p className="landing-trust-line">
+          7 days free - Cancel anytime - No long-term commitment
+        </p>
+        <div className="landing-launch-metrics" aria-label="Truthlabel launch facts">
+          {launchMetrics.map((metric) => (
+            <span key={metric.label}>
+              <strong>{metric.value}</strong>
+              {metric.label}
+            </span>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function LandingPage() {
   return (
     <main className="landing-page">
@@ -351,45 +416,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section id="pricing" className="landing-pricing">
-        <div className="landing-pricing__card">
-          <div>
-            <p className="landing-eyebrow">Truthlabel Full Access</p>
-            <h2>Protect yourself from evil brands that put profit first</h2>
-            <p>
-              Try Truthlabel free for 7 days and start checking the food you
-              buy, eat, and bring home.
-            </p>
-          </div>
-          <div className="landing-price">
-            <strong>$4.99</strong>
-            <span>/ month after trial</span>
-          </div>
-          <ul>
-            {planIncludes.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-          <div className="landing-guarantee">
-            <strong>Cancel Anytime Guarantee</strong>
-            <p>No long-term commitment. Cancel future renewals whenever you choose.</p>
-          </div>
-          <PrimaryCta analyticsSource="pricing_section">
-            Begin my 7-day free trial
-          </PrimaryCta>
-          <p className="landing-trust-line">
-            7 days free - Cancel anytime - No long-term commitment
-          </p>
-          <div className="landing-launch-metrics" aria-label="Truthlabel launch facts">
-            {launchMetrics.map((metric) => (
-              <span key={metric.label}>
-                <strong>{metric.value}</strong>
-                {metric.label}
-              </span>
-            ))}
-          </div>
-        </div>
-      </section>
+      <QuickTrialSection />
 
       <section className="landing-profit-section">
         <div className="landing-profit-lead">
@@ -521,6 +548,8 @@ export default function LandingPage() {
           ))}
         </div>
       </section>
+
+      <FullPricingSection />
 
       <section id="questions" className="landing-faq">
         <SectionIntro
