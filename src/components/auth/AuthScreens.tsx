@@ -280,7 +280,6 @@ export function CreateAccountScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [status, setStatus] = useState<{
     tone: "green" | "yellow" | "red";
     message: string;
@@ -302,14 +301,6 @@ export function CreateAccountScreen() {
 
     if (password !== confirmPassword) {
       setStatus({ tone: "red", message: "Passwords do not match." });
-      return;
-    }
-
-    if (!acceptedTerms) {
-      setStatus({
-        tone: "red",
-        message: "Please accept the Terms and Privacy Policy to continue.",
-      });
       return;
     }
 
@@ -345,7 +336,6 @@ export function CreateAccountScreen() {
       setFirstName("");
       setPassword("");
       setConfirmPassword("");
-      setAcceptedTerms(false);
       setIsRedirectingToCheckout(true);
       setStatus({
         tone: "green",
@@ -463,32 +453,6 @@ export function CreateAccountScreen() {
                 value={confirmPassword}
                 onChange={(event) => setConfirmPassword(event.target.value)}
               />
-            </label>
-            <label className="mt-4 flex gap-3 rounded-[18px] border border-[var(--border-soft)] bg-white px-4 py-3 text-[12px] leading-5 text-[var(--text-secondary)]">
-              <input
-                type="checkbox"
-                required
-                checked={acceptedTerms}
-                onChange={(event) => setAcceptedTerms(event.target.checked)}
-                className="mt-1 h-4 w-4 shrink-0 accent-[var(--green-main)]"
-              />
-              <span>
-                I agree to the{" "}
-                <Link
-                  href="/terms"
-                  className="font-semibold text-[var(--green-main)]"
-                >
-                  Terms
-                </Link>{" "}
-                and{" "}
-                <Link
-                  href="/privacy"
-                  className="font-semibold text-[var(--green-main)]"
-                >
-                  Privacy Policy
-                </Link>
-                .
-              </span>
             </label>
             {status ? (
               <StatusMessage tone={status.tone} message={status.message} />

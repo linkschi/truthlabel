@@ -18,7 +18,7 @@ const genuineReviews: Array<{
   verified: boolean;
 }> = [];
 
-const truthlabelCheckoutUrl = "https://truthlabel.gumroad.com/l/fnoakd?wanted=true";
+const truthlabelTrialStartUrl = "/create-account";
 
 const navLinks = [
   { href: "#how", label: "How it works" },
@@ -238,7 +238,7 @@ function PrimaryCta({
   className?: string;
 }) {
   return (
-    <a className={`landing-button landing-button--primary ${className}`} href={truthlabelCheckoutUrl}>
+    <a className={`landing-button landing-button--primary ${className}`} href={truthlabelTrialStartUrl}>
       {children}
     </a>
   );
@@ -314,25 +314,13 @@ export default function LandingPage() {
         <div className="landing-hero__copy">
           <p className="landing-eyebrow">Know what is really in your food</p>
           <h1>Scan before you trust it.</h1>
-          <div className="landing-hero__actions">
-            <PrimaryCta className="landing-hero__primary">
-              Begin my 7-day free trial
-            </PrimaryCta>
-            <a className="landing-button landing-button--secondary" href="#how">
-              See how it works
-            </a>
-          </div>
-          <p className="landing-trust-line">
-            7 days free - Cancel anytime - No long-term commitment
-          </p>
+          <p>Truthlabel exposes dangerous ingredients hidden in your food.</p>
         </div>
       </section>
 
       <section className="landing-exposure-intro">
         <div className="landing-exposure-copy">
-          <h2>
-            Truthlabel exposes dangerous ingredients hidden in everyday food.
-          </h2>
+          <h2>Truthlabel exposes dangerous ingredients hidden in your food.</h2>
           <p>
             Truthlabel helps spot products &quot;banned&quot; in other
             countries, harmful additives, ultra-processing, and warning signals
