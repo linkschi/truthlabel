@@ -275,18 +275,18 @@ function QuickTrialSection() {
   return (
     <section className="landing-quick-trial" aria-label="Start Truthlabel trial">
       <div className="landing-quick-trial__copy">
-        <p className="landing-eyebrow">Start here</p>
-        <h2>Begin your 7-day free trial.</h2>
+        <p className="landing-eyebrow">Truthlabel Full Access</p>
+        <h2>Protect yourself from evil brands that put profit first</h2>
         <p>
-          Create your account, continue to checkout, then start scanning food
-          labels with Truthlabel.
+          Try Truthlabel free for 7 days and start checking the food you buy,
+          eat, and bring home.
         </p>
       </div>
       <div className="landing-quick-trial__action">
         <PrimaryCta analyticsSource="quick_trial_section">
           Begin my 7-day free trial
         </PrimaryCta>
-        <span>7 days free - $4.99/month after trial - Cancel anytime</span>
+        <span>7 days free - Cancel anytime - No long-term commitment</span>
       </div>
     </section>
   );
