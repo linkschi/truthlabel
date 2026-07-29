@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import AllergyProfile from "@/components/AllergyProfile";
 import { SectionLabel } from "@/components/ResultUi";
+import SupportContactLink from "@/components/SupportContactLink";
 import { publicAppConfig } from "@/lib/appConfig";
 import { type AllergyConcern, type AvoidConcern } from "@/data/fakeProduct";
 import { saveProfile, useStoredProfile } from "@/lib/profileStorage";
@@ -184,6 +185,17 @@ export default function AppMenu() {
                   );
                 })}
               </div>
+            </section>
+
+            <section className="mt-4 rounded-[22px] border border-[#e7decf] bg-white/76 px-4 py-4">
+              <SectionLabel>Help</SectionLabel>
+              <p className="mt-2 text-[12px] leading-5 text-[#6a776f]">
+                If something is not working, send a quick support message.
+              </p>
+              <SupportContactLink
+                context="App menu"
+                className="mt-3 inline-flex h-10 w-full items-center justify-center rounded-full border border-[#D7E7DD] bg-[#F3FAF6] px-4 text-[12px] font-bold text-[#0E5A3F] transition hover:bg-[#E8F6EF] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
+              />
             </section>
 
             <div className="mt-4">

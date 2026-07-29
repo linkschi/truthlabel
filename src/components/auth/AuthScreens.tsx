@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { type FormEvent, Suspense, useEffect, useRef, useState } from "react";
+import SupportContactLink from "@/components/SupportContactLink";
 import { useTruthlabelAuth } from "@/components/auth/AuthProvider";
 import { trackTruthlabelEvent } from "@/lib/analytics/analyticsClient";
 import { normalizeAnalyticsError } from "@/lib/analytics/analyticsEvents";
@@ -45,6 +46,14 @@ function AuthShell({
             {message}
           </p>
           {children}
+          <div className="mt-5 border-t border-[var(--border-soft)] pt-4 text-center">
+            <SupportContactLink
+              context={title}
+              className="inline-flex items-center justify-center rounded-full border border-[var(--border-soft)] bg-white px-4 py-2 text-[12px] font-semibold text-[var(--text-secondary)] transition hover:border-[var(--green-border)] hover:text-[var(--green-main)]"
+            >
+              Need help? Contact support
+            </SupportContactLink>
+          </div>
         </div>
       </section>
     </main>

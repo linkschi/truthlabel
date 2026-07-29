@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import AllergyProfileSettings from "@/components/AllergyProfileSettings";
 import ScanPreferencesSettings from "@/components/ScanPreferencesSettings";
+import SupportContactLink from "@/components/SupportContactLink";
 import { useTruthlabelAuth } from "@/components/auth/AuthProvider";
 import { getBrowserStorageNotice } from "@/lib/browserStorage";
 import {
@@ -303,6 +304,23 @@ export default function AccountScreen() {
             >
               Sign out
             </button>
+          </div>
+        </section>
+
+        <section className="mt-4 rounded-[16px] border border-[#D7E7DD] bg-[#F3FAF6] px-4 py-3.5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-[14px] font-extrabold text-[#101613]">
+                Need help with your account?
+              </h2>
+              <p className="mt-1 text-[12.5px] leading-[1.45] text-[#66716B]">
+                Use this if checkout, activation, sign in, or scanning does not work.
+              </p>
+            </div>
+            <SupportContactLink
+              context="Account support"
+              className="inline-flex h-10 shrink-0 items-center justify-center rounded-full border border-[#BFDCCB] bg-white px-4 text-[12px] font-bold text-[#0E5A3F] transition hover:bg-[#E8F6EF] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
+            />
           </div>
         </section>
 

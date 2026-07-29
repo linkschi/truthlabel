@@ -9,6 +9,7 @@ import {
   demoProducts,
   getDemoProductById,
 } from "@/data/demoProducts";
+import SupportContactLink from "@/components/SupportContactLink";
 import { publicAppConfig } from "@/lib/appConfig";
 import { saveProfile, useStoredProfile } from "@/lib/profileStorage";
 import PwaInstallPrompt from "@/components/PwaInstallPrompt";
@@ -890,6 +891,14 @@ export default function HomeScreen() {
           onNavigate={handleNavigate}
         />
         <PwaInstallPrompt />
+        <div className="mt-4 flex justify-center">
+          <SupportContactLink
+            context="App home"
+            className="inline-flex rounded-full border border-[#E2E8E4] bg-white px-4 py-2 text-[12px] font-bold text-[#66716B] transition hover:border-[#D7E7DD] hover:bg-[#F3FAF6] hover:text-[#0E5A3F] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
+          >
+            Need help? Contact support
+          </SupportContactLink>
+        </div>
       </div>
       <BottomNavigation />
     </main>

@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import LandingConcernCarousel from "@/components/LandingConcernCarousel";
 import LandingFaq, { type LandingFaqItem } from "@/components/LandingFaq";
+import SupportContactLink from "@/components/SupportContactLink";
 import "../homepage-theme.css";
 
 export const metadata: Metadata = {
@@ -723,7 +724,7 @@ export default function LandingPage() {
           <Link href="/privacy">Privacy</Link>
           <Link href="/terms">Terms</Link>
           <Link href="/health-disclaimer">Health disclaimer</Link>
-          <a href="mailto:support@truthlabel.app">Contact/support</a>
+          <SupportContactLink context="Landing page">Contact support</SupportContactLink>
         </nav>
         <p>Copyright {new Date().getFullYear()} Truthlabel.</p>
       </footer>
