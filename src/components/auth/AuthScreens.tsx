@@ -903,7 +903,7 @@ export function ActivateScreen() {
           "activation_success",
           {
             activation_method: "mvp_access_link",
-            status: data.status || "active_until_end",
+            status: data.status || "active",
           },
           { userId: user.id },
         );
@@ -1060,77 +1060,93 @@ export function ActivateScreen() {
       ) : null}
 
       <div className="mt-5 grid gap-2.5">
-        {user ? (
-          <a
-            href={checkoutUrl}
-            onClick={() =>
-              trackTruthlabelEvent(
-                "checkout_started",
-                {
-                  source: "activation_page",
-                },
-                { userId: user.id },
-              )
-            }
-            className="inline-flex justify-center rounded-full border border-transparent bg-[var(--text-main)] px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-white"
-          >
-            Start 7-day trial
-          </a>
-        ) : activationLinkContext.hasActivationLink ? null : (
-          <Link
-            href="/create-account"
-            className="inline-flex justify-center rounded-full border border-transparent bg-[var(--text-main)] px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-white"
-          >
-            Create account to start trial
-          </Link>
-        )}
-        {activationLinkContext.hasActivationLink && !user ? (
-          <p className="text-center text-[12px] font-semibold leading-5 text-[var(--text-secondary)]">
-            Use the Truthlabel account you want this access connected to.
-          </p>
-        ) : (
-          <p className="text-center text-[12px] font-semibold leading-5 text-[var(--text-secondary)]">
-            Trial details are confirmed at checkout. You can cancel anytime.
-          </p>
-        )}
-        {user ? (
-          <button
-            type="button"
-            onClick={() => {
-              trackTruthlabelEvent(
-                "checkout_returned",
-                {
-                  source: "activation_page_check_access",
-                },
-                { userId: user.id },
-              );
-              void refreshAccess();
-            }}
-            className="rounded-full border border-[var(--border-soft)] bg-white px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-[var(--text-main)]"
-          >
-            I finished checkout - check access
-          </button>
-        ) : (
-          <Link
-            href={`/sign-in?next=${encodeURIComponent(
-              activationLinkContext.returnPath,
-            )}`}
-            className="inline-flex justify-center rounded-full border border-[var(--border-soft)] bg-white px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-[var(--text-main)]"
-          >
-            Sign in to activate
-          </Link>
-        )}
         {isActive ? (
-          <Link
-            href="/app"
-            className="inline-flex justify-center rounded-full border border-[var(--green-border)] bg-[var(--green-bg)] px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-[var(--green-dark)]"
-          >
-            Open Truthlabel
-          </Link>
-        ) : null}
+          <>
+            {activationStatus ? (
+              <StatusMessage
+                tone={activationStatus.tone}
+                message={activationStatus.message}
+              />
+            ) : (
+              <StatusMessage
+                tone="green"
+                message="This account is already active. You do not need to activate again."
+              />
+            )}
+            <Link
+              href="/app"
+              className="inline-flex justify-center rounded-full border border-[var(--green-border)] bg-[var(--green-bg)] px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-[var(--green-dark)]"
+            >
+              Open Truthlabel
+            </Link>
+          </>
+        ) : (
+          <>
+            {user ? (
+              <a
+                href={checkoutUrl}
+                onClick={() =>
+                  trackTruthlabelEvent(
+                    "checkout_started",
+                    {
+                      source: "activation_page",
+                    },
+                    { userId: user.id },
+                  )
+                }
+                className="inline-flex justify-center rounded-full border border-transparent bg-[var(--text-main)] px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-white"
+              >
+                Start 7-day trial
+              </a>
+            ) : activationLinkContext.hasActivationLink ? null : (
+              <Link
+                href="/create-account"
+                className="inline-flex justify-center rounded-full border border-transparent bg-[var(--text-main)] px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-white"
+              >
+                Create account to start trial
+              </Link>
+            )}
+            {activationLinkContext.hasActivationLink && !user ? (
+              <p className="text-center text-[12px] font-semibold leading-5 text-[var(--text-secondary)]">
+                Use the Truthlabel account you want this access connected to.
+              </p>
+            ) : (
+              <p className="text-center text-[12px] font-semibold leading-5 text-[var(--text-secondary)]">
+                Trial details are confirmed at checkout. You can cancel anytime.
+              </p>
+            )}
+            {user ? (
+              <button
+                type="button"
+                onClick={() => {
+                  trackTruthlabelEvent(
+                    "checkout_returned",
+                    {
+                      source: "activation_page_check_access",
+                    },
+                    { userId: user.id },
+                  );
+                  void refreshAccess();
+                }}
+                className="rounded-full border border-[var(--border-soft)] bg-white px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-[var(--text-main)]"
+              >
+                I finished checkout - check access
+              </button>
+            ) : (
+              <Link
+                href={`/sign-in?next=${encodeURIComponent(
+                  activationLinkContext.returnPath,
+                )}`}
+                className="inline-flex justify-center rounded-full border border-[var(--border-soft)] bg-white px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-[var(--text-main)]"
+              >
+                Sign in to activate
+              </Link>
+            )}
+          </>
+        )}
       </div>
 
-      {user ? (
+      {user && !isActive ? (
         <form
           onSubmit={handleLicenseActivation}
           className="mt-5 rounded-[20px] border border-[var(--border-soft)] bg-white px-4 py-4"

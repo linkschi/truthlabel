@@ -3,7 +3,7 @@
 // This is intentionally simple for launch testing:
 // - Requires a signed-in Truthlabel user.
 // - Requires TRUTHLABEL_MVP_ACCESS_CODE.
-// - Grants a short active_until_end access row so the existing app access check works.
+// - Grants an active access row so the existing app access check works.
 //
 // Secrets required in Supabase:
 // - SUPABASE_SERVICE_ROLE_KEY
@@ -35,12 +35,6 @@ function env(name: string) {
 
 function cleanCode(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
-}
-
-function getAccessEndDate() {
-  const expiresAt = new Date();
-  expiresAt.setDate(expiresAt.getDate() + 7);
-  return expiresAt.toISOString();
 }
 
 Deno.serve(async (request) => {
@@ -146,7 +140,6 @@ Deno.serve(async (request) => {
       env("GUMROAD_PRODUCT_ID") ||
       env("GUMROAD_PRODUCT_PERMALINK") ||
       "truthlabel-mvp-early-access";
-    const accessEndsAt = getAccessEndDate();
 
     const { error: writeError } = await serviceClient
       .from("subscriptions")
@@ -157,8 +150,8 @@ Deno.serve(async (request) => {
           gumroad_product_id: productId,
           gumroad_email: user.email?.trim().toLowerCase() ?? null,
           license_key_hash: `mvp_access_${user.id}`,
-          status: "active_until_end",
-          access_ends_at: accessEndsAt,
+          status: "active",
+          access_ends_at: null,
           last_verified_at: new Date().toISOString(),
         },
         { onConflict: "user_id" },
@@ -170,8 +163,8 @@ Deno.serve(async (request) => {
 
     return json({
       activated: true,
-      status: "active_until_end",
-      accessEndsAt,
+      status: "active",
+      accessEndsAt: null,
       message: "Truthlabel MVP access is active on this account.",
     });
   } catch (error) {
