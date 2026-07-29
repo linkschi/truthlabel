@@ -756,9 +756,15 @@ export function ActivateScreen() {
     message: string;
   } | null>(null);
   const [isActivatingLicense, setIsActivatingLicense] = useState(false);
+  const [isActivatingMvpAccess, setIsActivatingMvpAccess] = useState(false);
   const activationViewTrackedRef = useRef(false);
+  const mvpAccessHandledRef = useRef(false);
   const checkoutUrl = getGumroadCheckoutUrl();
   const isActive = accessState === "active";
+  const activationReturnPath =
+    typeof window === "undefined"
+      ? "/activate"
+      : `${window.location.pathname}${window.location.search}`;
 
   useEffect(() => {
     if (activationViewTrackedRef.current) {
@@ -801,6 +807,110 @@ export function ActivateScreen() {
       });
     });
   }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const mvpAccessCode =
+      params.get("mvp_access") ||
+      params.get("early_access") ||
+      params.get("access_code") ||
+      "";
+
+    if (!mvpAccessCode.trim()) {
+      return;
+    }
+
+    if (accessState === "loading") {
+      return;
+    }
+
+    if (!user) {
+      void Promise.resolve().then(() => {
+        setActivationStatus({
+          tone: "yellow",
+          message: "Sign in to finish activating your Truthlabel access.",
+        });
+      });
+      return;
+    }
+
+    if (isActive || mvpAccessHandledRef.current) {
+      return;
+    }
+
+    mvpAccessHandledRef.current = true;
+
+    void Promise.resolve()
+      .then(() => {
+        setIsActivatingMvpAccess(true);
+        setActivationStatus({
+          tone: "yellow",
+          message: "Activating Truthlabel access on this account...",
+        });
+      })
+      .then(async () => {
+        const supabase = getSupabaseBrowserClient();
+
+        if (!supabase) {
+          throw new Error("Account access is not configured yet.");
+        }
+
+        const { data, error } = await supabase.functions.invoke<{
+          activated?: boolean;
+          message?: string;
+          status?: string;
+        }>("activate-mvp-access", {
+          body: { code: mvpAccessCode.trim() },
+        });
+
+        if (error) {
+          throw error;
+        }
+
+        if (!data?.activated) {
+          throw new Error(
+            data?.message || "Truthlabel could not activate this access link.",
+          );
+        }
+
+        setActivationStatus({
+          tone: "green",
+          message: data.message || "Truthlabel access is active.",
+        });
+        trackTruthlabelEvent(
+          "activation_success",
+          {
+            activation_method: "mvp_access_link",
+            status: data.status || "active_until_end",
+          },
+          { userId: user.id },
+        );
+        await refreshAccess();
+        window.history.replaceState(null, "", "/activate");
+      })
+      .catch((error) => {
+        trackTruthlabelEvent(
+          "activation_failed",
+          {
+            activation_method: "mvp_access_link",
+            error_type: normalizeAnalyticsError(error),
+          },
+          { userId: user.id },
+        );
+        setActivationStatus({
+          tone: "red",
+          message:
+            error instanceof Error
+              ? error.message
+              : "Truthlabel could not activate this access link.",
+        });
+      })
+      .finally(() => setIsActivatingMvpAccess(false));
+  }, [accessState, isActive, refreshAccess, user]);
 
   async function handleLicenseActivation(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -900,7 +1010,7 @@ export function ActivateScreen() {
     <AuthShell
       eyebrow="Activate"
       title="Activate your Truthlabel access."
-      message="Access not active yet. If you used a different email at checkout, paste the license key from your purchase email to link access to this account."
+      message="Truthlabel will check this account first. If access is not active yet, paste the license key from your purchase email."
     >
       {errorMessage ? <StatusMessage tone="red" message={errorMessage} /> : null}
 
@@ -976,7 +1086,7 @@ export function ActivateScreen() {
           </button>
         ) : (
           <Link
-            href="/sign-in?next=/activate"
+            href={`/sign-in?next=${encodeURIComponent(activationReturnPath)}`}
             className="inline-flex justify-center rounded-full border border-[var(--border-soft)] bg-white px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-[var(--text-main)]"
           >
             Sign in to activate
@@ -1020,10 +1130,14 @@ export function ActivateScreen() {
           />
         ) : null}
         <button
-          disabled={isActivatingLicense || !user}
-          className={submitButtonClass(isActivatingLicense || !user)}
+          disabled={isActivatingLicense || isActivatingMvpAccess || !user}
+          className={submitButtonClass(
+            isActivatingLicense || isActivatingMvpAccess || !user,
+          )}
         >
-          {isActivatingLicense ? "Verifying..." : "Activate access"}
+          {isActivatingLicense || isActivatingMvpAccess
+            ? "Activating..."
+            : "Activate access"}
         </button>
       </form>
     </AuthShell>
