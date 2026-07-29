@@ -761,10 +761,28 @@ export function ActivateScreen() {
   const mvpAccessHandledRef = useRef(false);
   const checkoutUrl = getGumroadCheckoutUrl();
   const isActive = accessState === "active";
-  const activationReturnPath =
-    typeof window === "undefined"
-      ? "/activate"
-      : `${window.location.pathname}${window.location.search}`;
+  const [activationLinkContext] = useState(() => {
+    if (typeof window === "undefined") {
+      return {
+        hasActivationLink: false,
+        returnPath: "/activate",
+      };
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const hasActivationLink = Boolean(
+      params.get("mvp_access") ||
+        params.get("early_access") ||
+        params.get("access_code") ||
+        params.get("license_key") ||
+        params.get("license"),
+    );
+
+    return {
+      hasActivationLink,
+      returnPath: `${window.location.pathname}${window.location.search}`,
+    };
+  });
 
   useEffect(() => {
     if (activationViewTrackedRef.current) {
@@ -1016,7 +1034,9 @@ export function ActivateScreen() {
 
       {!user ? (
         <div className="mt-5 rounded-[20px] border border-[var(--amber-border)] bg-[var(--amber-bg)] px-4 py-3 text-[13px] leading-5 text-[var(--amber-dark)]">
-          Sign in or create an account before activating access.
+          {activationLinkContext.hasActivationLink
+            ? "Sign in to finish activating your Truthlabel access."
+            : "Sign in before activating access. If you have not started yet, create an account first."}
         </div>
       ) : null}
 
@@ -1056,7 +1076,7 @@ export function ActivateScreen() {
           >
             Start 7-day trial
           </a>
-        ) : (
+        ) : activationLinkContext.hasActivationLink ? null : (
           <Link
             href="/create-account"
             className="inline-flex justify-center rounded-full border border-transparent bg-[var(--text-main)] px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-white"
@@ -1064,9 +1084,15 @@ export function ActivateScreen() {
             Create account to start trial
           </Link>
         )}
-        <p className="text-center text-[12px] font-semibold leading-5 text-[var(--text-secondary)]">
-          Trial details are confirmed at checkout. You can cancel anytime.
-        </p>
+        {activationLinkContext.hasActivationLink && !user ? (
+          <p className="text-center text-[12px] font-semibold leading-5 text-[var(--text-secondary)]">
+            Use the Truthlabel account you want this access connected to.
+          </p>
+        ) : (
+          <p className="text-center text-[12px] font-semibold leading-5 text-[var(--text-secondary)]">
+            Trial details are confirmed at checkout. You can cancel anytime.
+          </p>
+        )}
         {user ? (
           <button
             type="button"
@@ -1086,7 +1112,9 @@ export function ActivateScreen() {
           </button>
         ) : (
           <Link
-            href={`/sign-in?next=${encodeURIComponent(activationReturnPath)}`}
+            href={`/sign-in?next=${encodeURIComponent(
+              activationLinkContext.returnPath,
+            )}`}
             className="inline-flex justify-center rounded-full border border-[var(--border-soft)] bg-white px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-[var(--text-main)]"
           >
             Sign in to activate
@@ -1102,44 +1130,47 @@ export function ActivateScreen() {
         ) : null}
       </div>
 
-      <form
-        onSubmit={handleLicenseActivation}
-        className="mt-5 rounded-[20px] border border-[var(--border-soft)] bg-white px-4 py-4"
-      >
-        <label className="block">
-          <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--text-secondary)]">
-            License key
-          </span>
-          <input
-            className={inputClass}
-            type="text"
-            autoComplete="off"
-            inputMode="text"
-            value={licenseKey}
-            onChange={(event) => setLicenseKey(event.target.value)}
-            placeholder="Paste your license key"
-          />
-        </label>
-        <p className="mt-2 text-[12px] leading-5 text-[var(--text-secondary)]">
-          Paste the key from your purchase email to activate this account.
-        </p>
-        {activationStatus ? (
-          <StatusMessage
-            tone={activationStatus.tone}
-            message={activationStatus.message}
-          />
-        ) : null}
-        <button
-          disabled={isActivatingLicense || isActivatingMvpAccess || !user}
-          className={submitButtonClass(
-            isActivatingLicense || isActivatingMvpAccess || !user,
-          )}
+      {user ? (
+        <form
+          onSubmit={handleLicenseActivation}
+          className="mt-5 rounded-[20px] border border-[var(--border-soft)] bg-white px-4 py-4"
         >
-          {isActivatingLicense || isActivatingMvpAccess
-            ? "Activating..."
-            : "Activate access"}
-        </button>
-      </form>
+          <label className="block">
+            <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--text-secondary)]">
+              License key
+            </span>
+            <input
+              className={inputClass}
+              type="text"
+              autoComplete="off"
+              inputMode="text"
+              value={licenseKey}
+              onChange={(event) => setLicenseKey(event.target.value)}
+              placeholder="Paste your license key"
+            />
+          </label>
+          <p className="mt-2 text-[12px] leading-5 text-[var(--text-secondary)]">
+            Paste the key from your purchase email if automatic activation did not
+            connect yet.
+          </p>
+          {activationStatus ? (
+            <StatusMessage
+              tone={activationStatus.tone}
+              message={activationStatus.message}
+            />
+          ) : null}
+          <button
+            disabled={isActivatingLicense || isActivatingMvpAccess}
+            className={submitButtonClass(
+              isActivatingLicense || isActivatingMvpAccess,
+            )}
+          >
+            {isActivatingLicense || isActivatingMvpAccess
+              ? "Activating..."
+              : "Activate access"}
+          </button>
+        </form>
+      ) : null}
     </AuthShell>
   );
 }
