@@ -151,6 +151,17 @@ function getGumroadCheckoutUrl() {
   );
 }
 
+function isExistingAccountSignupError(error: unknown) {
+  const message = error instanceof Error ? error.message.toLowerCase() : "";
+
+  return (
+    message.includes("already registered") ||
+    message.includes("already been registered") ||
+    message.includes("already exists") ||
+    message.includes("user_exists")
+  );
+}
+
 function storePendingCheckoutEmail(email: string) {
   if (typeof window === "undefined") {
     return;
@@ -380,6 +391,44 @@ export function CreateAccountScreen() {
     });
   }, []);
 
+  function continueToCheckout({
+    message,
+    source,
+    userId,
+  }: {
+    message: string;
+    source: string;
+    userId?: string | null;
+  }) {
+    trackTruthlabelEvent(
+      "checkout_handoff_shown",
+      {
+        source,
+      },
+      { userId },
+    );
+    storePendingCheckoutEmail(email);
+    setFirstName("");
+    setPassword("");
+    setConfirmPassword("");
+    setIsRedirectingToCheckout(true);
+    setStatus({
+      tone: "green",
+      message,
+    });
+
+    window.setTimeout(() => {
+      trackTruthlabelEvent(
+        "checkout_started",
+        {
+          source,
+        },
+        { userId },
+      );
+      window.location.assign(checkoutUrl);
+    }, 1900);
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setStatus(null);
@@ -421,6 +470,34 @@ export function CreateAccountScreen() {
       });
 
       if (error) {
+        if (isExistingAccountSignupError(error)) {
+          const { data: signInData, error: signInError } =
+            await supabase.auth.signInWithPassword({
+              email,
+              password,
+            });
+
+          if (signInError) {
+            throw new Error(
+              "This email already has a Truthlabel account. Sign in with the existing password to continue.",
+            );
+          }
+
+          trackTruthlabelEvent(
+            "login_success",
+            {
+              source: "create_account_existing_account",
+            },
+            { userId: signInData.user?.id },
+          );
+          continueToCheckout({
+            message: "Account found. Taking you to checkout.",
+            source: "create_account_existing_account",
+            userId: signInData.user?.id,
+          });
+          return;
+        }
+
         throw error;
       }
 
@@ -432,33 +509,11 @@ export function CreateAccountScreen() {
         },
         { userId: data.user?.id },
       );
-      trackTruthlabelEvent(
-        "checkout_handoff_shown",
-        {
-          source: "create_account_page",
-        },
-        { userId: data.user?.id },
-      );
-      storePendingCheckoutEmail(email);
-      setFirstName("");
-      setPassword("");
-      setConfirmPassword("");
-      setIsRedirectingToCheckout(true);
-      setStatus({
-        tone: "green",
+      continueToCheckout({
         message: "Account created. Taking you to checkout.",
+        source: "create_account_auto_redirect",
+        userId: data.user?.id,
       });
-
-      window.setTimeout(() => {
-        trackTruthlabelEvent(
-          "checkout_started",
-          {
-            source: "create_account_auto_redirect",
-          },
-          { userId: data.user?.id },
-        );
-        window.location.assign(checkoutUrl);
-      }, 1900);
     } catch (error) {
       trackTruthlabelEvent("signup_failed", {
         error_type: normalizeAnalyticsError(error),
