@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AllergyProfileSettings from "@/components/AllergyProfileSettings";
 import ScanPreferencesSettings from "@/components/ScanPreferencesSettings";
 import SupportContactLink from "@/components/SupportContactLink";
@@ -185,6 +185,7 @@ export default function AccountScreen() {
     signOut,
   } = useTruthlabelAuth();
   const [statusMessage, setStatusMessage] = useState("");
+  const [isPreferencesOpen, setIsPreferencesOpen] = useState(false);
   const storageNotice = getBrowserStorageNotice();
 
   const accessLabel =
@@ -194,6 +195,31 @@ export default function AccountScreen() {
   const accountFirstName = getAccountFirstName(user?.user_metadata);
   void trialAccess;
   void trialDaysRemaining;
+  const savedAllergyCount =
+    settings.allergyProfile.allergens.length +
+    settings.allergyProfile.customAllergens.length;
+
+  useEffect(() => {
+    if (!isPreferencesOpen) {
+      return;
+    }
+
+    const originalOverflow = document.body.style.overflow;
+
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setIsPreferencesOpen(false);
+      }
+    }
+
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener("keydown", handleEscape);
+    };
+  }, [isPreferencesOpen]);
 
   async function handleSignOut() {
     await signOut();
@@ -324,27 +350,6 @@ export default function AccountScreen() {
           </div>
         </section>
 
-        <section className="mt-4 rounded-[18px] border border-[#E2E8E4] bg-white px-4 py-4">
-          <h2 className="text-[16px] font-extrabold text-[#101613]">
-            Account benefits
-          </h2>
-          <div className="mt-3 grid gap-2">
-            {benefits.map((benefit) => (
-              <div
-                key={benefit}
-                className="flex items-center gap-2.5 rounded-[14px] bg-[#F3FAF6] px-3 py-2.5"
-              >
-                <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white text-[#0E5A3F]">
-                  <Icon name="check" className="h-4 w-4" />
-                </span>
-                <span className="text-[13.5px] font-semibold text-[#101613]">
-                  {benefit}
-                </span>
-              </div>
-            ))}
-          </div>
-        </section>
-
         {storageNotice ? (
           <section
             role="status"
@@ -358,42 +363,98 @@ export default function AccountScreen() {
           </section>
         ) : null}
 
-        <section className="mt-4 rounded-[18px] border border-[#E2E8E4] bg-[#F6F8F7] px-4 py-4">
-          <h2 className="text-[16px] font-extrabold text-[#101613]">
-            Personal scan controls
-          </h2>
-          <p className="mt-1 text-[13px] leading-[1.45] text-[#66716B]">
-            Manage allergy and scan preferences here. Region detection can be
-            handled automatically later.
-          </p>
-          <div className="mt-4 grid gap-4">
-            <AllergyProfileSettings
-              key={`account-allergy-${settings.allergyProfile.lastUpdated ?? settings.updatedAt}`}
-              profile={settings.allergyProfile}
-              onSave={(profile) => {
-                updateAllergyProfile(profile);
-                setStatusMessage("Allergy Watch List saved on this device.");
-              }}
-              onClear={() => {
-                updateAllergyProfile({
-                  allergens: [],
-                  customAllergens: [],
-                  lastUpdated: new Date().toISOString(),
-                });
-                setStatusMessage("Allergy Watch List cleared on this device.");
-              }}
-            />
-
-            <ScanPreferencesSettings
-              key={`account-scan-preferences-${settings.scanPreferences.defaultProductCategory}-${settings.scanPreferences.showNotCheckedExternalSections}-${settings.scanPreferences.showConfidenceNotes}-${settings.scanPreferences.autoRunExternalSafetyLookup}`}
-              value={settings.scanPreferences}
-              onSave={(scanPreferences) => {
-                updateScanPreferences(scanPreferences);
-                setStatusMessage("Result preferences saved on this device.");
-              }}
-            />
+        <section className="mt-4 rounded-[18px] border border-[#D7E7DD] bg-[#F3FAF6] px-4 py-4 shadow-[0_5px_18px_rgba(15,40,28,0.045)]">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h2 className="text-[17px] font-extrabold text-[#101613]">
+                Allergy Watch List & scan preferences
+              </h2>
+              <p className="mt-1.5 text-[13px] leading-[1.45] text-[#66716B]">
+                Choose allergens Truthlabel should flag strongly, then set a few scan defaults.
+              </p>
+            </div>
+            <span className="shrink-0 rounded-full border border-[#C8E0D2] bg-white px-2.5 py-1 text-[11px] font-bold text-[#0E5A3F]">
+              {savedAllergyCount} saved
+            </span>
           </div>
+          <button
+            type="button"
+            onClick={() => setIsPreferencesOpen(true)}
+            className="mt-4 inline-flex min-h-11 w-full items-center justify-center rounded-[14px] border border-[#0E5A3F] bg-[#0E5A3F] px-4 text-[13px] font-extrabold text-white shadow-[0_12px_24px_rgba(14,90,63,0.14)] transition hover:bg-[#0B4732] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
+          >
+            Open allergy and scan settings
+          </button>
         </section>
+
+        {isPreferencesOpen ? (
+          <div
+            className="fixed inset-0 z-50 bg-[#101613]/45 px-3 py-[calc(18px+env(safe-area-inset-top))] backdrop-blur-sm"
+            onClick={() => setIsPreferencesOpen(false)}
+            role="presentation"
+          >
+            <section
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="account-preferences-title"
+              className="mx-auto flex h-full max-h-[760px] w-full max-w-[500px] flex-col overflow-hidden rounded-[26px] border border-white/70 bg-[#F8FBF9] shadow-[0_24px_70px_rgba(16,22,19,0.22)]"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <header className="flex items-start justify-between gap-4 border-b border-[#E2E8E4] bg-white px-4 py-4">
+                <div>
+                  <p className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-[#0E5A3F]">
+                    Account settings
+                  </p>
+                  <h2
+                    id="account-preferences-title"
+                    className="mt-1 text-[20px] font-black leading-tight text-[#101613]"
+                  >
+                    Allergy & scan preferences
+                  </h2>
+                  <p className="mt-1 text-[12.5px] leading-5 text-[#66716B]">
+                    Update allergy warnings and scan behavior in one place.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsPreferencesOpen(false)}
+                  className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#D7E7DD] bg-[#F3FAF6] text-[18px] font-bold text-[#0E5A3F] transition hover:bg-[#E8F6EF] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2"
+                  aria-label="Close allergy and scan settings"
+                >
+                  X
+                </button>
+              </header>
+              <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
+                <div className="grid gap-4">
+                  <AllergyProfileSettings
+                    key={`account-allergy-${settings.allergyProfile.lastUpdated ?? settings.updatedAt}`}
+                    profile={settings.allergyProfile}
+                    onSave={(profile) => {
+                      updateAllergyProfile(profile);
+                      setStatusMessage("Allergy Watch List saved on this device.");
+                    }}
+                    onClear={() => {
+                      updateAllergyProfile({
+                        allergens: [],
+                        customAllergens: [],
+                        lastUpdated: new Date().toISOString(),
+                      });
+                      setStatusMessage("Allergy Watch List cleared on this device.");
+                    }}
+                  />
+
+                  <ScanPreferencesSettings
+                    key={`account-scan-preferences-${settings.scanPreferences.defaultProductCategory}-${settings.scanPreferences.showNotCheckedExternalSections}-${settings.scanPreferences.showConfidenceNotes}-${settings.scanPreferences.autoRunExternalSafetyLookup}`}
+                    value={settings.scanPreferences}
+                    onSave={(scanPreferences) => {
+                      updateScanPreferences(scanPreferences);
+                      setStatusMessage("Result preferences saved on this device.");
+                    }}
+                  />
+                </div>
+              </div>
+            </section>
+          </div>
+        ) : null}
 
         <section className="mt-4 rounded-[18px] border border-[#E2E8E4] bg-white px-4 py-4">
           <h2 className="text-[16px] font-extrabold text-[#101613]">
@@ -429,10 +490,31 @@ export default function AccountScreen() {
 
         <section className="mt-4 rounded-[16px] border border-[#E9E1D2] bg-[#FBF8F1] px-4 py-3.5">
           <div className="flex items-start gap-3">
-              <Icon name="shield" className="mt-0.5 h-5 w-5 shrink-0 text-[#0E5A3F]" />
+            <Icon name="shield" className="mt-0.5 h-5 w-5 shrink-0 text-[#0E5A3F]" />
             <p className="text-[13px] leading-[1.48] text-[#66716B]">
               Privacy note: your allergy profile should be treated as sensitive preference data. Always check the product label yourself, especially for allergies.
             </p>
+          </div>
+        </section>
+
+        <section className="mt-4 rounded-[18px] border border-[#E2E8E4] bg-white px-4 py-4">
+          <h2 className="text-[16px] font-extrabold text-[#101613]">
+            Account benefits
+          </h2>
+          <div className="-mx-1 mt-3 flex snap-x gap-2 overflow-x-auto px-1 pb-1">
+            {benefits.map((benefit) => (
+              <div
+                key={benefit}
+                className="flex min-w-[168px] snap-start items-center gap-2.5 rounded-[15px] border border-[#D7E7DD] bg-[#F3FAF6] px-3 py-3"
+              >
+                <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-[#0E5A3F]">
+                  <Icon name="check" className="h-4 w-4" />
+                </span>
+                <span className="text-[12.5px] font-bold leading-[1.25] text-[#101613]">
+                  {benefit}
+                </span>
+              </div>
+            ))}
           </div>
         </section>
 

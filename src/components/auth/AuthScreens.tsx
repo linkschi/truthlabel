@@ -107,6 +107,43 @@ function getPasswordResetErrorMessage(error: unknown) {
   return message || "Truthlabel could not send the reset email.";
 }
 
+function getActivationErrorMessage(error: unknown) {
+  const message = error instanceof Error ? error.message : "";
+  const normalized = message.toLowerCase();
+
+  if (
+    normalized.includes("different email") ||
+    normalized.includes("another email") ||
+    normalized.includes("email address")
+  ) {
+    return "This license key belongs to a different email address. Sign in using the email used at checkout.";
+  }
+
+  if (
+    normalized.includes("expired") ||
+    normalized.includes("refunded") ||
+    normalized.includes("disputed") ||
+    normalized.includes("chargeback") ||
+    normalized.includes("payment_failed") ||
+    normalized.includes("payment failed") ||
+    normalized.includes("not currently eligible")
+  ) {
+    return "This subscription is no longer active. Renew it through checkout to restore access.";
+  }
+
+  if (
+    normalized.includes("could not verify") ||
+    normalized.includes("license verification failed") ||
+    normalized.includes("not valid") ||
+    normalized.includes("invalid") ||
+    normalized.includes("license")
+  ) {
+    return "We couldn't verify this license key. Check the key and try again.";
+  }
+
+  return "We couldn't check your access right now. Please try again.";
+}
+
 function getGumroadCheckoutUrl() {
   return (
     process.env.NEXT_PUBLIC_GUMROAD_CHECKOUT_URL?.trim() ||
@@ -747,7 +784,6 @@ export function ActivateScreen() {
     accessState,
     errorMessage,
     refreshAccess,
-    subscription,
     user,
   } = useTruthlabelAuth();
   const [licenseKey, setLicenseKey] = useState("");
@@ -759,7 +795,6 @@ export function ActivateScreen() {
   const [isActivatingMvpAccess, setIsActivatingMvpAccess] = useState(false);
   const activationViewTrackedRef = useRef(false);
   const mvpAccessHandledRef = useRef(false);
-  const checkoutUrl = getGumroadCheckoutUrl();
   const isActive = accessState === "active";
   const [activationLinkContext] = useState(() => {
     if (typeof window === "undefined") {
@@ -783,6 +818,22 @@ export function ActivateScreen() {
       returnPath: `${window.location.pathname}${window.location.search}`,
     };
   });
+  const isCheckingAccess = accessState === "loading";
+  const isVerifyingAccess = isActivatingLicense || isActivatingMvpAccess;
+  const activationTitle = isCheckingAccess
+    ? "Checking access"
+    : isActive
+      ? "Access activated"
+      : !user
+        ? "Sign in to activate Truthlabel"
+        : "Activate your Truthlabel account";
+  const activationMessage = isCheckingAccess
+    ? "Truthlabel is checking your account access."
+    : isActive
+      ? "Your Truthlabel account is ready. You can now start scanning products."
+      : !user
+        ? "Sign in with the Truthlabel account you want this access connected to."
+        : "Your account is not active yet. Enter your license key to continue.";
 
   useEffect(() => {
     if (activationViewTrackedRef.current) {
@@ -895,10 +946,6 @@ export function ActivateScreen() {
           );
         }
 
-        setActivationStatus({
-          tone: "green",
-          message: data.message || "Truthlabel access is active.",
-        });
         trackTruthlabelEvent(
           "activation_success",
           {
@@ -908,6 +955,7 @@ export function ActivateScreen() {
           { userId: user.id },
         );
         await refreshAccess();
+        setActivationStatus(null);
         window.history.replaceState(null, "", "/activate");
       })
       .catch((error) => {
@@ -921,10 +969,7 @@ export function ActivateScreen() {
         );
         setActivationStatus({
           tone: "red",
-          message:
-            error instanceof Error
-              ? error.message
-              : "Truthlabel could not activate this access link.",
+          message: getActivationErrorMessage(error),
         });
       })
       .finally(() => setIsActivatingMvpAccess(false));
@@ -990,10 +1035,6 @@ export function ActivateScreen() {
       }
 
       setLicenseKey("");
-      setActivationStatus({
-        tone: "green",
-        message: data.message || "Paid Truthlabel access is active.",
-      });
       trackTruthlabelEvent(
         "activation_success",
         {
@@ -1003,6 +1044,7 @@ export function ActivateScreen() {
         { userId: user.id },
       );
       await refreshAccess();
+      setActivationStatus(null);
     } catch (error) {
       trackTruthlabelEvent(
         "activation_failed",
@@ -1014,10 +1056,7 @@ export function ActivateScreen() {
       );
       setActivationStatus({
         tone: "red",
-        message:
-          error instanceof Error
-            ? error.message
-            : "Truthlabel could not verify this license key.",
+        message: getActivationErrorMessage(error),
       });
     } finally {
       setIsActivatingLicense(false);
@@ -1026,167 +1065,148 @@ export function ActivateScreen() {
 
   return (
     <AuthShell
-      eyebrow="Activate"
-      title="Activate your Truthlabel access."
-      message="Truthlabel will check this account first. If access is not active yet, paste the license key from your purchase email."
+      eyebrow="Truthlabel access"
+      title={activationTitle}
+      message={activationMessage}
     >
-      {errorMessage ? <StatusMessage tone="red" message={errorMessage} /> : null}
-
-      {!user ? (
-        <div className="mt-5 rounded-[20px] border border-[var(--amber-border)] bg-[var(--amber-bg)] px-4 py-3 text-[13px] leading-5 text-[var(--amber-dark)]">
-          {activationLinkContext.hasActivationLink
-            ? "Sign in to finish activating your Truthlabel access."
-            : "Sign in before activating access. If you have not started yet, create an account first."}
+      {isCheckingAccess ? (
+        <div
+          role="status"
+          aria-live="polite"
+          className="mt-5 flex items-center gap-3 rounded-[16px] border border-[var(--border-soft)] bg-white px-4 py-3 text-[13px] font-semibold text-[var(--text-secondary)]"
+        >
+          <span className="h-4 w-4 animate-spin rounded-full border-2 border-[var(--green-border)] border-t-[var(--green-main)]" />
+          Checking access...
         </div>
       ) : null}
 
-      {user ? (
-        <div className="mt-5 rounded-[20px] border border-[var(--border-soft)] bg-[var(--bg-soft)] px-4 py-3">
-          <p className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--text-secondary)]">
-            Signed in as
-          </p>
-          <p className="mt-1 text-[14px] font-semibold text-[var(--text-main)]">
-            {user.email}
-          </p>
-          <p className="mt-2 text-[13px] leading-5 text-[var(--text-secondary)]">
-            Current access:{" "}
-            <span className="font-semibold">
-              {accessKind === "paid"
-                ? "Active subscription or trial"
-                : subscription?.status ?? "Inactive"}
+      {!isCheckingAccess && !user ? (
+        <div className="mt-5 grid gap-3">
+          <Link
+            href={`/sign-in?next=${encodeURIComponent(
+              activationLinkContext.returnPath,
+            )}`}
+            className="inline-flex min-h-[52px] items-center justify-center rounded-[16px] border border-transparent bg-[var(--green-main)] px-5 py-3 text-[14px] font-semibold text-white shadow-[0_14px_28px_rgba(14,90,63,0.14)]"
+          >
+            Sign in to activate
+          </Link>
+          {!activationLinkContext.hasActivationLink ? (
+            <Link
+              href="/create-account"
+              className="text-center text-[13px] font-semibold text-[var(--green-main)]"
+            >
+              Need a Truthlabel account? Create one
+            </Link>
+          ) : null}
+        </div>
+      ) : null}
+
+      {!isCheckingAccess && isActive ? (
+        <div className="mt-5 grid gap-3">
+          <div
+            role="status"
+            aria-live="polite"
+            className="rounded-[16px] border border-[var(--green-border)] bg-[var(--green-bg)] px-4 py-3 text-[13px] font-semibold leading-5 text-[var(--green-dark)]"
+          >
+            This account is already active. You do not need to activate again.
+          </div>
+          <Link
+            href="/app"
+            className="inline-flex min-h-[52px] items-center justify-center rounded-[16px] border border-transparent bg-[var(--green-main)] px-5 py-3 text-[14px] font-semibold text-white shadow-[0_14px_28px_rgba(14,90,63,0.14)]"
+          >
+            Open Truthlabel
+          </Link>
+        </div>
+      ) : null}
+
+      {!isCheckingAccess && user && !isActive ? (
+        <div className="mt-5">
+          <p className="text-[13px] leading-5 text-[var(--text-secondary)]">
+            Signed in as{" "}
+            <span className="font-semibold text-[var(--text-main)]">
+              {user.email}
             </span>
           </p>
         </div>
       ) : null}
 
-      <div className="mt-5 grid gap-2.5">
-        {isActive ? (
-          <>
-            {activationStatus ? (
-              <StatusMessage
-                tone={activationStatus.tone}
-                message={activationStatus.message}
-              />
-            ) : (
-              <StatusMessage
-                tone="green"
-                message="This account is already active. You do not need to activate again."
-              />
-            )}
-            <Link
-              href="/app"
-              className="inline-flex justify-center rounded-full border border-[var(--green-border)] bg-[var(--green-bg)] px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-[var(--green-dark)]"
-            >
-              Open Truthlabel
-            </Link>
-          </>
-        ) : (
-          <>
-            {user ? (
-              <a
-                href={checkoutUrl}
-                onClick={() =>
-                  trackTruthlabelEvent(
-                    "checkout_started",
-                    {
-                      source: "activation_page",
-                    },
-                    { userId: user.id },
-                  )
-                }
-                className="inline-flex justify-center rounded-full border border-transparent bg-[var(--text-main)] px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-white"
-              >
-                Start 7-day trial
-              </a>
-            ) : activationLinkContext.hasActivationLink ? null : (
-              <Link
-                href="/create-account"
-                className="inline-flex justify-center rounded-full border border-transparent bg-[var(--text-main)] px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-white"
-              >
-                Create account to start trial
-              </Link>
-            )}
-            {activationLinkContext.hasActivationLink && !user ? (
-              <p className="text-center text-[12px] font-semibold leading-5 text-[var(--text-secondary)]">
-                Use the Truthlabel account you want this access connected to.
-              </p>
-            ) : (
-              <p className="text-center text-[12px] font-semibold leading-5 text-[var(--text-secondary)]">
-                Trial details are confirmed at checkout. You can cancel anytime.
-              </p>
-            )}
-            {user ? (
-              <button
-                type="button"
-                onClick={() => {
-                  trackTruthlabelEvent(
-                    "checkout_returned",
-                    {
-                      source: "activation_page_check_access",
-                    },
-                    { userId: user.id },
-                  );
-                  void refreshAccess();
-                }}
-                className="rounded-full border border-[var(--border-soft)] bg-white px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-[var(--text-main)]"
-              >
-                I finished checkout - check access
-              </button>
-            ) : (
-              <Link
-                href={`/sign-in?next=${encodeURIComponent(
-                  activationLinkContext.returnPath,
-                )}`}
-                className="inline-flex justify-center rounded-full border border-[var(--border-soft)] bg-white px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-[var(--text-main)]"
-              >
-                Sign in to activate
-              </Link>
-            )}
-          </>
-        )}
-      </div>
-
-      {user && !isActive ? (
-        <form
-          onSubmit={handleLicenseActivation}
-          className="mt-5 rounded-[20px] border border-[var(--border-soft)] bg-white px-4 py-4"
-        >
-          <label className="block">
-            <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--text-secondary)]">
+      {!isCheckingAccess && user && !isActive ? (
+        <form onSubmit={handleLicenseActivation} className="mt-5">
+          <label htmlFor="truthlabel-license-key" className="block">
+            <span className="text-[12px] font-semibold text-[var(--text-main)]">
               License key
             </span>
             <input
-              className={inputClass}
+              id="truthlabel-license-key"
+              className="mt-2 w-full rounded-[16px] border border-[var(--border-soft)] bg-white px-4 py-3 text-[15px] text-[var(--text-main)] outline-none transition placeholder:text-[var(--text-muted)] focus:border-[var(--green-main)] focus:ring-2 focus:ring-[rgba(21,128,61,0.14)]"
               type="text"
               autoComplete="off"
               inputMode="text"
+              disabled={isVerifyingAccess}
               value={licenseKey}
               onChange={(event) => setLicenseKey(event.target.value)}
-              placeholder="Paste your license key"
+              placeholder="Enter your license key"
             />
           </label>
-          <p className="mt-2 text-[12px] leading-5 text-[var(--text-secondary)]">
-            Paste the key from your purchase email if automatic activation did not
-            connect yet.
+          <p className="mt-2 text-[12.5px] leading-5 text-[var(--text-secondary)]">
+            You can find your license key in the purchase email sent after checkout.
           </p>
           {activationStatus ? (
-            <StatusMessage
-              tone={activationStatus.tone}
-              message={activationStatus.message}
-            />
+            <div
+              role={activationStatus.tone === "red" ? "alert" : "status"}
+              aria-live="polite"
+              className={`mt-3 rounded-[14px] border px-3 py-2.5 text-[12.5px] leading-5 ${
+                activationStatus.tone === "red"
+                  ? "border-[#FDA29B] bg-[#FEF3F2] text-[#B42318]"
+                  : "border-[var(--amber-border)] bg-[var(--amber-bg)] text-[var(--amber-dark)]"
+              }`}
+            >
+              {activationStatus.message}
+            </div>
+          ) : errorMessage ? (
+            <div
+              role="alert"
+              aria-live="polite"
+              className="mt-3 rounded-[14px] border border-[#FDA29B] bg-[#FEF3F2] px-3 py-2.5 text-[12.5px] leading-5 text-[#B42318]"
+            >
+              {getActivationErrorMessage(new Error(errorMessage))}
+            </div>
           ) : null}
           <button
-            disabled={isActivatingLicense || isActivatingMvpAccess}
-            className={submitButtonClass(
-              isActivatingLicense || isActivatingMvpAccess,
-            )}
+            disabled={isVerifyingAccess}
+            className="mt-4 inline-flex min-h-[52px] w-full items-center justify-center gap-2 rounded-[16px] border border-transparent bg-[var(--green-main)] px-5 py-3 text-[14px] font-semibold text-white shadow-[0_14px_28px_rgba(14,90,63,0.14)] transition active:scale-[0.99] disabled:cursor-wait disabled:opacity-75"
           >
-            {isActivatingLicense || isActivatingMvpAccess
-              ? "Activating..."
-              : "Activate access"}
+            {isVerifyingAccess ? (
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/45 border-t-white" />
+            ) : null}
+            {isVerifyingAccess ? "Checking access..." : "Activate access"}
           </button>
+          <button
+            type="button"
+            onClick={() => {
+              trackTruthlabelEvent(
+                "checkout_returned",
+                {
+                  source: "activation_page_check_access",
+                },
+                { userId: user.id },
+              );
+              void refreshAccess();
+            }}
+            className="mt-3 w-full rounded-full px-4 py-2 text-[13px] font-semibold text-[var(--green-main)] transition hover:bg-[var(--green-bg)]"
+          >
+            Already completed activation? Check access
+          </button>
+          <p className="mt-3 text-center text-[12.5px] leading-5 text-[var(--text-secondary)]">
+            Can&apos;t find your license key?{" "}
+            <SupportContactLink
+              context="Activation page"
+              className="font-semibold text-[var(--green-main)]"
+            />
+          </p>
         </form>
       ) : null}
+
     </AuthShell>
   );
 }
