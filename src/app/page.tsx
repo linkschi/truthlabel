@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import PublicStartPage from "@/components/PublicStartPage";
+import { SignInScreen } from "@/components/auth/AuthScreens";
 
 export const metadata: Metadata = {
-  title: "Truthlabel - Scan before you trust it",
+  title: "Sign in",
   description:
-    "Truthlabel helps scan barcodes and ingredient lists for clear food-label warnings.",
+    "Sign in to Truthlabel or begin your 7-day free trial.",
 };
 
 export default function HomePage() {
-  return <PublicStartPage />;
+  return <SignInScreen />;
 }

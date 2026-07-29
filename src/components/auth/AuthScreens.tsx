@@ -120,6 +120,7 @@ function storePendingCheckoutEmail(email: string) {
 function SignInFormInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { accessState } = useTruthlabelAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [status, setStatus] = useState<{ tone: "green" | "red"; message: string } | null>(
@@ -127,6 +128,23 @@ function SignInFormInner() {
   );
   const [isBusy, setIsBusy] = useState(false);
   const nextPath = searchParams.get("next") || "/app";
+
+  if (accessState === "active") {
+    return (
+      <AuthShell
+        eyebrow="Signed in"
+        title="Truthlabel is ready."
+        message="You are already signed in on this device."
+      >
+        <Link
+          href="/app"
+          className="mt-5 inline-flex w-full justify-center rounded-full border border-transparent bg-[var(--text-main)] px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-white shadow-[0_18px_36px_rgba(23,20,18,0.16)]"
+        >
+          Open Truthlabel
+        </Link>
+      </AuthShell>
+    );
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -181,8 +199,8 @@ function SignInFormInner() {
   return (
     <AuthShell
       eyebrow="Sign in"
-      title="Welcome back."
-      message="Sign in with the email you used for your Truthlabel account."
+      title="Welcome to Truthlabel."
+      message="Sign in to continue, or begin your 7-day free trial."
     >
       <form onSubmit={handleSubmit} className="mt-5">
         <label className="block">
@@ -221,8 +239,11 @@ function SignInFormInner() {
         <Link href="/forgot-password" className="font-semibold text-[var(--green-main)]">
           Forgot password?
         </Link>
-        <Link href="/create-account" className="font-semibold text-[var(--green-main)]">
-          Create an account
+        <Link
+          href="/create-account"
+          className="inline-flex justify-center rounded-full border border-[var(--green-border)] bg-[var(--green-bg)] px-4 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-[var(--green-dark)]"
+        >
+          Begin 7-day free trial
         </Link>
       </div>
     </AuthShell>
