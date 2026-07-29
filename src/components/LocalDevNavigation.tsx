@@ -7,14 +7,12 @@ import { publicAppConfig } from "@/lib/appConfig";
 const localNavigationLinks = [
   { href: "/app", label: "Home" },
   { href: "/app/manual", label: "Manual" },
-  { href: "/app/manual?mode=camera", label: "Camera" },
   { href: "/app/history", label: "History" },
   { href: "/app/account", label: "Account" },
   {
     href: "/app/results?category=packaged-processed-foods&demo=red-berry-soda",
     label: "Sample Result",
   },
-  { href: "/app/scan", label: "Scan Route" },
   { href: "/app/saved", label: "Saved Route" },
   { href: "/", label: "Landing" },
   { href: "/sign-in", label: "Sign In" },

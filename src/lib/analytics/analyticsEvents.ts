@@ -12,6 +12,7 @@ export const ANALYTICS_EVENT_NAMES = [
   "activation_viewed",
   "activation_success",
   "activation_failed",
+  "login_started",
   "login_success",
   "login_failed",
   "forgot_password_started",

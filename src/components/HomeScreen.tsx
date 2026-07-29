@@ -43,7 +43,6 @@ const showLocalInternalTools = featureFlags.enableLocalDevBypass;
 const capabilityPills = [
   { label: "Barcode", icon: "barcode" as const, tint: "red" as const },
   { label: "Ingredients", icon: "list" as const, tint: "yellow" as const },
-  { label: "OCR", icon: "camera" as const, tint: "green" as const },
 ];
 
 const valuePreviewItems = [
@@ -380,7 +379,7 @@ function HeroSection() {
         <span className="text-[#0E5A3F]">trust it.</span>
       </h1>
       <p className="mt-3 max-w-[360px] text-[14.5px] leading-[1.5] text-[#66716B]">
-        Truthlabel scans barcodes and ingredient labels to help you understand what a food product contains.
+        Type a barcode or paste ingredients to help you understand what a food product contains.
       </p>
       <div className="mt-4 flex flex-wrap gap-2">
         {capabilityPills.map((pill) => (
@@ -411,7 +410,7 @@ function ScanActionCard({
   title,
   description,
   capabilities,
-  variant,
+  tone = "light",
   onClick,
 }: {
   href: string;
@@ -419,46 +418,51 @@ function ScanActionCard({
   title: string;
   description: string;
   capabilities: string;
-  variant: "manual" | "camera";
+  tone?: "primary" | "light";
   onClick: () => void;
 }) {
-  const isCamera = variant === "camera";
-  const cardClasses = isCamera
-    ? "border-transparent bg-[linear-gradient(145deg,#0E5A3F_0%,#16815D_100%)] text-white shadow-[0_9px_24px_rgba(14,90,63,0.18)] hover:shadow-[0_11px_28px_rgba(14,90,63,0.22)] focus-visible:ring-white"
-    : "border-[#CFE5D8] bg-[#F3FAF6] text-[#101613] shadow-[0_5px_18px_rgba(15,40,28,0.07)] hover:border-[#9CCCB5] hover:shadow-[0_8px_22px_rgba(15,40,28,0.09)] focus-visible:ring-[#0E5A3F]";
-  const iconClasses = isCamera
-    ? "bg-white/15 text-white ring-1 ring-white/22"
-    : "bg-[#E8F6EF] text-[#0E5A3F]";
-  const arrowClasses = isCamera
-    ? "bg-white/92 text-[#0E5A3F]"
-    : "bg-white text-[#0E5A3F]";
-  const mutedText = isCamera ? "text-white/78" : "text-[#66716B]";
-  const capabilityText = isCamera ? "text-white/86" : "text-[#0E5A3F]";
+  const isPrimary = tone === "primary";
 
   return (
     <Link
       href={href}
       onClick={onClick}
-      className={`group flex min-h-[176px] flex-col rounded-[18px] border p-4 outline-none transition duration-200 ease-out hover:-translate-y-px focus-visible:ring-2 focus-visible:ring-offset-2 active:scale-[0.985] ${cardClasses}`}
+      className={`group flex min-h-[156px] flex-col rounded-[18px] border p-4 shadow-[0_5px_18px_rgba(15,40,28,0.07)] outline-none transition duration-200 ease-out hover:-translate-y-px hover:shadow-[0_8px_22px_rgba(15,40,28,0.09)] focus-visible:ring-2 focus-visible:ring-offset-2 active:scale-[0.985] ${
+        isPrimary
+          ? "border-[#0E5A3F] bg-[#0E5A3F] text-white focus-visible:ring-[#0E5A3F]"
+          : "border-[#CFE5D8] bg-[#F3FAF6] text-[#101613] hover:border-[#9CCCB5] focus-visible:ring-[#0E5A3F]"
+      }`}
     >
       <div className="flex items-start justify-between gap-3">
         <span
-          className={`inline-flex h-11 w-11 items-center justify-center rounded-[14px] ${iconClasses}`}
+          className={`inline-flex h-11 w-11 items-center justify-center rounded-[14px] ${
+            isPrimary ? "bg-white/14 text-white" : "bg-[#E8F6EF] text-[#0E5A3F]"
+          }`}
         >
           <Icon name={icon} className="h-[22px] w-[22px]" />
         </span>
         <span
-          className={`inline-flex h-8 w-8 items-center justify-center rounded-full transition group-hover:scale-105 ${arrowClasses}`}
+          className={`inline-flex h-8 w-8 items-center justify-center rounded-full transition group-hover:scale-105 ${
+            isPrimary ? "bg-white text-[#0E5A3F]" : "bg-white text-[#0E5A3F]"
+          }`}
         >
           <Icon name="arrow" className="h-4 w-4" />
         </span>
       </div>
       <div className="mt-auto pt-7">
         <h3 className="text-[17px] font-extrabold tracking-[-0.01em]">{title}</h3>
-        <p className={`mt-1.5 text-[13px] leading-[1.45] ${mutedText}`}>
+        <p
+          className={`mt-1.5 text-[13px] leading-[1.45] ${
+            isPrimary ? "text-white/78" : "text-[#66716B]"
+          }`}
+        >
           {description}
         </p>
-        <p className={`mt-3 text-[12px] font-semibold ${capabilityText}`}>
+        <p
+          className={`mt-3 text-[12px] font-semibold ${
+            isPrimary ? "text-white/86" : "text-[#0E5A3F]"
+          }`}
+        >
           {capabilities}
         </p>
       </div>
@@ -470,23 +474,22 @@ function ScanActionGrid({ onNavigate }: { onNavigate: () => void }) {
   return (
     <section className="mt-6">
       <SectionHeading>Start a scan</SectionHeading>
-      <div className="mt-3 grid grid-cols-2 gap-3 max-[349px]:grid-cols-1">
+      <div className="mt-3 grid gap-3">
         <ScanActionCard
           href="/app/manual?mode=camera"
           icon="camera"
-          title="Camera Scan"
-          description="Scan a barcode or photograph an ingredient label."
-          capabilities="Barcode / Camera / OCR"
-          variant="camera"
+          title="Scan barcode"
+          description="Open the camera and scan the product barcode."
+          capabilities="Camera barcode"
+          tone="primary"
           onClick={onNavigate}
         />
         <ScanActionCard
           href="/app/manual"
           icon="clipboard"
-          title="Manual Scan"
-          description="Enter a barcode or paste an ingredient list."
-          capabilities="Barcode / Ingredient text"
-          variant="manual"
+          title="Manual ingredients"
+          description="Paste the ingredient list yourself."
+          capabilities="Manual ingredients"
           onClick={onNavigate}
         />
       </div>
@@ -700,10 +703,10 @@ function DeveloperDemoTools({ onNavigate }: { onNavigate: () => void }) {
       ) : null}
       <ToolRow
         href="/app/manual"
-        title="Manual Scan"
+        title="Barcode or Manual Ingredients"
         detail={manualDetail}
         meta="Live input"
-        icon="clipboard"
+        icon="barcode"
         onNavigate={onNavigate}
       />
       <ToolRow
@@ -714,16 +717,6 @@ function DeveloperDemoTools({ onNavigate }: { onNavigate: () => void }) {
         icon="list"
         onNavigate={onNavigate}
       />
-      {process.env.NODE_ENV !== "production" ? (
-        <ToolRow
-          href="/app/manual?mode=camera&scannerDebug=1"
-          title="Scanner Diagnostics"
-          detail="Open the real camera scanner with safe stream, lens, focus, zoom, and decoder diagnostics."
-          meta="Development only"
-          icon="settings"
-          onNavigate={onNavigate}
-        />
-      ) : null}
       {featureFlags.enableDemoProducts ? (
         <>
           <ToolRow
@@ -815,39 +808,15 @@ function ExploreMore({
   );
 }
 
-function TrustNote() {
-  return (
-    <section className="mt-6 rounded-[16px] border border-[#E9E1D2] bg-[#FBF8F1] px-4 py-3.5">
-      <div className="flex items-start gap-3">
-        <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[12px] bg-white text-[#0E5A3F]">
-          <Icon name="shield" className="h-[19px] w-[19px]" />
-        </span>
-        <div>
-          <h2 className="text-[14px] font-extrabold text-[#101613]">Trust Note</h2>
-          <p className="mt-1 text-[13px] leading-[1.48] text-[#66716B]">
-            Truthlabel helps explain ingredient labels and safety signals. It is not medical advice. Always check the product label, especially for allergies.
-          </p>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 function BottomNavigation() {
   const pathname = usePathname();
   const items = [
     { href: "/app", label: "Home", icon: "home" as const, active: pathname === "/app" },
     {
-      href: "/app/manual",
-      label: "Manual",
-      icon: "clipboard" as const,
-      active: pathname === "/app/manual",
-    },
-    {
       href: "/app/manual?mode=camera",
       label: "Camera",
       icon: "camera" as const,
-      active: false,
+      active: pathname === "/app/manual",
     },
     {
       href: "/app/history",
@@ -868,7 +837,7 @@ function BottomNavigation() {
       aria-label="Primary navigation"
       className="fixed inset-x-0 bottom-0 z-40 border-t border-[#E2E8E4] bg-white/96 shadow-[0_-8px_22px_rgba(15,40,28,0.06)] backdrop-blur"
     >
-      <div className="mx-auto grid h-[66px] max-w-[480px] grid-cols-5 px-2 pb-[env(safe-area-inset-bottom)]">
+      <div className="mx-auto grid h-[66px] max-w-[480px] grid-cols-4 px-2 pb-[env(safe-area-inset-bottom)]">
         {items.map((item) => (
           <Link
             key={`${item.label}-${item.href}`}
@@ -921,7 +890,6 @@ export default function HomeScreen() {
           onNavigate={handleNavigate}
         />
         <PwaInstallPrompt />
-        <TrustNote />
       </div>
       <BottomNavigation />
     </main>

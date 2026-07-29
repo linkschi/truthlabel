@@ -244,6 +244,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, [refreshAccess, supabase]);
 
+  useEffect(() => {
+    if (!supabase) {
+      return;
+    }
+
+    const refreshStoredSession = () => {
+      void refreshAccess();
+    };
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        refreshStoredSession();
+      }
+    };
+
+    window.addEventListener("focus", refreshStoredSession);
+    window.addEventListener("online", refreshStoredSession);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    const intervalId = window.setInterval(refreshStoredSession, 10 * 60 * 1000);
+
+    return () => {
+      window.removeEventListener("focus", refreshStoredSession);
+      window.removeEventListener("online", refreshStoredSession);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.clearInterval(intervalId);
+    };
+  }, [refreshAccess, supabase]);
+
   const accessState = getAccessState({
     authLoading: isLoading,
     userPresent: Boolean(user),

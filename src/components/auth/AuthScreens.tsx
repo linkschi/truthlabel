@@ -99,7 +99,10 @@ function getPasswordResetErrorMessage(error: unknown) {
 }
 
 function getGumroadCheckoutUrl() {
-  return "https://truthlabel.gumroad.com/l/fnoakd?wanted=true";
+  return (
+    process.env.NEXT_PUBLIC_GUMROAD_CHECKOUT_URL?.trim() ||
+    "https://truthlabel.gumroad.com/l/fnoakd?wanted=true"
+  );
 }
 
 function storePendingCheckoutEmail(email: string) {
@@ -129,8 +132,8 @@ function SignInFormInner() {
     event.preventDefault();
     setStatus(null);
     setIsBusy(true);
-    trackTruthlabelEvent("forgot_password_started", {
-      source: "forgot_password_page",
+    trackTruthlabelEvent("login_started", {
+      source: "sign_in_page",
     });
 
     try {
@@ -411,34 +414,11 @@ export function CreateAccountScreen() {
 
   return (
     <AuthShell
-      eyebrow="Create account"
-      title="Create your Truthlabel account."
-      message="Create your account, then continue to checkout to start your 7-day trial."
-      wide
+      eyebrow="7-day free trial"
+      title="Create your account now."
+      message="Start with a simple Truthlabel account."
     >
-      <div className="mt-6 grid gap-5 lg:grid-cols-[0.88fr_1.12fr]">
-        <aside className="rounded-[26px] border border-[var(--green-border)] bg-[var(--green-bg)]/72 p-5">
-          <p className="text-[12px] font-black uppercase tracking-[0.16em] text-[var(--green-dark)]">
-            After checkout
-          </p>
-          <ul className="mt-4 grid gap-3 text-[13px] font-semibold leading-5 text-[var(--text-main)]">
-            {[
-              "Barcode, camera, OCR, and manual label checks",
-              "Personal allergy Watch List warnings",
-              "Independent, consumer-first ingredient review",
-              "Clear warnings before products reach your basket",
-              "Built to help you question confusing food labels",
-              "Cancel anytime",
-            ].map((item) => (
-              <li key={item} className="flex gap-2">
-                <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[var(--green-main)]" />
-                <span>{item}</span>
-              </li>
-            ))}
-          </ul>
-        </aside>
-
-        <div>
+      <div className="mt-6">
           <form onSubmit={handleSubmit}>
             <label className="block">
               <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--text-secondary)]">
@@ -505,13 +485,9 @@ export function CreateAccountScreen() {
               <StatusMessage tone={status.tone} message={status.message} />
             ) : null}
             <button disabled={isBusy} className={submitButtonClass(isBusy)}>
-              {isBusy ? "Creating account..." : "Create account"}
+              {isBusy ? "Creating account..." : "Create account now"}
             </button>
           </form>
-          <p className="mt-5 text-[13px] leading-5 text-[var(--text-secondary)]">
-            Truthlabel helps explain labels; it does not replace the original
-            package label or medical advice.
-          </p>
           <p className="mt-3 text-[13px] leading-5 text-[var(--text-secondary)]">
             Already have an account?{" "}
             <Link
@@ -521,7 +497,6 @@ export function CreateAccountScreen() {
               Sign in
             </Link>
           </p>
-        </div>
       </div>
     </AuthShell>
   );

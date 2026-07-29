@@ -490,7 +490,7 @@ function ErrorRecoveryScreen({
   title: string;
   message: string;
   onTryAgain?: () => void;
-  onChoosePhoto: () => void;
+  onChoosePhoto?: () => void;
   onManualEntry: () => void;
   onClose: () => void;
 }) {
@@ -530,13 +530,15 @@ function ErrorRecoveryScreen({
                   Try again
                 </button>
               ) : null}
-              <button
-                type="button"
-                onClick={onChoosePhoto}
-                className="min-h-12 rounded-[16px] border border-[#D7E7DD] bg-white px-4 text-[14px] font-bold text-[#12583D]"
-              >
-                Choose a photo
-              </button>
+              {onChoosePhoto ? (
+                <button
+                  type="button"
+                  onClick={onChoosePhoto}
+                  className="min-h-12 rounded-[16px] border border-[#D7E7DD] bg-white px-4 text-[14px] font-bold text-[#12583D]"
+                >
+                  Choose a photo
+                </button>
+              ) : null}
               <button
                 type="button"
                 onClick={onManualEntry}
@@ -887,7 +889,12 @@ export default function CameraBarcodeScanner({
   debugDiagnostics = false,
   barcodeLookupTimeoutMs = DEFAULT_BARCODE_LOOKUP_TIMEOUT_MS,
 }: CameraBarcodeScannerProps) {
-  const [mode, setMode] = useState<CameraScannerMode>(initialMode);
+  const ingredientModeEnabled = Boolean(onTextConfirmed);
+  const initialScannerMode =
+    initialMode === "ingredients" && !ingredientModeEnabled
+      ? "barcode"
+      : initialMode;
+  const [mode, setMode] = useState<CameraScannerMode>(initialScannerMode);
   const [phase, setPhase] = useState<ScannerPhase>("initializing");
   const [hintVisible, setHintVisible] = useState(false);
   const [torchSupported, setTorchSupported] = useState(false);
@@ -950,7 +957,7 @@ export default function CameraBarcodeScanner({
   });
   const sessionTokenRef = useRef(0);
   const ocrSessionTokenRef = useRef(0);
-  const modeRef = useRef<CameraScannerMode>(initialMode);
+  const modeRef = useRef<CameraScannerMode>(initialScannerMode);
   const phaseRef = useRef<ScannerPhase>("initializing");
   const resumeCameraOnVisibleRef = useRef(false);
   const barcodeCandidateRef = useRef<{
@@ -1641,6 +1648,10 @@ export default function CameraBarcodeScanner({
 
   const handleModeChange = useCallback(
     (nextMode: CameraScannerMode) => {
+      if (nextMode === "ingredients" && !ingredientModeEnabled) {
+        return;
+      }
+
       if (nextMode === modeRef.current) {
         return;
       }
@@ -1665,7 +1676,7 @@ export default function CameraBarcodeScanner({
         void startBarcodeDetection();
       }
     },
-    [startBarcodeDetection, startCamera, stopBarcodeScanner],
+    [ingredientModeEnabled, startBarcodeDetection, startCamera, stopBarcodeScanner],
   );
 
   const handleTryAgain = useCallback(() => {
@@ -1985,9 +1996,13 @@ export default function CameraBarcodeScanner({
     return (
       <ErrorRecoveryScreen
         title="Camera access is off"
-        message="Camera access was blocked. Allow camera access in your browser settings, then try again. You can also enter the barcode or ingredients manually."
+        message={
+          ingredientModeEnabled
+            ? "Camera access was blocked. Allow camera access in your browser settings, then try again. You can also enter the barcode or ingredients manually."
+            : "Camera access was blocked. Allow camera access in your browser settings, then try again. You can also enter the barcode manually."
+        }
         onTryAgain={handleTryAgain}
-        onChoosePhoto={handleChoosePhoto}
+        onChoosePhoto={ingredientModeEnabled ? handleChoosePhoto : undefined}
         onManualEntry={handleManualEntry}
         onClose={handleClose}
       />
@@ -1998,8 +2013,12 @@ export default function CameraBarcodeScanner({
     return (
       <ErrorRecoveryScreen
         title="No camera found"
-        message="No camera was found on this device. Choose a label photo or enter the product information manually."
-        onChoosePhoto={handleChoosePhoto}
+        message={
+          ingredientModeEnabled
+            ? "No camera was found on this device. Choose a label photo or enter the product information manually."
+            : "No camera was found on this device. Enter the barcode or product information manually."
+        }
+        onChoosePhoto={ingredientModeEnabled ? handleChoosePhoto : undefined}
         onManualEntry={handleManualEntry}
         onClose={handleClose}
       />
@@ -2010,9 +2029,13 @@ export default function CameraBarcodeScanner({
     return (
       <ErrorRecoveryScreen
         title="Camera scanning isn't supported here"
-        message="Choose a label photo or enter the product information manually."
+        message={
+          ingredientModeEnabled
+            ? "Choose a label photo or enter the product information manually."
+            : "Enter the barcode or product information manually."
+        }
         onTryAgain={handleTryAgain}
-        onChoosePhoto={handleChoosePhoto}
+        onChoosePhoto={ingredientModeEnabled ? handleChoosePhoto : undefined}
         onManualEntry={handleManualEntry}
         onClose={handleClose}
       />
@@ -2209,14 +2232,24 @@ export default function CameraBarcodeScanner({
         : "Product not found";
   const barcodeNotFoundMessage =
     barcodeLookupStatus === "found_missing_ingredients"
-      ? "Truthlabel found the product, but the product data does not include ingredients yet. Scan the ingredients to analyse it."
+      ? ingredientModeEnabled
+        ? "Truthlabel found the product, but the product data does not include ingredients yet. Scan the ingredients to analyse it."
+        : "Truthlabel found the product, but the product data does not include ingredients yet. Enter the ingredients manually to analyse it."
       : barcodeLookupStatus === "timeout"
-        ? "The product lookup took too long. Check your connection, try again, or scan the ingredients instead."
+        ? ingredientModeEnabled
+          ? "The product lookup took too long. Check your connection, try again, or scan the ingredients instead."
+          : "The product lookup took too long. Check your connection, try again, or enter the details manually."
       : barcodeLookupStatus === "error"
-        ? "The product lookup did not complete. You can try again, scan the ingredients, or enter the details manually."
+        ? ingredientModeEnabled
+          ? "The product lookup did not complete. You can try again, scan the ingredients, or enter the details manually."
+          : "The product lookup did not complete. You can try again or enter the details manually."
       : barcodeLookupStatus === "unknown"
-        ? "The barcode was read, but Truthlabel did not receive a clear lookup result. Try again, scan the ingredients, or enter the details manually."
-        : "This barcode is not in the product data yet. Scan the ingredients to analyse the product another way.";
+        ? ingredientModeEnabled
+          ? "The barcode was read, but Truthlabel did not receive a clear lookup result. Try again, scan the ingredients, or enter the details manually."
+          : "The barcode was read, but Truthlabel did not receive a clear lookup result. Try again or enter the details manually."
+        : ingredientModeEnabled
+          ? "This barcode is not in the product data yet. Scan the ingredients to analyse the product another way."
+          : "This barcode is not in the product data yet. Enter the ingredients manually to analyse the product another way.";
   const switchableCameraCount = cameraCandidates.filter(
     (candidate) => !candidate.isLikelyFront && candidate.deviceId,
   ).length;
@@ -2234,14 +2267,16 @@ export default function CameraBarcodeScanner({
   return (
     <div className="fixed inset-0 z-50 h-[100dvh] min-h-[100dvh] overflow-hidden bg-black text-white">
       <span className="sr-only">Scan Barcode</span>
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*"
-        onChange={handleFileSelected}
-        className="hidden"
-        data-testid="camera-ingredient-upload-input"
-      />
+      {ingredientModeEnabled ? (
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleFileSelected}
+          className="hidden"
+          data-testid="camera-ingredient-upload-input"
+        />
+      ) : null}
 
       <video
         ref={videoRef}
@@ -2259,7 +2294,9 @@ export default function CameraBarcodeScanner({
             <Spinner />
             <p className="mt-3 text-[14px] font-semibold">Starting camera...</p>
             <p className="mt-1.5 text-[12px] leading-5 text-white/72">
-              Allow camera access to scan product barcodes and ingredient labels.
+              {ingredientModeEnabled
+                ? "Allow camera access to scan product barcodes and ingredient labels."
+                : "Allow camera access to scan product barcodes."}
             </p>
           </div>
         </div>
@@ -2289,7 +2326,9 @@ export default function CameraBarcodeScanner({
             <FlashGlyph />
           </IconButton>
         </div>
-        <ModeSwitch mode={mode} onModeChange={handleModeChange} />
+        {ingredientModeEnabled ? (
+          <ModeSwitch mode={mode} onModeChange={handleModeChange} />
+        ) : null}
         {showCameraControlStrip ? (
           <div className="mx-auto mt-2 flex max-w-[430px] flex-wrap items-center justify-center gap-2 rounded-full bg-[rgba(8,14,11,0.52)] px-2 py-2 backdrop-blur-[6px]">
             {switchableCameraCount > 1 ? (
@@ -2436,13 +2475,15 @@ export default function CameraBarcodeScanner({
             {barcodeNotFoundMessage}
           </p>
           <div className="mt-4 grid gap-2.5">
-            <button
-              type="button"
-              onClick={() => handleModeChange("ingredients")}
-              className="min-h-12 rounded-[16px] bg-[#12583D] px-4 text-[14px] font-bold text-white"
-            >
-              Scan ingredients
-            </button>
+            {ingredientModeEnabled ? (
+              <button
+                type="button"
+                onClick={() => handleModeChange("ingredients")}
+                className="min-h-12 rounded-[16px] bg-[#12583D] px-4 text-[14px] font-bold text-white"
+              >
+                Scan ingredients
+              </button>
+            ) : null}
             <button
               type="button"
               onClick={handleManualEntry}
@@ -2466,11 +2507,13 @@ export default function CameraBarcodeScanner({
           {mode === "barcode" ? (
             <div className="mx-auto flex max-w-[430px] gap-2.5">
               <BottomAction label="Enter code" icon={<TextGlyph />} onClick={handleManualEntry} />
-              <BottomAction
-                label="Scan ingredients"
-                icon={<CameraIcon />}
-                onClick={() => handleModeChange("ingredients")}
-              />
+              {ingredientModeEnabled ? (
+                <BottomAction
+                  label="Scan ingredients"
+                  icon={<CameraIcon />}
+                  onClick={() => handleModeChange("ingredients")}
+                />
+              ) : null}
             </div>
           ) : (
             <div className="mx-auto grid max-w-[430px] grid-cols-[1fr_84px_1fr] items-center gap-3">

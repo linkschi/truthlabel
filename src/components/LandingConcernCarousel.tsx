@@ -1,52 +1,91 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
 
 type ConcernTone = "red" | "yellow" | "green";
 
 type ConcernCard = {
   label: string;
-  headline: string;
-  copy: string;
+  headline: ReactNode;
+  copy: ReactNode;
   tone: ConcernTone;
 };
 
 const concernCards: ConcernCard[] = [
   {
     label: "Banned or Restricted Ingredients",
-    headline:
-      "Some foods are banned in one country for safety concerns but still sold in another.",
-    copy:
-      "Truthlabel brings those warnings forward when a product or ingredient matches a supported restriction signal.",
+    headline: (
+      <>
+        Some foods are <span className="landing-highlight">banned</span> in one
+        country for <span className="landing-highlight">safety concerns</span>{" "}
+        but still sold in another.
+      </>
+    ),
+    copy: (
+      <>
+        Truthlabel brings those <span className="landing-highlight">warnings</span>{" "}
+        forward when a product or ingredient matches a supported restriction
+        signal.
+      </>
+    ),
     tone: "red",
   },
   {
     label: "Cancer-Linked Ingredients and Foods",
-    headline: "Some everyday foods carry serious long-term warnings.",
-    copy:
-      "Truthlabel shows these as warning signals so they are not buried inside the label.",
+    headline: (
+      <>
+        Some everyday foods carry{" "}
+        <span className="landing-highlight">serious long-term warnings</span>.
+      </>
+    ),
+    copy: (
+      <>
+        Truthlabel shows these as <span className="landing-highlight">warning signals</span>{" "}
+        so they are not buried inside the label.
+      </>
+    ),
     tone: "red",
   },
   {
     label: "Lab-Made and Bioengineered Food",
     headline: "Lab-made and bioengineered food.",
-    copy:
-      "Truthlabel highlights ingredients or disclosures linked to genetic changes, bioengineering, or laboratory food-production methods.",
+    copy: (
+      <>
+        Truthlabel flags wording linked to{" "}
+        <span className="landing-highlight">genetic changes</span>,
+        bioengineering, or laboratory food-production methods.
+      </>
+    ),
     tone: "yellow",
   },
   {
     label: "Misleading Labels and Troubling Company Records",
-    headline:
-      "Truthlabel shows some companies' warning letters for misbranding, undeclared allergens, contamination, and misleading claims.",
-    copy:
-      "Truthlabel can show warning letters, lawsuits, and safety actions when verified data is available.",
+    headline: (
+      <>
+        Truthlabel shows warning letters for{" "}
+        <span className="landing-highlight">misbranding</span>, undeclared
+        allergens, contamination, and misleading claims.
+      </>
+    ),
+    copy: (
+      <>
+        Truthlabel can show <span className="landing-highlight">warning letters</span>,
+        lawsuits, and safety actions when verified data is available.
+      </>
+    ),
     tone: "green",
   },
   {
     label: "Hundreds More Review Signals",
     headline: "Truthlabel scans far beyond the obvious ingredients.",
-    copy:
-      "The app checks many more additives, processing markers, safety signals, and product warnings as the database grows.",
+    copy: (
+      <>
+        The app checks many more additives, processing markers,{" "}
+        <span className="landing-highlight">safety signals</span>, and product
+        warnings as the database grows.
+      </>
+    ),
     tone: "yellow",
   },
 ];

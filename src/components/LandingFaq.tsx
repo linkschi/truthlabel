@@ -1,10 +1,11 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { useState } from "react";
 
 export type LandingFaqItem = {
   question: string;
-  answer: string;
+  answer: ReactNode;
 };
 
 export default function LandingFaq({ items }: { items: LandingFaqItem[] }) {

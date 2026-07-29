@@ -717,10 +717,9 @@ export default function ScanHistoryScreen() {
         aria-label="Primary navigation"
         className="fixed inset-x-0 bottom-0 z-40 border-t border-[#E2E8E4] bg-white/96 shadow-[0_-8px_22px_rgba(15,40,28,0.06)] backdrop-blur"
       >
-        <div className="mx-auto grid h-[66px] max-w-[480px] grid-cols-5 px-2 pb-[env(safe-area-inset-bottom)]">
+        <div className="mx-auto grid h-[66px] max-w-[480px] grid-cols-4 px-2 pb-[env(safe-area-inset-bottom)]">
           {[
             { href: "/app", label: "Home", icon: "home" as const },
-            { href: "/app/manual", label: "Manual", icon: "manual" as const },
             { href: "/app/manual?mode=camera", label: "Camera", icon: "camera" as const },
             { href: "/app/history", label: "History", icon: "history" as const },
             { href: "/app/account", label: "Account", icon: "account" as const },
