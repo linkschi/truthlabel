@@ -120,6 +120,23 @@ function getActivationErrorMessage(error: unknown) {
   const normalized = message.toLowerCase();
 
   if (
+    normalized.includes("activation link is not valid") ||
+    normalized.includes("mvp access activation is not configured") ||
+    normalized.includes("access activation is not configured") ||
+    normalized.includes("activate mvp access")
+  ) {
+    return message || "This activation link could not be used.";
+  }
+
+  if (
+    normalized.includes("sign in before activating") ||
+    normalized.includes("sign-in session expired") ||
+    normalized.includes("session expired")
+  ) {
+    return "Sign in again, then open the activation link from your purchase email.";
+  }
+
+  if (
     normalized.includes("different email") ||
     normalized.includes("another email") ||
     normalized.includes("email address")

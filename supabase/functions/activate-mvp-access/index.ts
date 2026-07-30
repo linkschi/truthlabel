@@ -10,6 +10,7 @@
 // - TRUTHLABEL_MVP_ACCESS_CODE
 // Optional:
 // - GUMROAD_PRODUCT_ID or GUMROAD_PRODUCT_PERMALINK
+// - TRUTHLABEL_ALLOW_MVP_DIRECT_ACTIVATION=true
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -37,6 +38,10 @@ function cleanCode(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
 }
 
+function isEnabled(value: string) {
+  return /^(1|true|yes|on)$/i.test(value);
+}
+
 Deno.serve(async (request) => {
   if (request.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -50,9 +55,17 @@ Deno.serve(async (request) => {
   const supabaseAnonKey = env("SUPABASE_ANON_KEY");
   const serviceRoleKey = env("SUPABASE_SERVICE_ROLE_KEY");
   const mvpAccessCode = env("TRUTHLABEL_MVP_ACCESS_CODE");
+  const allowDirectMvpActivation = isEnabled(
+    env("TRUTHLABEL_ALLOW_MVP_DIRECT_ACTIVATION"),
+  );
   const authHeader = request.headers.get("Authorization") ?? "";
 
-  if (!supabaseUrl || !supabaseAnonKey || !serviceRoleKey || !mvpAccessCode) {
+  if (
+    !supabaseUrl ||
+    !supabaseAnonKey ||
+    !serviceRoleKey ||
+    (!mvpAccessCode && !allowDirectMvpActivation)
+  ) {
     return json(
       {
         activated: false,
@@ -87,7 +100,7 @@ Deno.serve(async (request) => {
     );
   }
 
-  if (!code || code !== mvpAccessCode) {
+  if (!code || (!allowDirectMvpActivation && code !== mvpAccessCode)) {
     return json(
       {
         activated: false,
