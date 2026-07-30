@@ -870,6 +870,7 @@ export function UpdatePasswordScreen() {
 }
 
 export function ActivateScreen() {
+  const router = useRouter();
   const {
     accessKind,
     accessState,
@@ -887,6 +888,7 @@ export function ActivateScreen() {
   const [isLinkingPendingCheckout, setIsLinkingPendingCheckout] =
     useState(false);
   const activationViewTrackedRef = useRef(false);
+  const activeAccessHandledRef = useRef(false);
   const mvpAccessHandledRef = useRef(false);
   const pendingCheckoutHandledRef = useRef(false);
   const isActive = accessState === "active";
@@ -942,6 +944,13 @@ export function ActivateScreen() {
         : activationLinkContext.hasDirectAccessLink
           ? "Truthlabel is using your activation link to turn on access for this signed-in account."
           : "Use the activation link from checkout first. If that does not work, enter your license key.";
+
+  const openTruthlabelApp = useCallback(() => {
+    window.setTimeout(() => {
+      router.replace("/app");
+      router.refresh();
+    }, 650);
+  }, [router]);
 
   const linkPendingCheckoutAccess = useCallback(
     async ({
@@ -1002,7 +1011,11 @@ export function ActivateScreen() {
           );
           clearPendingCheckoutEmail();
           await refreshAccess();
-          setActivationStatus(null);
+          setActivationStatus({
+            tone: "green",
+            message: "Access activated. Opening Truthlabel...",
+          });
+          openTruthlabelApp();
           return true;
         }
 
@@ -1040,7 +1053,7 @@ export function ActivateScreen() {
         setIsLinkingPendingCheckout(false);
       }
     },
-    [isActive, refreshAccess, user],
+    [isActive, openTruthlabelApp, refreshAccess, user],
   );
 
   useEffect(() => {
@@ -1059,6 +1072,23 @@ export function ActivateScreen() {
       { userId: user?.id },
     );
   }, [accessKind, accessState, user]);
+
+  useEffect(() => {
+    if (!isActive || !activationLinkContext.hasActivationLink) {
+      return;
+    }
+
+    if (activeAccessHandledRef.current) {
+      return;
+    }
+
+    activeAccessHandledRef.current = true;
+    setActivationStatus({
+      tone: "green",
+      message: "Access activated. Opening Truthlabel...",
+    });
+    openTruthlabelApp();
+  }, [activationLinkContext.hasActivationLink, isActive, openTruthlabelApp]);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -1163,8 +1193,12 @@ export function ActivateScreen() {
           { userId: user.id },
         );
         await refreshAccess();
-        setActivationStatus(null);
+        setActivationStatus({
+          tone: "green",
+          message: "Access activated. Opening Truthlabel...",
+        });
         window.history.replaceState(null, "", "/activate");
+        openTruthlabelApp();
       })
       .catch((error) => {
         trackTruthlabelEvent(
@@ -1181,7 +1215,7 @@ export function ActivateScreen() {
         });
       })
       .finally(() => setIsActivatingMvpAccess(false));
-  }, [accessState, isActive, refreshAccess, user]);
+  }, [accessState, isActive, openTruthlabelApp, refreshAccess, user]);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -1338,7 +1372,11 @@ export function ActivateScreen() {
         { userId: user.id },
       );
       await refreshAccess();
-      setActivationStatus(null);
+      setActivationStatus({
+        tone: "green",
+        message: "Access activated. Opening Truthlabel...",
+      });
+      openTruthlabelApp();
     } catch (error) {
       trackTruthlabelEvent(
         "activation_failed",
@@ -1453,7 +1491,9 @@ export function ActivateScreen() {
               className={`mt-3 rounded-[14px] border px-3 py-2.5 text-[12.5px] leading-5 ${
                 activationStatus.tone === "red"
                   ? "border-[#FDA29B] bg-[#FEF3F2] text-[#B42318]"
-                  : "border-[var(--amber-border)] bg-[var(--amber-bg)] text-[var(--amber-dark)]"
+                  : activationStatus.tone === "green"
+                    ? "border-[var(--green-border)] bg-[var(--green-bg)] text-[var(--green-dark)]"
+                    : "border-[var(--amber-border)] bg-[var(--amber-bg)] text-[var(--amber-dark)]"
               }`}
             >
               {activationStatus.message}
