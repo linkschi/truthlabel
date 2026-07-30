@@ -82,6 +82,7 @@ Truthlabel MVP currently does not require private API keys for core scanning.
 - Recall and safety checks depend on available official data. Missing data is not proof of absence.
 - Allergy profile matching helps surface likely conflicts, but allergy users should always check the package label themselves.
 - Camera access is only used to read barcodes. Allergy profile data is stored locally on the device for MVP testing.
+- Paid access should primarily activate through the checkout/receipt activation link: `/activate?mvp_access=...`. Purchase ping matching and license-key entry are backup paths.
 
 ## Known limitations
 

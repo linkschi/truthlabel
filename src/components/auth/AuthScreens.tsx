@@ -894,21 +894,26 @@ export function ActivateScreen() {
     if (typeof window === "undefined") {
       return {
         hasActivationLink: false,
+        hasDirectAccessLink: false,
+        hasLicenseLink: false,
         returnPath: "/activate",
       };
     }
 
     const params = new URLSearchParams(window.location.search);
-    const hasActivationLink = Boolean(
+    const hasDirectAccessLink = Boolean(
       params.get("mvp_access") ||
         params.get("early_access") ||
-        params.get("access_code") ||
-        params.get("license_key") ||
-        params.get("license"),
+        params.get("access_code"),
+    );
+    const hasLicenseLink = Boolean(
+      params.get("license_key") || params.get("license"),
     );
 
     return {
-      hasActivationLink,
+      hasActivationLink: hasDirectAccessLink || hasLicenseLink,
+      hasDirectAccessLink,
+      hasLicenseLink,
       returnPath: `${window.location.pathname}${window.location.search}`,
     };
   });
@@ -920,15 +925,23 @@ export function ActivateScreen() {
     : isActive
       ? "Access activated"
       : !user
-        ? "Sign in to activate Truthlabel"
-        : "Activate your Truthlabel account";
+        ? activationLinkContext.hasDirectAccessLink
+          ? "Sign in to finish activation"
+          : "Sign in to activate Truthlabel"
+        : activationLinkContext.hasDirectAccessLink
+          ? "Activating your Truthlabel account"
+          : "Activate your Truthlabel account";
   const activationMessage = isCheckingAccess
     ? "Truthlabel is checking your account access."
     : isActive
       ? "Your Truthlabel account is ready. You can now start scanning products."
       : !user
-        ? "Sign in with the Truthlabel account you want this access connected to."
-        : "Your account is not active yet. Enter your license key to continue.";
+        ? activationLinkContext.hasDirectAccessLink
+          ? "Sign in with the account you want activated. The activation link will continue automatically after sign-in."
+          : "Sign in with the Truthlabel account you want this access connected to."
+        : activationLinkContext.hasDirectAccessLink
+          ? "Truthlabel is using your activation link to turn on access for this signed-in account."
+          : "Use the activation link from checkout first. If that does not work, enter your license key.";
 
   const linkPendingCheckoutAccess = useCallback(
     async ({
@@ -957,7 +970,7 @@ export function ActivateScreen() {
       if (!silent) {
         setActivationStatus({
           tone: "yellow",
-          message: "Checking whether checkout has activated this account...",
+          message: "Checking backup checkout records for this account...",
         });
       }
 
@@ -998,7 +1011,7 @@ export function ActivateScreen() {
             tone: "yellow",
             message:
               data?.message ||
-              "Checkout may still be finishing. If access does not activate, use your license key.",
+              "The activation link is the main path. If access does not activate, use your license key as backup.",
           });
         }
 
@@ -1018,7 +1031,7 @@ export function ActivateScreen() {
           setActivationStatus({
             tone: "yellow",
             message:
-              "Checkout activation is still being checked. If it does not activate, use your license key.",
+              "Backup checkout checking did not finish. Use the activation link or license key from your purchase email.",
           });
         }
 
@@ -1067,7 +1080,7 @@ export function ActivateScreen() {
       setActivationStatus({
         tone: "yellow",
         message:
-          "License key found from the activation link. Review it, then activate access.",
+          "License key found from the backup activation link. Review it, then activate access.",
       });
     });
   }, []);
@@ -1240,7 +1253,7 @@ export function ActivateScreen() {
         setActivationStatus({
           tone: "yellow",
           message:
-            "Checkout may still be finishing. If this does not activate soon, enter the license key from your purchase email.",
+            "The activation link is the main path. If this does not activate soon, enter the license key from your purchase email.",
         });
       }
     });
@@ -1415,7 +1428,7 @@ export function ActivateScreen() {
         <form onSubmit={handleLicenseActivation} className="mt-5">
           <label htmlFor="truthlabel-license-key" className="block">
             <span className="text-[12px] font-semibold text-[var(--text-main)]">
-              License key
+              Backup license key
             </span>
             <input
               id="truthlabel-license-key"
@@ -1430,7 +1443,8 @@ export function ActivateScreen() {
             />
           </label>
           <p className="mt-2 text-[12.5px] leading-5 text-[var(--text-secondary)]">
-            You can find your license key in the purchase email sent after checkout.
+            Use this only if the activation link from your purchase email does
+            not open correctly.
           </p>
           {activationStatus ? (
             <div
@@ -1460,7 +1474,7 @@ export function ActivateScreen() {
             {isVerifyingAccess ? (
               <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/45 border-t-white" />
             ) : null}
-            {isVerifyingAccess ? "Checking access..." : "Activate access"}
+            {isVerifyingAccess ? "Checking access..." : "Activate with license key"}
           </button>
           <button
             type="button"
@@ -1484,8 +1498,8 @@ export function ActivateScreen() {
             className="mt-3 w-full rounded-full px-4 py-2 text-[13px] font-semibold text-[var(--green-main)] transition hover:bg-[var(--green-bg)]"
           >
             {isLinkingPendingCheckout
-              ? "Checking checkout..."
-              : "Already completed activation? Check access"}
+              ? "Checking backup..."
+              : "Backup: check checkout status"}
           </button>
           <p className="mt-3 text-center text-[12.5px] leading-5 text-[var(--text-secondary)]">
             Can&apos;t find your license key?{" "}
