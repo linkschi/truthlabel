@@ -14,6 +14,7 @@ import SupportContactLink from "@/components/SupportContactLink";
 import { useTruthlabelAuth } from "@/components/auth/AuthProvider";
 import { trackTruthlabelEvent } from "@/lib/analytics/analyticsClient";
 import { normalizeAnalyticsError } from "@/lib/analytics/analyticsEvents";
+import { grantMvpActivationAccess } from "@/lib/auth/mvpActivationAccess";
 import { getSupabaseBrowserClient } from "@/lib/auth/supabaseClient";
 
 const inputClass =
@@ -901,7 +902,6 @@ export function ActivateScreen() {
     message: string;
   } | null>(null);
   const [isActivatingLicense, setIsActivatingLicense] = useState(false);
-  const [isActivatingMvpAccess, setIsActivatingMvpAccess] = useState(false);
   const [isLinkingPendingCheckout, setIsLinkingPendingCheckout] =
     useState(false);
   const activationViewTrackedRef = useRef(false);
@@ -938,7 +938,7 @@ export function ActivateScreen() {
   });
   const isCheckingAccess = accessState === "loading";
   const isVerifyingAccess =
-    isActivatingLicense || isActivatingMvpAccess || isLinkingPendingCheckout;
+    isActivatingLicense || isLinkingPendingCheckout;
   const activationTitle = isCheckingAccess
     ? "Checking access"
     : isActive
@@ -1148,91 +1148,28 @@ export function ActivateScreen() {
       return;
     }
 
-    if (accessState === "loading") {
-      return;
-    }
-
-    if (!user) {
-      void Promise.resolve().then(() => {
-        setActivationStatus({
-          tone: "yellow",
-          message: "Sign in to finish activating your Truthlabel access.",
-        });
-      });
-      return;
-    }
-
-    if (isActive || mvpAccessHandledRef.current) {
+    if (mvpAccessHandledRef.current) {
       return;
     }
 
     mvpAccessHandledRef.current = true;
+    grantMvpActivationAccess("activation_link");
 
-    void Promise.resolve()
-      .then(() => {
-        setIsActivatingMvpAccess(true);
-        setActivationStatus({
-          tone: "yellow",
-          message: "Activating Truthlabel access on this account...",
-        });
-      })
-      .then(async () => {
-        const supabase = getSupabaseBrowserClient();
-
-        if (!supabase) {
-          throw new Error("Account access is not configured yet.");
-        }
-
-        const { data, error } = await supabase.functions.invoke<{
-          activated?: boolean;
-          message?: string;
-          status?: string;
-        }>("activate-mvp-access", {
-          body: { code: mvpAccessCode.trim() },
-        });
-
-        if (error) {
-          throw error;
-        }
-
-        if (!data?.activated) {
-          throw new Error(
-            data?.message || "Truthlabel could not activate this access link.",
-          );
-        }
-
-        trackTruthlabelEvent(
-          "activation_success",
-          {
-            activation_method: "mvp_access_link",
-            status: data.status || "active",
-          },
-          { userId: user.id },
-        );
-        await refreshAccess();
-        setActivationStatus({
-          tone: "green",
-          message: "Access activated. Opening Truthlabel...",
-        });
-        window.history.replaceState(null, "", "/activate");
-        openTruthlabelApp();
-      })
-      .catch((error) => {
-        trackTruthlabelEvent(
-          "activation_failed",
-          {
-            activation_method: "mvp_access_link",
-            error_type: normalizeAnalyticsError(error),
-          },
-          { userId: user.id },
-        );
-        setActivationStatus({
-          tone: "red",
-          message: getActivationErrorMessage(error),
-        });
-      })
-      .finally(() => setIsActivatingMvpAccess(false));
-  }, [accessState, isActive, openTruthlabelApp, refreshAccess, user]);
+    trackTruthlabelEvent(
+      "activation_success",
+      {
+        activation_method: "mvp_access_link_local",
+        status: "active",
+      },
+      { userId: user?.id },
+    );
+    setActivationStatus({
+      tone: "green",
+      message: "Access activated. Opening Truthlabel...",
+    });
+    window.history.replaceState(null, "", "/activate");
+    openTruthlabelApp();
+  }, [openTruthlabelApp, user?.id]);
 
   useEffect(() => {
     if (typeof window === "undefined") {

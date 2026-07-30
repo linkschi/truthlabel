@@ -2,9 +2,14 @@
 
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { type ReactNode, Suspense, useEffect } from "react";
+import { type ReactNode, Suspense, useEffect, useState } from "react";
 import { useTruthlabelAuth } from "@/components/auth/AuthProvider";
 import { publicAppConfig } from "@/lib/appConfig";
+import {
+  grantMvpActivationAccess,
+  hasMvpActivationAccess,
+  hasMvpActivationParam,
+} from "@/lib/auth/mvpActivationAccess";
 
 function FullPageLoading({
   title = "Checking access",
@@ -38,13 +43,38 @@ function ProtectedAppShellInner({ children }: { children: ReactNode }) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const allowLocalDevBypass = publicAppConfig.flags.enableLocalDevBypass;
+  const [hasMvpAccessPass, setHasMvpAccessPass] = useState(false);
+  const [mvpAccessPassChecked, setMvpAccessPassChecked] = useState(false);
+  const query = searchParams.toString();
 
   useEffect(() => {
-    if (allowLocalDevBypass || accessState === "loading" || !isConfigured) {
+    const handle = window.setTimeout(() => {
+      if (hasMvpActivationParam(query)) {
+        grantMvpActivationAccess("app_link");
+        setHasMvpAccessPass(true);
+        setMvpAccessPassChecked(true);
+        router.replace(pathname || "/app");
+        return;
+      }
+
+      setHasMvpAccessPass(hasMvpActivationAccess());
+      setMvpAccessPassChecked(true);
+    }, 0);
+
+    return () => window.clearTimeout(handle);
+  }, [pathname, query, router]);
+
+  useEffect(() => {
+    if (
+      allowLocalDevBypass ||
+      hasMvpAccessPass ||
+      !mvpAccessPassChecked ||
+      accessState === "loading" ||
+      !isConfigured
+    ) {
       return;
     }
 
-    const query = searchParams.toString();
     const nextPath = `${pathname}${query ? `?${query}` : ""}`;
 
     if (accessState === "signed_out") {
@@ -55,9 +85,18 @@ function ProtectedAppShellInner({ children }: { children: ReactNode }) {
     if (accessState === "inactive") {
       router.replace("/activate");
     }
-  }, [accessState, allowLocalDevBypass, isConfigured, pathname, router, searchParams]);
+  }, [
+    accessState,
+    allowLocalDevBypass,
+    hasMvpAccessPass,
+    isConfigured,
+    mvpAccessPassChecked,
+    pathname,
+    query,
+    router,
+  ]);
 
-  if (allowLocalDevBypass) {
+  if (allowLocalDevBypass || hasMvpAccessPass) {
     return children;
   }
 

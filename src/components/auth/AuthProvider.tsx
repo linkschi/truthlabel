@@ -19,6 +19,7 @@ import {
   type TruthlabelSubscription,
   type TruthlabelTrialAccess,
 } from "@/lib/auth/access";
+import { clearMvpActivationAccess } from "@/lib/auth/mvpActivationAccess";
 import { getSupabaseBrowserClient } from "@/lib/auth/supabaseClient";
 import { getUserSettings } from "@/lib/userSettings/userSettingsStorage";
 
@@ -292,6 +293,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       errorMessage,
       refreshAccess,
       signOut: async () => {
+        clearMvpActivationAccess();
+
         if (!supabase) {
           return;
         }
