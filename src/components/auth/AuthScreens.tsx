@@ -2,7 +2,14 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { type FormEvent, Suspense, useEffect, useRef, useState } from "react";
+import {
+  type FormEvent,
+  Suspense,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import SupportContactLink from "@/components/SupportContactLink";
 import { useTruthlabelAuth } from "@/components/auth/AuthProvider";
 import { trackTruthlabelEvent } from "@/lib/analytics/analyticsClient";
@@ -11,6 +18,7 @@ import { getSupabaseBrowserClient } from "@/lib/auth/supabaseClient";
 
 const inputClass =
   "mt-2 w-full rounded-[18px] border border-[var(--border-soft)] bg-white px-4 py-3 text-[14px] text-[var(--text-main)] outline-none transition placeholder:text-[var(--text-muted)] focus:border-[var(--green-main)] focus:ring-2 focus:ring-[rgba(21,128,61,0.14)]";
+const pendingCheckoutEmailStorageKey = "truthlabel.pendingCheckoutEmail";
 
 function AuthShell({
   eyebrow,
@@ -168,10 +176,38 @@ function storePendingCheckoutEmail(email: string) {
   }
 
   try {
-    window.sessionStorage.setItem("truthlabel.pendingCheckoutEmail", email);
+    window.sessionStorage.setItem(pendingCheckoutEmailStorageKey, email);
   } catch {
     // Browsers can block storage. Checkout should still continue.
   }
+}
+
+function hasPendingCheckoutEmail() {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  try {
+    return Boolean(window.sessionStorage.getItem(pendingCheckoutEmailStorageKey));
+  } catch {
+    return false;
+  }
+}
+
+function clearPendingCheckoutEmail() {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    window.sessionStorage.removeItem(pendingCheckoutEmailStorageKey);
+  } catch {
+    // Storage cleanup is best effort only.
+  }
+}
+
+function wait(ms: number) {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
 }
 
 function SignInFormInner() {
@@ -848,8 +884,11 @@ export function ActivateScreen() {
   } | null>(null);
   const [isActivatingLicense, setIsActivatingLicense] = useState(false);
   const [isActivatingMvpAccess, setIsActivatingMvpAccess] = useState(false);
+  const [isLinkingPendingCheckout, setIsLinkingPendingCheckout] =
+    useState(false);
   const activationViewTrackedRef = useRef(false);
   const mvpAccessHandledRef = useRef(false);
+  const pendingCheckoutHandledRef = useRef(false);
   const isActive = accessState === "active";
   const [activationLinkContext] = useState(() => {
     if (typeof window === "undefined") {
@@ -874,7 +913,8 @@ export function ActivateScreen() {
     };
   });
   const isCheckingAccess = accessState === "loading";
-  const isVerifyingAccess = isActivatingLicense || isActivatingMvpAccess;
+  const isVerifyingAccess =
+    isActivatingLicense || isActivatingMvpAccess || isLinkingPendingCheckout;
   const activationTitle = isCheckingAccess
     ? "Checking access"
     : isActive
@@ -889,6 +929,106 @@ export function ActivateScreen() {
       : !user
         ? "Sign in with the Truthlabel account you want this access connected to."
         : "Your account is not active yet. Enter your license key to continue.";
+
+  const linkPendingCheckoutAccess = useCallback(
+    async ({
+      silent = false,
+      source = "activation_page",
+    }: {
+      silent?: boolean;
+      source?: string;
+    } = {}) => {
+      if (!user || isActive) {
+        return false;
+      }
+
+      const supabase = getSupabaseBrowserClient();
+
+      if (!supabase) {
+        setActivationStatus({
+          tone: "red",
+          message: "Account access is not configured yet.",
+        });
+        return false;
+      }
+
+      setIsLinkingPendingCheckout(true);
+
+      if (!silent) {
+        setActivationStatus({
+          tone: "yellow",
+          message: "Checking whether checkout has activated this account...",
+        });
+      }
+
+      try {
+        const { data, error } = await supabase.functions.invoke<{
+          linked?: boolean;
+          alreadyActive?: boolean;
+          message?: string;
+          status?: string;
+        }>("link-pending-gumroad-purchase", {
+          body: { source },
+        });
+
+        if (error) {
+          throw error;
+        }
+
+        if (data?.linked) {
+          trackTruthlabelEvent(
+            "activation_success",
+            {
+              activation_method: data.alreadyActive
+                ? "already_active_checkout"
+                : "pending_checkout_purchase",
+              status: data.status || "active",
+              source,
+            },
+            { userId: user.id },
+          );
+          clearPendingCheckoutEmail();
+          await refreshAccess();
+          setActivationStatus(null);
+          return true;
+        }
+
+        if (!silent) {
+          setActivationStatus({
+            tone: "yellow",
+            message:
+              data?.message ||
+              "Checkout may still be finishing. If access does not activate, use your license key.",
+          });
+        }
+
+        return false;
+      } catch (error) {
+        trackTruthlabelEvent(
+          "activation_failed",
+          {
+            activation_method: "pending_checkout_purchase",
+            error_type: normalizeAnalyticsError(error),
+            source,
+          },
+          { userId: user.id },
+        );
+
+        if (!silent) {
+          setActivationStatus({
+            tone: "yellow",
+            message:
+              "Checkout activation is still being checked. If it does not activate, use your license key.",
+          });
+        }
+
+        return false;
+      } finally {
+        setIsLinkingPendingCheckout(false);
+      }
+    },
+    [isActive, refreshAccess, user],
+  );
 
   useEffect(() => {
     if (activationViewTrackedRef.current) {
@@ -1029,6 +1169,92 @@ export function ActivateScreen() {
       })
       .finally(() => setIsActivatingMvpAccess(false));
   }, [accessState, isActive, refreshAccess, user]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    if (!user || isActive || accessState === "loading") {
+      return;
+    }
+
+    if (pendingCheckoutHandledRef.current) {
+      return;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const hasMvpAccessCode = Boolean(
+      params.get("mvp_access") ||
+        params.get("early_access") ||
+        params.get("access_code"),
+    );
+
+    if (hasMvpAccessCode) {
+      return;
+    }
+
+    const shouldCheckCheckout =
+      hasPendingCheckoutEmail() ||
+      params.has("checkout") ||
+      params.has("purchase") ||
+      params.has("success") ||
+      params.has("sale_id") ||
+      params.has("subscription_id");
+
+    if (!shouldCheckCheckout) {
+      return;
+    }
+
+    pendingCheckoutHandledRef.current = true;
+    let cancelled = false;
+    const retryDelays = [0, 2500, 5000, 9000, 14000];
+
+    void Promise.resolve().then(async () => {
+      for (const [index, retryDelay] of retryDelays.entries()) {
+        if (cancelled) {
+          return;
+        }
+
+        if (retryDelay > 0) {
+          await wait(retryDelay);
+        }
+
+        if (cancelled) {
+          return;
+        }
+
+        const linked = await linkPendingCheckoutAccess({
+          silent: index > 0,
+          source: "checkout_return_auto",
+        });
+
+        if (linked || cancelled) {
+          return;
+        }
+
+        await refreshAccess();
+      }
+
+      if (!cancelled) {
+        setActivationStatus({
+          tone: "yellow",
+          message:
+            "Checkout may still be finishing. If this does not activate soon, enter the license key from your purchase email.",
+        });
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    accessState,
+    isActive,
+    linkPendingCheckoutAccess,
+    refreshAccess,
+    user,
+  ]);
 
   async function handleLicenseActivation(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -1246,11 +1472,20 @@ export function ActivateScreen() {
                 },
                 { userId: user.id },
               );
-              void refreshAccess();
+              void linkPendingCheckoutAccess({
+                source: "activation_page_check_access",
+              }).then((linked) => {
+                if (!linked) {
+                  void refreshAccess();
+                }
+              });
             }}
+            disabled={isVerifyingAccess}
             className="mt-3 w-full rounded-full px-4 py-2 text-[13px] font-semibold text-[var(--green-main)] transition hover:bg-[var(--green-bg)]"
           >
-            Already completed activation? Check access
+            {isLinkingPendingCheckout
+              ? "Checking checkout..."
+              : "Already completed activation? Check access"}
           </button>
           <p className="mt-3 text-center text-[12.5px] leading-5 text-[var(--text-secondary)]">
             Can&apos;t find your license key?{" "}
