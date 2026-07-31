@@ -9,7 +9,6 @@ import ScanPreferencesSettings from "@/components/ScanPreferencesSettings";
 import SupportContactLink from "@/components/SupportContactLink";
 import { useTruthlabelAuth } from "@/components/auth/AuthProvider";
 import { avoidOptions, type AvoidConcern } from "@/data/fakeProduct";
-import { publicAppConfig } from "@/lib/appConfig";
 import { trackTruthlabelEvent } from "@/lib/analytics/analyticsClient";
 import { hasMvpActivationAccess } from "@/lib/auth/mvpActivationAccess";
 import {
@@ -319,7 +318,6 @@ function formatAccountDate(value: string | null | undefined) {
 function buildCancellationSupportBody({
   appEmail,
   checkoutEmail,
-  licenseKey,
   accessStatusLabel,
   subscriptionStatus,
   accessEndDate,
@@ -327,7 +325,6 @@ function buildCancellationSupportBody({
 }: {
   appEmail: string;
   checkoutEmail: string;
-  licenseKey: string;
   accessStatusLabel: string;
   subscriptionStatus: string;
   accessEndDate: string;
@@ -336,11 +333,10 @@ function buildCancellationSupportBody({
   return [
     "Cancellation matching request",
     "",
-    "I want to cancel or confirm cancellation for TruthLabel.",
+    "Please resend my TruthLabel checkout receipt so I can use the subscription settings/cancel button.",
     "",
     `Signed-in app email: ${appEmail}`,
     `Checkout email: ${checkoutEmail.trim() || "[not entered]"}`,
-    `Activation key: ${licenseKey.trim() || "[not entered]"}`,
     `Current app access: ${accessStatusLabel}`,
     `Subscription status shown in app: ${subscriptionStatus || "unknown"}`,
     `Access end date shown in app: ${accessEndDate || "not shown"}`,
@@ -718,7 +714,6 @@ export default function AccountScreen() {
     useState<ConfirmationAction | null>(null);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [cancelCheckoutEmail, setCancelCheckoutEmail] = useState("");
-  const [cancelLicenseKey, setCancelLicenseKey] = useState("");
   const [scanHistoryCount, setScanHistoryCount] = useState<number | null>(null);
   const hasMvpAccessPass = useSyncExternalStore(
     subscribeToMvpAccessStore,
@@ -726,9 +721,6 @@ export default function AccountScreen() {
     () => false,
   );
   const storageNotice = getBrowserStorageNotice();
-  const manageSubscriptionUrl =
-    publicAppConfig.gumroadManageSubscriptionUrl ||
-    publicAppConfig.gumroadCheckoutUrl;
   const accountFirstName = getAccountFirstName(user?.user_metadata);
   const accountEmail = user?.email ?? "Unknown email";
   const accessStatus = getAccessStatus({
@@ -745,11 +737,10 @@ export default function AccountScreen() {
   const accessIsActive = accessStatus.label === "Active" || accessStatus.label === "Access ending";
   const cancelButtonVisible = accessState !== "loading";
   const cancellationSupportHref = buildSupportMailtoHref({
-    subject: "Truthlabel cancellation matching request",
+    subject: "Truthlabel receipt resend request",
     body: buildCancellationSupportBody({
       appEmail: accountEmail,
       checkoutEmail: cancelCheckoutEmail,
-      licenseKey: cancelLicenseKey,
       accessStatusLabel: accessStatus.label,
       subscriptionStatus: subscription?.status ?? "unknown",
       accessEndDate,
@@ -823,7 +814,7 @@ export default function AccountScreen() {
     setCancelDialogOpen(true);
   }
 
-  function handleOpenManageSubscription(source: "access_card" | "cancel_dialog") {
+  function handleOpenManageSubscription(source: "access_card") {
     trackTruthlabelEvent(
       "subscription_manage_opened",
       {
@@ -833,6 +824,7 @@ export default function AccountScreen() {
       },
       { userId: user?.id },
     );
+    setCancelDialogOpen(true);
   }
 
   function handleEmailCancellationDetails() {
@@ -840,13 +832,12 @@ export default function AccountScreen() {
       "subscription_cancel_email_started",
       {
         has_checkout_email: Boolean(cancelCheckoutEmail.trim()),
-        has_key_hint: Boolean(cancelLicenseKey.trim()),
         access_status: accessStatus.label,
         subscription_status: subscription?.status ?? "unknown",
       },
       { userId: user?.id },
     );
-    setStatusMessage("Cancellation details prepared. Send the email after it opens.");
+    setStatusMessage("Receipt resend request prepared. Send the email after it opens.");
   }
 
   function handleToggleFoodPreference(value: AvoidConcern) {
@@ -997,15 +988,13 @@ export default function AccountScreen() {
           ) : null}
           <div className="mt-4 grid gap-2 min-[390px]:grid-cols-2">
             {accessIsActive ? (
-              <a
-                href={manageSubscriptionUrl}
-                target="_blank"
-                rel="noreferrer"
+              <button
+                type="button"
                 onClick={() => handleOpenManageSubscription("access_card")}
                 className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#0E5A3F] px-4 text-[13px] font-extrabold text-white transition hover:bg-[#0B4732] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
               >
                 Manage subscription
-              </a>
+              </button>
             ) : (
               <Link
                 href="/activate"
@@ -1237,9 +1226,9 @@ export default function AccountScreen() {
                     Cancel subscription
                   </h2>
                   <p className="mt-2 text-[13px] leading-6 text-[#56635C]">
-                    Open subscription settings to cancel billing. If your
-                    checkout email is different, send these details so we can
-                    match the right account.
+                    Your checkout receipt includes the subscription settings
+                    and cancel button. If you cannot find it, send us the
+                    email used at checkout so we can resend the receipt.
                   </p>
                 </div>
                 <button
@@ -1264,7 +1253,7 @@ export default function AccountScreen() {
               <div className="mt-4 grid gap-3">
                 <label htmlFor="cancel-checkout-email" className="block">
                   <span className="text-[13px] font-extrabold text-[#101613]">
-                    Checkout email, if different
+                    Checkout email
                   </span>
                   <input
                     id="cancel-checkout-email"
@@ -1275,44 +1264,28 @@ export default function AccountScreen() {
                     className="mt-2 min-h-12 w-full rounded-[16px] border border-[#DCE5DF] bg-white px-3.5 text-[15px] font-semibold text-[#101613] outline-none transition placeholder:text-[#9AA39D] focus:border-[#0E5A3F] focus:ring-3 focus:ring-[#0E5A3F]/15"
                   />
                 </label>
-
-                <label htmlFor="cancel-license-key" className="block">
-                  <span className="text-[13px] font-extrabold text-[#101613]">
-                    Activation key, optional
-                  </span>
-                  <input
-                    id="cancel-license-key"
-                    type="text"
-                    value={cancelLicenseKey}
-                    onChange={(event) => setCancelLicenseKey(event.target.value)}
-                    placeholder="paste key if you have it"
-                    className="mt-2 min-h-12 w-full rounded-[16px] border border-[#DCE5DF] bg-white px-3.5 text-[15px] font-semibold text-[#101613] outline-none transition placeholder:text-[#9AA39D] focus:border-[#0E5A3F] focus:ring-3 focus:ring-[#0E5A3F]/15"
-                  />
-                </label>
               </div>
 
               <p className="mt-3 text-[12.5px] leading-5 text-[#56635C]">
-                We use these details only to match the correct subscription
-                during MVP support.
+                If your checkout email is different from your app email, include
+                both so we can match the correct subscription.
               </p>
 
               <div className="mt-4 grid gap-2">
                 <a
-                  href={manageSubscriptionUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  onClick={() => handleOpenManageSubscription("cancel_dialog")}
-                  className="inline-flex min-h-12 items-center justify-center rounded-full bg-[#0E5A3F] px-4 text-[13px] font-extrabold text-white transition hover:bg-[#0B4732] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
-                >
-                  Open cancellation page
-                </a>
-                <a
                   href={cancellationSupportHref}
                   onClick={handleEmailCancellationDetails}
+                  className="inline-flex min-h-12 items-center justify-center rounded-full bg-[#0E5A3F] px-4 text-[13px] font-extrabold text-white transition hover:bg-[#0B4732] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
+                >
+                  Request receipt resend
+                </a>
+                <button
+                  type="button"
+                  onClick={() => setCancelDialogOpen(false)}
                   className="inline-flex min-h-12 items-center justify-center rounded-full border border-[#DCE5DF] bg-white px-4 text-[13px] font-extrabold text-[#0E5A3F] transition hover:bg-[#EDF7F1] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
                 >
-                  Email matching details
-                </a>
+                  I will check my receipt email
+                </button>
               </div>
             </section>
           </div>
