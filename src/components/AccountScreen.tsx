@@ -316,6 +316,7 @@ function formatAccountDate(value: string | null | undefined) {
 }
 
 function buildCancellationSupportBody({
+  accountName,
   appEmail,
   checkoutEmail,
   accessStatusLabel,
@@ -323,6 +324,7 @@ function buildCancellationSupportBody({
   accessEndDate,
   cancellationDetectedAt,
 }: {
+  accountName: string;
   appEmail: string;
   checkoutEmail: string;
   accessStatusLabel: string;
@@ -335,8 +337,9 @@ function buildCancellationSupportBody({
     "",
     "Please resend my TruthLabel checkout receipt so I can use the subscription settings/cancel button.",
     "",
+    `Account name: ${accountName || "not shown"}`,
     `Signed-in app email: ${appEmail}`,
-    `Checkout email: ${checkoutEmail.trim() || "[not entered]"}`,
+    `Checkout/billing email: ${checkoutEmail.trim() || "[not entered]"}`,
     `Current app access: ${accessStatusLabel}`,
     `Subscription status shown in app: ${subscriptionStatus || "unknown"}`,
     `Access end date shown in app: ${accessEndDate || "not shown"}`,
@@ -739,6 +742,7 @@ export default function AccountScreen() {
   const cancellationSupportHref = buildSupportMailtoHref({
     subject: "Truthlabel receipt resend request",
     body: buildCancellationSupportBody({
+      accountName: accountFirstName,
       appEmail: accountEmail,
       checkoutEmail: cancelCheckoutEmail,
       accessStatusLabel: accessStatus.label,
@@ -1223,12 +1227,13 @@ export default function AccountScreen() {
                     id="account-cancel-title"
                     className="text-[21px] font-black tracking-[-0.02em] text-[#101613]"
                   >
-                    Cancel subscription
+                    Need to cancel?
                   </h2>
                   <p className="mt-2 text-[13px] leading-6 text-[#56635C]">
-                    Your checkout receipt includes the subscription settings
-                    and cancel button. If you cannot find it, send us the
-                    email used at checkout so we can resend the receipt.
+                    Open the receipt email from checkout and click the
+                    subscription settings or manage membership button. If you
+                    cannot find the receipt, send us your checkout email and
+                    we will resend it.
                   </p>
                 </div>
                 <button
@@ -1243,9 +1248,10 @@ export default function AccountScreen() {
 
               <div className="mt-4 rounded-[18px] border border-[#DCE5DF] bg-[#F7F9F7] px-3 py-3">
                 <p className="text-[11px] font-black uppercase tracking-[0.14em] text-[#56635C]">
-                  Signed-in app email
+                  Signed-in account, included automatically
                 </p>
                 <p className="mt-1 break-all text-[13px] font-extrabold text-[#101613]">
+                  {accountFirstName ? `${accountFirstName} - ` : ""}
                   {accountEmail}
                 </p>
               </div>
@@ -1253,7 +1259,7 @@ export default function AccountScreen() {
               <div className="mt-4 grid gap-3">
                 <label htmlFor="cancel-checkout-email" className="block">
                   <span className="text-[13px] font-extrabold text-[#101613]">
-                    Checkout email
+                    Checkout or billing email
                   </span>
                   <input
                     id="cancel-checkout-email"
@@ -1267,8 +1273,8 @@ export default function AccountScreen() {
               </div>
 
               <p className="mt-3 text-[12.5px] leading-5 text-[#56635C]">
-                If your checkout email is different from your app email, include
-                both so we can match the correct subscription.
+                Only add this if it may be different from your signed-in email.
+                We use it to find the right receipt and send it back to you.
               </p>
 
               <div className="mt-4 grid gap-2">
