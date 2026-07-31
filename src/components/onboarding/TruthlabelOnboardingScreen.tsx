@@ -135,22 +135,23 @@ const expandedAllergenChips: AllergyChip[] = [
 const demoFindings = [
   {
     tone: "red",
-    label: "Red - Banned",
-    title: "Red No. 3 detected",
-    message:
-      "This color is no longer authorized for food use in some supported regions.",
+    label: "Banned ingredients",
+    title: "Restricted-item checks",
   },
   {
-    tone: "yellow",
-    label: "Yellow - Additive load",
-    title: "Several additive concerns found",
-    message: "Several moderate additive concerns were found.",
+    tone: "red",
+    label: "Cancer-linked warnings",
+    title: "High-concern ingredient checks",
   },
   {
-    tone: "yellow",
-    label: "Yellow - Ultra-processing",
-    title: "Processing markers detected",
-    message: "Truthlabel found markers of a more heavily processed formula.",
+    tone: "red",
+    label: "Lab-made food",
+    title: "Bioengineered food checks",
+  },
+  {
+    tone: "red",
+    label: "Brand warnings",
+    title: "Recalls and safety records",
   },
 ] as const;
 
@@ -543,29 +544,22 @@ function DemoFindingCard({
 }: {
   finding: (typeof demoFindings)[number];
 }) {
-  const isRed = finding.tone === "red";
-
   return (
-    <article
-      className={`rounded-[18px] border px-3.5 py-3 ${
-        isRed
-          ? "border-[#F3D2D4] bg-[#FFF6F6]"
-          : "border-[#F1DDAD] bg-[#FFFBEC]"
-      }`}
-    >
-      <p
-        className={`text-[10px] font-black uppercase tracking-[0.14em] ${
-          isRed ? "text-[#A33A3F]" : "text-[#8A6500]"
-        }`}
+    <article className="truthlabel-category-enter flex items-center gap-3 rounded-[16px] border border-[#F3D2D4] bg-[#FFF6F6] px-3 py-2.5">
+      <span
+        aria-hidden="true"
+        className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#FDECEE] text-[15px] font-black text-[#C62D36]"
       >
-        {finding.label}
-      </p>
-      <h3 className="mt-1 text-[14px] font-black text-[#101613]">
-        {finding.title}
-      </h3>
-      <p className="mt-1 text-[12.5px] leading-5 text-[#66716B]">
-        {finding.message}
-      </p>
+        !
+      </span>
+      <div className="min-w-0">
+        <p className="text-[9.5px] font-black uppercase tracking-[0.13em] text-[#A33A3F]">
+          {finding.label}
+        </p>
+        <h3 className="mt-0.5 text-[13px] font-black leading-5 text-[#101613]">
+          {finding.title}
+        </h3>
+      </div>
     </article>
   );
 }
@@ -578,19 +572,19 @@ function StepOneWelcome({
   onSkip: () => void;
 }) {
   const prefersReducedMotion = usePrefersReducedMotion();
-  const [phase, setPhase] = useState(prefersReducedMotion ? 6 : 0);
-  const finalScore = 38;
+  const [phase, setPhase] = useState(prefersReducedMotion ? 7 : 0);
+  const finalScore = 92;
   const score = phase >= 2 ? finalScore : 0;
-  const visibleFindings = phase >= 5 ? 3 : phase >= 4 ? 2 : phase >= 3 ? 1 : 0;
+  const visibleFindings = Math.max(0, Math.min(demoFindings.length, phase - 2));
   const importantResultVisible = phase >= 3;
 
   useEffect(() => {
     if (prefersReducedMotion) {
-      const timer = window.setTimeout(() => setPhase(6), 0);
+      const timer = window.setTimeout(() => setPhase(7), 0);
       return () => window.clearTimeout(timer);
     }
 
-    const timers = [450, 950, 1500, 2050, 2650, 3300].map((delayMs, index) =>
+    const timers = [180, 360, 580, 800, 1020, 1280, 1580].map((delayMs, index) =>
       window.setTimeout(() => setPhase(index + 1), delayMs),
     );
 
@@ -669,7 +663,7 @@ function StepOneWelcome({
           ))}
         </div>
 
-        {phase >= 6 ? (
+        {phase >= 7 ? (
           <div className="mt-4 rounded-[22px] border border-[#F3D2D4] bg-[#FFF6F6] px-4 py-4">
             <p className="text-[11px] font-black uppercase tracking-[0.16em] text-[#A33A3F]">
               Final verdict
@@ -726,6 +720,14 @@ function StepTwoAllergies({
           We&apos;ll bring selected allergens forward as personal warnings when
           they are found.
         </p>
+        <button
+          type="button"
+          onClick={onNoAllergens}
+          disabled={saving}
+          className="mt-3 inline-flex min-h-10 items-center rounded-full border border-[#D7E7DD] bg-white px-4 text-[13px] font-extrabold text-[#0E5A3F] outline-none transition hover:bg-[#F3FAF6] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98] disabled:cursor-wait disabled:opacity-60"
+        >
+          No allergies
+        </button>
       </div>
 
       <fieldset className="mt-6">
@@ -791,10 +793,6 @@ function StepTwoAllergies({
         </label>
       ) : null}
 
-      <p className="mt-4 rounded-[16px] border border-[#F1DDAD] bg-[#FFFBEC] px-3 py-2.5 text-[12px] font-semibold leading-5 text-[#8A6500]">
-        Always confirm the original package label when managing allergies.
-      </p>
-
       {saveError ? (
         <p
           role="alert"
@@ -808,9 +806,6 @@ function StepTwoAllergies({
         <PrimaryButton onClick={onSave} disabled={saving}>
           {saving ? "Saving..." : "Save and continue"}
         </PrimaryButton>
-        <TextButton onClick={onNoAllergens}>
-          I don&apos;t have any selected allergens
-        </TextButton>
       </div>
     </section>
   );
