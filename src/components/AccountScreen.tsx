@@ -1,38 +1,55 @@
 "use client";
 
+import type { ReactNode } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import AllergyProfileSettings from "@/components/AllergyProfileSettings";
 import ScanPreferencesSettings from "@/components/ScanPreferencesSettings";
 import SupportContactLink from "@/components/SupportContactLink";
 import { useTruthlabelAuth } from "@/components/auth/AuthProvider";
+import { avoidOptions, type AvoidConcern } from "@/data/fakeProduct";
 import { publicAppConfig } from "@/lib/appConfig";
 import { hasMvpActivationAccess } from "@/lib/auth/mvpActivationAccess";
-import { getBrowserStorageNotice } from "@/lib/browserStorage";
+import {
+  getBrowserStorageNotice,
+  safeLocalStorageRemoveItem,
+} from "@/lib/browserStorage";
+import {
+  clearScanHistory,
+  listScanHistory,
+} from "@/lib/scanHistory/scanHistoryClient";
+import { saveProfile, useStoredProfile } from "@/lib/profileStorage";
+import { defaultUserSettings } from "@/lib/userSettings/defaultUserSettings";
 import {
   clearUserSettings,
-  resetUserSettings,
   updateAllergyProfile,
   updateScanPreferences,
   useUserSettings,
 } from "@/lib/userSettings/userSettingsStorage";
 
 type AccountIconName =
+  | "alert"
   | "arrow"
+  | "camera"
   | "check"
+  | "chevron"
   | "clipboard"
   | "home"
+  | "history"
+  | "help"
   | "lock"
+  | "settings"
   | "shield"
+  | "trash"
   | "user";
 
-const benefits = [
-  "Keep your scan history",
-  "Save products for later",
-  "Sync your Watch List",
-  "Access Truthlabel on another device",
-] as const;
+type ProtectionPanel = "all" | "allergy" | "food" | "custom" | "scan";
+type ConfirmationAction =
+  | "clear_history"
+  | "reset_preferences"
+  | "clear_device_data"
+  | "delete_account";
 
 function Icon({
   name,
@@ -50,6 +67,18 @@ function Icon({
   };
 
   switch (name) {
+    case "alert":
+      return (
+        <svg {...commonProps}>
+          <path
+            d="M12 8v5M12 17.2h.01M10.4 4.7 3.7 16.3A2.1 2.1 0 0 0 5.5 19.5h13a2.1 2.1 0 0 0 1.8-3.2L13.6 4.7a1.85 1.85 0 0 0-3.2 0Z"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.7"
+          />
+        </svg>
+      );
     case "arrow":
       return (
         <svg {...commonProps}>
@@ -59,6 +88,22 @@ function Icon({
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth="1.8"
+          />
+        </svg>
+      );
+    case "camera":
+      return (
+        <svg {...commonProps}>
+          <path
+            d="M5 8.5h3l1.4-2h5.2l1.4 2h3A1.8 1.8 0 0 1 20.8 10v7A1.8 1.8 0 0 1 19 18.8H5A1.8 1.8 0 0 1 3.2 17v-7A1.8 1.8 0 0 1 5 8.5Z"
+            stroke="currentColor"
+            strokeLinejoin="round"
+            strokeWidth="1.7"
+          />
+          <path
+            d="M12 16a3.1 3.1 0 1 0 0-6.2 3.1 3.1 0 0 0 0 6.2Z"
+            stroke="currentColor"
+            strokeWidth="1.7"
           />
         </svg>
       );
@@ -74,6 +119,18 @@ function Icon({
           />
         </svg>
       );
+    case "chevron":
+      return (
+        <svg {...commonProps}>
+          <path
+            d="m9 6 6 6-6 6"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.8"
+          />
+        </svg>
+      );
     case "clipboard":
       return (
         <svg {...commonProps}>
@@ -86,6 +143,42 @@ function Icon({
           <path
             d="M8.5 3.8h7A2.5 2.5 0 0 1 18 6.3v12.2A2.5 2.5 0 0 1 15.5 21h-7A2.5 2.5 0 0 1 6 18.5V6.3a2.5 2.5 0 0 1 2.5-2.5Z"
             stroke="currentColor"
+            strokeWidth="1.7"
+          />
+        </svg>
+      );
+    case "history":
+      return (
+        <svg {...commonProps}>
+          <path
+            d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3L4.5 8.9"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.7"
+          />
+          <path
+            d="M4.5 5v4h4M12 8v4.3l3 1.7"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.7"
+          />
+        </svg>
+      );
+    case "help":
+      return (
+        <svg {...commonProps}>
+          <path
+            d="M12 20.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17Z"
+            stroke="currentColor"
+            strokeWidth="1.7"
+          />
+          <path
+            d="M9.8 9.5a2.25 2.25 0 1 1 3.7 1.7c-.9.7-1.5 1.1-1.5 2.3M12 16.8h.01"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
             strokeWidth="1.7"
           />
         </svg>
@@ -118,6 +211,22 @@ function Icon({
           />
         </svg>
       );
+    case "settings":
+      return (
+        <svg {...commonProps}>
+          <path
+            d="M12 15.3a3.3 3.3 0 1 0 0-6.6 3.3 3.3 0 0 0 0 6.6Z"
+            stroke="currentColor"
+            strokeWidth="1.7"
+          />
+          <path
+            d="M19.2 13.6v-3.2l-2-.5a6.6 6.6 0 0 0-.7-1.6l1.1-1.7-2.2-2.2-1.7 1.1a6.6 6.6 0 0 0-1.6-.7l-.5-2H10.4l-.5 2a6.6 6.6 0 0 0-1.6.7L6.6 4.4 4.4 6.6l1.1 1.7a6.6 6.6 0 0 0-.7 1.6l-2 .5v3.2l2 .5c.2.6.4 1.1.7 1.6l-1.1 1.7 2.2 2.2 1.7-1.1c.5.3 1 .5 1.6.7l.5 2h3.2l.5-2c.6-.2 1.1-.4 1.6-.7l1.7 1.1 2.2-2.2-1.1-1.7c.3-.5.5-1 .7-1.6l2-.5Z"
+            stroke="currentColor"
+            strokeLinejoin="round"
+            strokeWidth="1.45"
+          />
+        </svg>
+      );
     case "shield":
       return (
         <svg {...commonProps}>
@@ -129,6 +238,18 @@ function Icon({
           />
           <path
             d="m8.8 12 2 2 4.4-4.5"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="1.7"
+          />
+        </svg>
+      );
+    case "trash":
+      return (
+        <svg {...commonProps}>
+          <path
+            d="M5 7h14M10 11v5M14 11v5M9 7l.8-2h4.4L15 7M7 7l.7 13h8.6L17 7"
             stroke="currentColor"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -192,47 +313,360 @@ function formatAccountDate(value: string | null | undefined) {
   }).format(timestamp);
 }
 
-function getSubscriptionAccessLabel(
-  subscription: ReturnType<typeof useTruthlabelAuth>["subscription"],
-) {
-  if (!subscription) {
-    return "";
+function getAccessStatus(args: {
+  accessState: ReturnType<typeof useTruthlabelAuth>["accessState"];
+  accessKind: ReturnType<typeof useTruthlabelAuth>["accessKind"];
+  hasMvpAccessPass: boolean;
+  subscription: ReturnType<typeof useTruthlabelAuth>["subscription"];
+}) {
+  if (args.accessState === "loading") {
+    return {
+      label: "Checking access",
+      className: "border-[#DCE5DF] bg-white text-[#56635C]",
+    };
   }
 
-  const accessEndDate = formatAccountDate(subscription.access_ends_at);
-
-  switch (subscription.status) {
-    case "active":
-      return "Active subscription";
-    case "active_until_end":
-      return accessEndDate
-        ? `Canceled, active until ${accessEndDate}`
-        : "Canceled, active until period end";
-    case "payment_failed":
-      return "Payment issue";
-    case "expired":
-      return "Expired";
-    case "refunded":
-      return "Refunded";
-    case "disputed":
-      return "Payment disputed";
-    case "chargebacked":
-      return "Chargebacked";
-    case "inactive":
-    default:
-      return "Inactive";
+  if (
+    args.subscription?.status === "payment_failed" ||
+    args.subscription?.status === "disputed" ||
+    args.subscription?.status === "chargebacked"
+  ) {
+    return {
+      label: "Payment issue",
+      className: "border-[#F4C7C9] bg-[#FFF6F6] text-[#B42318]",
+    };
   }
+
+  if (args.subscription?.status === "active_until_end" && args.accessKind === "paid") {
+    return {
+      label: "Access ending",
+      className: "border-[#F1DDAD] bg-[#FFF8E1] text-[#8A6500]",
+    };
+  }
+
+  if (args.accessKind === "paid" || args.hasMvpAccessPass) {
+    return {
+      label: "Active",
+      className: "border-[#BFDCCB] bg-[#EDF7F1] text-[#0E5A3F]",
+    };
+  }
+
+  return {
+    label: "Inactive",
+    className: "border-[#DCE5DF] bg-white text-[#56635C]",
+  };
+}
+
+function getInitials(name: string, email: string) {
+  const source = name || email;
+  const parts = source
+    .replace(/@.*/, "")
+    .split(/[\s._+-]+/)
+    .filter(Boolean);
+  const first = parts[0]?.charAt(0) ?? "T";
+  const second = parts[1]?.charAt(0) ?? parts[0]?.charAt(1) ?? "L";
+
+  return `${first}${second}`.toUpperCase();
 }
 
 function subscribeToMvpAccessStore() {
   return () => undefined;
 }
 
+function SectionCard({
+  title,
+  children,
+  className = "",
+}: {
+  title: string;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <section
+      className={`mt-4 rounded-[20px] border border-[#DCE5DF] bg-white px-4 py-4 shadow-[0_6px_18px_rgba(15,40,28,0.045)] ${className}`}
+      aria-labelledby={`${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-title`}
+    >
+      <h2
+        id={`${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-title`}
+        className="text-[18px] font-extrabold text-[#101613]"
+      >
+        {title}
+      </h2>
+      <div className="mt-3 divide-y divide-[#EEF1EF]">{children}</div>
+    </section>
+  );
+}
+
+function RowShell({
+  icon,
+  title,
+  detail,
+  meta,
+  destructive = false,
+}: {
+  icon: AccountIconName;
+  title: string;
+  detail?: string;
+  meta?: string;
+  destructive?: boolean;
+}) {
+  return (
+    <>
+      <span
+        className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[13px] ${
+          destructive ? "bg-[#FFF6F6] text-[#B42318]" : "bg-[#EDF7F1] text-[#0E5A3F]"
+        }`}
+      >
+        <Icon name={icon} className="h-[18px] w-[18px]" />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span
+          className={`block text-[14px] font-extrabold ${
+            destructive ? "text-[#B42318]" : "text-[#101613]"
+          }`}
+        >
+          {title}
+        </span>
+        {detail ? (
+          <span className="mt-0.5 block text-[12.5px] leading-5 text-[#56635C]">
+            {detail}
+          </span>
+        ) : null}
+      </span>
+      {meta ? (
+        <span className="shrink-0 rounded-full border border-[#DCE5DF] bg-[#F7F9F7] px-2.5 py-1 text-[11px] font-extrabold text-[#56635C]">
+          {meta}
+        </span>
+      ) : null}
+      <Icon
+        name="chevron"
+        className={`h-4 w-4 shrink-0 ${destructive ? "text-[#B42318]" : "text-[#879089]"}`}
+      />
+    </>
+  );
+}
+
+function RowButton({
+  icon,
+  title,
+  detail,
+  meta,
+  destructive,
+  onClick,
+}: {
+  icon: AccountIconName;
+  title: string;
+  detail?: string;
+  meta?: string;
+  destructive?: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="grid min-h-[58px] w-full grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-3 py-3 text-left outline-none transition hover:bg-[#F7F9F7] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2"
+    >
+      <RowShell
+        icon={icon}
+        title={title}
+        detail={detail}
+        meta={meta}
+        destructive={destructive}
+      />
+    </button>
+  );
+}
+
+function RowLink({
+  icon,
+  title,
+  detail,
+  meta,
+  href,
+  destructive,
+  external = false,
+}: {
+  icon: AccountIconName;
+  title: string;
+  detail?: string;
+  meta?: string;
+  href: string;
+  destructive?: boolean;
+  external?: boolean;
+}) {
+  const className =
+    "grid min-h-[58px] w-full grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-3 py-3 text-left outline-none transition hover:bg-[#F7F9F7] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2";
+  const children = (
+    <RowShell
+      icon={icon}
+      title={title}
+      detail={detail}
+      meta={meta}
+      destructive={destructive}
+    />
+  );
+
+  if (external) {
+    return (
+      <a href={href} target="_blank" rel="noreferrer" className={className}>
+        {children}
+      </a>
+    );
+  }
+
+  return (
+    <Link href={href} className={className}>
+      {children}
+    </Link>
+  );
+}
+
+function FoodPreferenceSettings({
+  selected,
+  onToggle,
+}: {
+  selected: AvoidConcern[];
+  onToggle: (value: AvoidConcern) => void;
+}) {
+  return (
+    <section className="rounded-[22px] border border-[#DCE5DF] bg-white px-4 py-4">
+      <h3 className="text-[16px] font-extrabold text-[#101613]">
+        Food preferences
+      </h3>
+      <p className="mt-1.5 text-[13px] leading-5 text-[#56635C]">
+        Choose the food concerns Truthlabel should keep visible for you.
+      </p>
+      <div className="mt-4 flex flex-wrap gap-2">
+        {avoidOptions.map((option) => {
+          const isSelected = selected.includes(option);
+
+          return (
+            <button
+              key={option}
+              type="button"
+              onClick={() => onToggle(option)}
+              aria-pressed={isSelected}
+              className={`min-h-10 rounded-full border px-3.5 text-[12px] font-extrabold transition focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.99] ${
+                isSelected
+                  ? "border-[#0E5A3F] bg-[#0E5A3F] text-white"
+                  : "border-[#DCE5DF] bg-[#F7F9F7] text-[#56635C]"
+              }`}
+            >
+              {option}
+            </button>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function getConfirmationCopy(action: ConfirmationAction) {
+  switch (action) {
+    case "clear_history":
+      return {
+        title: "Clear scan history?",
+        message:
+          "This will permanently remove saved scan snapshots from your account.",
+        confirmLabel: "Clear scan history",
+      };
+    case "reset_preferences":
+      return {
+        title: "Reset your preferences?",
+        message:
+          "This will remove your selected food preferences. Your account and scan history will not be deleted.",
+        confirmLabel: "Reset preferences",
+      };
+    case "clear_device_data":
+      return {
+        title: "Clear data from this device?",
+        message:
+          "Removes cached settings and results stored only on this phone. Your account will not be deleted.",
+        confirmLabel: "Clear device data",
+      };
+    case "delete_account":
+      return {
+        title: "Delete your account?",
+        message:
+          "Account deletion is handled by support during MVP testing so we can verify the request safely.",
+        confirmLabel: "Contact support",
+      };
+  }
+}
+
+function BottomNavigation({ pathname }: { pathname: string }) {
+  const items = [
+    { href: "/app", label: "Home", icon: "home" as const, active: pathname === "/app" },
+    {
+      href: "/app/manual?mode=camera",
+      label: "Scan",
+      icon: "camera" as const,
+      active: pathname === "/app/manual",
+      ariaLabel: "Scan a product",
+    },
+    {
+      href: "/app/history",
+      label: "History",
+      icon: "history" as const,
+      active: pathname === "/app/history",
+    },
+    {
+      href: "/app/account",
+      label: "Account",
+      icon: "user" as const,
+      active:
+        pathname.startsWith("/app/account") ||
+        pathname === "/app/settings" ||
+        pathname === "/settings" ||
+        pathname === "/privacy" ||
+        pathname === "/terms" ||
+        pathname === "/health-disclaimer" ||
+        pathname === "/update-password",
+    },
+  ];
+
+  return (
+    <nav
+      aria-label="Primary navigation"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-[#DCE5DF] bg-white shadow-[0_-8px_22px_rgba(15,40,28,0.06)]"
+    >
+      <div className="mx-auto grid h-[66px] max-w-[480px] grid-cols-4 px-2 pb-[env(safe-area-inset-bottom)]">
+        {items.map((item) => (
+          <Link
+            key={`${item.label}-${item.href}`}
+            href={item.href}
+            aria-label={"ariaLabel" in item ? item.ariaLabel : undefined}
+            aria-current={item.active ? "page" : undefined}
+            className={`flex min-h-11 flex-col items-center justify-center gap-1 rounded-[12px] text-[11px] font-semibold outline-none transition focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 ${
+              item.active ? "text-[#0E5A3F]" : "text-[#5F6C65] hover:text-[#0E5A3F]"
+            }`}
+          >
+            <span
+              className={`inline-flex h-[30px] w-9 items-center justify-center rounded-[12px] ${
+                item.active ? "bg-[#EDF7F1]" : ""
+              }`}
+            >
+              <Icon name={item.icon} className="h-[20px] w-[20px]" />
+            </span>
+            <span>{item.label}</span>
+          </Link>
+        ))}
+      </div>
+    </nav>
+  );
+}
+
 export default function AccountScreen() {
+  const pathname = usePathname();
   const router = useRouter();
   const settings = useUserSettings();
+  const profile = useStoredProfile();
   const {
+    accessState,
     accessKind,
+    errorMessage,
     subscription,
     trialAccess,
     trialDaysRemaining,
@@ -241,8 +675,10 @@ export default function AccountScreen() {
     signOut,
   } = useTruthlabelAuth();
   const [statusMessage, setStatusMessage] = useState("");
-  const [isPreferencesOpen, setIsPreferencesOpen] = useState(false);
-  const [isCancelConfirmOpen, setIsCancelConfirmOpen] = useState(false);
+  const [protectionPanel, setProtectionPanel] = useState<ProtectionPanel | null>(null);
+  const [confirmationAction, setConfirmationAction] =
+    useState<ConfirmationAction | null>(null);
+  const [scanHistoryCount, setScanHistoryCount] = useState<number | null>(null);
   const hasMvpAccessPass = useSyncExternalStore(
     subscribeToMvpAccessStore,
     hasMvpActivationAccess,
@@ -252,23 +688,25 @@ export default function AccountScreen() {
   const manageSubscriptionUrl =
     publicAppConfig.gumroadManageSubscriptionUrl ||
     publicAppConfig.gumroadCheckoutUrl;
-  const subscriptionAccessLabel = getSubscriptionAccessLabel(subscription);
-
-  const accessLabel =
-    accessKind === "paid"
-      ? subscriptionAccessLabel || "Active subscription"
-      : hasMvpAccessPass
-        ? "Active MVP access on this device"
-        : subscriptionAccessLabel || "Inactive";
   const accountFirstName = getAccountFirstName(user?.user_metadata);
+  const accountEmail = user?.email ?? "Unknown email";
+  const accessStatus = getAccessStatus({
+    accessState,
+    accessKind,
+    hasMvpAccessPass,
+    subscription,
+  });
+  const accountInitials = getInitials(accountFirstName, accountEmail);
+  const accessEndDate = formatAccountDate(subscription?.access_ends_at);
+  const accessIsActive = accessStatus.label === "Active" || accessStatus.label === "Access ending";
   void trialAccess;
   void trialDaysRemaining;
-  const savedAllergyCount =
-    settings.allergyProfile.allergens.length +
-    settings.allergyProfile.customAllergens.length;
+  const allergyCount = settings.allergyProfile.allergens.length;
+  const customIngredientCount = settings.allergyProfile.customAllergens.length;
+  const foodPreferenceCount = profile.avoid.length;
 
   useEffect(() => {
-    if (!isPreferencesOpen) {
+    if (!protectionPanel) {
       return;
     }
 
@@ -276,7 +714,7 @@ export default function AccountScreen() {
 
     function handleEscape(event: KeyboardEvent) {
       if (event.key === "Escape") {
-        setIsPreferencesOpen(false);
+        setProtectionPanel(null);
       }
     }
 
@@ -287,7 +725,17 @@ export default function AccountScreen() {
       document.body.style.overflow = originalOverflow;
       window.removeEventListener("keydown", handleEscape);
     };
-  }, [isPreferencesOpen]);
+  }, [protectionPanel]);
+
+  useEffect(() => {
+    const loadHandle = window.setTimeout(() => {
+      void listScanHistory({ limit: 100 })
+        .then((records) => setScanHistoryCount(records.length))
+        .catch(() => setScanHistoryCount(null));
+    }, 0);
+
+    return () => window.clearTimeout(loadHandle);
+  }, []);
 
   async function handleSignOut() {
     await signOut();
@@ -304,9 +752,54 @@ export default function AccountScreen() {
     );
   }
 
+  function handleToggleFoodPreference(value: AvoidConcern) {
+    saveProfile({
+      ...profile,
+      avoid: profile.avoid.includes(value)
+        ? profile.avoid.filter((entry) => entry !== value)
+        : [...profile.avoid, value],
+    });
+  }
+
+  async function handleConfirmAction() {
+    const action = confirmationAction;
+
+    if (!action) {
+      return;
+    }
+
+    setConfirmationAction(null);
+
+    if (action === "clear_history") {
+      try {
+        await clearScanHistory();
+        setScanHistoryCount(0);
+        setStatusMessage("Scan history cleared.");
+      } catch {
+        setStatusMessage("We couldn't clear scan history. Try again.");
+      }
+      return;
+    }
+
+    if (action === "reset_preferences") {
+      updateScanPreferences(defaultUserSettings.scanPreferences);
+      saveProfile({ ...profile, avoid: [] });
+      setStatusMessage("Food preferences reset. Your account and scan history were not deleted.");
+      return;
+    }
+
+    if (action === "clear_device_data") {
+      clearUserSettings();
+      saveProfile({ allergies: [], avoid: [] });
+      safeLocalStorageRemoveItem("insideit.manual-scan.latest");
+      safeLocalStorageRemoveItem("insideit.barcode-scan.latest");
+      setStatusMessage("Device data cleared. Your account was not deleted.");
+    }
+  }
+
   return (
-    <main className="min-h-screen overflow-x-hidden bg-white px-[18px] pt-[calc(14px+env(safe-area-inset-top))] text-[#101613] sm:px-5">
-      <div className="mx-auto w-full max-w-[480px] pb-12">
+    <main className="min-h-screen overflow-x-hidden bg-[#F7F9F7] px-[18px] pt-[calc(14px+env(safe-area-inset-top))] text-[#101613] sm:px-5">
+      <div className="mx-auto w-full max-w-[480px] pb-[calc(100px+env(safe-area-inset-bottom))]">
         <header className="flex min-h-[58px] items-center justify-between gap-4">
           <Link
             href="/app"
@@ -327,373 +820,373 @@ export default function AccountScreen() {
           </Link>
         </header>
 
-        <section className="mt-5 rounded-[22px] border border-[#F3E4A9] bg-[#FFFBEA] px-4 py-5 shadow-[0_5px_18px_rgba(15,40,28,0.055)]">
-          <span className="inline-flex h-12 w-12 items-center justify-center rounded-[16px] bg-[#FFF6D8] text-[#8A6500]">
-            <Icon name="user" className="h-[23px] w-[23px]" />
-          </span>
-          <p className="mt-4 text-[12px] font-bold text-[#8A6500]">
-            Truthlabel Account
-          </p>
-          <h1 className="mt-1 max-w-[330px] text-[30px] font-black leading-[1.08] tracking-[-0.025em] text-[#101613]">
-            Save your scans and preferences
+        <section className="mt-5" aria-labelledby="account-title">
+          <h1
+            id="account-title"
+            className="text-[30px] font-black leading-tight tracking-[-0.025em] text-[#101613]"
+          >
+            Account
           </h1>
-          <p className="mt-3 max-w-[360px] text-[14px] leading-[1.5] text-[#66716B]">
-            Review your signed-in account, access status, Watch List, and privacy links.
-          </p>
-          <div className="mt-4 rounded-[16px] border border-[#D7E7DD] bg-white/78 px-3 py-3">
-            <div className="flex items-start gap-2.5">
-              <Icon name="shield" className="mt-0.5 h-4 w-4 shrink-0 text-[#0E5A3F]" />
-              <div className="min-w-0 text-[12.5px] leading-[1.45] text-[#66716B]">
-                {accountFirstName ? (
-                  <p>
-                    First name{" "}
-                    <span className="font-semibold text-[#101613]">
-                      {accountFirstName}
-                    </span>
-                  </p>
-                ) : null}
-                <p>
-                  Signed in as{" "}
-                  <span className="font-semibold text-[#101613]">
-                    {user?.email ?? "Unknown email"}
-                  </span>
+          <div className="mt-3 flex items-center gap-3">
+            <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-[16px] bg-[#0E5A3F] text-[15px] font-black text-white">
+              {accountInitials}
+            </span>
+            <div className="min-w-0 flex-1">
+              {accountFirstName ? (
+                <p className="truncate text-[14px] font-extrabold text-[#101613]">
+                  {accountFirstName}
                 </p>
-                <p className="mt-1">
-                  Access status:{" "}
-                  <span className="font-semibold text-[#101613]">
-                    {accessLabel}
-                  </span>
-                </p>
-              </div>
+              ) : null}
+              <p className="break-all text-[13px] font-semibold leading-5 text-[#56635C]">
+                {accountEmail}
+              </p>
+              <span
+                className={`mt-2 inline-flex min-h-7 items-center rounded-full border px-3 text-[12px] font-extrabold ${accessStatus.className}`}
+              >
+                {accessStatus.label}
+              </span>
             </div>
           </div>
         </section>
 
-        <section className="mt-4 rounded-[18px] border border-[#E2E8E4] bg-white px-4 py-4">
-          <h2 className="text-[16px] font-extrabold text-[#101613]">
-            Account access
-          </h2>
-          <p className="mt-1 text-[13px] leading-[1.45] text-[#66716B]">
-            Truthlabel keeps you signed in on this device unless you sign out
-            or clear the app&apos;s browser data.
-          </p>
+        <section className="mt-5 rounded-[20px] border border-[#DCE5DF] bg-white px-4 py-4 shadow-[0_6px_18px_rgba(15,40,28,0.045)]">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h2 className="text-[18px] font-extrabold text-[#101613]">
+                Truthlabel access
+              </h2>
+              <p className="mt-1.5 text-[13px] leading-[1.5] text-[#56635C]">
+                {accessState === "loading"
+                  ? "Checking your Truthlabel access."
+                  : accessIsActive
+                    ? "Your Truthlabel access is active."
+                    : "Your account is signed in, but paid access has not been activated."}
+              </p>
+              {accessEndDate && accessIsActive ? (
+                <p className="mt-1 text-[12px] font-semibold text-[#56635C]">
+                  Access end date: {accessEndDate}
+                </p>
+              ) : null}
+            </div>
+            <span
+              className={`inline-flex shrink-0 rounded-full border px-3 py-1.5 text-[12px] font-extrabold ${accessStatus.className}`}
+            >
+              {accessStatus.label}
+            </span>
+          </div>
+          {errorMessage ? (
+            <p className="mt-3 rounded-[14px] border border-[#F4C7C9] bg-[#FFF6F6] px-3 py-2 text-[12px] font-semibold leading-5 text-[#B42318]">
+              Access lookup failed. Try checking access again.
+            </p>
+          ) : null}
           {hasMvpAccessPass && accessKind !== "paid" ? (
-            <p className="mt-3 rounded-[14px] border border-[#D7E7DD] bg-[#F3FAF6] px-3 py-2 text-[12px] font-semibold leading-5 text-[#0E5A3F]">
+            <p className="mt-3 rounded-[14px] border border-[#BFDCCB] bg-[#EDF7F1] px-3 py-2 text-[12px] font-semibold leading-5 text-[#0E5A3F]">
               Your activation link has opened MVP access on this device. Full
               checkout/subscription linking can still be completed later.
             </p>
           ) : null}
           {statusMessage ? (
-            <p className="mt-3 rounded-[14px] border border-[#D7E7DD] bg-[#F3FAF6] px-3 py-2 text-[12px] font-semibold text-[#0E5A3F]">
+            <p className="mt-3 rounded-[14px] border border-[#BFDCCB] bg-[#EDF7F1] px-3 py-2 text-[12px] font-semibold text-[#0E5A3F]">
               {statusMessage}
             </p>
           ) : null}
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="mt-4 grid gap-2 min-[390px]:grid-cols-2">
+            {accessIsActive ? (
+              <a
+                href={manageSubscriptionUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#0E5A3F] px-4 text-[13px] font-extrabold text-white transition hover:bg-[#0B4732] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
+              >
+                Manage subscription
+              </a>
+            ) : (
+              <Link
+                href="/activate"
+                className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#0E5A3F] px-4 text-[13px] font-extrabold text-white transition hover:bg-[#0B4732] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
+              >
+                Activate access
+              </Link>
+            )}
             <button
               type="button"
               onClick={() => void handleRefreshAccess()}
-              className="inline-flex h-10 items-center rounded-full border border-[#D7E7DD] bg-white px-4 text-[12px] font-bold text-[#0E5A3F] transition hover:bg-[#F3FAF6] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
+              className="inline-flex min-h-11 items-center justify-center rounded-full border border-[#DCE5DF] bg-white px-4 text-[13px] font-extrabold text-[#0E5A3F] transition hover:bg-[#EDF7F1] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
             >
-              Refresh access
+              Check access
             </button>
-            <Link
-              href="/activate"
-              className="inline-flex h-10 items-center rounded-full border border-[#D7E7DD] bg-[#F3FAF6] px-4 text-[12px] font-bold text-[#0E5A3F] transition hover:bg-[#E8F6EF] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
-            >
-              Activation
-            </Link>
-            <Link
-              href="/app/onboarding?review=1&restart=1"
-              className="inline-flex h-10 items-center rounded-full border border-[#D7E7DD] bg-[#F3FAF6] px-4 text-[12px] font-bold text-[#0E5A3F] transition hover:bg-[#E8F6EF] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
-            >
-              View onboarding again
-            </Link>
+          </div>
+        </section>
+
+        <SectionCard title="Your protection">
+          <RowButton
+            icon="shield"
+            title="Allergy Watch List"
+            meta={`${allergyCount} selected`}
+            onClick={() => setProtectionPanel("allergy")}
+          />
+          <RowButton
+            icon="settings"
+            title="Food preferences"
+            meta={`${foodPreferenceCount} selected`}
+            onClick={() => setProtectionPanel("food")}
+          />
+          <RowButton
+            icon="clipboard"
+            title="Custom ingredients"
+            meta={`${customIngredientCount} watched`}
+            onClick={() => setProtectionPanel("custom")}
+          />
+          <div className="pt-3">
             <button
               type="button"
-              onClick={() => void handleSignOut()}
-              className="inline-flex h-10 items-center rounded-full border border-[#F3D2D4] bg-[#FFF6F6] px-4 text-[12px] font-bold text-[#A33A3F] transition hover:bg-[#FDEDEE] focus-visible:ring-2 focus-visible:ring-[#A33A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
+              onClick={() => setProtectionPanel("all")}
+              className="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-[#0E5A3F] px-4 text-[13px] font-extrabold text-white transition hover:bg-[#0B4732] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
             >
-              Sign out
+              Manage protection settings
             </button>
           </div>
-        </section>
+        </SectionCard>
 
-        <section className="mt-4 rounded-[18px] border border-[#F1DDAD] bg-[#FFFBEC] px-4 py-4">
-          <div className="flex items-start gap-3">
-            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-white text-[#8A6500]">
-              <Icon name="lock" className="h-5 w-5" />
-            </span>
-            <div className="min-w-0 flex-1">
-              <h2 className="text-[16px] font-extrabold text-[#101613]">
-                Subscription
-              </h2>
-              <p className="mt-1 text-[13px] leading-[1.5] text-[#66716B]">
-                Manage billing or cancel your Truthlabel subscription from the
-                checkout account page. If you cancel, access should remain on
-                until the current billing period ends.
-              </p>
-              {subscription?.status === "active_until_end" ? (
-                <p className="mt-3 rounded-[14px] border border-[#F1DDAD] bg-white px-3 py-2 text-[12px] font-semibold leading-5 text-[#8A6500]">
-                  Cancellation received. {accessLabel}
-                </p>
-              ) : null}
-              {isCancelConfirmOpen ? (
-                <div className="mt-3 rounded-[16px] border border-[#F3D2D4] bg-white px-3 py-3">
-                  <p className="text-[13px] font-extrabold text-[#101613]">
-                    Are you sure you want to cancel?
-                  </p>
-                  <p className="mt-1 text-[12.5px] leading-5 text-[#66716B]">
-                    This opens your subscription management page. Truthlabel
-                    will update access when the checkout cancellation signal is
-                    received.
-                  </p>
-                  <div className="mt-3 rounded-[14px] border border-[#D7E7DD] bg-[#F8FBF9] px-3 py-2.5 text-left">
-                    <p className="text-[12.5px] font-extrabold text-[#101613]">
-                      Different checkout email?
-                    </p>
-                    <p className="mt-1 text-[12px] leading-5 text-[#66716B]">
-                      Link your license key before canceling so Truthlabel knows
-                      which account and checkout belong together. You can
-                      usually find the key in your purchase email or receipt.
-                    </p>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      <Link
-                        href="/activate"
-                        className="inline-flex h-9 items-center rounded-full border border-[#BFDCCB] bg-white px-3.5 text-[11px] font-bold text-[#0E5A3F] transition hover:bg-[#E8F6EF] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
-                      >
-                        Link license key
-                      </Link>
-                      <SupportContactLink
-                        context="Lost license key or cancel help"
-                        className="inline-flex h-9 items-center rounded-full border border-[#E2E8E4] bg-white px-3.5 text-[11px] font-bold text-[#66716B] transition hover:bg-[#F6F8F7] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
-                      >
-                        I lost my key
-                      </SupportContactLink>
-                    </div>
-                  </div>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <a
-                      href={manageSubscriptionUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex h-10 items-center rounded-full bg-[#A33A3F] px-4 text-[12px] font-bold text-white transition hover:bg-[#8D3035] focus-visible:ring-2 focus-visible:ring-[#A33A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
-                    >
-                      Continue to cancel
-                    </a>
-                    <button
-                      type="button"
-                      onClick={() => setIsCancelConfirmOpen(false)}
-                      className="inline-flex h-10 items-center rounded-full border border-[#D7E7DD] bg-white px-4 text-[12px] font-bold text-[#0E5A3F] transition hover:bg-[#F3FAF6] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
-                    >
-                      Keep subscription
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setIsCancelConfirmOpen(true)}
-                  className="mt-3 inline-flex h-10 items-center rounded-full border border-[#F3D2D4] bg-white px-4 text-[12px] font-bold text-[#A33A3F] transition hover:bg-[#FFF6F6] focus-visible:ring-2 focus-visible:ring-[#A33A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
-                >
-                  Cancel subscription
-                </button>
-              )}
-            </div>
-          </div>
-        </section>
+        <SectionCard title="Your activity">
+          <RowLink
+            icon="history"
+            title="Scan history"
+            meta={scanHistoryCount === null ? undefined : `${scanHistoryCount} scans`}
+            href="/app/history"
+          />
+          <RowLink
+            icon="check"
+            title="Saved products"
+            href="/app/saved"
+          />
+        </SectionCard>
 
-        <section className="mt-4 rounded-[16px] border border-[#D7E7DD] bg-[#F3FAF6] px-4 py-3.5">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h2 className="text-[14px] font-extrabold text-[#101613]">
-                Need help with your account?
-              </h2>
-              <p className="mt-1 text-[12.5px] leading-[1.45] text-[#66716B]">
-                Use this if checkout, activation, sign in, or scanning does not work.
-              </p>
-            </div>
-            <SupportContactLink
-              context="Account support"
-              className="inline-flex h-10 shrink-0 items-center justify-center rounded-full border border-[#BFDCCB] bg-white px-4 text-[12px] font-bold text-[#0E5A3F] transition hover:bg-[#E8F6EF] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
-            />
-          </div>
-        </section>
+        <SectionCard title="App settings">
+          <RowButton
+            icon="settings"
+            title="Result display preferences"
+            detail="External safety sections, confidence notes, and default category."
+            onClick={() => setProtectionPanel("scan")}
+          />
+          <RowLink
+            icon="clipboard"
+            title="View onboarding again"
+            href="/app/onboarding?review=1&restart=1"
+          />
+        </SectionCard>
 
-        {storageNotice ? (
-          <section
-            role="status"
-            aria-live="polite"
-            className="mt-4 rounded-[18px] border border-[#F3D2D4] bg-[#FFF6F6] px-4 py-3 text-[#7A3D41]"
-          >
-            <p className="text-[11px] font-bold uppercase tracking-[0.14em]">
-              Storage note
+        <SectionCard title="Privacy and security">
+          <RowLink icon="lock" title="Change password" href="/update-password" />
+          <RowButton
+            icon="trash"
+            title="Clear scan history"
+            destructive
+            onClick={() => setConfirmationAction("clear_history")}
+          />
+          <RowButton
+            icon="settings"
+            title="Reset preferences"
+            destructive
+            onClick={() => setConfirmationAction("reset_preferences")}
+          />
+          <RowButton
+            icon="trash"
+            title="Clear data from this device"
+            detail="Removes cached settings and results stored only on this phone."
+            destructive
+            onClick={() => setConfirmationAction("clear_device_data")}
+          />
+          <RowButton
+            icon="alert"
+            title="Delete account"
+            detail="Contact support to request account deletion during MVP testing."
+            destructive
+            onClick={() => setConfirmationAction("delete_account")}
+          />
+          <RowLink icon="shield" title="Privacy Policy" href="/privacy" />
+          <RowLink icon="clipboard" title="Terms" href="/terms" />
+          <RowLink
+            icon="help"
+            title="Health disclaimer"
+            href="/health-disclaimer"
+          />
+          {storageNotice ? (
+            <p
+              role="status"
+              aria-live="polite"
+              className="pt-3 text-[12.5px] font-semibold leading-5 text-[#B42318]"
+            >
+              {storageNotice}
             </p>
-            <p className="mt-1.5 text-[13px] leading-5">{storageNotice}</p>
-          </section>
-        ) : null}
+          ) : null}
+        </SectionCard>
 
-        <section className="mt-4 rounded-[18px] border border-[#D7E7DD] bg-[#F3FAF6] px-4 py-4 shadow-[0_5px_18px_rgba(15,40,28,0.045)]">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <h2 className="text-[17px] font-extrabold text-[#101613]">
-                Allergy Watch List & scan preferences
-              </h2>
-              <p className="mt-1.5 text-[13px] leading-[1.45] text-[#66716B]">
-                Choose allergens Truthlabel should flag strongly, then set a few scan defaults.
-              </p>
-            </div>
-            <span className="shrink-0 rounded-full border border-[#C8E0D2] bg-white px-2.5 py-1 text-[11px] font-bold text-[#0E5A3F]">
-              {savedAllergyCount} saved
+        <section className="mt-4 rounded-[20px] border border-[#DCE5DF] bg-white px-4 py-4 shadow-[0_6px_18px_rgba(15,40,28,0.045)]">
+          <h2 className="text-[18px] font-extrabold text-[#101613]">
+            Help and support
+          </h2>
+          <SupportContactLink
+            context="Account support"
+            className="mt-3 grid min-h-[58px] w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-[16px] border border-[#DCE5DF] px-3 py-3 text-left outline-none transition hover:bg-[#F7F9F7] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2"
+          >
+            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[13px] bg-[#EDF7F1] text-[#0E5A3F]">
+              <Icon name="help" className="h-[18px] w-[18px]" />
             </span>
-          </div>
+            <span className="min-w-0">
+              <span className="block text-[14px] font-extrabold text-[#101613]">
+                Contact support
+              </span>
+              <span className="mt-0.5 block text-[12.5px] leading-5 text-[#56635C]">
+                Get help with activation, scanning, or your account.
+              </span>
+            </span>
+            <Icon name="chevron" className="h-4 w-4 shrink-0 text-[#879089]" />
+          </SupportContactLink>
+        </section>
+
+        <section className="mt-5">
           <button
             type="button"
-            onClick={() => setIsPreferencesOpen(true)}
-            className="mt-4 inline-flex min-h-11 w-full items-center justify-center rounded-[14px] border border-[#0E5A3F] bg-[#0E5A3F] px-4 text-[13px] font-extrabold text-white shadow-[0_12px_24px_rgba(14,90,63,0.14)] transition hover:bg-[#0B4732] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
+            onClick={() => void handleSignOut()}
+            className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#DCE5DF] bg-white px-4 text-[13px] font-extrabold text-[#101613] transition hover:bg-[#F7F9F7] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
           >
-            Open allergy and scan settings
+            Sign out
           </button>
         </section>
 
-        {isPreferencesOpen ? (
+        {protectionPanel ? (
           <div
             className="fixed inset-0 z-50 bg-[#101613]/45 px-3 py-[calc(18px+env(safe-area-inset-top))] backdrop-blur-sm"
-            onClick={() => setIsPreferencesOpen(false)}
+            onClick={() => setProtectionPanel(null)}
             role="presentation"
           >
             <section
               role="dialog"
               aria-modal="true"
               aria-labelledby="account-preferences-title"
-              className="mx-auto flex h-full max-h-[760px] w-full max-w-[500px] flex-col overflow-hidden rounded-[26px] border border-white/70 bg-[#F8FBF9] shadow-[0_24px_70px_rgba(16,22,19,0.22)]"
+              className="mx-auto flex h-full max-h-[760px] w-full max-w-[500px] flex-col overflow-hidden rounded-[24px] border border-white/70 bg-[#F7F9F7] shadow-[0_24px_70px_rgba(16,22,19,0.22)]"
               onClick={(event) => event.stopPropagation()}
             >
-              <header className="flex items-start justify-between gap-4 border-b border-[#E2E8E4] bg-white px-4 py-4">
+              <header className="flex items-start justify-between gap-4 border-b border-[#DCE5DF] bg-white px-4 py-4">
                 <div>
-                  <p className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-[#0E5A3F]">
-                    Account settings
-                  </p>
                   <h2
                     id="account-preferences-title"
-                    className="mt-1 text-[20px] font-black leading-tight text-[#101613]"
+                    className="text-[20px] font-black leading-tight text-[#101613]"
                   >
-                    Allergy & scan preferences
+                    Protection settings
                   </h2>
-                  <p className="mt-1 text-[12.5px] leading-5 text-[#66716B]">
-                    Update allergy warnings and scan behavior in one place.
+                  <p className="mt-1 text-[12.5px] leading-5 text-[#56635C]">
+                    Allergy safety settings stay separate from ordinary food preferences.
                   </p>
                 </div>
                 <button
                   type="button"
-                  onClick={() => setIsPreferencesOpen(false)}
-                  className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#D7E7DD] bg-[#F3FAF6] text-[18px] font-bold text-[#0E5A3F] transition hover:bg-[#E8F6EF] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2"
-                  aria-label="Close allergy and scan settings"
+                  onClick={() => setProtectionPanel(null)}
+                  className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#DCE5DF] bg-[#F7F9F7] text-[18px] font-bold text-[#0E5A3F] transition hover:bg-[#EDF7F1] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2"
+                  aria-label="Close protection settings"
                 >
                   X
                 </button>
               </header>
               <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
                 <div className="grid gap-4">
-                  <AllergyProfileSettings
-                    key={`account-allergy-${settings.allergyProfile.lastUpdated ?? settings.updatedAt}`}
-                    profile={settings.allergyProfile}
-                    onSave={(profile) => {
-                      updateAllergyProfile(profile);
-                      setStatusMessage("Allergy Watch List saved on this device.");
-                    }}
-                    onClear={() => {
-                      updateAllergyProfile({
-                        allergens: [],
-                        customAllergens: [],
-                        lastUpdated: new Date().toISOString(),
-                      });
-                      setStatusMessage("Allergy Watch List cleared on this device.");
-                    }}
-                  />
+                  {protectionPanel === "all" ||
+                  protectionPanel === "allergy" ||
+                  protectionPanel === "custom" ? (
+                    <AllergyProfileSettings
+                      key={`account-allergy-${settings.allergyProfile.lastUpdated ?? settings.updatedAt}`}
+                      profile={settings.allergyProfile}
+                      onSave={(profile) => {
+                        updateAllergyProfile(profile);
+                        setStatusMessage("Allergy Watch List saved on this device.");
+                      }}
+                      onClear={() => {
+                        updateAllergyProfile({
+                          allergens: [],
+                          customAllergens: [],
+                          lastUpdated: new Date().toISOString(),
+                        });
+                        setStatusMessage("Allergy Watch List cleared on this device.");
+                      }}
+                    />
+                  ) : null}
 
-                  <ScanPreferencesSettings
-                    key={`account-scan-preferences-${settings.scanPreferences.defaultProductCategory}-${settings.scanPreferences.showNotCheckedExternalSections}-${settings.scanPreferences.showConfidenceNotes}-${settings.scanPreferences.autoRunExternalSafetyLookup}`}
-                    value={settings.scanPreferences}
-                    onSave={(scanPreferences) => {
-                      updateScanPreferences(scanPreferences);
-                      setStatusMessage("Result preferences saved on this device.");
-                    }}
-                  />
+                  {protectionPanel === "all" || protectionPanel === "food" ? (
+                    <FoodPreferenceSettings
+                      selected={profile.avoid}
+                      onToggle={handleToggleFoodPreference}
+                    />
+                  ) : null}
+
+                  {protectionPanel === "all" || protectionPanel === "scan" ? (
+                    <ScanPreferencesSettings
+                      key={`account-scan-preferences-${settings.scanPreferences.defaultProductCategory}-${settings.scanPreferences.showNotCheckedExternalSections}-${settings.scanPreferences.showConfidenceNotes}-${settings.scanPreferences.autoRunExternalSafetyLookup}`}
+                      value={settings.scanPreferences}
+                      onSave={(scanPreferences) => {
+                        updateScanPreferences(scanPreferences);
+                        setStatusMessage("Result preferences saved on this device.");
+                      }}
+                    />
+                  ) : null}
                 </div>
               </div>
             </section>
           </div>
         ) : null}
 
-        <section className="mt-4 rounded-[18px] border border-[#E2E8E4] bg-white px-4 py-4">
-          <h2 className="text-[16px] font-extrabold text-[#101613]">
-            Local data
-          </h2>
-          <p className="mt-1 text-[13px] leading-[1.45] text-[#66716B]">
-            Clear or reset the local Watch List and scan preferences saved on
-            this device.
-          </p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => {
-                clearUserSettings();
-                setStatusMessage("Local preferences cleared on this device.");
-              }}
-              className="inline-flex h-10 items-center rounded-full border border-[#D7E7DD] bg-white px-4 text-[12px] font-bold text-[#0E5A3F] transition hover:bg-[#F3FAF6] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
+        {confirmationAction ? (
+          <div
+            className="fixed inset-0 z-50 flex items-end bg-[#101613]/45 px-4 py-4 sm:items-center"
+            role="presentation"
+            onClick={() => setConfirmationAction(null)}
+          >
+            <section
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="account-confirm-title"
+              className="mx-auto w-full max-w-[420px] rounded-[22px] border border-[#DCE5DF] bg-white px-4 py-4 shadow-[0_22px_58px_rgba(15,40,28,0.22)]"
+              onClick={(event) => event.stopPropagation()}
             >
-              Clear local data
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                resetUserSettings();
-                setStatusMessage("Preferences reset to Truthlabel defaults.");
-              }}
-              className="inline-flex h-10 items-center rounded-full border border-[#F3D2D4] bg-[#FFF6F6] px-4 text-[12px] font-bold text-[#A33A3F] transition hover:bg-[#FDEDEE] focus-visible:ring-2 focus-visible:ring-[#A33A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
-            >
-              Reset preferences
-            </button>
-          </div>
-        </section>
-
-        <section className="mt-4 rounded-[16px] border border-[#E9E1D2] bg-[#FBF8F1] px-4 py-3.5">
-          <div className="flex items-start gap-3">
-            <Icon name="shield" className="mt-0.5 h-5 w-5 shrink-0 text-[#0E5A3F]" />
-            <p className="text-[13px] leading-[1.48] text-[#66716B]">
-              Privacy note: your allergy profile should be treated as sensitive preference data. Always check the product label yourself, especially for allergies.
-            </p>
-          </div>
-        </section>
-
-        <section className="mt-4 rounded-[18px] border border-[#E2E8E4] bg-white px-4 py-4">
-          <h2 className="text-[16px] font-extrabold text-[#101613]">
-            Account benefits
-          </h2>
-          <div className="-mx-1 mt-3 flex snap-x gap-2 overflow-x-auto px-1 pb-1">
-            {benefits.map((benefit) => (
-              <div
-                key={benefit}
-                className="flex min-w-[168px] snap-start items-center gap-2.5 rounded-[15px] border border-[#D7E7DD] bg-[#F3FAF6] px-3 py-3"
+              <h2
+                id="account-confirm-title"
+                className="text-[20px] font-black text-[#101613]"
               >
-                <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-[#0E5A3F]">
-                  <Icon name="check" className="h-4 w-4" />
-                </span>
-                <span className="text-[12.5px] font-bold leading-[1.25] text-[#101613]">
-                  {benefit}
-                </span>
+                {getConfirmationCopy(confirmationAction).title}
+              </h2>
+              <p className="mt-2 text-[13px] leading-6 text-[#56635C]">
+                {getConfirmationCopy(confirmationAction).message}
+              </p>
+              <div className="mt-4 grid gap-2 min-[390px]:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={() => setConfirmationAction(null)}
+                  className="min-h-11 rounded-full border border-[#DCE5DF] bg-white px-4 text-[13px] font-extrabold text-[#101613] transition hover:bg-[#F7F9F7] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2"
+                >
+                  Cancel
+                </button>
+                {confirmationAction === "delete_account" ? (
+                  <SupportContactLink
+                    context="Delete account request"
+                    className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#B42318] px-4 text-[13px] font-extrabold text-white transition hover:bg-[#921B12] focus-visible:ring-2 focus-visible:ring-[#B42318] focus-visible:ring-offset-2"
+                  >
+                    {getConfirmationCopy(confirmationAction).confirmLabel}
+                  </SupportContactLink>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => void handleConfirmAction()}
+                    className="min-h-11 rounded-full bg-[#B42318] px-4 text-[13px] font-extrabold text-white transition hover:bg-[#921B12] focus-visible:ring-2 focus-visible:ring-[#B42318] focus-visible:ring-offset-2"
+                  >
+                    {getConfirmationCopy(confirmationAction).confirmLabel}
+                  </button>
+                )}
               </div>
-            ))}
+            </section>
           </div>
-        </section>
-
-        <div className="mt-4 flex flex-wrap gap-3 px-1 text-[12px] font-semibold text-[#66716B]">
-          <Link href="/privacy">Privacy</Link>
-          <Link href="/terms">Terms</Link>
-          <Link href="/health-disclaimer">Health disclaimer</Link>
-          <Link href="/update-password">Change password</Link>
-        </div>
+        ) : null}
       </div>
+      <BottomNavigation pathname={pathname} />
     </main>
   );
 }

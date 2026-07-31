@@ -139,7 +139,7 @@ export default function RecentScansSection({
     try {
       setRecords(await listScanHistory({ limit: 5 }));
     } catch {
-      setError("We couldn't load your recent scans.");
+      setError("Recent scans are temporarily unavailable.");
     } finally {
       setLoading(false);
     }
@@ -225,30 +225,30 @@ export default function RecentScansSection({
             <RecentScanSkeleton />
           </div>
         ) : error ? (
-          <div className="mx-[18px] rounded-[18px] border border-[#F4C7C9] bg-[#FEF2F2] px-4 py-3 sm:mx-5">
+          <div className="mx-[18px] rounded-[18px] border border-[#F4C7C9] bg-white px-4 py-4 shadow-[0_6px_18px_rgba(159,29,36,0.06)] sm:mx-5">
             <p className="text-[13px] font-bold text-[#9F1D24]">{error}</p>
             <button
               type="button"
               onClick={() => void loadRecentScans()}
-              className="mt-2 text-[12px] font-extrabold text-[#9F1D24] underline"
+              className="mt-3 inline-flex min-h-9 items-center justify-center rounded-full bg-[#9F1D24] px-4 text-[12px] font-extrabold text-white outline-none transition focus-visible:ring-2 focus-visible:ring-[#9F1D24] focus-visible:ring-offset-2 active:scale-[0.99]"
             >
               Retry
             </button>
           </div>
         ) : records.length === 0 ? (
-          <div className="mx-[18px] rounded-[18px] border border-[#E2E8E4] bg-[#F8FAF8] px-4 py-4 sm:mx-5">
+          <div className="mx-[18px] rounded-[18px] border border-[#DCE7E1] bg-white px-4 py-4 shadow-[0_6px_18px_rgba(15,40,28,0.045)] sm:mx-5">
             <h3 className="text-[14px] font-extrabold text-[#101613]">
-              Your recent scans will appear here
+              No recent scans yet
             </h3>
             <p className="mt-1.5 text-[13px] leading-5 text-[#66716B]">
-              Scan a product to save its result and review it later.
+              Your latest products will appear here.
             </p>
             <Link
               href="/app/manual"
               onClick={onScanProduct}
-              className="mt-3 inline-flex min-h-10 items-center justify-center rounded-full bg-[#0E5A3F] px-4 text-[12px] font-extrabold text-white"
+              className="mt-3 inline-flex min-h-10 items-center justify-center rounded-full bg-[#0E5A3F] px-4 text-[12px] font-extrabold text-white outline-none transition focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.99]"
             >
-              Scan a product
+              Scan your first product
             </Link>
           </div>
         ) : (

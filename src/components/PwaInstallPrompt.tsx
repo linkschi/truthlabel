@@ -1,6 +1,10 @@
 "use client";
 
 import { useEffect, useState, useSyncExternalStore } from "react";
+import {
+  safeLocalStorageGetItem,
+  safeLocalStorageSetItem,
+} from "@/lib/browserStorage";
 
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
@@ -10,6 +14,9 @@ type BeforeInstallPromptEvent = Event & {
 type NavigatorWithStandalone = Navigator & {
   standalone?: boolean;
 };
+
+const INSTALL_PROMPT_DISMISSED_KEY = "truthlabel.install-prompt.dismissed";
+const INSTALL_PROMPT_DISMISSED_EVENT = "truthlabel.install-prompt.dismissed.changed";
 
 function InstallGlyph() {
   return (
@@ -76,6 +83,40 @@ function subscribeToClientReady() {
   return () => undefined;
 }
 
+function subscribeToInstallPromptDismissed(onStoreChange: () => void) {
+  if (typeof window === "undefined") {
+    return () => undefined;
+  }
+
+  function handleChange(event: Event) {
+    if (
+      event instanceof StorageEvent &&
+      event.key !== null &&
+      event.key !== INSTALL_PROMPT_DISMISSED_KEY
+    ) {
+      return;
+    }
+
+    onStoreChange();
+  }
+
+  window.addEventListener("storage", handleChange);
+  window.addEventListener(INSTALL_PROMPT_DISMISSED_EVENT, handleChange);
+
+  return () => {
+    window.removeEventListener("storage", handleChange);
+    window.removeEventListener(INSTALL_PROMPT_DISMISSED_EVENT, handleChange);
+  };
+}
+
+function getInstallPromptDismissedClientSnapshot() {
+  return safeLocalStorageGetItem(INSTALL_PROMPT_DISMISSED_KEY) === "true";
+}
+
+function getInstallPromptDismissedServerSnapshot() {
+  return false;
+}
+
 export default function PwaInstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] =
     useState<BeforeInstallPromptEvent | null>(null);
@@ -85,6 +126,11 @@ export default function PwaInstallPrompt() {
     subscribeToClientReady,
     () => true,
     () => false,
+  );
+  const dismissed = useSyncExternalStore(
+    subscribeToInstallPromptDismissed,
+    getInstallPromptDismissedClientSnapshot,
+    getInstallPromptDismissedServerSnapshot,
   );
   const isAppleMobile = isClientReady && isAppleMobileDevice();
   const isReady = isClientReady && isMobileDevice();
@@ -126,7 +172,12 @@ export default function PwaInstallPrompt() {
     }
   }
 
-  if (!isReady || isInstalled) {
+  function handleDismiss() {
+    safeLocalStorageSetItem(INSTALL_PROMPT_DISMISSED_KEY, "true");
+    window.dispatchEvent(new Event(INSTALL_PROMPT_DISMISSED_EVENT));
+  }
+
+  if (dismissed || !isReady || isInstalled) {
     return null;
   }
 
@@ -141,45 +192,42 @@ export default function PwaInstallPrompt() {
 
   return (
     <section
-      className="mt-6 overflow-hidden rounded-[22px] border border-[#D7E7DD] bg-[linear-gradient(145deg,#F3FAF6_0%,#FFFFFF_52%,#FFF8D7_100%)] px-4 py-4 shadow-[0_14px_34px_rgba(15,40,28,0.08)]"
+      className="mt-5 overflow-hidden rounded-[18px] border border-[#DCE7E1] bg-white px-4 py-3.5 shadow-[0_6px_18px_rgba(15,40,28,0.045)]"
       aria-label="Install Truthlabel"
       data-testid="pwa-install-prompt"
     >
       <div className="flex items-start gap-3">
-        <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-[15px] bg-[#0E5A3F] text-white shadow-[0_8px_18px_rgba(14,90,63,0.2)]">
+        <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-[#E8F6EF] text-[#0E5A3F]">
           <PhoneGlyph />
         </span>
         <div className="min-w-0 flex-1">
           <h2 className="text-[15px] font-extrabold text-[#101613]">
-            Install Truthlabel on your phone
+            Install Truthlabel
           </h2>
           <p className="mt-1 text-[12px] leading-5 text-[#66716B]">
-            Add the web app to your home screen for faster scans and an app-like view.
+            Open Truthlabel faster from your Home Screen.
           </p>
-          <div className="mt-3 flex flex-wrap gap-1.5">
-            {["Home screen icon", "Fast access", "App-like view"].map((item) => (
-              <span
-                key={item}
-                className="rounded-full border border-[#D7E7DD] bg-white/82 px-2.5 py-1 text-[10px] font-bold text-[#0E5A3F]"
-              >
-                {item}
-              </span>
-            ))}
-          </div>
           <button
             type="button"
             onClick={handleInstall}
-            className="mt-3 inline-flex min-h-10 items-center gap-2 rounded-[13px] bg-[#0E5A3F] px-4 text-[12px] font-bold text-white outline-none transition active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2"
+            className="mt-3 inline-flex min-h-9 items-center gap-2 rounded-full bg-[#0E5A3F] px-4 text-[12px] font-bold text-white outline-none transition active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2"
           >
             <InstallGlyph />
-            {hasNativePrompt ? "Install app" : "How to install"}
+            How to install
           </button>
         </div>
+        <button
+          type="button"
+          onClick={handleDismiss}
+          className="rounded-full px-2 py-1 text-[11px] font-bold text-[#879089] outline-none transition hover:text-[#0E5A3F] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2"
+        >
+          Dismiss
+        </button>
       </div>
 
       {showInstructions ? (
         <div
-          className="mt-3 rounded-[16px] border border-[#DCE9E1] bg-white/88 px-3.5 py-3 text-[12px] leading-5 text-[#526159]"
+          className="mt-3 rounded-[15px] border border-[#DCE9E1] bg-[#F8FAF8] px-3.5 py-3 text-[12px] leading-5 text-[#526159]"
           aria-live="polite"
         >
           <p className="font-extrabold text-[#101613]">

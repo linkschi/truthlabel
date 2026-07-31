@@ -9,9 +9,9 @@ import {
   demoProducts,
   getDemoProductById,
 } from "@/data/demoProducts";
-import SupportContactLink from "@/components/SupportContactLink";
 import { publicAppConfig } from "@/lib/appConfig";
 import { saveProfile, useStoredProfile } from "@/lib/profileStorage";
+import { useUserSettings } from "@/lib/userSettings/userSettingsStorage";
 import PwaInstallPrompt from "@/components/PwaInstallPrompt";
 import RecentScansSection from "@/components/scanHistory/RecentScansSection";
 
@@ -33,42 +33,13 @@ type HomeIconName =
   | "spark"
   | "user";
 
-type AccordionId = "how" | "watch" | "developer";
+type AccordionId = "developer";
 type Tint = "green" | "yellow" | "red" | "neutral";
 
 const defaultProductHref = `/app/results?category=packaged-processed-foods&demo=${defaultDemoProductId}`;
 const defaultDemoProduct = getDemoProductById(defaultDemoProductId);
 const featureFlags = publicAppConfig.flags;
 const showLocalInternalTools = featureFlags.enableLocalDevBypass;
-
-const capabilityPills = [
-  { label: "Barcode", icon: "barcode" as const, tint: "red" as const },
-  { label: "Ingredients", icon: "list" as const, tint: "yellow" as const },
-];
-
-const valuePreviewItems = [
-  {
-    icon: "search" as const,
-    label: "Ingredient flags",
-    tint: "red" as const,
-  },
-  {
-    icon: "activity" as const,
-    label: "Exposure score",
-    tint: "yellow" as const,
-  },
-  {
-    icon: "shield" as const,
-    label: "Clear verdict",
-    tint: "green" as const,
-  },
-];
-
-const howItWorksSteps = [
-  "Scan or enter the ingredient list.",
-  "Truthlabel analyses ingredients and exposure checks.",
-  "Review highlighted concerns, explanations, and the final verdict.",
-] as const;
 
 function Icon({ name, className = "" }: { name: HomeIconName; className?: string }) {
   const commonProps = {
@@ -380,19 +351,8 @@ function HeroSection() {
         <span className="text-[#0E5A3F]">trust it.</span>
       </h1>
       <p className="mt-3 max-w-[360px] text-[14.5px] leading-[1.5] text-[#66716B]">
-        Type a barcode or paste ingredients to help you understand what a food product contains.
+        Scan a barcode or paste an ingredient list to see what deserves your attention.
       </p>
-      <div className="mt-4 flex flex-wrap gap-2">
-        {capabilityPills.map((pill) => (
-          <span
-            key={pill.label}
-            className={`inline-flex h-[30px] items-center gap-1.5 rounded-full px-3 text-[12px] font-semibold ${tintClasses(pill.tint)}`}
-          >
-            <Icon name={pill.icon} className="h-3.5 w-3.5" />
-            {pill.label}
-          </span>
-        ))}
-      </div>
     </section>
   );
 }
@@ -410,7 +370,7 @@ function ScanActionCard({
   icon,
   title,
   description,
-  capabilities,
+  action,
   tone = "light",
   onClick,
 }: {
@@ -418,55 +378,62 @@ function ScanActionCard({
   icon: HomeIconName;
   title: string;
   description: string;
-  capabilities: string;
+  action: string;
   tone?: "primary" | "light";
   onClick: () => void;
 }) {
   const isPrimary = tone === "primary";
 
+  if (isPrimary) {
+    return (
+      <Link
+        href={href}
+        onClick={onClick}
+        aria-label="Scan a product"
+        className="group flex min-h-[190px] flex-col rounded-[20px] border border-[#0E5A3F] bg-[#0E5A3F] p-5 text-white shadow-[0_12px_28px_rgba(14,90,63,0.18)] outline-none transition duration-200 ease-out hover:-translate-y-px hover:shadow-[0_14px_34px_rgba(14,90,63,0.22)] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.985]"
+      >
+        <span className="inline-flex h-12 w-12 items-center justify-center rounded-[15px] bg-white/14 text-white">
+          <Icon name={icon} className="h-[23px] w-[23px]" />
+        </span>
+        <span className="mt-auto block pt-10">
+          <span className="block text-[20px] font-extrabold tracking-[-0.015em]">
+            {title}
+          </span>
+          <span className="mt-2 block max-w-[310px] text-[13.5px] leading-[1.5] text-white/80">
+            {description}
+          </span>
+          <span className="mt-5 inline-flex min-h-11 items-center justify-center rounded-full bg-white px-5 text-[13px] font-extrabold text-[#0E5A3F] transition group-hover:bg-[#F8FAF8]">
+            {action}
+          </span>
+        </span>
+      </Link>
+    );
+  }
+
   return (
     <Link
       href={href}
       onClick={onClick}
-      className={`group flex min-h-[156px] flex-col rounded-[18px] border p-4 shadow-[0_5px_18px_rgba(15,40,28,0.07)] outline-none transition duration-200 ease-out hover:-translate-y-px hover:shadow-[0_8px_22px_rgba(15,40,28,0.09)] focus-visible:ring-2 focus-visible:ring-offset-2 active:scale-[0.985] ${
-        isPrimary
-          ? "border-[#0E5A3F] bg-[#0E5A3F] text-white focus-visible:ring-[#0E5A3F]"
-          : "border-[#CFE5D8] bg-[#F3FAF6] text-[#101613] hover:border-[#9CCCB5] focus-visible:ring-[#0E5A3F]"
-      }`}
+      aria-label="Paste ingredients"
+      className="group grid min-h-[108px] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-[20px] border border-[#DCE7E1] bg-white p-4 text-[#101613] shadow-[0_8px_24px_rgba(15,40,28,0.07)] outline-none transition duration-200 ease-out hover:-translate-y-px hover:border-[#BFD7C9] hover:shadow-[0_12px_28px_rgba(15,40,28,0.1)] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.985]"
     >
-      <div className="flex items-start justify-between gap-3">
-        <span
-          className={`inline-flex h-11 w-11 items-center justify-center rounded-[14px] ${
-            isPrimary ? "bg-white/14 text-white" : "bg-[#E8F6EF] text-[#0E5A3F]"
-          }`}
-        >
-          <Icon name={icon} className="h-[22px] w-[22px]" />
+      <span className="inline-flex h-11 w-11 items-center justify-center rounded-[14px] bg-[#E8F6EF] text-[#0E5A3F]">
+        <Icon name={icon} className="h-[22px] w-[22px]" />
+      </span>
+      <span className="min-w-0">
+        <span className="block text-[18px] font-extrabold tracking-[-0.01em]">
+          {title}
         </span>
-        <span
-          className={`inline-flex h-8 w-8 items-center justify-center rounded-full transition group-hover:scale-105 ${
-            isPrimary ? "bg-white text-[#0E5A3F]" : "bg-white text-[#0E5A3F]"
-          }`}
-        >
-          <Icon name="arrow" className="h-4 w-4" />
-        </span>
-      </div>
-      <div className="mt-auto pt-7">
-        <h3 className="text-[17px] font-extrabold tracking-[-0.01em]">{title}</h3>
-        <p
-          className={`mt-1.5 text-[13px] leading-[1.45] ${
-            isPrimary ? "text-white/78" : "text-[#66716B]"
-          }`}
-        >
+        <span className="mt-1.5 block text-[13px] leading-[1.45] text-[#66716B]">
           {description}
-        </p>
-        <p
-          className={`mt-3 text-[12px] font-semibold ${
-            isPrimary ? "text-white/86" : "text-[#0E5A3F]"
-          }`}
-        >
-          {capabilities}
-        </p>
-      </div>
+        </span>
+        <span className="mt-3 inline-flex min-h-9 items-center justify-center rounded-full border border-[#D7E7DD] bg-[#F8FAF8] px-4 text-[12px] font-extrabold text-[#0E5A3F]">
+          {action}
+        </span>
+      </span>
+      <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#F6F8F7] text-[#0E5A3F] transition group-hover:scale-105">
+        <Icon name="arrow" className="h-4 w-4" />
+      </span>
     </Link>
   );
 }
@@ -479,45 +446,20 @@ function ScanActionGrid({ onNavigate }: { onNavigate: () => void }) {
         <ScanActionCard
           href="/app/manual?mode=camera"
           icon="camera"
-          title="Scan barcode"
-          description="Open the camera and scan the product barcode."
-          capabilities="Camera barcode"
+          title="Scan a product"
+          description="Point your camera at a product barcode for an instant ingredient check."
+          action="Start scan"
           tone="primary"
           onClick={onNavigate}
         />
         <ScanActionCard
           href="/app/manual"
           icon="clipboard"
-          title="Manual ingredients"
-          description="Paste the ingredient list yourself."
-          capabilities="Manual ingredients"
+          title="Paste ingredients"
+          description="Enter an ingredient list when a barcode is unavailable."
+          action="Enter ingredients"
           onClick={onNavigate}
         />
-      </div>
-    </section>
-  );
-}
-
-function ValuePreview() {
-  return (
-    <section className="mt-6">
-      <h2 className="text-[18px] font-extrabold text-[#101613]">
-        What you&apos;ll see
-      </h2>
-      <div className="mt-3 grid grid-cols-3 gap-2.5">
-        {valuePreviewItems.map((item) => (
-          <div
-            key={item.label}
-            className={`min-h-[96px] rounded-[16px] px-2.5 py-3 text-center ${tintClasses(item.tint)}`}
-          >
-            <span className="mx-auto flex h-9 w-9 items-center justify-center rounded-[12px] bg-white/72">
-              <Icon name={item.icon} className="h-[18px] w-[18px]" />
-            </span>
-            <p className="mt-2.5 text-[12px] font-extrabold leading-[1.2] text-[#101613]">
-              {item.label}
-            </p>
-          </div>
-        ))}
       </div>
     </section>
   );
@@ -584,58 +526,6 @@ function AccordionCard({
           <div className="border-t border-[#EEF1EF] px-3.5 py-3">{children}</div>
         </div>
       </div>
-    </div>
-  );
-}
-
-function HowItWorksSteps() {
-  return (
-    <ol className="space-y-0">
-      {howItWorksSteps.map((step, index) => (
-        <li key={step} className="grid grid-cols-[28px_minmax(0,1fr)] gap-3">
-          <div className="flex flex-col items-center">
-            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#FFF6D8] text-[12px] font-bold text-[#8A6500]">
-              {index + 1}
-            </span>
-            {index < howItWorksSteps.length - 1 ? (
-              <span className="my-1 h-7 w-px bg-[#F3E4A9]" />
-            ) : null}
-          </div>
-          <p className="pb-4 pt-1 text-[13.5px] leading-[1.45] text-[#101613]">
-            {step}
-          </p>
-        </li>
-      ))}
-    </ol>
-  );
-}
-
-function WatchListPreview({ watchItems }: { watchItems: string[] }) {
-  return (
-    <div>
-      {watchItems.length > 0 ? (
-        <div className="flex flex-wrap gap-1.5">
-          {watchItems.map((item) => (
-            <span
-              key={item}
-              className="inline-flex rounded-full border border-[#F3D2D4] bg-[#FDEDEE] px-3 py-1.5 text-[12px] font-semibold text-[#A33A3F]"
-            >
-              {item}
-            </span>
-          ))}
-        </div>
-      ) : (
-        <p className="rounded-[14px] bg-[#F6F8F7] px-3 py-3 text-[13px] text-[#66716B]">
-          No watch-list items selected.
-        </p>
-      )}
-
-      <Link
-        href="/app/account"
-        className="mt-3 flex min-h-[42px] w-full items-center justify-center rounded-[12px] border border-[#D7E7DD] bg-white px-4 text-[13px] font-bold text-[#0E5A3F] transition hover:bg-[#F3FAF6] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.99]"
-      >
-        {watchItems.length > 0 ? "Edit Watch List" : "Set Up Watch List"}
-      </Link>
     </div>
   );
 }
@@ -752,58 +642,116 @@ function DeveloperDemoTools({ onNavigate }: { onNavigate: () => void }) {
   );
 }
 
-function ExploreMore({
+function DeveloperToolsSection({
   activeAccordion,
   onToggle,
-  watchItems,
   onNavigate,
 }: {
   activeAccordion: AccordionId | null;
   onToggle: (id: AccordionId) => void;
-  watchItems: string[];
   onNavigate: () => void;
 }) {
+  if (!showLocalInternalTools) {
+    return null;
+  }
+
   return (
-    <section className="mt-6">
-      <h2 className="text-[18px] font-extrabold text-[#101613]">Explore more</h2>
-      <div className="mt-3 space-y-3">
-        <AccordionCard
-          id="how"
-          icon="list"
-          tint="yellow"
-          title="How It Works"
-          summary="3 steps"
-          activeAccordion={activeAccordion}
-          onToggle={onToggle}
-        >
-          <HowItWorksSteps />
-        </AccordionCard>
+    <section className="mt-5">
+      <AccordionCard
+        id="developer"
+        icon="code"
+        tint="neutral"
+        title="Developer & Demo Tools"
+        summary="Local only"
+        activeAccordion={activeAccordion}
+        onToggle={onToggle}
+      >
+        <DeveloperDemoTools onNavigate={onNavigate} />
+      </AccordionCard>
+    </section>
+  );
+}
 
-        <AccordionCard
-          id="watch"
-          icon="settings"
-          tint="red"
-          title="Watch List"
-          summary={watchItems.length > 0 ? `${watchItems.length} active` : "Not set"}
-          activeAccordion={activeAccordion}
-          onToggle={onToggle}
-        >
-          <WatchListPreview watchItems={watchItems} />
-        </AccordionCard>
+function ProtectionSummary({
+  allergyCount,
+  preferenceCount,
+  customCount,
+}: {
+  allergyCount: number;
+  preferenceCount: number;
+  customCount: number;
+}) {
+  const rows = [
+    {
+      icon: "shield" as const,
+      label: "Allergy Watch List",
+      value: allergyCount,
+      status: "active",
+      tint: "red" as const,
+    },
+    {
+      icon: "settings" as const,
+      label: "Food preferences",
+      value: preferenceCount,
+      status: "selected",
+      tint: "yellow" as const,
+    },
+    {
+      icon: "list" as const,
+      label: "Custom ingredients",
+      value: customCount,
+      status: "watched",
+      tint: "green" as const,
+    },
+  ];
 
-        {showLocalInternalTools ? (
-          <AccordionCard
-            id="developer"
-            icon="code"
-            tint="neutral"
-            title="Developer & Demo Tools"
-            summary="Local only"
-            activeAccordion={activeAccordion}
-            onToggle={onToggle}
-          >
-            <DeveloperDemoTools onNavigate={onNavigate} />
-          </AccordionCard>
-        ) : null}
+  return (
+    <section className="mt-6" aria-labelledby="protection-title">
+      <div className="rounded-[22px] border border-[#DCE7E1] bg-white p-4 shadow-[0_8px_26px_rgba(15,40,28,0.055)]">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <h2
+              id="protection-title"
+              className="text-[18px] font-extrabold text-[#101613]"
+            >
+              Your protection
+            </h2>
+            <p className="mt-1 text-[12.5px] leading-5 text-[#66716B]">
+              Saved checks without showing private Watch List names.
+            </p>
+          </div>
+          <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-[15px] bg-[#E8F6EF] text-[#0E5A3F]">
+            <Icon name="shield" className="h-[21px] w-[21px]" />
+          </span>
+        </div>
+
+        <div className="mt-4 divide-y divide-[#EEF1EF]">
+          {rows.map((row) => (
+            <div
+              key={row.label}
+              className="grid min-h-[58px] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 py-2.5"
+            >
+              <span
+                className={`inline-flex h-10 w-10 items-center justify-center rounded-[13px] ${tintClasses(row.tint)}`}
+              >
+                <Icon name={row.icon} className="h-[18px] w-[18px]" />
+              </span>
+              <span className="min-w-0 text-[14px] font-extrabold text-[#101613]">
+                {row.label}
+              </span>
+              <span className="rounded-full border border-[#E2E8E4] bg-[#F8FAF8] px-3 py-1.5 text-[12px] font-extrabold text-[#27332E]">
+                {row.value} {row.status}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <Link
+          href="/app/account"
+          className="mt-4 flex min-h-11 w-full items-center justify-center rounded-full bg-[#0E5A3F] px-4 text-[13px] font-extrabold text-white outline-none transition hover:bg-[#0B4A34] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.99]"
+        >
+          Manage Watch List
+        </Link>
       </div>
     </section>
   );
@@ -815,9 +763,10 @@ function BottomNavigation() {
     { href: "/app", label: "Home", icon: "home" as const, active: pathname === "/app" },
     {
       href: "/app/manual?mode=camera",
-      label: "Camera",
+      label: "Scan",
       icon: "camera" as const,
       active: pathname === "/app/manual",
+      ariaLabel: "Scan a product",
     },
     {
       href: "/app/history",
@@ -836,13 +785,14 @@ function BottomNavigation() {
   return (
     <nav
       aria-label="Primary navigation"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-[#E2E8E4] bg-white/96 shadow-[0_-8px_22px_rgba(15,40,28,0.06)] backdrop-blur"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-[#DCE7E1] bg-white shadow-[0_-8px_22px_rgba(15,40,28,0.06)]"
     >
       <div className="mx-auto grid h-[66px] max-w-[480px] grid-cols-4 px-2 pb-[env(safe-area-inset-bottom)]">
         {items.map((item) => (
           <Link
             key={`${item.label}-${item.href}`}
             href={item.href}
+            aria-label={"ariaLabel" in item ? item.ariaLabel : undefined}
             aria-current={item.active ? "page" : undefined}
             className={`flex min-h-11 flex-col items-center justify-center gap-1 rounded-[12px] text-[11px] font-semibold outline-none transition focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 ${
               item.active ? "text-[#0E5A3F]" : "text-[#5F6C65] hover:text-[#0E5A3F]"
@@ -865,8 +815,11 @@ function BottomNavigation() {
 
 export default function HomeScreen() {
   const profile = useStoredProfile();
+  const settings = useUserSettings();
   const [activeAccordion, setActiveAccordion] = useState<AccordionId | null>(null);
-  const watchItems = [...profile.allergies, ...profile.avoid];
+  const allergyCount = settings.allergyProfile.allergens.length;
+  const customCount = settings.allergyProfile.customAllergens.length;
+  const preferenceCount = profile.avoid.length;
 
   function handleNavigate() {
     saveProfile(profile);
@@ -877,28 +830,23 @@ export default function HomeScreen() {
   }
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-white px-[18px] pt-[calc(12px+env(safe-area-inset-top))] text-[#101613] sm:px-5">
+    <main className="min-h-screen overflow-x-hidden bg-[#F8FAF8] px-[18px] pt-[calc(12px+env(safe-area-inset-top))] text-[#101613] sm:px-5">
       <div className="mx-auto w-full max-w-[480px] pb-[calc(100px+env(safe-area-inset-bottom))]">
         <HomeHeader />
         <HeroSection />
         <ScanActionGrid onNavigate={handleNavigate} />
         <RecentScansSection onScanProduct={handleNavigate} />
-        <ValuePreview />
-        <ExploreMore
-          activeAccordion={activeAccordion}
-          onToggle={handleToggleAccordion}
-          watchItems={watchItems}
-          onNavigate={handleNavigate}
+        <ProtectionSummary
+          allergyCount={allergyCount}
+          preferenceCount={preferenceCount}
+          customCount={customCount}
         />
         <PwaInstallPrompt />
-        <div className="mt-4 flex justify-center">
-          <SupportContactLink
-            context="App home"
-            className="inline-flex rounded-full border border-[#E2E8E4] bg-white px-4 py-2 text-[12px] font-bold text-[#66716B] transition hover:border-[#D7E7DD] hover:bg-[#F3FAF6] hover:text-[#0E5A3F] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
-          >
-            Need help? Contact support
-          </SupportContactLink>
-        </div>
+        <DeveloperToolsSection
+          activeAccordion={activeAccordion}
+          onToggle={handleToggleAccordion}
+          onNavigate={handleNavigate}
+        />
       </div>
       <BottomNavigation />
     </main>

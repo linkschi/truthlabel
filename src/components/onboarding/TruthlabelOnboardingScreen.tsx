@@ -442,7 +442,7 @@ function DemoFindingCard({
   );
 }
 
-function StepOneDemo({
+function StepOneWelcome({
   onContinue,
   onSkip,
 }: {
@@ -470,22 +470,43 @@ function StepOneDemo({
   }, [prefersReducedMotion]);
 
   useEffect(() => {
-    trackTruthlabelEvent("demo_viewed", { onboarding_step: 1 });
+    trackTruthlabelEvent("demo_viewed", { onboarding_step: 1, screen: "welcome" });
   }, []);
 
   return (
     <section className="flex flex-1 flex-col py-6">
-      <div>
-        <h1 className="text-[30px] font-black leading-[1.04] tracking-[-0.04em] text-[#101613]">
-          See what deserves your attention
+      <div className="text-center">
+        <p className="mx-auto inline-flex rounded-full border border-[#D7E7DD] bg-white px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.16em] text-[#0E5A3F] shadow-[0_8px_22px_rgba(15,40,28,0.06)]">
+          Welcome to Truthlabel
+        </p>
+        <h1 className="mx-auto mt-4 max-w-[390px] text-[34px] font-black leading-[1.02] tracking-[-0.05em] text-[#101613]">
+          Scan before you trust it.
         </h1>
-        <p className="mt-3 text-[15px] leading-6 text-[#66716B]">
-          Truthlabel brings the most important findings forward and explains why
-          they matter.
+        <p className="mx-auto mt-3 max-w-[360px] text-[15px] leading-6 text-[#66716B]">
+          Truthlabel helps bring important ingredient warnings, allergy matches,
+          processing signals, and product concerns into plain English.
         </p>
       </div>
 
-      <div className="mt-6 rounded-[30px] border border-[#D7E7DD] bg-white p-4 shadow-[0_18px_48px_rgba(15,40,28,0.08)]">
+      <div className="mt-5 grid grid-cols-3 gap-2.5">
+        {[
+          ["Scan", "Barcode or label"],
+          ["Check", "Warnings and reasons"],
+          ["Decide", "Clear next action"],
+        ].map(([title, copy]) => (
+          <div
+            key={title}
+            className="rounded-[18px] border border-[#D7E7DD] bg-white px-2.5 py-3 text-center shadow-[0_10px_24px_rgba(15,40,28,0.05)]"
+          >
+            <p className="text-[13px] font-black text-[#101613]">{title}</p>
+            <p className="mt-1 text-[10.5px] font-bold leading-4 text-[#66716B]">
+              {copy}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-5 rounded-[30px] border border-[#D7E7DD] bg-white p-4 shadow-[0_18px_48px_rgba(15,40,28,0.08)]">
         <div className="flex items-start justify-between gap-4">
           <div className="flex min-w-0 items-center gap-3">
             <Image
@@ -534,9 +555,9 @@ function StepOneDemo({
 
       <div className="mt-auto pt-6">
         <PrimaryButton onClick={onContinue} disabled={!importantResultVisible}>
-          Continue
+          Start setup
         </PrimaryButton>
-        <TextButton onClick={onSkip}>Skip demonstration</TextButton>
+        <TextButton onClick={onSkip}>Skip intro</TextButton>
       </div>
     </section>
   );
@@ -702,17 +723,13 @@ function SetupTaskRow({
 
 function StepThreePreparing({
   completedTasks,
-  connectionWarning,
   countLabel,
   setupComplete,
-  onRetryProductData,
   onContinue,
 }: {
   completedTasks: number;
-  connectionWarning: string;
   countLabel: string;
   setupComplete: boolean;
-  onRetryProductData: () => void;
   onContinue: () => void;
 }) {
   const setupTasks = [
@@ -747,12 +764,9 @@ function StepThreePreparing({
 
       <ol className="mt-6 grid gap-2.5" aria-live="polite">
         {setupTasks.map((task, index) => {
-          const isConnectionTask = index === 3;
           const status: SetupTaskStatus =
             index < completedTasks
-              ? isConnectionTask && connectionWarning
-                ? "warning"
-                : "complete"
+              ? "complete"
               : index === completedTasks
                 ? "active"
                 : "waiting";
@@ -772,21 +786,6 @@ function StepThreePreparing({
           food-product records
         </p>
       </div>
-
-      {connectionWarning ? (
-        <div className="mt-3 rounded-[16px] border border-[#F1DDAD] bg-[#FFFBEC] px-3 py-3">
-          <p className="text-[12.5px] font-semibold leading-5 text-[#8A6500]">
-            {connectionWarning}
-          </p>
-          <button
-            type="button"
-            onClick={onRetryProductData}
-            className="mt-2 min-h-9 rounded-full border border-[#F1DDAD] bg-white px-3 text-[11px] font-bold text-[#8A6500]"
-          >
-            Retry connection
-          </button>
-        </div>
-      ) : null}
 
       {setupComplete ? (
         <div className="mt-auto pt-6">
@@ -1057,25 +1056,6 @@ async function saveAllergySettingsToAccount(
   );
 }
 
-async function checkOpenFoodFactsConnection() {
-  const baseUrl = publicAppConfig.openFoodFactsApiBaseUrl;
-  const controller = new AbortController();
-  const timeoutId = window.setTimeout(() => controller.abort(), 2500);
-
-  try {
-    const response = await fetch(`${baseUrl}/search?page_size=1&fields=code`, {
-      signal: controller.signal,
-      cache: "no-store",
-    });
-
-    return response.ok;
-  } catch {
-    return false;
-  } finally {
-    window.clearTimeout(timeoutId);
-  }
-}
-
 export default function TruthlabelOnboardingScreen() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -1097,7 +1077,6 @@ export default function TruthlabelOnboardingScreen() {
   );
   const [saveError, setSaveError] = useState("");
   const [completedSetupTasks, setCompletedSetupTasks] = useState(0);
-  const [connectionWarning, setConnectionWarning] = useState("");
   const [countLabel, setCountLabel] = useState("0");
   const [skipInstallVisible, setSkipInstallVisible] = useState(false);
   const [installCompleted, setInstallCompleted] = useState(false);
@@ -1277,7 +1256,6 @@ export default function TruthlabelOnboardingScreen() {
 
     async function runSetup() {
       setCompletedSetupTasks(0);
-      setConnectionWarning("");
 
       const taskDelay = prefersReducedMotion ? 0 : 360;
 
@@ -1317,16 +1295,7 @@ export default function TruthlabelOnboardingScreen() {
 
       await completeTask(2);
       await completeTask(3);
-
-      const connected = await checkOpenFoodFactsConnection();
-      if (!connected && !cancelled) {
-        setConnectionWarning(
-          "Product data could not be reached right now. Truthlabel will try again when you scan.",
-        );
-      }
-      if (!cancelled) {
-        setCompletedSetupTasks(4);
-      }
+      await completeTask(4);
 
       await completeTask(5, async () => {
         await saveOnboardingState(userId, {
@@ -1335,7 +1304,7 @@ export default function TruthlabelOnboardingScreen() {
       });
 
       if (!cancelled) {
-        trackTruthlabelEvent("setup_completed", { product_data_connected: connected }, { userId });
+        trackTruthlabelEvent("setup_completed", { product_data_ready: true }, { userId });
       }
     }
 
@@ -1482,27 +1451,14 @@ export default function TruthlabelOnboardingScreen() {
     startTransition(() => router.replace("/app"));
   }, [router, userId]);
 
-  const retryProductData = useCallback(async () => {
-    const connected = await checkOpenFoodFactsConnection();
-
-    if (connected) {
-      setConnectionWarning("");
-      setCompletedSetupTasks((current) => Math.max(current, 4));
-    } else {
-      setConnectionWarning(
-        "Product data could not be reached right now. Truthlabel will try again when you scan.",
-      );
-    }
-  }, []);
-
   const content = useMemo(() => {
     switch (step) {
       case 1:
         return (
-          <StepOneDemo
+          <StepOneWelcome
             onContinue={() => void goToStep(2)}
             onSkip={() => {
-              trackTruthlabelEvent("demo_skipped", { onboarding_step: 1 }, { userId });
+              trackTruthlabelEvent("demo_skipped", { onboarding_step: 1, screen: "welcome" }, { userId });
               void goToStep(2);
             }}
           />
@@ -1524,10 +1480,8 @@ export default function TruthlabelOnboardingScreen() {
         return (
           <StepThreePreparing
             completedTasks={completedSetupTasks}
-            connectionWarning={connectionWarning}
             countLabel={countLabel}
             setupComplete={setupComplete}
-            onRetryProductData={retryProductData}
             onContinue={() => void goToStep(4)}
           />
         );
@@ -1557,7 +1511,6 @@ export default function TruthlabelOnboardingScreen() {
     }
   }, [
     completedSetupTasks,
-    connectionWarning,
     countLabel,
     customInput,
     deferredPrompt,
@@ -1570,7 +1523,6 @@ export default function TruthlabelOnboardingScreen() {
     installCompleted,
     installOutcome,
     isPending,
-    retryProductData,
     saveError,
     selectedAllergens,
     setupComplete,

@@ -715,18 +715,24 @@ export default function ScanHistoryScreen() {
 
       <nav
         aria-label="Primary navigation"
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-[#E2E8E4] bg-white/96 shadow-[0_-8px_22px_rgba(15,40,28,0.06)] backdrop-blur"
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-[#DCE7E1] bg-white shadow-[0_-8px_22px_rgba(15,40,28,0.06)]"
       >
         <div className="mx-auto grid h-[66px] max-w-[480px] grid-cols-4 px-2 pb-[env(safe-area-inset-bottom)]">
           {[
             { href: "/app", label: "Home", icon: "home" as const },
-            { href: "/app/manual?mode=camera", label: "Camera", icon: "camera" as const },
+            {
+              href: "/app/manual?mode=camera",
+              label: "Scan",
+              icon: "camera" as const,
+              ariaLabel: "Scan a product",
+            },
             { href: "/app/history", label: "History", icon: "history" as const },
             { href: "/app/account", label: "Account", icon: "account" as const },
           ].map((item) => (
             <Link
               key={item.href}
               href={item.href}
+              aria-label={"ariaLabel" in item ? item.ariaLabel : undefined}
               aria-current={item.href === "/app/history" ? "page" : undefined}
               className={`flex min-h-11 flex-col items-center justify-center gap-1 rounded-[12px] text-[11px] font-semibold outline-none transition focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 ${
                 item.href === "/app/history"
