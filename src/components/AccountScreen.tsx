@@ -10,6 +10,7 @@ import SupportContactLink from "@/components/SupportContactLink";
 import { useTruthlabelAuth } from "@/components/auth/AuthProvider";
 import { avoidOptions, type AvoidConcern } from "@/data/fakeProduct";
 import { publicAppConfig } from "@/lib/appConfig";
+import { trackTruthlabelEvent } from "@/lib/analytics/analyticsClient";
 import { hasMvpActivationAccess } from "@/lib/auth/mvpActivationAccess";
 import {
   getBrowserStorageNotice,
@@ -22,6 +23,7 @@ import {
 } from "@/lib/scanHistory/scanHistoryClient";
 import { saveProfile, useStoredProfile } from "@/lib/profileStorage";
 import { defaultUserSettings } from "@/lib/userSettings/defaultUserSettings";
+import { buildSupportMailtoHref } from "@/lib/supportContact";
 import {
   clearUserSettings,
   updateAllergyProfile,
@@ -312,6 +314,41 @@ function formatAccountDate(value: string | null | undefined) {
     day: "numeric",
     year: "numeric",
   }).format(timestamp);
+}
+
+function buildCancellationSupportBody({
+  appEmail,
+  checkoutEmail,
+  licenseKey,
+  accessStatusLabel,
+  subscriptionStatus,
+  accessEndDate,
+  cancellationDetectedAt,
+}: {
+  appEmail: string;
+  checkoutEmail: string;
+  licenseKey: string;
+  accessStatusLabel: string;
+  subscriptionStatus: string;
+  accessEndDate: string;
+  cancellationDetectedAt: string;
+}) {
+  return [
+    "Cancellation matching request",
+    "",
+    "I want to cancel or confirm cancellation for TruthLabel.",
+    "",
+    `Signed-in app email: ${appEmail}`,
+    `Checkout email: ${checkoutEmail.trim() || "[not entered]"}`,
+    `Activation key: ${licenseKey.trim() || "[not entered]"}`,
+    `Current app access: ${accessStatusLabel}`,
+    `Subscription status shown in app: ${subscriptionStatus || "unknown"}`,
+    `Access end date shown in app: ${accessEndDate || "not shown"}`,
+    `Cancellation detected in app: ${cancellationDetectedAt || "not shown"}`,
+    `Request time: ${new Date().toISOString()}`,
+    "",
+    "Notes:",
+  ].join("\n");
 }
 
 function getAccessStatus(args: {
@@ -679,6 +716,9 @@ export default function AccountScreen() {
   const [protectionPanel, setProtectionPanel] = useState<ProtectionPanel | null>(null);
   const [confirmationAction, setConfirmationAction] =
     useState<ConfirmationAction | null>(null);
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [cancelCheckoutEmail, setCancelCheckoutEmail] = useState("");
+  const [cancelLicenseKey, setCancelLicenseKey] = useState("");
   const [scanHistoryCount, setScanHistoryCount] = useState<number | null>(null);
   const hasMvpAccessPass = useSyncExternalStore(
     subscribeToMvpAccessStore,
@@ -699,7 +739,23 @@ export default function AccountScreen() {
   });
   const accountInitials = getInitials(accountFirstName, accountEmail);
   const accessEndDate = formatAccountDate(subscription?.access_ends_at);
+  const cancellationDetectedDate = formatAccountDate(
+    subscription?.cancellation_detected_at,
+  );
   const accessIsActive = accessStatus.label === "Active" || accessStatus.label === "Access ending";
+  const cancelButtonVisible = accessState !== "loading";
+  const cancellationSupportHref = buildSupportMailtoHref({
+    subject: "Truthlabel cancellation matching request",
+    body: buildCancellationSupportBody({
+      appEmail: accountEmail,
+      checkoutEmail: cancelCheckoutEmail,
+      licenseKey: cancelLicenseKey,
+      accessStatusLabel: accessStatus.label,
+      subscriptionStatus: subscription?.status ?? "unknown",
+      accessEndDate,
+      cancellationDetectedAt: cancellationDetectedDate,
+    }),
+  });
   void trialAccess;
   void trialDaysRemaining;
   const allergyCount = settings.allergyProfile.allergens.length;
@@ -708,7 +764,7 @@ export default function AccountScreen() {
   const isThiislincornTester = isThiislincornOnboardingTestAccount(user?.email);
 
   useEffect(() => {
-    if (!protectionPanel) {
+    if (!protectionPanel && !cancelDialogOpen) {
       return;
     }
 
@@ -717,6 +773,7 @@ export default function AccountScreen() {
     function handleEscape(event: KeyboardEvent) {
       if (event.key === "Escape") {
         setProtectionPanel(null);
+        setCancelDialogOpen(false);
       }
     }
 
@@ -727,7 +784,7 @@ export default function AccountScreen() {
       document.body.style.overflow = originalOverflow;
       window.removeEventListener("keydown", handleEscape);
     };
-  }, [protectionPanel]);
+  }, [cancelDialogOpen, protectionPanel]);
 
   useEffect(() => {
     const loadHandle = window.setTimeout(() => {
@@ -752,6 +809,44 @@ export default function AccountScreen() {
         ? "MVP access is active on this device."
         : "Access status refreshed.",
     );
+  }
+
+  function handleOpenCancelDialog() {
+    trackTruthlabelEvent(
+      "subscription_cancel_started",
+      {
+        access_status: accessStatus.label,
+        subscription_status: subscription?.status ?? "unknown",
+      },
+      { userId: user?.id },
+    );
+    setCancelDialogOpen(true);
+  }
+
+  function handleOpenManageSubscription(source: "access_card" | "cancel_dialog") {
+    trackTruthlabelEvent(
+      "subscription_manage_opened",
+      {
+        source,
+        access_status: accessStatus.label,
+        subscription_status: subscription?.status ?? "unknown",
+      },
+      { userId: user?.id },
+    );
+  }
+
+  function handleEmailCancellationDetails() {
+    trackTruthlabelEvent(
+      "subscription_cancel_email_started",
+      {
+        has_checkout_email: Boolean(cancelCheckoutEmail.trim()),
+        has_key_hint: Boolean(cancelLicenseKey.trim()),
+        access_status: accessStatus.label,
+        subscription_status: subscription?.status ?? "unknown",
+      },
+      { userId: user?.id },
+    );
+    setStatusMessage("Cancellation details prepared. Send the email after it opens.");
   }
 
   function handleToggleFoodPreference(value: AvoidConcern) {
@@ -906,6 +1001,7 @@ export default function AccountScreen() {
                 href={manageSubscriptionUrl}
                 target="_blank"
                 rel="noreferrer"
+                onClick={() => handleOpenManageSubscription("access_card")}
                 className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#0E5A3F] px-4 text-[13px] font-extrabold text-white transition hover:bg-[#0B4732] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
               >
                 Manage subscription
@@ -918,6 +1014,15 @@ export default function AccountScreen() {
                 Activate access
               </Link>
             )}
+            {cancelButtonVisible ? (
+              <button
+                type="button"
+                onClick={handleOpenCancelDialog}
+                className="inline-flex min-h-11 items-center justify-center rounded-full border border-[#F4C7C9] bg-[#FFF6F6] px-4 text-[13px] font-extrabold text-[#B42318] transition hover:bg-[#FDECEC] focus-visible:ring-2 focus-visible:ring-[#B42318] focus-visible:ring-offset-2 active:scale-[0.98]"
+              >
+                Cancel subscription
+              </button>
+            ) : null}
             <button
               type="button"
               onClick={() => void handleRefreshAccess()}
@@ -1109,6 +1214,109 @@ export default function AccountScreen() {
             Sign out
           </button>
         </section>
+
+        {cancelDialogOpen ? (
+          <div
+            className="fixed inset-0 z-50 flex items-end bg-[#101613]/45 px-4 py-4 sm:items-center"
+            role="presentation"
+            onClick={() => setCancelDialogOpen(false)}
+          >
+            <section
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="account-cancel-title"
+              className="mx-auto w-full max-w-[440px] rounded-[24px] border border-[#DCE5DF] bg-white px-4 py-4 shadow-[0_22px_58px_rgba(15,40,28,0.22)]"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h2
+                    id="account-cancel-title"
+                    className="text-[21px] font-black tracking-[-0.02em] text-[#101613]"
+                  >
+                    Cancel subscription
+                  </h2>
+                  <p className="mt-2 text-[13px] leading-6 text-[#56635C]">
+                    Open subscription settings to cancel billing. If your
+                    checkout email is different, send these details so we can
+                    match the right account.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setCancelDialogOpen(false)}
+                  className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#DCE5DF] bg-[#F7F9F7] text-[18px] font-bold text-[#0E5A3F] transition hover:bg-[#EDF7F1] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2"
+                  aria-label="Close cancellation options"
+                >
+                  X
+                </button>
+              </div>
+
+              <div className="mt-4 rounded-[18px] border border-[#DCE5DF] bg-[#F7F9F7] px-3 py-3">
+                <p className="text-[11px] font-black uppercase tracking-[0.14em] text-[#56635C]">
+                  Signed-in app email
+                </p>
+                <p className="mt-1 break-all text-[13px] font-extrabold text-[#101613]">
+                  {accountEmail}
+                </p>
+              </div>
+
+              <div className="mt-4 grid gap-3">
+                <label htmlFor="cancel-checkout-email" className="block">
+                  <span className="text-[13px] font-extrabold text-[#101613]">
+                    Checkout email, if different
+                  </span>
+                  <input
+                    id="cancel-checkout-email"
+                    type="email"
+                    value={cancelCheckoutEmail}
+                    onChange={(event) => setCancelCheckoutEmail(event.target.value)}
+                    placeholder="email used at checkout"
+                    className="mt-2 min-h-12 w-full rounded-[16px] border border-[#DCE5DF] bg-white px-3.5 text-[15px] font-semibold text-[#101613] outline-none transition placeholder:text-[#9AA39D] focus:border-[#0E5A3F] focus:ring-3 focus:ring-[#0E5A3F]/15"
+                  />
+                </label>
+
+                <label htmlFor="cancel-license-key" className="block">
+                  <span className="text-[13px] font-extrabold text-[#101613]">
+                    Activation key, optional
+                  </span>
+                  <input
+                    id="cancel-license-key"
+                    type="text"
+                    value={cancelLicenseKey}
+                    onChange={(event) => setCancelLicenseKey(event.target.value)}
+                    placeholder="paste key if you have it"
+                    className="mt-2 min-h-12 w-full rounded-[16px] border border-[#DCE5DF] bg-white px-3.5 text-[15px] font-semibold text-[#101613] outline-none transition placeholder:text-[#9AA39D] focus:border-[#0E5A3F] focus:ring-3 focus:ring-[#0E5A3F]/15"
+                  />
+                </label>
+              </div>
+
+              <p className="mt-3 text-[12.5px] leading-5 text-[#56635C]">
+                We use these details only to match the correct subscription
+                during MVP support.
+              </p>
+
+              <div className="mt-4 grid gap-2">
+                <a
+                  href={manageSubscriptionUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={() => handleOpenManageSubscription("cancel_dialog")}
+                  className="inline-flex min-h-12 items-center justify-center rounded-full bg-[#0E5A3F] px-4 text-[13px] font-extrabold text-white transition hover:bg-[#0B4732] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
+                >
+                  Open cancellation page
+                </a>
+                <a
+                  href={cancellationSupportHref}
+                  onClick={handleEmailCancellationDetails}
+                  className="inline-flex min-h-12 items-center justify-center rounded-full border border-[#DCE5DF] bg-white px-4 text-[13px] font-extrabold text-[#0E5A3F] transition hover:bg-[#EDF7F1] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
+                >
+                  Email matching details
+                </a>
+              </div>
+            </section>
+          </div>
+        ) : null}
 
         {protectionPanel ? (
           <div

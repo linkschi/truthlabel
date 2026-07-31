@@ -95,11 +95,13 @@
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
-  overscroll-behavior: contain;
+  overscroll-behavior-x: none;
+  overscroll-behavior-y: auto;
   padding: 1.75rem 0.9rem;
   scrollbar-width: none;
   scroll-behavior: auto;
   touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
 }
 
 .scroller::-webkit-scrollbar {
