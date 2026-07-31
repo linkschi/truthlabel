@@ -60,7 +60,7 @@ type InstallDeviceKind =
   | "desktop"
   | "installed";
 
-type IosInstallStep = {
+type InstallGuideStep = {
   id: string;
   progress: string;
   title: string;
@@ -81,7 +81,7 @@ const totalSteps = 4;
 const setupTaskCount = 5;
 const countSequence = ["0", "500K", "1.4M", "2.6M", "3.8M", "4.3M+"];
 
-const iosInstallSteps: IosInstallStep[] = [
+const iosInstallSteps: InstallGuideStep[] = [
   {
     id: "share",
     progress: "Step 1 of 3",
@@ -105,6 +105,33 @@ const iosInstallSteps: IosInstallStep[] = [
     imageKey: "ios-confirm-install",
     imageAlt: "iPhone Add to Home Screen confirmation",
     placeholderLabel: "Install confirmation image slot",
+  },
+];
+
+const androidInstallSteps: InstallGuideStep[] = [
+  {
+    id: "browser-menu",
+    progress: "Step 1 of 3",
+    title: "Open your browser menu",
+    imageKey: "android-browser-menu",
+    imageAlt: "Android browser showing its menu button",
+    placeholderLabel: "Android browser menu image slot",
+  },
+  {
+    id: "install-app",
+    progress: "Step 2 of 3",
+    title: 'Choose "Install app" or "Add to Home screen"',
+    imageKey: "android-install-app",
+    imageAlt: "Android browser menu showing the install app option",
+    placeholderLabel: "Android install option image slot",
+  },
+  {
+    id: "confirm-install",
+    progress: "Step 3 of 3",
+    title: "Confirm the TruthLabel installation",
+    imageKey: "android-confirm-install",
+    imageAlt: "Android installation confirmation for TruthLabel",
+    placeholderLabel: "Android confirmation image slot",
   },
 ];
 
@@ -1045,7 +1072,7 @@ function SwipeCue() {
   );
 }
 
-function InstallStepCarousel({ steps }: { steps: IosInstallStep[] }) {
+function InstallStepCarousel({ steps }: { steps: InstallGuideStep[] }) {
   return (
     <div className="mt-4">
       <SwipeCue />
@@ -1424,23 +1451,7 @@ function StepFourInstall({
         <h1 className="mt-2 text-[32px] font-black leading-[1.04] tracking-[-0.04em] text-[#101613]">
           Install TruthLabel manually
         </h1>
-        <InstallCard compact>
-          <InstallStepList
-            steps={[
-              "Open your browser menu",
-              "Choose Install app or Add to Home screen",
-              "Open TruthLabel from your Home Screen",
-            ]}
-          />
-          <div className="mt-3">
-            <InstallationImagePlaceholder
-              imageKey="android-manual-install"
-              alt="Android browser installation menu"
-              label="Android install menu image slot"
-              aspectRatio="16 / 9"
-            />
-          </div>
-        </InstallCard>
+        <InstallStepCarousel steps={androidInstallSteps} />
         {installCheckStatus ? (
           <p className="mt-4 rounded-[16px] border border-[#F1DDAD] bg-[#FFFBEC] px-4 py-3 text-[13px] font-bold leading-5 text-[#8A6500]">
             {installCheckStatus}
