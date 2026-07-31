@@ -244,8 +244,8 @@ export default function PwaInstallPrompt() {
       ? "Open in Chrome to install TruthLabel"
       : "Open in Safari to install TruthLabel"
     : isAppleMobile
-      ? "Install TruthLabel on your iPhone"
-      : "Install TruthLabel on your phone";
+      ? "Install the TruthLabel app on your iPhone"
+      : "Install the TruthLabel app on your phone";
   const installSteps = isInApp
     ? isAndroid
       ? [
@@ -282,10 +282,10 @@ export default function PwaInstallPrompt() {
         </span>
         <div className="min-w-0 flex-1">
           <h2 className="text-[15px] font-extrabold text-[#101613]">
-            Install TruthLabel
+            Install the TruthLabel app
           </h2>
           <p className="mt-1 text-[12px] leading-5 text-[#66716B]">
-            Add TruthLabel to your Home Screen so it opens directly like an app whenever you shop.
+            Add TruthLabel to your Home Screen to finish installing the app for faster scanning.
           </p>
           <button
             type="button"

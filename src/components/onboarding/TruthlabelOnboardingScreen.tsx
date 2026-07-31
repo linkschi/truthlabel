@@ -1321,12 +1321,12 @@ function StepFourInstall({
   if (deviceKind === "iphone_safari" && installStage === "ios_intro") {
     return (
       <section className="flex flex-1 flex-col justify-center py-6">
-        <InstallationEyebrow>iPhone setup</InstallationEyebrow>
+        <InstallationEyebrow>Install the app</InstallationEyebrow>
         <h1 className="mt-2 text-[32px] font-black leading-[1.04] tracking-[-0.04em] text-[#101613]">
-          Add TruthLabel to your iPhone
+          Install TruthLabel on your iPhone
         </h1>
         <p className="mt-3 text-[15px] leading-6 text-[#66716B]">
-          Follow these quick Safari steps to place TruthLabel on your Home Screen.
+          This is the final setup step. Add TruthLabel to your Home Screen so it opens like an app whenever you shop.
         </p>
         <InstallCard>
           <InstallationImagePlaceholder
@@ -1343,7 +1343,7 @@ function StepFourInstall({
               setIosStepIndex(0);
             }}
           >
-            Start setup
+            Start installation
           </PrimaryButton>
           <TextButton onClick={onDefer}>Continue in browser for now</TextButton>
         </div>
@@ -1468,12 +1468,12 @@ function StepFourInstall({
   if (deviceKind === "android_prompt") {
     return (
       <section className="flex flex-1 flex-col py-6">
-        <InstallationEyebrow>Android setup</InstallationEyebrow>
+        <InstallationEyebrow>Install the app</InstallationEyebrow>
         <h1 className="mt-2 text-[32px] font-black leading-[1.04] tracking-[-0.04em] text-[#101613]">
-          Add TruthLabel to your phone
+          Install the TruthLabel app
         </h1>
         <p className="mt-3 text-[15px] leading-6 text-[#66716B]">
-          Open TruthLabel directly from your Home Screen and scan products faster while you shop.
+          Finish setup by adding TruthLabel to your Home Screen. It opens in its own app window and keeps scanning one tap away.
         </p>
         <InstallCard>
           <InstallBenefitList
@@ -1500,7 +1500,7 @@ function StepFourInstall({
   if (deviceKind === "android_fallback") {
     return (
       <section className="flex flex-1 flex-col py-6">
-        <InstallationEyebrow>Android setup</InstallationEyebrow>
+        <InstallationEyebrow>Install the app</InstallationEyebrow>
         <h1 className="mt-2 text-[32px] font-black leading-[1.04] tracking-[-0.04em] text-[#101613]">
           Install TruthLabel manually
         </h1>
@@ -1527,12 +1527,12 @@ function StepFourInstall({
   if (deviceKind === "desktop" || deviceKind === "browser_fallback") {
     return (
       <section className="flex flex-1 flex-col justify-center py-6">
-        <InstallationEyebrow>Final setup</InstallationEyebrow>
+        <InstallationEyebrow>Install the app</InstallationEyebrow>
         <h1 className="mt-2 text-[32px] font-black leading-[1.04] tracking-[-0.04em] text-[#101613]">
           Install from your phone
         </h1>
         <p className="mt-3 text-[15px] leading-6 text-[#66716B]">
-          TruthLabel works best from your phone while shopping. Open your account on Safari, Chrome, or Samsung Internet to add it to your Home Screen.
+          TruthLabel works best as an installed phone app. Open your account on Safari, Chrome, or Samsung Internet to finish installation.
         </p>
         <InstallCard>
           <p className="text-[13.5px] font-semibold leading-6 text-[#66716B]">
@@ -1549,15 +1549,15 @@ function StepFourInstall({
   return (
     <section className="flex flex-1 flex-col py-6">
       <div>
-        <InstallationEyebrow>Final setup</InstallationEyebrow>
+        <InstallationEyebrow>Install the app</InstallationEyebrow>
         <h1 className="text-[30px] font-black leading-[1.04] tracking-[-0.04em] text-[#101613]">
-          One last step
+          Install TruthLabel to finish setup
         </h1>
         <p className="mt-3 text-[15px] leading-6 text-[#66716B]">
-          Add TruthLabel to your Home Screen so you can open it instantly whenever you shop.
+          Add TruthLabel to your Home Screen now so the scanner is ready whenever you shop.
         </p>
         <p className="mt-2 text-[13.5px] font-semibold leading-5 text-[#66716B]">
-          It opens like an app and keeps your scanner one tap away.
+          This installs TruthLabel as a web app on your phone. No app store needed.
         </p>
       </div>
 
@@ -1569,7 +1569,7 @@ function StepFourInstall({
           aspectRatio="4 / 5"
         />
         <p className="mt-4 text-center text-[12.5px] font-bold text-[#66716B]">
-          You can install TruthLabel later from your Account page.
+          If you continue in browser, you can finish installing from Account later.
         </p>
       </InstallCard>
 
@@ -1695,14 +1695,13 @@ export default function TruthlabelOnboardingScreen() {
     let cancelled = false;
 
     async function loadState() {
-      if (restartMode && !restartAppliedRef.current) {
+      if (restartMode && !installReviewMode && !restartAppliedRef.current) {
         restartAppliedRef.current = true;
-        const restartStep = installReviewMode ? 4 : 1;
         const restartedState = await saveOnboardingState(userId, {
-          currentOnboardingStep: restartStep,
+          currentOnboardingStep: 1,
           onboardingStartedAt: new Date().toISOString(),
           onboardingCompletedAt: null,
-          ...(installReviewMode ? {} : { allergySetupCompleted: false }),
+          allergySetupCompleted: false,
           installPromptSeen: false,
           installPromptOutcome: null,
           appInstallStatus: "unknown",
@@ -1737,7 +1736,7 @@ export default function TruthlabelOnboardingScreen() {
         return;
       }
 
-      setStep(resolvedState.currentOnboardingStep);
+      setStep(installReviewMode ? 4 : resolvedState.currentOnboardingStep);
       setStateLoaded(true);
     }
 
@@ -2065,6 +2064,11 @@ export default function TruthlabelOnboardingScreen() {
               void finishInstallStep(outcome, installStatus);
             }}
             onFinish={(outcome, installStatus) => {
+              if (outcome === "already_installed") {
+                void handleOpenApp(outcome, installStatus);
+                return;
+              }
+
               if (installCompleted) {
                 void handleOpenApp(installOutcome, installStatusRef.current);
                 return;

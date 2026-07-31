@@ -974,8 +974,8 @@ export default function AccountScreen() {
           <RowLink
             icon="check"
             title="Install TruthLabel"
-            detail="Add TruthLabel to your Home Screen."
-            href="/app/onboarding?review=1&restart=1&install=1"
+            detail="Finish installing TruthLabel on your Home Screen."
+            href="/app/onboarding?review=1&install=1"
           />
           <RowLink
             icon="clipboard"
@@ -998,27 +998,27 @@ export default function AccountScreen() {
             <RowLink
               icon="check"
               title="Install setup - auto detect"
-              href="/app/onboarding?review=1&restart=1&install=1"
+              href="/app/onboarding?review=1&install=1"
             />
             <RowLink
               icon="camera"
               title="Test iPhone install guide"
-              href="/app/onboarding?review=1&restart=1&install=1&installEnv=iphone"
+              href="/app/onboarding?review=1&install=1&installEnv=iphone"
             />
             <RowLink
               icon="arrow"
               title="Test Instagram iPhone handoff"
-              href="/app/onboarding?review=1&restart=1&install=1&installEnv=ios-in-app"
+              href="/app/onboarding?review=1&install=1&installEnv=ios-in-app"
             />
             <RowLink
               icon="arrow"
               title="Test Instagram Android handoff"
-              href="/app/onboarding?review=1&restart=1&install=1&installEnv=android-in-app"
+              href="/app/onboarding?review=1&install=1&installEnv=android-in-app"
             />
             <RowLink
               icon="settings"
               title="Test Android manual install"
-              href="/app/onboarding?review=1&restart=1&install=1&installEnv=android-manual"
+              href="/app/onboarding?review=1&install=1&installEnv=android-manual"
             />
           </SectionCard>
         ) : null}
