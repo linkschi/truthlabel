@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import type { ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
 
@@ -10,6 +11,10 @@ type ConcernCard = {
   headline: ReactNode;
   copy: ReactNode;
   tone: ConcernTone;
+  imageSrc?: string;
+  imageAlt?: string;
+  imageWidth?: number;
+  imageHeight?: number;
 };
 
 const concernCards: ConcernCard[] = [
@@ -27,6 +32,10 @@ const concernCards: ConcernCard[] = [
       </>
     ),
     tone: "red",
+    imageSrc: "/landing-banned-carousel.jpeg",
+    imageAlt: "Banned stamp over packaged foods in a supermarket setting",
+    imageWidth: 1024,
+    imageHeight: 1280,
   },
   {
     label: "Cancer-Linked Ingredients and Foods",
@@ -51,6 +60,10 @@ const concernCards: ConcernCard[] = [
       </>
     ),
     tone: "yellow",
+    imageSrc: "/landing-misleading-carousel.jpeg",
+    imageAlt: "Protest signs and crop testing imagery related to food-label and GMO concerns",
+    imageWidth: 1280,
+    imageHeight: 1280,
   },
   {
     label: "Misleading Labels and Troubling Company Records",
@@ -78,7 +91,33 @@ const concernCards: ConcernCard[] = [
   },
 ];
 
-function ConcernIllustration({ tone }: { tone: ConcernTone }) {
+function ConcernIllustration({
+  imageAlt,
+  imageHeight,
+  imageSrc,
+  imageWidth,
+  tone,
+}: {
+  imageAlt?: string;
+  imageHeight?: number;
+  imageSrc?: string;
+  imageWidth?: number;
+  tone: ConcernTone;
+}) {
+  if (imageSrc) {
+    return (
+      <div className={`landing-concern-visual landing-concern-visual--image landing-concern-visual--${tone}`}>
+        <Image
+          className="landing-concern-image"
+          src={imageSrc}
+          alt={imageAlt ?? ""}
+          width={imageWidth ?? 1024}
+          height={imageHeight ?? 1280}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className={`landing-concern-visual landing-concern-visual--${tone}`} aria-hidden="true">
       <div className="landing-concern-visual__package">
@@ -173,7 +212,13 @@ export default function LandingConcernCarousel() {
       >
         {concernCards.map((card) => (
           <article className={`landing-concern-card landing-concern-card--${card.tone}`} key={card.label}>
-            <ConcernIllustration tone={card.tone} />
+            <ConcernIllustration
+              imageAlt={card.imageAlt}
+              imageHeight={card.imageHeight}
+              imageSrc={card.imageSrc}
+              imageWidth={card.imageWidth}
+              tone={card.tone}
+            />
             <div className="landing-concern-card__body">
               <p>{card.label}</p>
               <h3>{card.headline}</h3>
