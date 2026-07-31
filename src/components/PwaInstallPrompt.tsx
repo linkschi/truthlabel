@@ -284,9 +284,6 @@ export default function PwaInstallPrompt() {
           <h2 className="text-[15px] font-extrabold text-[#101613]">
             Install the TruthLabel app
           </h2>
-          <p className="mt-1 text-[12px] leading-5 text-[#66716B]">
-            Add TruthLabel to your Home Screen to finish installing the app for faster scanning.
-          </p>
           <button
             type="button"
             onClick={handleInstall}
@@ -313,11 +310,6 @@ export default function PwaInstallPrompt() {
           <p className="font-extrabold text-[#101613]">
             {installTitle}
           </p>
-          {isInApp ? (
-            <p className="mt-1 text-[12px] leading-5 text-[#66716B]">
-              Instagram and Facebook browsers cannot finish app installation. Open this link in Safari or Chrome first.
-            </p>
-          ) : null}
           <ol className="mt-2 grid gap-1.5">
             {installSteps.map((step, index) => (
               <li key={step} className="flex gap-2">

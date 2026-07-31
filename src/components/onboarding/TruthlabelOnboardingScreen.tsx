@@ -64,19 +64,6 @@ type IosInstallStep = {
   id: string;
   progress: string;
   title: string;
-  description: string;
-  imageKey: string;
-  imageAlt: string;
-  placeholderLabel: string;
-  help?: string;
-};
-
-type InstallationImagePlaceholderProps = {
-  imageKey: string;
-  src?: string;
-  alt: string;
-  label: string;
-  aspectRatio?: string;
 };
 
 const totalSteps = 4;
@@ -88,32 +75,16 @@ const iosInstallSteps: IosInstallStep[] = [
     id: "share",
     progress: "Step 1 of 3",
     title: "Tap Safari's Share button",
-    description: "Look for the square with the upward arrow in Safari.",
-    imageKey: "ios-share-button",
-    imageAlt: "Safari showing the TruthLabel page and Share button",
-    placeholderLabel: "Safari screenshot showing the Share button",
   },
   {
     id: "add-home-screen",
     progress: "Step 2 of 3",
     title: 'Choose "Add to Home Screen"',
-    description:
-      "Scroll through Safari's Share menu and tap Add to Home Screen.",
-    imageKey: "ios-add-to-home-screen",
-    imageAlt: "Safari Share menu showing Add to Home Screen",
-    placeholderLabel: "Safari Share menu screenshot",
-    help:
-      "Scroll to the bottom of the Share menu and tap Edit Actions. Then add Add to Home Screen to the menu.",
   },
   {
     id: "confirm",
     progress: "Step 3 of 3",
     title: "Finish adding TruthLabel",
-    description:
-      "Keep the app install setting turned on, then tap Add in the top-right corner.",
-    imageKey: "ios-confirm-install",
-    imageAlt: "iPhone Add to Home Screen confirmation",
-    placeholderLabel: "Add to Home Screen confirmation screenshot",
   },
 ];
 
@@ -407,37 +378,6 @@ function CheckIcon({ className = "" }: { className?: string }) {
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeWidth="2"
-      />
-    </svg>
-  );
-}
-
-function ImageIcon({ className = "" }: { className?: string }) {
-  return (
-    <svg
-      aria-hidden="true"
-      className={`h-7 w-7 ${className}`}
-      fill="none"
-      viewBox="0 0 24 24"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M4.75 7A2.25 2.25 0 0 1 7 4.75h10A2.25 2.25 0 0 1 19.25 7v10A2.25 2.25 0 0 1 17 19.25H7A2.25 2.25 0 0 1 4.75 17V7Z"
-        stroke="currentColor"
-        strokeWidth="1.8"
-      />
-      <path
-        d="m6.75 16.25 3.15-3.15a1.4 1.4 0 0 1 1.98 0l1.05 1.05 1.8-1.8a1.4 1.4 0 0 1 1.98 0l.54.54"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="1.8"
-      />
-      <path
-        d="M9 8.9h.01"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeWidth="2.4"
       />
     </svg>
   );
@@ -933,48 +873,6 @@ function StepThreePreparing({
   );
 }
 
-function InstallationImagePlaceholder({
-  imageKey,
-  src,
-  alt,
-  label,
-  aspectRatio = "9 / 16",
-}: InstallationImagePlaceholderProps) {
-  if (src) {
-    return (
-      <Image
-        src={src}
-        alt={alt}
-        width={390}
-        height={693}
-        className="mx-auto block h-auto w-[min(100%,390px)] rounded-[26px] object-contain shadow-[0_18px_38px_rgba(15,40,28,0.08)]"
-        data-image-key={imageKey}
-      />
-    );
-  }
-
-  return (
-    <div
-      className="mx-auto grid w-[min(100%,390px)] place-content-center gap-2.5 overflow-hidden rounded-[26px] border border-dashed border-[rgba(7,79,59,0.24)] bg-[linear-gradient(145deg,rgba(235,246,240,0.9),rgba(250,249,244,0.95))] px-5 py-6 text-center text-[#668078]"
-      style={{ aspectRatio }}
-      data-image-key={imageKey}
-      aria-label={label}
-    >
-      <ImageIcon className="mx-auto" />
-      <span
-        className={`text-[12px] font-extrabold ${
-          process.env.NODE_ENV === "production" ? "sr-only" : ""
-        }`}
-      >
-        {label}
-      </span>
-      <span className="text-[10px] font-black uppercase tracking-[0.16em] text-[#8A9B94]">
-        {imageKey}
-      </span>
-    </div>
-  );
-}
-
 function InstallationEyebrow({ children }: { children: React.ReactNode }) {
   return (
     <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#0E5A3F]">
@@ -1086,22 +984,6 @@ function InstallStepCarousel({ steps }: { steps: IosInstallStep[] }) {
             <h2 className="mt-1.5 text-[20px] font-black leading-tight tracking-[-0.03em] text-[#101613]">
               {step.title}
             </h2>
-            <p className="mt-1.5 text-[12.5px] font-semibold leading-5 text-[#66716B]">
-              {step.description}
-            </p>
-            <div className="mt-3">
-              <InstallationImagePlaceholder
-                imageKey={step.imageKey}
-                alt={step.imageAlt}
-                label={step.placeholderLabel}
-                aspectRatio="4 / 3"
-              />
-            </div>
-            {step.help ? (
-              <p className="mt-2.5 rounded-[14px] bg-[#F3FAF6] px-3 py-2 text-[11.5px] font-semibold leading-5 text-[#56635C]">
-                Tip: {step.help}
-              </p>
-            ) : null}
             <div className="mt-3 flex justify-center gap-1.5" aria-hidden="true">
               {steps.map((dotStep, dotIndex) => (
                 <span
@@ -1330,7 +1212,6 @@ function StepFourInstall({
 
   if (isInApp || isIphoneOtherBrowser) {
     const isAndroid = deviceKind === "android_in_app";
-    const imageKey = isAndroid ? "in-app-open-chrome" : "in-app-open-safari";
 
     return (
       <section className="flex flex-1 flex-col py-6">
@@ -1343,14 +1224,9 @@ function StepFourInstall({
               ? "Open this link in Chrome to install TruthLabel"
               : "Open this link in Safari to install TruthLabel"}
           </h1>
-          <p className="mt-3 text-[15px] leading-6 text-[#66716B]">
-            {isAndroid
-              ? "Instagram and Facebook browsers cannot finish app installation. Open this page in Chrome or Samsung Internet, then install the app there."
-              : "Instagram and Facebook browsers cannot finish app installation. Open this page in Safari first, then install the app from there."}
-          </p>
         </div>
 
-        <InstallCard>
+        <InstallCard compact>
           <InstallStepList
             steps={
               isAndroid
@@ -1366,13 +1242,6 @@ function StepFourInstall({
                   ]
             }
           />
-          <div className="mt-5">
-            <InstallationImagePlaceholder
-              imageKey={imageKey}
-              alt="Instagram browser handoff screenshot"
-              label="Instagram browser handoff screenshot"
-            />
-          </div>
         </InstallCard>
 
         {copyStatus ? (
@@ -1421,10 +1290,7 @@ function StepFourInstall({
         <h1 className="mt-2 text-[32px] font-black leading-[1.04] tracking-[-0.04em] text-[#101613]">
           Install the TruthLabel app
         </h1>
-        <p className="mt-3 text-[15px] leading-6 text-[#66716B]">
-          Finish setup by adding TruthLabel to your Home Screen. It opens in its own app window and keeps scanning one tap away.
-        </p>
-        <InstallCard>
+        <InstallCard compact>
           <InstallBenefitList
             items={[
               "One-tap access",
@@ -1432,9 +1298,6 @@ function StepFourInstall({
               "No need to search for the website",
             ]}
           />
-          <p className="mt-4 text-[12.5px] font-bold text-[#66716B]">
-            Free to install. No app store required.
-          </p>
         </InstallCard>
         <div className="mt-auto pt-6">
           <PrimaryButton onClick={handlePrimaryAction} disabled={promptBusy || isSaving}>
@@ -1453,14 +1316,13 @@ function StepFourInstall({
         <h1 className="mt-2 text-[32px] font-black leading-[1.04] tracking-[-0.04em] text-[#101613]">
           Install TruthLabel manually
         </h1>
-        <p className="mt-3 text-[15px] leading-6 text-[#66716B]">
-          Open your browser menu and choose Install app or Add to Home screen, then confirm the installation.
-        </p>
-        <InstallCard>
-          <InstallationImagePlaceholder
-            imageKey="android-manual-install"
-            alt="Android browser installation menu"
-            label="Android browser installation menu screenshot"
+        <InstallCard compact>
+          <InstallStepList
+            steps={[
+              "Open your browser menu",
+              "Choose Install app or Add to Home screen",
+              "Open TruthLabel from your Home Screen",
+            ]}
           />
         </InstallCard>
         {installCheckStatus ? (
@@ -1485,14 +1347,6 @@ function StepFourInstall({
         <h1 className="mt-2 text-[32px] font-black leading-[1.04] tracking-[-0.04em] text-[#101613]">
           Install from your phone
         </h1>
-        <p className="mt-3 text-[15px] leading-6 text-[#66716B]">
-          TruthLabel works best as an installed phone app. Open your account on Safari, Chrome, or Samsung Internet to finish installation.
-        </p>
-        <InstallCard>
-          <p className="text-[13.5px] font-semibold leading-6 text-[#66716B]">
-            You can use the browser for now and install TruthLabel later from your Account page.
-          </p>
-        </InstallCard>
         <div className="mt-6">
           <PrimaryButton onClick={onDefer}>Continue in browser for now</PrimaryButton>
         </div>
@@ -1507,24 +1361,16 @@ function StepFourInstall({
         <h1 className="text-[30px] font-black leading-[1.04] tracking-[-0.04em] text-[#101613]">
           Install TruthLabel to finish setup
         </h1>
-        <p className="mt-3 text-[15px] leading-6 text-[#66716B]">
-          Add TruthLabel to your Home Screen now so the scanner is ready whenever you shop.
-        </p>
-        <p className="mt-2 text-[13.5px] font-semibold leading-5 text-[#66716B]">
-          This installs the TruthLabel app on your phone. No app store needed.
-        </p>
       </div>
 
-      <InstallCard>
-        <InstallationImagePlaceholder
-          imageKey="install-opening"
-          alt="TruthLabel app installation preview"
-          label="TruthLabel installation preview screenshot"
-          aspectRatio="4 / 5"
+      <InstallCard compact>
+        <InstallBenefitList
+          items={[
+            "Install TruthLabel on this phone",
+            "Open it from your Home Screen",
+            "Keep scanning one tap away",
+          ]}
         />
-        <p className="mt-4 text-center text-[12.5px] font-bold text-[#66716B]">
-          If you continue in browser, you can finish installing from Account later.
-        </p>
       </InstallCard>
 
       <div className="mt-auto pt-6">
