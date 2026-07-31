@@ -50,6 +50,10 @@ const concernCards: ConcernCard[] = [
       </>
     ),
     tone: "red",
+    imageSrc: "/landing-cancer-carousel.jpeg",
+    imageAlt: "Processed snack foods and packaged products in a supermarket aisle",
+    imageWidth: 851,
+    imageHeight: 1280,
   },
   {
     label: "Lab-Made and Bioengineered Food",
@@ -60,10 +64,6 @@ const concernCards: ConcernCard[] = [
       </>
     ),
     tone: "yellow",
-    imageSrc: "/landing-misleading-carousel.jpeg",
-    imageAlt: "Protest signs and crop testing imagery related to food-label and GMO concerns",
-    imageWidth: 1280,
-    imageHeight: 1280,
   },
   {
     label: "Misleading Labels and Troubling Company Records",
@@ -78,6 +78,10 @@ const concernCards: ConcernCard[] = [
       </>
     ),
     tone: "yellow",
+    imageSrc: "/landing-misleading-carousel.jpeg",
+    imageAlt: "Protest signs and crop testing imagery related to food-label and GMO concerns",
+    imageWidth: 1280,
+    imageHeight: 1280,
   },
   {
     label: "Hundreds More Review Signals",
