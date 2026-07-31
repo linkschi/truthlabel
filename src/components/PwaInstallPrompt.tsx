@@ -262,10 +262,10 @@ export default function PwaInstallPrompt() {
       ? [
           "Tap Safari's Share button",
           "Choose Add to Home Screen",
-          "Keep Open as Web App turned on, then tap Add",
+          "Keep the app install setting turned on, then tap Add",
         ]
       : [
-          hasNativePrompt ? "Tap Install TruthLabel below" : "Open your browser menu",
+          hasNativePrompt ? "Tap Install this app below" : "Open your browser menu",
           hasNativePrompt ? "Confirm the install prompt" : "Choose Install app or Add to Home screen",
           "Open TruthLabel from your Home Screen",
         ];
@@ -293,7 +293,7 @@ export default function PwaInstallPrompt() {
             className="mt-3 inline-flex min-h-9 items-center gap-2 rounded-full bg-[#0E5A3F] px-4 text-[12px] font-bold text-white outline-none transition active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2"
           >
             <InstallGlyph />
-            {hasNativePrompt && !isInApp ? "Install TruthLabel" : "Show installation steps"}
+            {hasNativePrompt && !isInApp ? "Install this app" : "Show installation steps"}
           </button>
         </div>
         <button

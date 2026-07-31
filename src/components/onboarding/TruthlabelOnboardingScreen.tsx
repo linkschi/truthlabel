@@ -110,7 +110,7 @@ const iosInstallSteps: IosInstallStep[] = [
     progress: "Step 3 of 3",
     title: "Finish adding TruthLabel",
     description:
-      "Keep Open as Web App turned on, then tap Add in the top-right corner.",
+      "Keep the app install setting turned on, then tap Add in the top-right corner.",
     imageKey: "ios-confirm-install",
     imageAlt: "iPhone Add to Home Screen confirmation",
     placeholderLabel: "Add to Home Screen confirmation screenshot",
@@ -1034,23 +1034,55 @@ function InstallStepList({ steps }: { steps: string[] }) {
   );
 }
 
-function InstallProgressDots({
-  total,
-  current,
-}: {
-  total: number;
-  current: number;
-}) {
+function InstallStepCarousel({ steps }: { steps: IosInstallStep[] }) {
   return (
-    <div className="mt-4 flex justify-center gap-2" aria-label={`Step ${current + 1} of ${total}`}>
-      {Array.from({ length: total }, (_, index) => (
-        <span
-          key={index}
-          className={`h-2 rounded-full transition-all ${
-            index === current ? "w-7 bg-[#0E5A3F]" : "w-2 bg-[#D7E7DD]"
-          }`}
-        />
-      ))}
+    <div className="mt-5">
+      <p className="text-[12px] font-black uppercase tracking-[0.16em] text-[#66716B]">
+        Swipe through the installation steps
+      </p>
+      <div
+        className="-mx-5 mt-3 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        aria-label="TruthLabel installation steps"
+      >
+        {steps.map((step, index) => (
+          <article
+            key={step.id}
+            className="min-w-[86%] snap-center rounded-[26px] border border-[#D7E7DD] bg-white px-4 py-4 shadow-[0_14px_34px_rgba(15,40,28,0.07)]"
+          >
+            <p className="text-[11px] font-black uppercase tracking-[0.14em] text-[#0E5A3F]">
+              {step.progress}
+            </p>
+            <h2 className="mt-2 text-[22px] font-black leading-tight tracking-[-0.03em] text-[#101613]">
+              {step.title}
+            </h2>
+            <p className="mt-2 text-[13.5px] font-semibold leading-6 text-[#66716B]">
+              {step.description}
+            </p>
+            <div className="mt-4">
+              <InstallationImagePlaceholder
+                imageKey={step.imageKey}
+                alt={step.imageAlt}
+                label={step.placeholderLabel}
+              />
+            </div>
+            {step.help ? (
+              <p className="mt-3 rounded-[14px] bg-[#F3FAF6] px-3 py-2 text-[12px] font-semibold leading-5 text-[#56635C]">
+                Tip: {step.help}
+              </p>
+            ) : null}
+            <div className="mt-4 flex justify-center gap-1.5" aria-hidden="true">
+              {steps.map((dotStep, dotIndex) => (
+                <span
+                  key={dotStep.id}
+                  className={`h-1.5 rounded-full ${
+                    dotIndex === index ? "w-6 bg-[#0E5A3F]" : "w-1.5 bg-[#D7E7DD]"
+                  }`}
+                />
+              ))}
+            </div>
+          </article>
+        ))}
+      </div>
     </div>
   );
 }
@@ -1082,11 +1114,10 @@ function StepFourInstall({
 }) {
   const [promptBusy, setPromptBusy] = useState(false);
   const [installStage, setInstallStage] = useState<
-    "opening" | "ios_intro" | "ios_step" | "ios_live"
+    "opening" | "ios_intro"
   >("opening");
-  const [iosStepIndex, setIosStepIndex] = useState(0);
-  const [iosHelpOpen, setIosHelpOpen] = useState(false);
   const [copyStatus, setCopyStatus] = useState("");
+  const [installCheckStatus, setInstallCheckStatus] = useState("");
   const deviceKind = useMemo(
     () => getInstallDeviceKind(deferredPrompt, installDeviceOverride),
     [deferredPrompt, installDeviceOverride],
@@ -1098,9 +1129,8 @@ function StepFourInstall({
   useEffect(() => {
     const resetHandle = window.setTimeout(() => {
       setInstallStage("opening");
-      setIosStepIndex(0);
-      setIosHelpOpen(false);
       setCopyStatus("");
+      setInstallCheckStatus("");
     }, 0);
 
     return () => window.clearTimeout(resetHandle);
@@ -1193,7 +1223,7 @@ function StepFourInstall({
     }
 
     if (deviceKind === "android_fallback") {
-      onFinish("manual_confirmed", "manual_confirmed");
+      handleCheckInstallation();
       return;
     }
 
@@ -1203,6 +1233,17 @@ function StepFourInstall({
     }
 
     onDefer();
+  }
+
+  function handleCheckInstallation() {
+    if (isStandaloneMode() || installCompleted) {
+      onFinish("already_installed", "installed");
+      return;
+    }
+
+    setInstallCheckStatus(
+      "TruthLabel is not opening as the installed app yet. Open it from your Home Screen, or continue in the browser for now.",
+    );
   }
 
   if (installCompleted) {
@@ -1312,7 +1353,7 @@ function StepFourInstall({
           <PrimaryButton onClick={handlePrimaryAction} disabled={isSaving}>
             Copy secure setup link
           </PrimaryButton>
-          <TextButton onClick={onDefer}>Continue here for now</TextButton>
+          <TextButton onClick={onDefer}>Continue in browser for now</TextButton>
         </div>
       </section>
     );
@@ -1320,145 +1361,24 @@ function StepFourInstall({
 
   if (deviceKind === "iphone_safari" && installStage === "ios_intro") {
     return (
-      <section className="flex flex-1 flex-col justify-center py-6">
+      <section className="flex flex-1 flex-col py-6">
         <InstallationEyebrow>Install the app</InstallationEyebrow>
         <h1 className="mt-2 text-[32px] font-black leading-[1.04] tracking-[-0.04em] text-[#101613]">
-          Install TruthLabel on your iPhone
+          Install TruthLabel on this iPhone
         </h1>
         <p className="mt-3 text-[15px] leading-6 text-[#66716B]">
-          This is the final setup step. Add TruthLabel to your Home Screen so it opens like an app whenever you shop.
+          Finish setup by adding TruthLabel to your Home Screen. Swipe through the steps, install the app, then open it from your Home Screen.
         </p>
-        <InstallCard>
-          <InstallationImagePlaceholder
-            imageKey="ios-install-intro"
-            alt="iPhone Home Screen installation introduction"
-            label="iPhone installation introduction screenshot"
-            aspectRatio="4 / 5"
-          />
-        </InstallCard>
+        <InstallStepCarousel steps={iosInstallSteps} />
+        {installCheckStatus ? (
+          <p className="mt-4 rounded-[16px] border border-[#F1DDAD] bg-[#FFFBEC] px-4 py-3 text-[13px] font-bold leading-5 text-[#8A6500]">
+            {installCheckStatus}
+          </p>
+        ) : null}
         <div className="mt-auto pt-6">
-          <PrimaryButton
-            onClick={() => {
-              setInstallStage("ios_step");
-              setIosStepIndex(0);
-            }}
-          >
-            Start installation
+          <PrimaryButton onClick={handleCheckInstallation} disabled={isSaving}>
+            {isSaving ? "Checking..." : "Check if TruthLabel is installed"}
           </PrimaryButton>
-          <TextButton onClick={onDefer}>Continue in browser for now</TextButton>
-        </div>
-      </section>
-    );
-  }
-
-  if (deviceKind === "iphone_safari" && installStage === "ios_step") {
-    const step = iosInstallSteps[iosStepIndex] ?? iosInstallSteps[0];
-    const isLastStep = iosStepIndex >= iosInstallSteps.length - 1;
-
-    return (
-      <section className="flex flex-1 flex-col py-6">
-        <div className="flex items-center justify-between gap-3">
-          <button
-            type="button"
-            onClick={() => {
-              if (iosStepIndex === 0) {
-                setInstallStage("ios_intro");
-                return;
-              }
-
-              setIosStepIndex((current) => Math.max(0, current - 1));
-            }}
-            className="min-h-10 rounded-full border border-[#D7E7DD] bg-white px-4 text-[12px] font-bold text-[#0E5A3F] outline-none focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2"
-          >
-            Back
-          </button>
-          <p className="text-[12px] font-black uppercase tracking-[0.16em] text-[#66716B]">
-            {step.progress}
-          </p>
-          <button
-            type="button"
-            onClick={() => setInstallStage("opening")}
-            className="min-h-10 rounded-full px-4 text-[12px] font-bold text-[#66716B] outline-none focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2"
-          >
-            Close
-          </button>
-        </div>
-
-        <div className="mt-6">
-          <h1 className="text-[30px] font-black leading-[1.04] tracking-[-0.04em] text-[#101613]">
-            {step.title}
-          </h1>
-          <p className="mt-3 text-[15px] leading-6 text-[#66716B]">
-            {step.description}
-          </p>
-        </div>
-
-        <InstallCard>
-          <InstallationImagePlaceholder
-            imageKey={step.imageKey}
-            alt={step.imageAlt}
-            label={step.placeholderLabel}
-          />
-          {step.help ? (
-            <div className="mt-4">
-              <button
-                type="button"
-                onClick={() => setIosHelpOpen((current) => !current)}
-                className="text-[13px] font-extrabold text-[#0E5A3F] underline-offset-4 outline-none hover:underline focus-visible:rounded-full focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2"
-              >
-                Can&apos;t find it?
-              </button>
-              {iosHelpOpen ? (
-                <p className="mt-2 rounded-[14px] bg-[#F3FAF6] px-3 py-2 text-[12.5px] font-semibold leading-5 text-[#56635C]">
-                  {step.help}
-                </p>
-              ) : null}
-            </div>
-          ) : null}
-        </InstallCard>
-
-        <InstallProgressDots total={iosInstallSteps.length} current={iosStepIndex} />
-
-        <div className="mt-auto pt-6">
-          <PrimaryButton
-            onClick={() => {
-              if (isLastStep) {
-                setInstallStage("ios_live");
-                return;
-              }
-
-              setIosHelpOpen(false);
-              setIosStepIndex((current) =>
-                Math.min(iosInstallSteps.length - 1, current + 1),
-              );
-            }}
-          >
-            {isLastStep ? "Install TruthLabel now" : "Next step"}
-          </PrimaryButton>
-        </div>
-      </section>
-    );
-  }
-
-  if (deviceKind === "iphone_safari" && installStage === "ios_live") {
-    return (
-      <section className="flex flex-1 flex-col py-6 pb-[calc(120px+env(safe-area-inset-bottom))]">
-        <InstallCard compact>
-          <h1 className="text-[24px] font-black tracking-[-0.03em] text-[#101613]">
-            Now install TruthLabel
-          </h1>
-          <InstallStepList
-            steps={[
-              "Open Safari's Share menu",
-              "Choose Add to Home Screen",
-              "Keep Open as Web App turned on and tap Add",
-            ]}
-          />
-          <p className="mt-4 text-[13px] font-semibold leading-5 text-[#66716B]">
-            This guide will still be here if you return to Safari.
-          </p>
-        </InstallCard>
-        <div className="mt-5">
           <TextButton onClick={onDefer}>Continue in browser for now</TextButton>
         </div>
       </section>
@@ -1514,9 +1434,14 @@ function StepFourInstall({
             label="Android browser installation menu screenshot"
           />
         </InstallCard>
+        {installCheckStatus ? (
+          <p className="mt-4 rounded-[16px] border border-[#F1DDAD] bg-[#FFFBEC] px-4 py-3 text-[13px] font-bold leading-5 text-[#8A6500]">
+            {installCheckStatus}
+          </p>
+        ) : null}
         <div className="mt-auto pt-6">
           <PrimaryButton onClick={handlePrimaryAction} disabled={isSaving}>
-            I&apos;ve installed it
+            {isSaving ? "Checking..." : "Check if TruthLabel is installed"}
           </PrimaryButton>
           <TextButton onClick={onDefer}>Continue in browser for now</TextButton>
         </div>
@@ -1557,7 +1482,7 @@ function StepFourInstall({
           Add TruthLabel to your Home Screen now so the scanner is ready whenever you shop.
         </p>
         <p className="mt-2 text-[13.5px] font-semibold leading-5 text-[#66716B]">
-          This installs TruthLabel as a web app on your phone. No app store needed.
+          This installs the TruthLabel app on your phone. No app store needed.
         </p>
       </div>
 
@@ -1575,11 +1500,7 @@ function StepFourInstall({
 
       <div className="mt-auto pt-6">
         <PrimaryButton onClick={handlePrimaryAction} disabled={promptBusy || isSaving}>
-          {promptBusy || isSaving
-            ? "Opening installation..."
-            : deviceKind === "iphone_safari"
-              ? "Show me how"
-              : "Install TruthLabel"}
+          {promptBusy || isSaving ? "Opening installation..." : "Install this app"}
         </PrimaryButton>
         <TextButton onClick={onDefer}>
           {skipVisible ? "Continue in browser for now" : "Continue in browser for now"}
