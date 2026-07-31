@@ -720,6 +720,7 @@ export default function AccountScreen() {
   const [confirmationAction, setConfirmationAction] =
     useState<ConfirmationAction | null>(null);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [cancelReceiptHelpOpen, setCancelReceiptHelpOpen] = useState(false);
   const [cancelCheckoutEmail, setCancelCheckoutEmail] = useState("");
   const [scanHistoryCount, setScanHistoryCount] = useState<number | null>(null);
   const hasMvpAccessPass = useSyncExternalStore(
@@ -743,6 +744,9 @@ export default function AccountScreen() {
   );
   const accessIsActive = accessStatus.label === "Active" || accessStatus.label === "Access ending";
   const cancelButtonVisible = accessState !== "loading";
+  const cancelCheckoutEmailReady = /\S+@\S+\.\S+/.test(
+    cancelCheckoutEmail.trim(),
+  );
   const cancellationSupportHref = buildSupportMailtoHref({
     subject: "Truthlabel receipt resend request",
     body: buildCancellationSupportBody({
@@ -772,7 +776,7 @@ export default function AccountScreen() {
     function handleEscape(event: KeyboardEvent) {
       if (event.key === "Escape") {
         setProtectionPanel(null);
-        setCancelDialogOpen(false);
+        closeCancelDialog();
       }
     }
 
@@ -784,6 +788,11 @@ export default function AccountScreen() {
       window.removeEventListener("keydown", handleEscape);
     };
   }, [cancelDialogOpen, protectionPanel]);
+
+  function closeCancelDialog() {
+    setCancelDialogOpen(false);
+    setCancelReceiptHelpOpen(false);
+  }
 
   useEffect(() => {
     const loadHandle = window.setTimeout(() => {
@@ -819,6 +828,7 @@ export default function AccountScreen() {
       },
       { userId: user?.id },
     );
+    setCancelReceiptHelpOpen(false);
     setCancelDialogOpen(true);
   }
 
@@ -832,6 +842,7 @@ export default function AccountScreen() {
       },
       { userId: user?.id },
     );
+    setCancelReceiptHelpOpen(false);
     setCancelDialogOpen(true);
   }
 
@@ -1216,7 +1227,7 @@ export default function AccountScreen() {
           <div
             className="fixed inset-0 z-50 flex items-end bg-[#101613]/45 px-4 py-4 sm:items-center"
             role="presentation"
-            onClick={() => setCancelDialogOpen(false)}
+            onClick={closeCancelDialog}
           >
             <section
               role="dialog"
@@ -1242,7 +1253,7 @@ export default function AccountScreen() {
                 </div>
                 <button
                   type="button"
-                  onClick={() => setCancelDialogOpen(false)}
+                  onClick={closeCancelDialog}
                   className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#DCE5DF] bg-[#F7F9F7] text-[18px] font-bold text-[#0E5A3F] transition hover:bg-[#EDF7F1] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2"
                   aria-label="Close cancellation options"
                 >
@@ -1250,53 +1261,78 @@ export default function AccountScreen() {
                 </button>
               </div>
 
-              <div className="mt-4 rounded-[18px] border border-[#DCE5DF] bg-[#F7F9F7] px-3 py-3">
-                <p className="text-[11px] font-black uppercase tracking-[0.14em] text-[#56635C]">
-                  Signed-in account, included automatically
-                </p>
-                <p className="mt-1 break-all text-[13px] font-extrabold text-[#101613]">
-                  {accountFirstName ? `${accountFirstName} - ` : ""}
-                  {accountEmail}
-                </p>
-              </div>
-
-              <div className="mt-4 grid gap-3">
-                <label htmlFor="cancel-checkout-email" className="block">
-                  <span className="text-[13px] font-extrabold text-[#101613]">
-                    Checkout or billing email
-                  </span>
-                  <input
-                    id="cancel-checkout-email"
-                    type="email"
-                    value={cancelCheckoutEmail}
-                    onChange={(event) => setCancelCheckoutEmail(event.target.value)}
-                    placeholder="email used at checkout"
-                    className="mt-2 min-h-12 w-full rounded-[16px] border border-[#DCE5DF] bg-white px-3.5 text-[15px] font-semibold text-[#101613] outline-none transition placeholder:text-[#9AA39D] focus:border-[#0E5A3F] focus:ring-3 focus:ring-[#0E5A3F]/15"
-                  />
-                </label>
-              </div>
-
-              <p className="mt-3 text-[12.5px] leading-5 text-[#56635C]">
-                Only add this if it may be different from your signed-in email.
-                We use it to find the right receipt and send it back to you.
-              </p>
-
               <div className="mt-4 grid gap-2">
-                <a
-                  href={cancellationSupportHref}
-                  onClick={handleEmailCancellationDetails}
-                  className="inline-flex min-h-12 items-center justify-center rounded-full bg-[#0E5A3F] px-4 text-[13px] font-extrabold text-white transition hover:bg-[#0B4732] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
-                >
-                  Request receipt resend
-                </a>
                 <button
                   type="button"
-                  onClick={() => setCancelDialogOpen(false)}
-                  className="inline-flex min-h-12 items-center justify-center rounded-full border border-[#DCE5DF] bg-white px-4 text-[13px] font-extrabold text-[#0E5A3F] transition hover:bg-[#EDF7F1] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
+                  onClick={closeCancelDialog}
+                  className="inline-flex min-h-12 items-center justify-center rounded-full bg-[#0E5A3F] px-4 text-[13px] font-extrabold text-white transition hover:bg-[#0B4732] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
                 >
                   I will check my receipt email
                 </button>
+                <button
+                  type="button"
+                  onClick={() => setCancelReceiptHelpOpen((isOpen) => !isOpen)}
+                  aria-expanded={cancelReceiptHelpOpen}
+                  className="inline-flex min-h-12 items-center justify-center rounded-full border border-[#DCE5DF] bg-white px-4 text-[13px] font-extrabold text-[#0E5A3F] transition hover:bg-[#EDF7F1] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
+                >
+                  I cannot find my receipt
+                </button>
               </div>
+
+              {cancelReceiptHelpOpen ? (
+                <div className="mt-4 rounded-[20px] border border-[#DCE5DF] bg-[#F7F9F7] px-3 py-3">
+                  <p className="text-[13px] font-extrabold text-[#101613]">
+                    We can resend it for you.
+                  </p>
+                  <p className="mt-1.5 text-[12.5px] leading-5 text-[#56635C]">
+                    Enter the email you used at checkout. Your signed-in
+                    account is included automatically so we can match the
+                    request.
+                  </p>
+
+                  <div className="mt-3 rounded-[16px] border border-[#DCE5DF] bg-white px-3 py-2.5">
+                    <p className="text-[10.5px] font-black uppercase tracking-[0.14em] text-[#56635C]">
+                      Signed-in account
+                    </p>
+                    <p className="mt-1 break-all text-[12.5px] font-extrabold text-[#101613]">
+                      {accountFirstName ? `${accountFirstName} - ` : ""}
+                      {accountEmail}
+                    </p>
+                  </div>
+
+                  <label htmlFor="cancel-checkout-email" className="mt-3 block">
+                    <span className="text-[13px] font-extrabold text-[#101613]">
+                      Email used at checkout
+                    </span>
+                    <input
+                      id="cancel-checkout-email"
+                      type="email"
+                      value={cancelCheckoutEmail}
+                      onChange={(event) => setCancelCheckoutEmail(event.target.value)}
+                      placeholder="email used at checkout"
+                      className="mt-2 min-h-12 w-full rounded-[16px] border border-[#DCE5DF] bg-white px-3.5 text-[15px] font-semibold text-[#101613] outline-none transition placeholder:text-[#9AA39D] focus:border-[#0E5A3F] focus:ring-3 focus:ring-[#0E5A3F]/15"
+                    />
+                  </label>
+
+                  {cancelCheckoutEmailReady ? (
+                    <a
+                      href={cancellationSupportHref}
+                      onClick={handleEmailCancellationDetails}
+                      className="mt-3 inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[#0E5A3F] px-4 text-[13px] font-extrabold text-white transition hover:bg-[#0B4732] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
+                    >
+                      Request receipt resend
+                    </a>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled
+                      className="mt-3 inline-flex min-h-12 w-full cursor-not-allowed items-center justify-center rounded-full bg-[#DCE5DF] px-4 text-[13px] font-extrabold text-[#56635C]"
+                    >
+                      Enter checkout email to continue
+                    </button>
+                  )}
+                </div>
+              ) : null}
             </section>
           </div>
         ) : null}
