@@ -283,7 +283,12 @@ function isInAppBrowser() {
 
 function getInstallDeviceKind(
   deferredPrompt: BeforeInstallPromptEvent | null,
+  override?: InstallDeviceKind | null,
 ): InstallDeviceKind {
+  if (override) {
+    return override;
+  }
+
   if (isStandaloneMode()) {
     return "installed";
   }
@@ -309,6 +314,29 @@ function getInstallDeviceKind(
   }
 
   return "desktop";
+}
+
+function getInstallDeviceKindOverride(
+  value: string | null,
+): InstallDeviceKind | null {
+  switch (value) {
+    case "ios-in-app":
+      return "ios_in_app";
+    case "android-in-app":
+      return "android_in_app";
+    case "iphone":
+      return "iphone_safari";
+    case "iphone-other":
+      return "iphone_other";
+    case "android-manual":
+      return "android_fallback";
+    case "desktop":
+      return "desktop";
+    case "installed":
+      return "installed";
+    default:
+      return null;
+  }
 }
 
 function ProgressRing({
@@ -1029,6 +1057,7 @@ function InstallProgressDots({
 
 function StepFourInstall({
   deferredPrompt,
+  installDeviceOverride,
   skipVisible,
   installCompleted,
   isSaving,
@@ -1037,6 +1066,7 @@ function StepFourInstall({
   onDefer,
 }: {
   deferredPrompt: BeforeInstallPromptEvent | null;
+  installDeviceOverride?: InstallDeviceKind | null;
   skipVisible: boolean;
   installCompleted: boolean;
   isSaving: boolean;
@@ -1058,8 +1088,8 @@ function StepFourInstall({
   const [iosHelpOpen, setIosHelpOpen] = useState(false);
   const [copyStatus, setCopyStatus] = useState("");
   const deviceKind = useMemo(
-    () => getInstallDeviceKind(deferredPrompt),
-    [deferredPrompt],
+    () => getInstallDeviceKind(deferredPrompt, installDeviceOverride),
+    [deferredPrompt, installDeviceOverride],
   );
   const isInstalled = deviceKind === "installed";
   const isInApp = deviceKind === "ios_in_app" || deviceKind === "android_in_app";
@@ -1589,6 +1619,9 @@ export default function TruthlabelOnboardingScreen() {
   const reviewMode = searchParams.get("review") === "1";
   const restartMode = reviewMode && searchParams.get("restart") === "1";
   const installReviewMode = reviewMode && searchParams.get("install") === "1";
+  const installDeviceOverride = isThiislincornOnboardingTestAccount(user?.email)
+    ? getInstallDeviceKindOverride(searchParams.get("installEnv"))
+    : null;
   const [isPending, startTransition] = useTransition();
   const [hasMvpAccessPass, setHasMvpAccessPass] = useState(
     () => typeof window !== "undefined" && hasMvpActivationAccess(),
@@ -2022,6 +2055,7 @@ export default function TruthlabelOnboardingScreen() {
         return (
           <StepFourInstall
             deferredPrompt={deferredPrompt}
+            installDeviceOverride={installDeviceOverride}
             skipVisible={skipInstallVisible}
             installCompleted={installCompleted}
             isSaving={isPending}
@@ -2053,6 +2087,7 @@ export default function TruthlabelOnboardingScreen() {
     handleNoAllergens,
     handleOpenApp,
     handleSaveAllergies,
+    installDeviceOverride,
     installCompleted,
     installOutcome,
     isPending,

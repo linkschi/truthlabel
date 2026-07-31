@@ -15,6 +15,7 @@ import {
   getBrowserStorageNotice,
   safeLocalStorageRemoveItem,
 } from "@/lib/browserStorage";
+import { isThiislincornOnboardingTestAccount } from "@/lib/onboarding/onboardingTestMode";
 import {
   clearScanHistory,
   listScanHistory,
@@ -704,6 +705,7 @@ export default function AccountScreen() {
   const allergyCount = settings.allergyProfile.allergens.length;
   const customIngredientCount = settings.allergyProfile.customAllergens.length;
   const foodPreferenceCount = profile.avoid.length;
+  const isThiislincornTester = isThiislincornOnboardingTestAccount(user?.email);
 
   useEffect(() => {
     if (!protectionPanel) {
@@ -981,6 +983,45 @@ export default function AccountScreen() {
             href="/app/onboarding?review=1&restart=1"
           />
         </SectionCard>
+
+        {isThiislincornTester ? (
+          <SectionCard title="Thiislincorn tester shortcuts">
+            <p className="pb-2 text-[12.5px] font-semibold leading-5 text-[#56635C]">
+              Visible only on thiislincorn test accounts. Use these buttons to
+              replay setup screens quickly.
+            </p>
+            <RowLink
+              icon="clipboard"
+              title="Replay full onboarding"
+              href="/app/onboarding?review=1&restart=1"
+            />
+            <RowLink
+              icon="check"
+              title="Install setup - auto detect"
+              href="/app/onboarding?review=1&restart=1&install=1"
+            />
+            <RowLink
+              icon="camera"
+              title="Test iPhone install guide"
+              href="/app/onboarding?review=1&restart=1&install=1&installEnv=iphone"
+            />
+            <RowLink
+              icon="arrow"
+              title="Test Instagram iPhone handoff"
+              href="/app/onboarding?review=1&restart=1&install=1&installEnv=ios-in-app"
+            />
+            <RowLink
+              icon="arrow"
+              title="Test Instagram Android handoff"
+              href="/app/onboarding?review=1&restart=1&install=1&installEnv=android-in-app"
+            />
+            <RowLink
+              icon="settings"
+              title="Test Android manual install"
+              href="/app/onboarding?review=1&restart=1&install=1&installEnv=android-manual"
+            />
+          </SectionCard>
+        ) : null}
 
         <SectionCard title="Privacy and security">
           <RowLink icon="lock" title="Change password" href="/update-password" />
