@@ -221,8 +221,8 @@ export default function PwaInstallPrompt() {
       await navigator.clipboard.writeText(payload.setupUrl);
       setCopyStatus(
         isAndroid
-          ? "Setup link copied. Open Chrome, paste the link, and continue installing TruthLabel."
-          : "Setup link copied. Open Safari, paste the link, and continue installing TruthLabel.",
+          ? "Install link copied. Open Chrome, paste the link, then install TruthLabel from there."
+          : "Install link copied. Open Safari, paste the link, then install TruthLabel from there.",
       );
     } catch {
       setCopyStatus("Copy failed. Use your browser menu to open this page in Safari or Chrome.");
@@ -251,12 +251,12 @@ export default function PwaInstallPrompt() {
       ? [
           "Tap the browser menu",
           "Choose Open in Chrome, Open in browser, or Open in external browser",
-          "Continue installing TruthLabel there",
+          "Install the TruthLabel app there",
         ]
       : [
           "Tap the browser menu",
           "Choose Open in Safari or Open in external browser",
-          "Continue installing TruthLabel in Safari",
+          "Install the TruthLabel app from Safari",
         ]
     : isAppleMobile
       ? [
@@ -315,7 +315,7 @@ export default function PwaInstallPrompt() {
           </p>
           {isInApp ? (
             <p className="mt-1 text-[12px] leading-5 text-[#66716B]">
-              This browser cannot complete app installation. Open TruthLabel in your phone browser first.
+              Instagram and Facebook browsers cannot finish app installation. Open this link in Safari or Chrome first.
             </p>
           ) : null}
           <ol className="mt-2 grid gap-1.5">
@@ -335,7 +335,7 @@ export default function PwaInstallPrompt() {
                 onClick={handleCopySetupLink}
                 className="inline-flex min-h-9 items-center rounded-full bg-[#0E5A3F] px-4 text-[12px] font-bold text-white outline-none transition active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2"
               >
-                Copy secure setup link
+                Copy install link
               </button>
               {copyStatus ? (
                 <p className="mt-2 text-[12px] font-bold leading-5 text-[#0E5A3F]">

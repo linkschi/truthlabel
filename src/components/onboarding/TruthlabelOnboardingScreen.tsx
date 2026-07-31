@@ -1203,8 +1203,8 @@ function StepFourInstall({
       await navigator.clipboard.writeText(payload.setupUrl);
       setCopyStatus(
         deviceKind === "android_in_app"
-          ? "Secure setup link copied. Open Chrome, paste the link, and TruthLabel will continue where you left off."
-          : "Secure setup link copied. Open Safari, paste the link, and TruthLabel will continue where you left off.",
+          ? "Install link copied. Open Chrome, paste the link, then install TruthLabel from there."
+          : "Install link copied. Open Safari, paste the link, then install TruthLabel from there.",
       );
     } catch {
       setCopyStatus("Copy failed. Use your browser menu to open this page in Safari or Chrome.");
@@ -1336,17 +1336,17 @@ function StepFourInstall({
       <section className="flex flex-1 flex-col py-6">
         <div>
           <InstallationEyebrow>
-            {isAndroid ? "Open in your browser" : "Open in Safari"}
+            {isAndroid ? "Install in Chrome" : "Install in Safari"}
           </InstallationEyebrow>
           <h1 className="mt-2 text-[30px] font-black leading-[1.04] tracking-[-0.04em] text-[#101613]">
             {isAndroid
-              ? "Continue setting up TruthLabel in Chrome"
-              : "Continue setting up TruthLabel in Safari"}
+              ? "Open this link in Chrome to install TruthLabel"
+              : "Open this link in Safari to install TruthLabel"}
           </h1>
           <p className="mt-3 text-[15px] leading-6 text-[#66716B]">
             {isAndroid
-              ? "Open TruthLabel in Chrome or Samsung Internet before installing it on your phone."
-              : "TruthLabel must be opened in Safari before it can be added to your iPhone Home Screen."}
+              ? "Instagram and Facebook browsers cannot finish app installation. Open this page in Chrome or Samsung Internet, then install the app there."
+              : "Instagram and Facebook browsers cannot finish app installation. Open this page in Safari first, then install the app from there."}
           </p>
         </div>
 
@@ -1355,14 +1355,14 @@ function StepFourInstall({
             steps={
               isAndroid
                 ? [
-                    "Tap Instagram's browser menu",
+                    "Tap the Instagram or Facebook browser menu",
                     'Choose "Open in Chrome," "Open in browser," or "Open in external browser"',
-                    "Continue your TruthLabel setup there",
+                    "Install the TruthLabel app there",
                   ]
                 : [
-                    "Tap Instagram's browser menu",
+                    "Tap the Instagram or Facebook browser menu",
                     'Choose "Open in Safari" or "Open in external browser"',
-                    "Continue your TruthLabel setup there",
+                    "Install the TruthLabel app from Safari",
                   ]
             }
           />
@@ -1383,7 +1383,7 @@ function StepFourInstall({
 
         <div className="mt-auto pt-6">
           <PrimaryButton onClick={handlePrimaryAction} disabled={isSaving}>
-            Copy secure setup link
+            Copy install link
           </PrimaryButton>
           <TextButton onClick={onDefer}>Continue in browser for now</TextButton>
         </div>
