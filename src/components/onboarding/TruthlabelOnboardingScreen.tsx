@@ -64,6 +64,17 @@ type IosInstallStep = {
   id: string;
   progress: string;
   title: string;
+  imageKey: string;
+  imageAlt: string;
+  placeholderLabel: string;
+};
+
+type InstallationImagePlaceholderProps = {
+  imageKey: string;
+  src?: string;
+  alt: string;
+  label: string;
+  aspectRatio?: string;
 };
 
 const totalSteps = 4;
@@ -75,16 +86,25 @@ const iosInstallSteps: IosInstallStep[] = [
     id: "share",
     progress: "Step 1 of 3",
     title: "Tap Safari's Share button",
+    imageKey: "ios-share-button",
+    imageAlt: "Safari showing the TruthLabel page and Share button",
+    placeholderLabel: "Safari Share button image slot",
   },
   {
     id: "add-home-screen",
     progress: "Step 2 of 3",
     title: 'Choose "Add to Home Screen"',
+    imageKey: "ios-add-to-home-screen",
+    imageAlt: "Safari Share menu showing Add to Home Screen",
+    placeholderLabel: "Add to Home Screen image slot",
   },
   {
     id: "confirm",
     progress: "Step 3 of 3",
     title: "Finish adding TruthLabel",
+    imageKey: "ios-confirm-install",
+    imageAlt: "iPhone Add to Home Screen confirmation",
+    placeholderLabel: "Install confirmation image slot",
   },
 ];
 
@@ -378,6 +398,37 @@ function CheckIcon({ className = "" }: { className?: string }) {
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeWidth="2"
+      />
+    </svg>
+  );
+}
+
+function ImageIcon({ className = "" }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={`h-5 w-5 ${className}`}
+      fill="none"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M4.75 7A2.25 2.25 0 0 1 7 4.75h10A2.25 2.25 0 0 1 19.25 7v10A2.25 2.25 0 0 1 17 19.25H7A2.25 2.25 0 0 1 4.75 17V7Z"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      />
+      <path
+        d="m6.75 16.25 3.15-3.15a1.4 1.4 0 0 1 1.98 0l1.05 1.05 1.8-1.8a1.4 1.4 0 0 1 1.98 0l.54.54"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+      />
+      <path
+        d="M9 8.9h.01"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeWidth="2.4"
       />
     </svg>
   );
@@ -881,6 +932,44 @@ function InstallationEyebrow({ children }: { children: React.ReactNode }) {
   );
 }
 
+function InstallationImagePlaceholder({
+  imageKey,
+  src,
+  alt,
+  label,
+  aspectRatio = "16 / 9",
+}: InstallationImagePlaceholderProps) {
+  if (src) {
+    return (
+      <Image
+        src={src}
+        alt={alt}
+        width={390}
+        height={220}
+        className="mx-auto block h-auto w-full rounded-[18px] object-contain shadow-[0_12px_24px_rgba(15,40,28,0.07)]"
+        data-image-key={imageKey}
+      />
+    );
+  }
+
+  return (
+    <div
+      className="mx-auto grid w-full place-content-center gap-1.5 overflow-hidden rounded-[18px] border border-dashed border-[rgba(7,79,59,0.24)] bg-[linear-gradient(145deg,rgba(235,246,240,0.9),rgba(250,249,244,0.95))] px-3 py-3 text-center text-[#668078]"
+      style={{ aspectRatio }}
+      data-image-key={imageKey}
+      aria-label={label}
+    >
+      <ImageIcon className="mx-auto" />
+      <span className="text-[10.5px] font-extrabold leading-4">
+        {label}
+      </span>
+      <span className="text-[9px] font-black uppercase tracking-[0.14em] text-[#8A9B94]">
+        {imageKey}
+      </span>
+    </div>
+  );
+}
+
 function InstallCard({
   children,
   compact = false,
@@ -984,6 +1073,14 @@ function InstallStepCarousel({ steps }: { steps: IosInstallStep[] }) {
             <h2 className="mt-1.5 text-[20px] font-black leading-tight tracking-[-0.03em] text-[#101613]">
               {step.title}
             </h2>
+            <div className="mt-2.5">
+              <InstallationImagePlaceholder
+                imageKey={step.imageKey}
+                alt={step.imageAlt}
+                label={step.placeholderLabel}
+                aspectRatio="16 / 9"
+              />
+            </div>
             <div className="mt-3 flex justify-center gap-1.5" aria-hidden="true">
               {steps.map((dotStep, dotIndex) => (
                 <span
@@ -1242,6 +1339,18 @@ function StepFourInstall({
                   ]
             }
           />
+          <div className="mt-3">
+            <InstallationImagePlaceholder
+              imageKey={isAndroid ? "in-app-open-chrome" : "in-app-open-safari"}
+              alt="Social browser open-in-browser installation step"
+              label={
+                isAndroid
+                  ? "Chrome install handoff image slot"
+                  : "Safari install handoff image slot"
+              }
+              aspectRatio="16 / 9"
+            />
+          </div>
         </InstallCard>
 
         {copyStatus ? (
@@ -1298,6 +1407,14 @@ function StepFourInstall({
               "No need to search for the website",
             ]}
           />
+          <div className="mt-3">
+            <InstallationImagePlaceholder
+              imageKey="android-native-install"
+              alt="Android install prompt"
+              label="Android install prompt image slot"
+              aspectRatio="16 / 9"
+            />
+          </div>
         </InstallCard>
         <div className="mt-auto pt-6">
           <PrimaryButton onClick={handlePrimaryAction} disabled={promptBusy || isSaving}>
@@ -1324,6 +1441,14 @@ function StepFourInstall({
               "Open TruthLabel from your Home Screen",
             ]}
           />
+          <div className="mt-3">
+            <InstallationImagePlaceholder
+              imageKey="android-manual-install"
+              alt="Android browser installation menu"
+              label="Android install menu image slot"
+              aspectRatio="16 / 9"
+            />
+          </div>
         </InstallCard>
         {installCheckStatus ? (
           <p className="mt-4 rounded-[16px] border border-[#F1DDAD] bg-[#FFFBEC] px-4 py-3 text-[13px] font-bold leading-5 text-[#8A6500]">
@@ -1371,6 +1496,14 @@ function StepFourInstall({
             "Keep scanning one tap away",
           ]}
         />
+        <div className="mt-3">
+          <InstallationImagePlaceholder
+            imageKey="install-opening"
+            alt="TruthLabel app installation preview"
+            label="Install opening image slot"
+            aspectRatio="16 / 9"
+          />
+        </div>
       </InstallCard>
 
       <div className="mt-auto pt-6">
