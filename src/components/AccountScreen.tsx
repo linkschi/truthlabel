@@ -1233,7 +1233,7 @@ export default function AccountScreen() {
               role="dialog"
               aria-modal="true"
               aria-labelledby="account-cancel-title"
-              className="mx-auto w-full max-w-[440px] rounded-[24px] border border-[#DCE5DF] bg-white px-4 py-4 shadow-[0_22px_58px_rgba(15,40,28,0.22)]"
+              className="mx-auto w-full max-w-[440px] rounded-[24px] border border-[#DCE5DF] bg-white px-5 py-5 shadow-[0_22px_58px_rgba(15,40,28,0.22)]"
               onClick={(event) => event.stopPropagation()}
             >
               <div className="flex items-start justify-between gap-4">
@@ -1274,18 +1274,22 @@ export default function AccountScreen() {
                   aria-expanded={cancelReceiptHelpOpen}
                   className="inline-flex min-h-12 items-center justify-center rounded-full border border-[#DCE5DF] bg-white px-4 text-[13px] font-extrabold text-[#0E5A3F] transition hover:bg-[#EDF7F1] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
                 >
-                  I cannot find my email
+                  I cannot find my receipt
                 </button>
               </div>
 
               {cancelReceiptHelpOpen ? (
-                <div className="mt-4 rounded-[20px] border border-[#DCE5DF] bg-[#F7F9F7] px-3 py-3">
-                  <p className="text-[13px] font-extrabold text-[#101613]">
-                    We can resend it for you.
+                <div className="mt-4 rounded-[20px] border border-[#DCE5DF] bg-[#F7F9F7] px-4 py-4">
+                  <p className="text-[14px] font-extrabold text-[#101613]">
+                    Cannot find the receipt?
                   </p>
-                  <p className="mt-1.5 text-[12.5px] leading-5 text-[#56635C]">
-                    It may be the same email you signed in with, or it could
-                    be different. Simply enter the email you used at checkout.
+                  <p className="mt-1.5 text-[13px] leading-5 text-[#56635C]">
+                    No problem. Enter the email used at checkout and we will
+                    resend the receipt.
+                  </p>
+                  <p className="mt-2 text-[12.5px] leading-5 text-[#56635C]">
+                    It could be the same email you signed in with, or a
+                    different checkout or billing email.
                   </p>
 
                   <div className="mt-3 rounded-[16px] border border-[#DCE5DF] bg-white px-3 py-2.5">
