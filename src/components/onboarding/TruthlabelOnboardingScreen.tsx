@@ -604,13 +604,9 @@ function StepOneWelcome({
         <h1 className="mx-auto mt-4 max-w-[390px] text-[34px] font-black leading-[1.02] tracking-[-0.05em] text-[#101613]">
           Scan before you trust it.
         </h1>
-        <p className="mx-auto mt-3 max-w-[360px] text-[15px] leading-6 text-[#66716B]">
-          Truthlabel helps bring important ingredient warnings, allergy matches,
-          processing signals, and product concerns into plain English.
-        </p>
       </div>
 
-      <div className="mt-5 grid grid-cols-3 gap-2.5">
+      <div className="mt-6 grid grid-cols-3 gap-2.5">
         {[
           ["Scan", "Barcode or label"],
           ["Check", "Warnings and reasons"],
