@@ -1148,28 +1148,108 @@ export function ActivateScreen() {
       return;
     }
 
+    if (accessState === "loading") {
+      return;
+    }
+
+    if (isActive) {
+      grantMvpActivationAccess("activation_link");
+      return;
+    }
+
+    if (!user) {
+      const statusHandle = window.setTimeout(() => {
+        setActivationStatus({
+          tone: "yellow",
+          message:
+            "Sign in with the account you want activated. Truthlabel will continue automatically.",
+        });
+      }, 0);
+
+      return () => window.clearTimeout(statusHandle);
+    }
+
     if (mvpAccessHandledRef.current) {
       return;
     }
 
     mvpAccessHandledRef.current = true;
-    grantMvpActivationAccess("activation_link");
+    let cancelled = false;
 
-    trackTruthlabelEvent(
-      "activation_success",
-      {
-        activation_method: "mvp_access_link_local",
-        status: "active",
-      },
-      { userId: user?.id },
-    );
-    setActivationStatus({
-      tone: "green",
-      message: "Access activated. Opening Truthlabel...",
+    void Promise.resolve().then(async () => {
+      setActivationStatus({
+        tone: "yellow",
+        message: "Activating this Truthlabel account...",
+      });
+
+      try {
+        const supabase = getSupabaseBrowserClient();
+
+        if (!supabase) {
+          throw new Error("Account access is not configured yet.");
+        }
+
+        const { data, error } = await supabase.functions.invoke<{
+          activated?: boolean;
+          message?: string;
+          status?: string;
+        }>("activate-mvp-access", {
+          body: { code: mvpAccessCode.trim() },
+        });
+
+        if (error) {
+          throw error;
+        }
+
+        if (!data?.activated) {
+          throw new Error(data?.message || "Truthlabel could not activate this account.");
+        }
+
+        grantMvpActivationAccess("activation_link");
+        trackTruthlabelEvent(
+          "activation_success",
+          {
+            activation_method: "mvp_access_link_account",
+            status: data.status || "active",
+          },
+          { userId: user.id },
+        );
+        await refreshAccess();
+
+        if (cancelled) {
+          return;
+        }
+
+        setActivationStatus({
+          tone: "green",
+          message: "Access activated for this account. Opening Truthlabel...",
+        });
+        window.history.replaceState(null, "", "/activate");
+        openTruthlabelApp();
+      } catch (error) {
+        if (cancelled) {
+          return;
+        }
+
+        trackTruthlabelEvent(
+          "activation_failed",
+          {
+            activation_method: "mvp_access_link_account",
+            error_type: normalizeAnalyticsError(error),
+          },
+          { userId: user.id },
+        );
+        setActivationStatus({
+          tone: "red",
+          message: getActivationErrorMessage(error),
+        });
+      }
     });
-    window.history.replaceState(null, "", "/activate");
-    openTruthlabelApp();
-  }, [openTruthlabelApp, user?.id]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [accessState, isActive, openTruthlabelApp, refreshAccess, user]);
 
   useEffect(() => {
     if (typeof window === "undefined") {

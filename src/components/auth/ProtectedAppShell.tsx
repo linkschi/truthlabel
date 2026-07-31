@@ -6,7 +6,6 @@ import { type ReactNode, Suspense, useEffect, useState } from "react";
 import { useTruthlabelAuth } from "@/components/auth/AuthProvider";
 import { publicAppConfig } from "@/lib/appConfig";
 import {
-  grantMvpActivationAccess,
   hasMvpActivationAccess,
   hasMvpActivationParam,
 } from "@/lib/auth/mvpActivationAccess";
@@ -50,10 +49,8 @@ function ProtectedAppShellInner({ children }: { children: ReactNode }) {
   useEffect(() => {
     const handle = window.setTimeout(() => {
       if (hasMvpActivationParam(query)) {
-        grantMvpActivationAccess("app_link");
-        setHasMvpAccessPass(true);
         setMvpAccessPassChecked(true);
-        router.replace(pathname || "/app");
+        router.replace(`/activate?${query}`);
         return;
       }
 
