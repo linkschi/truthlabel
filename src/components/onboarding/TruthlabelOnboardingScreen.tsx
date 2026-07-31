@@ -1034,43 +1034,75 @@ function InstallStepList({ steps }: { steps: string[] }) {
   );
 }
 
+function SwipeCue() {
+  return (
+    <div
+      className="flex items-center justify-center gap-2 text-[11px] font-black uppercase tracking-[0.14em] text-[#66716B]"
+      aria-hidden="true"
+    >
+      <span className="h-px w-10 bg-[#D7E7DD]" />
+      <span className="relative inline-flex h-9 w-16 items-center justify-center rounded-full border border-[#D7E7DD] bg-white shadow-[0_8px_20px_rgba(15,40,28,0.06)]">
+        <span className="absolute left-3 h-1.5 w-1.5 rounded-full bg-[#CFE2D6]" />
+        <span className="absolute right-3 h-1.5 w-1.5 rounded-full bg-[#CFE2D6]" />
+        <span className="motion-safe:animate-[truthlabelSwipeCue_1.45s_ease-in-out_infinite]">
+          <svg
+            className="h-5 w-5 text-[#0E5A3F]"
+            fill="none"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M8 12h8m0 0-3-3m3 3-3 3"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+            />
+          </svg>
+        </span>
+      </span>
+      <span>Swipe</span>
+      <span className="h-px w-10 bg-[#D7E7DD]" />
+    </div>
+  );
+}
+
 function InstallStepCarousel({ steps }: { steps: IosInstallStep[] }) {
   return (
-    <div className="mt-5">
-      <p className="text-[12px] font-black uppercase tracking-[0.16em] text-[#66716B]">
-        Swipe through the installation steps
-      </p>
+    <div className="mt-4">
+      <SwipeCue />
       <div
-        className="-mx-5 mt-3 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="-mx-5 mt-3 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         aria-label="TruthLabel installation steps"
       >
         {steps.map((step, index) => (
           <article
             key={step.id}
-            className="min-w-[86%] snap-center rounded-[26px] border border-[#D7E7DD] bg-white px-4 py-4 shadow-[0_14px_34px_rgba(15,40,28,0.07)]"
+            className="min-w-[84%] snap-center rounded-[22px] border border-[#D7E7DD] bg-white px-3.5 py-3.5 shadow-[0_12px_28px_rgba(15,40,28,0.06)]"
           >
             <p className="text-[11px] font-black uppercase tracking-[0.14em] text-[#0E5A3F]">
               {step.progress}
             </p>
-            <h2 className="mt-2 text-[22px] font-black leading-tight tracking-[-0.03em] text-[#101613]">
+            <h2 className="mt-1.5 text-[20px] font-black leading-tight tracking-[-0.03em] text-[#101613]">
               {step.title}
             </h2>
-            <p className="mt-2 text-[13.5px] font-semibold leading-6 text-[#66716B]">
+            <p className="mt-1.5 text-[12.5px] font-semibold leading-5 text-[#66716B]">
               {step.description}
             </p>
-            <div className="mt-4">
+            <div className="mt-3">
               <InstallationImagePlaceholder
                 imageKey={step.imageKey}
                 alt={step.imageAlt}
                 label={step.placeholderLabel}
+                aspectRatio="4 / 3"
               />
             </div>
             {step.help ? (
-              <p className="mt-3 rounded-[14px] bg-[#F3FAF6] px-3 py-2 text-[12px] font-semibold leading-5 text-[#56635C]">
+              <p className="mt-2.5 rounded-[14px] bg-[#F3FAF6] px-3 py-2 text-[11.5px] font-semibold leading-5 text-[#56635C]">
                 Tip: {step.help}
               </p>
             ) : null}
-            <div className="mt-4 flex justify-center gap-1.5" aria-hidden="true">
+            <div className="mt-3 flex justify-center gap-1.5" aria-hidden="true">
               {steps.map((dotStep, dotIndex) => (
                 <span
                   key={dotStep.id}
@@ -1363,12 +1395,9 @@ function StepFourInstall({
     return (
       <section className="flex flex-1 flex-col py-6">
         <InstallationEyebrow>Install the app</InstallationEyebrow>
-        <h1 className="mt-2 text-[32px] font-black leading-[1.04] tracking-[-0.04em] text-[#101613]">
+        <h1 className="mt-2 text-[30px] font-black leading-[1.04] tracking-[-0.04em] text-[#101613]">
           Install TruthLabel on this iPhone
         </h1>
-        <p className="mt-3 text-[15px] leading-6 text-[#66716B]">
-          Finish setup by adding TruthLabel to your Home Screen. Swipe through the steps, install the app, then open it from your Home Screen.
-        </p>
         <InstallStepCarousel steps={iosInstallSteps} />
         {installCheckStatus ? (
           <p className="mt-4 rounded-[16px] border border-[#F1DDAD] bg-[#FFFBEC] px-4 py-3 text-[13px] font-bold leading-5 text-[#8A6500]">
