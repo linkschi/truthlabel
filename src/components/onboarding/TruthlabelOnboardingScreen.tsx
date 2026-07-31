@@ -50,16 +50,72 @@ type AllergyChip = {
 
 type SetupTaskStatus = "complete" | "active" | "waiting" | "warning";
 type InstallDeviceKind =
+  | "ios_in_app"
+  | "android_in_app"
   | "android_prompt"
   | "android_fallback"
   | "iphone_safari"
   | "iphone_other"
+  | "browser_fallback"
   | "desktop"
   | "installed";
+
+type IosInstallStep = {
+  id: string;
+  progress: string;
+  title: string;
+  description: string;
+  imageKey: string;
+  imageAlt: string;
+  placeholderLabel: string;
+  help?: string;
+};
+
+type InstallationImagePlaceholderProps = {
+  imageKey: string;
+  src?: string;
+  alt: string;
+  label: string;
+  aspectRatio?: string;
+};
 
 const totalSteps = 4;
 const setupTaskCount = 5;
 const countSequence = ["0", "500K", "1.4M", "2.6M", "3.8M", "4.3M+"];
+
+const iosInstallSteps: IosInstallStep[] = [
+  {
+    id: "share",
+    progress: "Step 1 of 3",
+    title: "Tap Safari's Share button",
+    description: "Look for the square with the upward arrow in Safari.",
+    imageKey: "ios-share-button",
+    imageAlt: "Safari showing the TruthLabel page and Share button",
+    placeholderLabel: "Safari screenshot showing the Share button",
+  },
+  {
+    id: "add-home-screen",
+    progress: "Step 2 of 3",
+    title: 'Choose "Add to Home Screen"',
+    description:
+      "Scroll through Safari's Share menu and tap Add to Home Screen.",
+    imageKey: "ios-add-to-home-screen",
+    imageAlt: "Safari Share menu showing Add to Home Screen",
+    placeholderLabel: "Safari Share menu screenshot",
+    help:
+      "Scroll to the bottom of the Share menu and tap Edit Actions. Then add Add to Home Screen to the menu.",
+  },
+  {
+    id: "confirm",
+    progress: "Step 3 of 3",
+    title: "Finish adding TruthLabel",
+    description:
+      "Keep Open as Web App turned on, then tap Add in the top-right corner.",
+    imageKey: "ios-confirm-install",
+    imageAlt: "iPhone Add to Home Screen confirmation",
+    placeholderLabel: "Add to Home Screen confirmation screenshot",
+  },
+];
 
 const primaryAllergenChips: AllergyChip[] = [
   { id: "milk", label: "Milk", values: ["milk"] },
@@ -215,11 +271,33 @@ function isSafariBrowser() {
   return /Safari/i.test(userAgent) && !/CriOS|FxiOS|EdgiOS/i.test(userAgent);
 }
 
+function isInAppBrowser() {
+  if (typeof navigator === "undefined") {
+    return false;
+  }
+
+  return /Instagram|FBAN|FBAV|FB_IAB|FBIOS|FB4A|TikTok|Bytedance|Line\/|MicroMessenger|Snapchat|Pinterest|LinkedInApp/i.test(
+    navigator.userAgent,
+  );
+}
+
 function getInstallDeviceKind(
   deferredPrompt: BeforeInstallPromptEvent | null,
 ): InstallDeviceKind {
   if (isStandaloneMode()) {
     return "installed";
+  }
+
+  if (isInAppBrowser()) {
+    if (isAppleMobileDevice()) {
+      return "ios_in_app";
+    }
+
+    if (isAndroidDevice()) {
+      return "android_in_app";
+    }
+
+    return "browser_fallback";
   }
 
   if (isAppleMobileDevice()) {
@@ -301,6 +379,37 @@ function CheckIcon({ className = "" }: { className?: string }) {
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeWidth="2"
+      />
+    </svg>
+  );
+}
+
+function ImageIcon({ className = "" }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={`h-7 w-7 ${className}`}
+      fill="none"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M4.75 7A2.25 2.25 0 0 1 7 4.75h10A2.25 2.25 0 0 1 19.25 7v10A2.25 2.25 0 0 1 17 19.25H7A2.25 2.25 0 0 1 4.75 17V7Z"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      />
+      <path
+        d="m6.75 16.25 3.15-3.15a1.4 1.4 0 0 1 1.98 0l1.05 1.05 1.8-1.8a1.4 1.4 0 0 1 1.98 0l.54.54"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+      />
+      <path
+        d="M9 8.9h.01"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeWidth="2.4"
       />
     </svg>
   );
@@ -796,101 +905,126 @@ function StepThreePreparing({
   );
 }
 
-function InstallInstructionVisual({
-  kind,
-}: {
-  kind: InstallDeviceKind;
-}) {
-  const isIphone = kind === "iphone_safari" || kind === "iphone_other";
-  const steps = isIphone
-    ? ["Tap Share", "Add to Home Screen", "Tap Add"]
-    : ["Open menu", "Choose Install app", "Open Truthlabel"];
+function InstallationImagePlaceholder({
+  imageKey,
+  src,
+  alt,
+  label,
+  aspectRatio = "9 / 16",
+}: InstallationImagePlaceholderProps) {
+  if (src) {
+    return (
+      <Image
+        src={src}
+        alt={alt}
+        width={390}
+        height={693}
+        className="mx-auto block h-auto w-[min(100%,390px)] rounded-[26px] object-contain shadow-[0_18px_38px_rgba(15,40,28,0.08)]"
+        data-image-key={imageKey}
+      />
+    );
+  }
 
   return (
-    <div className="mt-5 rounded-[28px] border border-[#D7E7DD] bg-white p-4 shadow-[0_12px_32px_rgba(15,40,28,0.06)]">
-      <div className="mx-auto flex h-[230px] max-w-[210px] flex-col rounded-[32px] border-[8px] border-[#101613] bg-[#F3FAF6] p-3 shadow-[0_16px_36px_rgba(16,22,19,0.12)]">
-        <div className="mx-auto h-1.5 w-16 rounded-full bg-[#101613]" />
-        <div className="mt-4 grid flex-1 grid-cols-3 gap-2">
-          {["TL", "Mail", "Maps", "Scan", "Food", "Shop"].map((label, index) => (
-            <div
-              key={label}
-              className={`flex flex-col items-center gap-1 ${
-                index === 3 ? "scale-105" : ""
-              }`}
-            >
-              <span
-                className={`flex h-10 w-10 items-center justify-center rounded-[12px] text-[10px] font-black ${
-                  index === 3
-                    ? "bg-[#0E5A3F] text-white"
-                    : "bg-white text-[#66716B]"
-                }`}
-              >
-                {label}
-              </span>
-              <span className="h-1 w-8 rounded-full bg-[#D7E7DD]" />
-            </div>
-          ))}
-        </div>
-      </div>
-      <ol className="mt-4 grid grid-cols-3 gap-2 text-center">
-        {steps.map((step, index) => (
-          <li
-            key={step}
-            className="rounded-[14px] border border-[#E2E8E4] bg-[#FBFDFB] px-2 py-2"
-          >
-            <span className="mx-auto flex h-6 w-6 items-center justify-center rounded-full bg-[#0E5A3F] text-[11px] font-black text-white">
-              {index + 1}
-            </span>
-            <span className="mt-1 block text-[10.5px] font-bold leading-4 text-[#66716B]">
-              {step}
-            </span>
-          </li>
-        ))}
-      </ol>
+    <div
+      className="mx-auto grid w-[min(100%,390px)] place-content-center gap-2.5 overflow-hidden rounded-[26px] border border-dashed border-[rgba(7,79,59,0.24)] bg-[linear-gradient(145deg,rgba(235,246,240,0.9),rgba(250,249,244,0.95))] px-5 py-6 text-center text-[#668078]"
+      style={{ aspectRatio }}
+      data-image-key={imageKey}
+      aria-label={label}
+    >
+      <ImageIcon className="mx-auto" />
+      <span
+        className={`text-[12px] font-extrabold ${
+          process.env.NODE_ENV === "production" ? "sr-only" : ""
+        }`}
+      >
+        {label}
+      </span>
+      <span className="text-[10px] font-black uppercase tracking-[0.16em] text-[#8A9B94]">
+        {imageKey}
+      </span>
     </div>
   );
 }
 
-function getInstallCopy(kind: InstallDeviceKind) {
-  switch (kind) {
-    case "installed":
-      return {
-        title: "Truthlabel is installed",
-        copy: "You can now open it directly from your Home Screen.",
-        button: "Start scanning",
-      };
-    case "android_prompt":
-      return {
-        title: "Install Truthlabel",
-        copy: "Add Truthlabel to your Home Screen so it opens and feels like a regular app.",
-        button: "Install Truthlabel",
-      };
-    case "iphone_safari":
-      return {
-        title: "Add Truthlabel to your iPhone",
-        copy: "Use Safari to place Truthlabel on your Home Screen and open it like an app.",
-        button: "I've added Truthlabel",
-      };
-    case "iphone_other":
-      return {
-        title: "Open this page in Safari",
-        copy: "Use Safari to add Truthlabel to your Home Screen. Other iPhone browsers may not show the right install option.",
-        button: "I've added Truthlabel",
-      };
-    case "desktop":
-      return {
-        title: "Install when you open Truthlabel on your phone",
-        copy: "Truthlabel works best from your phone while shopping or checking food at home.",
-        button: "Continue",
-      };
-    case "android_fallback":
-    default:
-      return {
-        title: "Add Truthlabel to your phone",
-        copy: "Use your browser menu to install Truthlabel or add it to your Home Screen.",
-        button: "I added it",
-      };
-  }
+function InstallationEyebrow({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#0E5A3F]">
+      {children}
+    </p>
+  );
+}
+
+function InstallCard({
+  children,
+  compact = false,
+}: {
+  children: React.ReactNode;
+  compact?: boolean;
+}) {
+  return (
+    <div
+      className={`mt-5 rounded-[28px] border border-[#D7E7DD] bg-white shadow-[0_14px_36px_rgba(15,40,28,0.07)] ${
+        compact ? "px-4 py-4" : "px-5 py-5"
+      }`}
+    >
+      {children}
+    </div>
+  );
+}
+
+function InstallBenefitList({ items }: { items: string[] }) {
+  return (
+    <ul className="mt-4 grid gap-2">
+      {items.map((item) => (
+        <li
+          key={item}
+          className="flex items-center gap-2 rounded-[14px] border border-[#E2EDE6] bg-[#FBFDFB] px-3 py-2 text-[13px] font-bold text-[#101613]"
+        >
+          <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#E8F6EF] text-[#0E5A3F]">
+            <CheckIcon className="h-3.5 w-3.5" />
+          </span>
+          {item}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function InstallStepList({ steps }: { steps: string[] }) {
+  return (
+    <ol className="mt-4 grid gap-2 text-[13px] font-semibold text-[#101613]">
+      {steps.map((step, index) => (
+        <li key={step} className="flex gap-2 rounded-[14px] bg-[#F8FBF8] px-3 py-2">
+          <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#0E5A3F] text-[10px] font-black text-white">
+            {index + 1}
+          </span>
+          <span>{step}</span>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+function InstallProgressDots({
+  total,
+  current,
+}: {
+  total: number;
+  current: number;
+}) {
+  return (
+    <div className="mt-4 flex justify-center gap-2" aria-label={`Step ${current + 1} of ${total}`}>
+      {Array.from({ length: total }, (_, index) => (
+        <span
+          key={index}
+          className={`h-2 rounded-full transition-all ${
+            index === current ? "w-7 bg-[#0E5A3F]" : "w-2 bg-[#D7E7DD]"
+          }`}
+        />
+      ))}
+    </div>
+  );
 }
 
 function StepFourInstall({
@@ -917,14 +1051,75 @@ function StepFourInstall({
   onDefer: () => void;
 }) {
   const [promptBusy, setPromptBusy] = useState(false);
+  const [installStage, setInstallStage] = useState<
+    "opening" | "ios_intro" | "ios_step" | "ios_live"
+  >("opening");
+  const [iosStepIndex, setIosStepIndex] = useState(0);
+  const [iosHelpOpen, setIosHelpOpen] = useState(false);
+  const [copyStatus, setCopyStatus] = useState("");
   const deviceKind = useMemo(
     () => getInstallDeviceKind(deferredPrompt),
     [deferredPrompt],
   );
-  const copy = getInstallCopy(deviceKind);
   const isInstalled = deviceKind === "installed";
+  const isInApp = deviceKind === "ios_in_app" || deviceKind === "android_in_app";
+  const isIphoneOtherBrowser = deviceKind === "iphone_other";
 
-  async function handlePrimaryAction() {
+  useEffect(() => {
+    const resetHandle = window.setTimeout(() => {
+      setInstallStage("opening");
+      setIosStepIndex(0);
+      setIosHelpOpen(false);
+      setCopyStatus("");
+    }, 0);
+
+    return () => window.clearTimeout(resetHandle);
+  }, [deviceKind]);
+
+  async function handleCopySetupLink() {
+    const supabase = getSupabaseBrowserClient();
+
+    if (!supabase) {
+      setCopyStatus("Setup link unavailable. Open TruthLabel in Safari or Chrome and sign in.");
+      return;
+    }
+
+    try {
+      setCopyStatus("Creating secure setup link...");
+      const { data, error } = await supabase.auth.getSession();
+      const accessToken = data.session?.access_token;
+
+      if (error || !accessToken) {
+        throw new Error("Missing setup session.");
+      }
+
+      const response = await fetch("/api/setup-handoff/create", {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+      });
+      const payload = (await response.json().catch(() => ({}))) as {
+        setupUrl?: string;
+        message?: string;
+      };
+
+      if (!response.ok || !payload.setupUrl) {
+        throw new Error(payload.message || "Setup link could not be created.");
+      }
+
+      await navigator.clipboard.writeText(payload.setupUrl);
+      setCopyStatus(
+        deviceKind === "android_in_app"
+          ? "Secure setup link copied. Open Chrome, paste the link, and TruthLabel will continue where you left off."
+          : "Secure setup link copied. Open Safari, paste the link, and TruthLabel will continue where you left off.",
+      );
+    } catch {
+      setCopyStatus("Copy failed. Use your browser menu to open this page in Safari or Chrome.");
+    }
+  }
+
+  async function handleNativeInstall() {
     if (deviceKind === "android_prompt" && deferredPrompt) {
       setPromptBusy(true);
       trackTruthlabelEvent("install_prompt_shown", {
@@ -949,38 +1144,373 @@ function StepFourInstall({
       }
       return;
     }
+  }
 
+  function handlePrimaryAction() {
     if (isInstalled) {
       onFinish("already_installed", "installed");
       return;
     }
 
-    onFinish(
-      deviceKind === "desktop" ? "unsupported" : "manual_confirmed",
-      deviceKind === "desktop" ? "unsupported" : "manual_confirmed",
-    );
+    if (deviceKind === "android_prompt") {
+      void handleNativeInstall();
+      return;
+    }
+
+    if (deviceKind === "iphone_safari") {
+      setInstallStage("ios_intro");
+      return;
+    }
+
+    if (deviceKind === "android_fallback") {
+      onFinish("manual_confirmed", "manual_confirmed");
+      return;
+    }
+
+    if (isInApp || isIphoneOtherBrowser) {
+      void handleCopySetupLink();
+      return;
+    }
+
+    onDefer();
   }
 
   if (installCompleted) {
     return (
       <section className="flex flex-1 flex-col justify-center py-6 text-center">
-        <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-[22px] bg-[#0E5A3F] text-white">
-          <CheckIcon className="h-8 w-8" />
-        </span>
+        <InstallationEyebrow>Setup complete</InstallationEyebrow>
+        <div className="relative mx-auto mt-4 flex h-20 w-20 items-center justify-center">
+          <span className="absolute h-20 w-20 rounded-[26px] bg-[#E8F6EF] motion-safe:animate-[ping_900ms_ease-out_1]" />
+          <span className="relative flex h-16 w-16 items-center justify-center rounded-[22px] bg-[#0E5A3F] text-white shadow-[0_16px_36px_rgba(14,90,63,0.24)]">
+            <CheckIcon className="h-8 w-8" />
+          </span>
+        </div>
         <h1 className="mt-5 text-[30px] font-black leading-[1.04] tracking-[-0.04em] text-[#101613]">
-          You&apos;re ready to scan
+          TruthLabel is ready
         </h1>
         <p className="mx-auto mt-3 max-w-[340px] text-[15px] leading-6 text-[#66716B]">
-          Truthlabel is set up with your personal alerts and ready whenever you
-          need it.
+          Your app is installed and ready whenever you need to scan a product.
         </p>
         <p className="mt-4 text-[12.5px] font-semibold text-[#66716B]">
-          Your settings can be changed anytime from Account.
+          You can now open TruthLabel directly from your Home Screen.
         </p>
         <div className="mt-8">
           <PrimaryButton onClick={() => onFinish("manual_confirmed", "manual_confirmed")} disabled={isSaving}>
-            {isSaving ? "Opening..." : "Open Truthlabel"}
+            {isSaving ? "Opening..." : "Start scanning"}
           </PrimaryButton>
+        </div>
+      </section>
+    );
+  }
+
+  if (isInstalled) {
+    return (
+      <section className="flex flex-1 flex-col justify-center py-6 text-center">
+        <InstallationEyebrow>Installation complete</InstallationEyebrow>
+        <span className="mx-auto mt-4 flex h-16 w-16 items-center justify-center rounded-[22px] bg-[#0E5A3F] text-white">
+          <CheckIcon className="h-8 w-8" />
+        </span>
+        <h1 className="mt-5 text-[30px] font-black leading-[1.04] tracking-[-0.04em] text-[#101613]">
+          TruthLabel is installed
+        </h1>
+        <p className="mx-auto mt-3 max-w-[340px] text-[15px] leading-6 text-[#66716B]">
+          TruthLabel is now on your Home Screen and ready whenever you need to scan a product.
+        </p>
+        <div className="mt-8">
+          <PrimaryButton onClick={handlePrimaryAction} disabled={isSaving}>
+            {isSaving ? "Opening..." : "Start scanning"}
+          </PrimaryButton>
+        </div>
+      </section>
+    );
+  }
+
+  if (isInApp || isIphoneOtherBrowser) {
+    const isAndroid = deviceKind === "android_in_app";
+    const imageKey = isAndroid ? "in-app-open-chrome" : "in-app-open-safari";
+
+    return (
+      <section className="flex flex-1 flex-col py-6">
+        <div>
+          <InstallationEyebrow>
+            {isAndroid ? "Open in your browser" : "Open in Safari"}
+          </InstallationEyebrow>
+          <h1 className="mt-2 text-[30px] font-black leading-[1.04] tracking-[-0.04em] text-[#101613]">
+            {isAndroid
+              ? "Continue setting up TruthLabel in Chrome"
+              : "Continue setting up TruthLabel in Safari"}
+          </h1>
+          <p className="mt-3 text-[15px] leading-6 text-[#66716B]">
+            {isAndroid
+              ? "Open TruthLabel in Chrome or Samsung Internet before installing it on your phone."
+              : "TruthLabel must be opened in Safari before it can be added to your iPhone Home Screen."}
+          </p>
+        </div>
+
+        <InstallCard>
+          <InstallStepList
+            steps={
+              isAndroid
+                ? [
+                    "Tap Instagram's browser menu",
+                    'Choose "Open in Chrome," "Open in browser," or "Open in external browser"',
+                    "Continue your TruthLabel setup there",
+                  ]
+                : [
+                    "Tap Instagram's browser menu",
+                    'Choose "Open in Safari" or "Open in external browser"',
+                    "Continue your TruthLabel setup there",
+                  ]
+            }
+          />
+          <div className="mt-5">
+            <InstallationImagePlaceholder
+              imageKey={imageKey}
+              alt="Instagram browser handoff screenshot"
+              label="Instagram browser handoff screenshot"
+            />
+          </div>
+        </InstallCard>
+
+        {copyStatus ? (
+          <p className="mt-4 rounded-[16px] border border-[#D7E7DD] bg-[#F3FAF6] px-4 py-3 text-[13px] font-bold leading-5 text-[#0E5A3F]">
+            {copyStatus}
+          </p>
+        ) : null}
+
+        <div className="mt-auto pt-6">
+          <PrimaryButton onClick={handlePrimaryAction} disabled={isSaving}>
+            Copy secure setup link
+          </PrimaryButton>
+          <TextButton onClick={onDefer}>Continue here for now</TextButton>
+        </div>
+      </section>
+    );
+  }
+
+  if (deviceKind === "iphone_safari" && installStage === "ios_intro") {
+    return (
+      <section className="flex flex-1 flex-col justify-center py-6">
+        <InstallationEyebrow>iPhone setup</InstallationEyebrow>
+        <h1 className="mt-2 text-[32px] font-black leading-[1.04] tracking-[-0.04em] text-[#101613]">
+          Add TruthLabel to your iPhone
+        </h1>
+        <p className="mt-3 text-[15px] leading-6 text-[#66716B]">
+          Follow these quick Safari steps to place TruthLabel on your Home Screen.
+        </p>
+        <InstallCard>
+          <InstallationImagePlaceholder
+            imageKey="ios-install-intro"
+            alt="iPhone Home Screen installation introduction"
+            label="iPhone installation introduction screenshot"
+            aspectRatio="4 / 5"
+          />
+        </InstallCard>
+        <div className="mt-auto pt-6">
+          <PrimaryButton
+            onClick={() => {
+              setInstallStage("ios_step");
+              setIosStepIndex(0);
+            }}
+          >
+            Start setup
+          </PrimaryButton>
+          <TextButton onClick={onDefer}>Continue in browser for now</TextButton>
+        </div>
+      </section>
+    );
+  }
+
+  if (deviceKind === "iphone_safari" && installStage === "ios_step") {
+    const step = iosInstallSteps[iosStepIndex] ?? iosInstallSteps[0];
+    const isLastStep = iosStepIndex >= iosInstallSteps.length - 1;
+
+    return (
+      <section className="flex flex-1 flex-col py-6">
+        <div className="flex items-center justify-between gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              if (iosStepIndex === 0) {
+                setInstallStage("ios_intro");
+                return;
+              }
+
+              setIosStepIndex((current) => Math.max(0, current - 1));
+            }}
+            className="min-h-10 rounded-full border border-[#D7E7DD] bg-white px-4 text-[12px] font-bold text-[#0E5A3F] outline-none focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2"
+          >
+            Back
+          </button>
+          <p className="text-[12px] font-black uppercase tracking-[0.16em] text-[#66716B]">
+            {step.progress}
+          </p>
+          <button
+            type="button"
+            onClick={() => setInstallStage("opening")}
+            className="min-h-10 rounded-full px-4 text-[12px] font-bold text-[#66716B] outline-none focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2"
+          >
+            Close
+          </button>
+        </div>
+
+        <div className="mt-6">
+          <h1 className="text-[30px] font-black leading-[1.04] tracking-[-0.04em] text-[#101613]">
+            {step.title}
+          </h1>
+          <p className="mt-3 text-[15px] leading-6 text-[#66716B]">
+            {step.description}
+          </p>
+        </div>
+
+        <InstallCard>
+          <InstallationImagePlaceholder
+            imageKey={step.imageKey}
+            alt={step.imageAlt}
+            label={step.placeholderLabel}
+          />
+          {step.help ? (
+            <div className="mt-4">
+              <button
+                type="button"
+                onClick={() => setIosHelpOpen((current) => !current)}
+                className="text-[13px] font-extrabold text-[#0E5A3F] underline-offset-4 outline-none hover:underline focus-visible:rounded-full focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2"
+              >
+                Can&apos;t find it?
+              </button>
+              {iosHelpOpen ? (
+                <p className="mt-2 rounded-[14px] bg-[#F3FAF6] px-3 py-2 text-[12.5px] font-semibold leading-5 text-[#56635C]">
+                  {step.help}
+                </p>
+              ) : null}
+            </div>
+          ) : null}
+        </InstallCard>
+
+        <InstallProgressDots total={iosInstallSteps.length} current={iosStepIndex} />
+
+        <div className="mt-auto pt-6">
+          <PrimaryButton
+            onClick={() => {
+              if (isLastStep) {
+                setInstallStage("ios_live");
+                return;
+              }
+
+              setIosHelpOpen(false);
+              setIosStepIndex((current) =>
+                Math.min(iosInstallSteps.length - 1, current + 1),
+              );
+            }}
+          >
+            {isLastStep ? "Install TruthLabel now" : "Next step"}
+          </PrimaryButton>
+        </div>
+      </section>
+    );
+  }
+
+  if (deviceKind === "iphone_safari" && installStage === "ios_live") {
+    return (
+      <section className="flex flex-1 flex-col py-6 pb-[calc(120px+env(safe-area-inset-bottom))]">
+        <InstallCard compact>
+          <h1 className="text-[24px] font-black tracking-[-0.03em] text-[#101613]">
+            Now install TruthLabel
+          </h1>
+          <InstallStepList
+            steps={[
+              "Open Safari's Share menu",
+              "Choose Add to Home Screen",
+              "Keep Open as Web App turned on and tap Add",
+            ]}
+          />
+          <p className="mt-4 text-[13px] font-semibold leading-5 text-[#66716B]">
+            This guide will still be here if you return to Safari.
+          </p>
+        </InstallCard>
+        <div className="mt-5">
+          <TextButton onClick={onDefer}>Continue in browser for now</TextButton>
+        </div>
+      </section>
+    );
+  }
+
+  if (deviceKind === "android_prompt") {
+    return (
+      <section className="flex flex-1 flex-col py-6">
+        <InstallationEyebrow>Android setup</InstallationEyebrow>
+        <h1 className="mt-2 text-[32px] font-black leading-[1.04] tracking-[-0.04em] text-[#101613]">
+          Add TruthLabel to your phone
+        </h1>
+        <p className="mt-3 text-[15px] leading-6 text-[#66716B]">
+          Open TruthLabel directly from your Home Screen and scan products faster while you shop.
+        </p>
+        <InstallCard>
+          <InstallBenefitList
+            items={[
+              "One-tap access",
+              "Opens in its own app window",
+              "No need to search for the website",
+            ]}
+          />
+          <p className="mt-4 text-[12.5px] font-bold text-[#66716B]">
+            Free to install. No app store required.
+          </p>
+        </InstallCard>
+        <div className="mt-auto pt-6">
+          <PrimaryButton onClick={handlePrimaryAction} disabled={promptBusy || isSaving}>
+            {promptBusy || isSaving ? "Opening installation..." : "Install TruthLabel"}
+          </PrimaryButton>
+          <TextButton onClick={onDefer}>Continue in browser for now</TextButton>
+        </div>
+      </section>
+    );
+  }
+
+  if (deviceKind === "android_fallback") {
+    return (
+      <section className="flex flex-1 flex-col py-6">
+        <InstallationEyebrow>Android setup</InstallationEyebrow>
+        <h1 className="mt-2 text-[32px] font-black leading-[1.04] tracking-[-0.04em] text-[#101613]">
+          Install TruthLabel manually
+        </h1>
+        <p className="mt-3 text-[15px] leading-6 text-[#66716B]">
+          Open your browser menu and choose Install app or Add to Home screen, then confirm the installation.
+        </p>
+        <InstallCard>
+          <InstallationImagePlaceholder
+            imageKey="android-manual-install"
+            alt="Android browser installation menu"
+            label="Android browser installation menu screenshot"
+          />
+        </InstallCard>
+        <div className="mt-auto pt-6">
+          <PrimaryButton onClick={handlePrimaryAction} disabled={isSaving}>
+            I&apos;ve installed it
+          </PrimaryButton>
+          <TextButton onClick={onDefer}>Continue in browser for now</TextButton>
+        </div>
+      </section>
+    );
+  }
+
+  if (deviceKind === "desktop" || deviceKind === "browser_fallback") {
+    return (
+      <section className="flex flex-1 flex-col justify-center py-6">
+        <InstallationEyebrow>Final setup</InstallationEyebrow>
+        <h1 className="mt-2 text-[32px] font-black leading-[1.04] tracking-[-0.04em] text-[#101613]">
+          Install from your phone
+        </h1>
+        <p className="mt-3 text-[15px] leading-6 text-[#66716B]">
+          TruthLabel works best from your phone while shopping. Open your account on Safari, Chrome, or Samsung Internet to add it to your Home Screen.
+        </p>
+        <InstallCard>
+          <p className="text-[13.5px] font-semibold leading-6 text-[#66716B]">
+            You can use the browser for now and install TruthLabel later from your Account page.
+          </p>
+        </InstallCard>
+        <div className="mt-6">
+          <PrimaryButton onClick={onDefer}>Continue in browser for now</PrimaryButton>
         </div>
       </section>
     );
@@ -989,46 +1519,41 @@ function StepFourInstall({
   return (
     <section className="flex flex-1 flex-col py-6">
       <div>
+        <InstallationEyebrow>Final setup</InstallationEyebrow>
         <h1 className="text-[30px] font-black leading-[1.04] tracking-[-0.04em] text-[#101613]">
-          Put Truthlabel on your Home Screen
+          One last step
         </h1>
         <p className="mt-3 text-[15px] leading-6 text-[#66716B]">
-          Install Truthlabel for faster access whenever you&apos;re shopping or
-          checking food at home.
+          Add TruthLabel to your Home Screen so you can open it instantly whenever you shop.
+        </p>
+        <p className="mt-2 text-[13.5px] font-semibold leading-5 text-[#66716B]">
+          It opens like an app and keeps your scanner one tap away.
         </p>
       </div>
 
-      <InstallInstructionVisual kind={deviceKind} />
-
-      <div className="mt-5 rounded-[20px] border border-[#D7E7DD] bg-[#F3FAF6] px-4 py-4">
-        <h2 className="text-[18px] font-black text-[#101613]">{copy.title}</h2>
-        <p className="mt-2 text-[13.5px] leading-6 text-[#66716B]">
-          {copy.copy}
+      <InstallCard>
+        <InstallationImagePlaceholder
+          imageKey="install-opening"
+          alt="TruthLabel app installation preview"
+          label="TruthLabel installation preview screenshot"
+          aspectRatio="4 / 5"
+        />
+        <p className="mt-4 text-center text-[12.5px] font-bold text-[#66716B]">
+          You can install TruthLabel later from your Account page.
         </p>
-        {deviceKind === "android_fallback" ? (
-          <ol className="mt-3 grid gap-2 text-[13px] font-semibold text-[#101613]">
-            <li>1. Open the browser menu</li>
-            <li>2. Tap &quot;Install app&quot; or &quot;Add to Home screen&quot;</li>
-            <li>3. Confirm &quot;Install&quot;</li>
-          </ol>
-        ) : null}
-        {deviceKind === "iphone_safari" ? (
-          <ol className="mt-3 grid gap-2 text-[13px] font-semibold text-[#101613]">
-            <li>1. Tap the Share icon</li>
-            <li>2. Tap &quot;Add to Home Screen&quot;</li>
-            <li>3. Enable &quot;Open as Web App&quot; when available</li>
-            <li>4. Tap &quot;Add&quot;</li>
-          </ol>
-        ) : null}
-      </div>
+      </InstallCard>
 
       <div className="mt-auto pt-6">
         <PrimaryButton onClick={handlePrimaryAction} disabled={promptBusy || isSaving}>
-          {promptBusy || isSaving ? "Working..." : copy.button}
+          {promptBusy || isSaving
+            ? "Opening installation..."
+            : deviceKind === "iphone_safari"
+              ? "Show me how"
+              : "Install TruthLabel"}
         </PrimaryButton>
-        {skipVisible ? (
-          <TextButton onClick={onDefer}>I&apos;ll do this later</TextButton>
-        ) : null}
+        <TextButton onClick={onDefer}>
+          {skipVisible ? "Continue in browser for now" : "Continue in browser for now"}
+        </TextButton>
       </div>
     </section>
   );
@@ -1063,6 +1588,7 @@ export default function TruthlabelOnboardingScreen() {
   const prefersReducedMotion = usePrefersReducedMotion();
   const reviewMode = searchParams.get("review") === "1";
   const restartMode = reviewMode && searchParams.get("restart") === "1";
+  const installReviewMode = reviewMode && searchParams.get("install") === "1";
   const [isPending, startTransition] = useTransition();
   const [hasMvpAccessPass, setHasMvpAccessPass] = useState(
     () => typeof window !== "undefined" && hasMvpActivationAccess(),
@@ -1138,11 +1664,12 @@ export default function TruthlabelOnboardingScreen() {
     async function loadState() {
       if (restartMode && !restartAppliedRef.current) {
         restartAppliedRef.current = true;
+        const restartStep = installReviewMode ? 4 : 1;
         const restartedState = await saveOnboardingState(userId, {
-          currentOnboardingStep: 1,
+          currentOnboardingStep: restartStep,
           onboardingStartedAt: new Date().toISOString(),
           onboardingCompletedAt: null,
-          allergySetupCompleted: false,
+          ...(installReviewMode ? {} : { allergySetupCompleted: false }),
           installPromptSeen: false,
           installPromptOutcome: null,
           appInstallStatus: "unknown",
@@ -1186,7 +1713,7 @@ export default function TruthlabelOnboardingScreen() {
     return () => {
       cancelled = true;
     };
-  }, [restartMode, reviewMode, router, user?.email, userId]);
+  }, [installReviewMode, restartMode, reviewMode, router, user?.email, userId]);
 
   useEffect(() => {
     if (!userId || trackedStartRef.current || !stateLoaded) {
@@ -1412,7 +1939,12 @@ export default function TruthlabelOnboardingScreen() {
       });
       setInstallOutcome(outcome);
       installStatusRef.current = installStatus;
-      setInstallCompleted(true);
+      setInstallCompleted(
+        outcome === "accepted" ||
+          outcome === "manual_confirmed" ||
+          outcome === "already_installed" ||
+          installStatus === "installed",
+      );
     },
     [userId],
   );
@@ -1495,6 +2027,7 @@ export default function TruthlabelOnboardingScreen() {
             isSaving={isPending}
             onInstallPromptUsed={(outcome, installStatus) => {
               setSkipInstallVisible(true);
+              setDeferredPrompt(null);
               void finishInstallStep(outcome, installStatus);
             }}
             onFinish={(outcome, installStatus) => {

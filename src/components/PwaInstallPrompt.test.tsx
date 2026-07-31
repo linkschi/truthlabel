@@ -68,10 +68,10 @@ test("PwaInstallPrompt shows mobile installation guidance", async () => {
   const rendered = await renderInstallPrompt();
 
   try {
-    assert.match(rendered.container.textContent ?? "", /Install Truthlabel/i);
+    assert.match(rendered.container.textContent ?? "", /Install TruthLabel/i);
     const button = rendered.container.querySelector("button");
     assert.ok(button);
-    assert.match(button.textContent ?? "", /How to install/i);
+    assert.match(button.textContent ?? "", /Show installation steps/i);
 
     await act(async () => {
       button.dispatchEvent(

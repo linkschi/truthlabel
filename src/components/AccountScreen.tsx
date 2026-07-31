@@ -970,6 +970,12 @@ export default function AccountScreen() {
             onClick={() => setProtectionPanel("scan")}
           />
           <RowLink
+            icon="check"
+            title="Install TruthLabel"
+            detail="Add TruthLabel to your Home Screen."
+            href="/app/onboarding?review=1&restart=1&install=1"
+          />
+          <RowLink
             icon="clipboard"
             title="View onboarding again"
             href="/app/onboarding?review=1&restart=1"

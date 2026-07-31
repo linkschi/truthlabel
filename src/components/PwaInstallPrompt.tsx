@@ -5,6 +5,7 @@ import {
   safeLocalStorageGetItem,
   safeLocalStorageSetItem,
 } from "@/lib/browserStorage";
+import { getSupabaseBrowserClient } from "@/lib/auth/supabaseClient";
 
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
@@ -65,6 +66,16 @@ function isAppleMobileDevice() {
   return /iPad|iPhone|iPod/i.test(navigator.userAgent) || touchMac;
 }
 
+function isAndroidDevice() {
+  return /Android/i.test(navigator.userAgent);
+}
+
+function isInAppBrowser() {
+  return /Instagram|FBAN|FBAV|FB_IAB|FBIOS|FB4A|TikTok|Bytedance|Line\/|MicroMessenger|Snapchat|Pinterest|LinkedInApp/i.test(
+    navigator.userAgent,
+  );
+}
+
 function isMobileDevice() {
   return (
     /Android|iPad|iPhone|iPod|Mobile/i.test(navigator.userAgent) ||
@@ -122,6 +133,7 @@ export default function PwaInstallPrompt() {
     useState<BeforeInstallPromptEvent | null>(null);
   const [installAccepted, setInstallAccepted] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
+  const [copyStatus, setCopyStatus] = useState("");
   const isClientReady = useSyncExternalStore(
     subscribeToClientReady,
     () => true,
@@ -133,6 +145,8 @@ export default function PwaInstallPrompt() {
     getInstallPromptDismissedServerSnapshot,
   );
   const isAppleMobile = isClientReady && isAppleMobileDevice();
+  const isAndroid = isClientReady && isAndroidDevice();
+  const isInApp = isClientReady && isInAppBrowser();
   const isReady = isClientReady && isMobileDevice();
   const isInstalled =
     installAccepted || (isClientReady && isStandaloneMode());
@@ -158,7 +172,7 @@ export default function PwaInstallPrompt() {
   }, []);
 
   async function handleInstall() {
-    if (!deferredPrompt) {
+    if (isInApp || !deferredPrompt) {
       setShowInstructions((current) => !current);
       return;
     }
@@ -172,6 +186,49 @@ export default function PwaInstallPrompt() {
     }
   }
 
+  async function handleCopySetupLink() {
+    const supabase = getSupabaseBrowserClient();
+
+    if (!supabase) {
+      setCopyStatus("Setup link unavailable. Open TruthLabel in Safari or Chrome and sign in.");
+      return;
+    }
+
+    try {
+      setCopyStatus("Creating setup link...");
+      const { data, error } = await supabase.auth.getSession();
+      const accessToken = data.session?.access_token;
+
+      if (error || !accessToken) {
+        throw new Error("Missing setup session.");
+      }
+
+      const response = await fetch("/api/setup-handoff/create", {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+      });
+      const payload = (await response.json().catch(() => ({}))) as {
+        setupUrl?: string;
+        message?: string;
+      };
+
+      if (!response.ok || !payload.setupUrl) {
+        throw new Error(payload.message || "Setup link could not be created.");
+      }
+
+      await navigator.clipboard.writeText(payload.setupUrl);
+      setCopyStatus(
+        isAndroid
+          ? "Setup link copied. Open Chrome, paste the link, and continue installing TruthLabel."
+          : "Setup link copied. Open Safari, paste the link, and continue installing TruthLabel.",
+      );
+    } catch {
+      setCopyStatus("Copy failed. Use your browser menu to open this page in Safari or Chrome.");
+    }
+  }
+
   function handleDismiss() {
     safeLocalStorageSetItem(INSTALL_PROMPT_DISMISSED_KEY, "true");
     window.dispatchEvent(new Event(INSTALL_PROMPT_DISMISSED_EVENT));
@@ -182,18 +239,41 @@ export default function PwaInstallPrompt() {
   }
 
   const hasNativePrompt = Boolean(deferredPrompt);
-  const installSteps = isAppleMobile
-    ? ["Tap Share in your browser", "Choose Add to Home Screen", "Tap Add"]
-    : [
-        hasNativePrompt ? "Tap Install app below" : "Open your browser menu",
-        hasNativePrompt ? "Confirm the install prompt" : "Choose Install app or Add to Home screen",
-        "Open Truthlabel from your phone screen",
-      ];
+  const installTitle = isInApp
+    ? isAndroid
+      ? "Open in Chrome to install TruthLabel"
+      : "Open in Safari to install TruthLabel"
+    : isAppleMobile
+      ? "Install TruthLabel on your iPhone"
+      : "Install TruthLabel on your phone";
+  const installSteps = isInApp
+    ? isAndroid
+      ? [
+          "Tap the browser menu",
+          "Choose Open in Chrome, Open in browser, or Open in external browser",
+          "Continue installing TruthLabel there",
+        ]
+      : [
+          "Tap the browser menu",
+          "Choose Open in Safari or Open in external browser",
+          "Continue installing TruthLabel in Safari",
+        ]
+    : isAppleMobile
+      ? [
+          "Tap Safari's Share button",
+          "Choose Add to Home Screen",
+          "Keep Open as Web App turned on, then tap Add",
+        ]
+      : [
+          hasNativePrompt ? "Tap Install TruthLabel below" : "Open your browser menu",
+          hasNativePrompt ? "Confirm the install prompt" : "Choose Install app or Add to Home screen",
+          "Open TruthLabel from your Home Screen",
+        ];
 
   return (
     <section
       className="mt-5 overflow-hidden rounded-[18px] border border-[#DCE7E1] bg-white px-4 py-3.5 shadow-[0_6px_18px_rgba(15,40,28,0.045)]"
-      aria-label="Install Truthlabel"
+      aria-label="Install TruthLabel"
       data-testid="pwa-install-prompt"
     >
       <div className="flex items-start gap-3">
@@ -202,10 +282,10 @@ export default function PwaInstallPrompt() {
         </span>
         <div className="min-w-0 flex-1">
           <h2 className="text-[15px] font-extrabold text-[#101613]">
-            Install Truthlabel
+            Install TruthLabel
           </h2>
           <p className="mt-1 text-[12px] leading-5 text-[#66716B]">
-            Open Truthlabel faster from your Home Screen.
+            Add TruthLabel to your Home Screen so it opens directly like an app whenever you shop.
           </p>
           <button
             type="button"
@@ -213,7 +293,7 @@ export default function PwaInstallPrompt() {
             className="mt-3 inline-flex min-h-9 items-center gap-2 rounded-full bg-[#0E5A3F] px-4 text-[12px] font-bold text-white outline-none transition active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2"
           >
             <InstallGlyph />
-            How to install
+            {hasNativePrompt && !isInApp ? "Install TruthLabel" : "Show installation steps"}
           </button>
         </div>
         <button
@@ -221,7 +301,7 @@ export default function PwaInstallPrompt() {
           onClick={handleDismiss}
           className="rounded-full px-2 py-1 text-[11px] font-bold text-[#879089] outline-none transition hover:text-[#0E5A3F] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2"
         >
-          Dismiss
+          I&apos;ll use the browser for now
         </button>
       </div>
 
@@ -231,8 +311,13 @@ export default function PwaInstallPrompt() {
           aria-live="polite"
         >
           <p className="font-extrabold text-[#101613]">
-            {isAppleMobile ? "iPhone install steps" : "Android install steps"}
+            {installTitle}
           </p>
+          {isInApp ? (
+            <p className="mt-1 text-[12px] leading-5 text-[#66716B]">
+              This browser cannot complete app installation. Open TruthLabel in your phone browser first.
+            </p>
+          ) : null}
           <ol className="mt-2 grid gap-1.5">
             {installSteps.map((step, index) => (
               <li key={step} className="flex gap-2">
@@ -243,6 +328,22 @@ export default function PwaInstallPrompt() {
               </li>
             ))}
           </ol>
+          {isInApp ? (
+            <div className="mt-3">
+              <button
+                type="button"
+                onClick={handleCopySetupLink}
+                className="inline-flex min-h-9 items-center rounded-full bg-[#0E5A3F] px-4 text-[12px] font-bold text-white outline-none transition active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2"
+              >
+                Copy secure setup link
+              </button>
+              {copyStatus ? (
+                <p className="mt-2 text-[12px] font-bold leading-5 text-[#0E5A3F]">
+                  {copyStatus}
+                </p>
+              ) : null}
+            </div>
+          ) : null}
         </div>
       ) : null}
     </section>
