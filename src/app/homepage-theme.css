@@ -579,10 +579,27 @@
 }
 
 .landing-media-slot--brands {
-  min-height: 14rem;
-  background:
-    radial-gradient(circle at 12% 12%, rgba(189, 32, 32, 0.12), transparent 12rem),
-    linear-gradient(145deg, #fff8f4, #ffffff);
+  display: block;
+  min-height: 0;
+  margin: 0;
+  overflow: hidden;
+  padding: 0;
+  background: #ffffff;
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow: 0 22px 48px rgba(3, 23, 14, 0.22);
+}
+
+.landing-media-slot--brands::before,
+.landing-media-slot--brands::after {
+  display: none;
+}
+
+.landing-brand-shopping-image {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  object-position: center;
 }
 
 .landing-profit-section {

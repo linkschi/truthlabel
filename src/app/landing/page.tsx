@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import FloatingInsights from "@/components/FloatingInsights";
 import LandingConcernCarousel from "@/components/LandingConcernCarousel";
@@ -375,11 +376,15 @@ export default function LandingPage() {
               </>
             }
           />
-          <div className="landing-media-slot landing-media-slot--brands">
-            <span>Image placeholder</span>
-            <strong>Popular brands and people shopping</strong>
-            <p>Add a visual showing everyday supermarket choices and brand evidence.</p>
-          </div>
+          <figure className="landing-media-slot landing-media-slot--brands">
+            <Image
+              className="landing-brand-shopping-image"
+              src="/landing-brand-shopping.jpeg"
+              alt="Supermarket aisle with popular packaged-food brand logos above shoppers"
+              width={851}
+              height={1280}
+            />
+          </figure>
         </div>
         <div className="landing-profit-copy">
           <p>
