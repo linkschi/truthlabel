@@ -32,6 +32,7 @@ import {
   getUserSettings,
   updateAllergyProfile,
 } from "@/lib/userSettings/userSettingsStorage";
+import { WelcomeOnboarding } from "./WelcomeOnboarding";
 
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
@@ -158,29 +159,6 @@ const expandedAllergenChips: AllergyChip[] = [
   { id: "molluscs", label: "Molluscs", values: ["molluscs"] },
   { id: "sulphites", label: "Sulphites", values: ["sulphites"] },
 ];
-
-const demoFindings = [
-  {
-    tone: "red",
-    label: "Banned ingredients",
-    title: "Restricted-item checks",
-  },
-  {
-    tone: "red",
-    label: "Cancer-linked warnings",
-    title: "High-concern ingredient checks",
-  },
-  {
-    tone: "red",
-    label: "Lab-made food",
-    title: "Bioengineered food checks",
-  },
-  {
-    tone: "red",
-    label: "Brand warnings",
-    title: "Recalls and safety records",
-  },
-] as const;
 
 function uniqueStrings(values: Array<string | null | undefined>) {
   const seen = new Set<string>();
@@ -547,164 +525,6 @@ function TextButton({
     >
       {children}
     </button>
-  );
-}
-
-function DemoScoreRing({ score }: { score: number }) {
-  return (
-    <div className="relative inline-flex h-[76px] w-[76px] items-center justify-center rounded-full bg-white shadow-[0_12px_28px_rgba(15,40,28,0.08)]">
-      <ProgressRing value={score} size={76} stroke={8} label={`Demo score ${score} out of 100`} />
-      <span className="absolute text-center">
-        <span className="block text-[18px] font-black text-[#101613]">
-          {score}
-        </span>
-        <span className="block text-[9px] font-black uppercase tracking-[0.1em] text-[#66716B]">
-          /100
-        </span>
-      </span>
-    </div>
-  );
-}
-
-function DemoFindingCard({
-  finding,
-}: {
-  finding: (typeof demoFindings)[number];
-}) {
-  return (
-    <article className="truthlabel-category-enter flex items-center gap-3 rounded-[16px] border border-[#F3D2D4] bg-[#FFF6F6] px-3 py-2.5">
-      <span
-        aria-hidden="true"
-        className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#FDECEE] text-[15px] font-black text-[#C62D36]"
-      >
-        !
-      </span>
-      <div className="min-w-0">
-        <p className="text-[9.5px] font-black uppercase tracking-[0.13em] text-[#A33A3F]">
-          {finding.label}
-        </p>
-        <h3 className="mt-0.5 text-[13px] font-black leading-5 text-[#101613]">
-          {finding.title}
-        </h3>
-      </div>
-    </article>
-  );
-}
-
-function StepOneWelcome({
-  onContinue,
-  onSkip,
-}: {
-  onContinue: () => void;
-  onSkip: () => void;
-}) {
-  const prefersReducedMotion = usePrefersReducedMotion();
-  const [phase, setPhase] = useState(prefersReducedMotion ? 7 : 0);
-  const finalScore = 92;
-  const score = phase >= 2 ? finalScore : 0;
-  const visibleFindings = Math.max(0, Math.min(demoFindings.length, phase - 2));
-  const importantResultVisible = phase >= 3;
-
-  useEffect(() => {
-    if (prefersReducedMotion) {
-      const timer = window.setTimeout(() => setPhase(7), 0);
-      return () => window.clearTimeout(timer);
-    }
-
-    const timers = [180, 360, 580, 800, 1020, 1280, 1580].map((delayMs, index) =>
-      window.setTimeout(() => setPhase(index + 1), delayMs),
-    );
-
-    return () => timers.forEach((timer) => window.clearTimeout(timer));
-  }, [prefersReducedMotion]);
-
-  useEffect(() => {
-    trackTruthlabelEvent("demo_viewed", { onboarding_step: 1, screen: "welcome" });
-  }, []);
-
-  return (
-    <section className="flex flex-1 flex-col py-6">
-      <div className="text-center">
-        <p className="mx-auto inline-flex rounded-full border border-[#D7E7DD] bg-white px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.16em] text-[#0E5A3F] shadow-[0_8px_22px_rgba(15,40,28,0.06)]">
-          Welcome to Truthlabel
-        </p>
-        <h1 className="mx-auto mt-4 max-w-[390px] text-[34px] font-black leading-[1.02] tracking-[-0.05em] text-[#101613]">
-          Scan before you trust it.
-        </h1>
-      </div>
-
-      <div className="mt-6 grid grid-cols-3 gap-2.5">
-        {[
-          ["Scan", "Barcode or label"],
-          ["Check", "Warnings and reasons"],
-          ["Decide", "Clear next action"],
-        ].map(([title, copy]) => (
-          <div
-            key={title}
-            className="rounded-[18px] border border-[#D7E7DD] bg-white px-2.5 py-3 text-center shadow-[0_10px_24px_rgba(15,40,28,0.05)]"
-          >
-            <p className="text-[13px] font-black text-[#101613]">{title}</p>
-            <p className="mt-1 text-[10.5px] font-bold leading-4 text-[#66716B]">
-              {copy}
-            </p>
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-5 rounded-[30px] border border-[#D7E7DD] bg-white p-4 shadow-[0_18px_48px_rgba(15,40,28,0.08)]">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex min-w-0 items-center gap-3">
-            <Image
-              src="/onboarding-chocolate-cereal.svg"
-              alt="Example chocolate cereal box"
-              width={72}
-              height={72}
-              priority
-              className="h-[72px] w-[72px] rounded-[22px] border border-[#F1DDAD] bg-[#FFF8D7] object-cover"
-            />
-            <div className="min-w-0">
-              <p className="text-[11px] font-black uppercase tracking-[0.16em] text-[#8A6500]">
-                Example scan
-              </p>
-              <h2 className="mt-1 text-[18px] font-black leading-tight text-[#101613]">
-                Example Chocolate Cereal
-              </h2>
-              <p
-                className="mt-1 text-[12.5px] font-bold text-[#66716B]"
-                aria-live="polite"
-              >
-                {phase < 2 ? "Checking ingredients..." : "Findings ready"}
-              </p>
-            </div>
-          </div>
-          <DemoScoreRing score={score} />
-        </div>
-
-        <div className="mt-4 grid gap-2.5" aria-live="polite">
-          {demoFindings.slice(0, visibleFindings).map((finding) => (
-            <DemoFindingCard key={finding.title} finding={finding} />
-          ))}
-        </div>
-
-        {phase >= 7 ? (
-          <div className="mt-4 rounded-[22px] border border-[#F3D2D4] bg-[#FFF6F6] px-4 py-4">
-            <p className="text-[11px] font-black uppercase tracking-[0.16em] text-[#A33A3F]">
-              Final verdict
-            </p>
-            <p className="mt-1 text-[22px] font-black tracking-[-0.03em] text-[#101613]">
-              Recommended to avoid
-            </p>
-          </div>
-        ) : null}
-      </div>
-
-      <div className="mt-auto pt-6">
-        <PrimaryButton onClick={onContinue} disabled={!importantResultVisible}>
-          Start setup
-        </PrimaryButton>
-        <TextButton onClick={onSkip}>Skip intro</TextButton>
-      </div>
-    </section>
   );
 }
 
@@ -1949,15 +1769,7 @@ export default function TruthlabelOnboardingScreen() {
   const content = useMemo(() => {
     switch (step) {
       case 1:
-        return (
-          <StepOneWelcome
-            onContinue={() => void goToStep(2)}
-            onSkip={() => {
-              trackTruthlabelEvent("demo_skipped", { onboarding_step: 1, screen: "welcome" }, { userId });
-              void goToStep(2);
-            }}
-          />
-        );
+        return <WelcomeOnboarding onContinue={() => void goToStep(2)} />;
       case 2:
         return (
           <StepTwoAllergies
@@ -2031,7 +1843,6 @@ export default function TruthlabelOnboardingScreen() {
     setupComplete,
     skipInstallVisible,
     step,
-    userId,
   ]);
 
   if (!stateLoaded || accessState === "loading") {
@@ -2050,6 +1861,10 @@ export default function TruthlabelOnboardingScreen() {
         </section>
       </main>
     );
+  }
+
+  if (step === 1) {
+    return content;
   }
 
   return (
