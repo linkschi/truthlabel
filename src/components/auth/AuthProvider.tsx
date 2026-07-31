@@ -21,6 +21,7 @@ import {
   type TruthlabelSubscription,
   type TruthlabelTrialAccess,
 } from "@/lib/auth/access";
+import { publicAppConfig } from "@/lib/appConfig";
 import { clearMvpActivationAccess } from "@/lib/auth/mvpActivationAccess";
 import { getSupabaseBrowserClient } from "@/lib/auth/supabaseClient";
 import {
@@ -223,6 +224,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [errorMessage, setErrorMessage] = useState("");
   const supabase = getSupabaseBrowserClient();
   const currentUserRef = useRef<User | null>(null);
+  const allowSignedInMvpAccess = publicAppConfig.flags.enableSignedInMvpAccess;
 
   const refreshAccess = useCallback(async () => {
     if (!supabase) {
@@ -381,6 +383,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     userPresent: Boolean(user),
     subscription,
     trialAccess,
+    allowSignedInMvpAccess,
   });
   const accessKind = getAccessKind({ subscription, trialAccess });
   const trialDaysRemaining = getTrialDaysRemaining(trialAccess);

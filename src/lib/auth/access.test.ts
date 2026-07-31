@@ -40,6 +40,19 @@ test("account-created trial rows do not grant app access without Gumroad access"
   );
 });
 
+test("signed-in MVP access mode lets a valid login use the app", () => {
+  assert.equal(
+    getAccessState({
+      authLoading: false,
+      userPresent: true,
+      subscription: null,
+      trialAccess: null,
+      allowSignedInMvpAccess: true,
+    }),
+    "active",
+  );
+});
+
 test("expired trial without paid access is inactive", () => {
   const expiredTrial = {
     trial_started_at: new Date(now - 9 * 86_400_000).toISOString(),

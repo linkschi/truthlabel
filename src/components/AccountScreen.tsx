@@ -381,7 +381,11 @@ function getAccessStatus(args: {
     };
   }
 
-  if (args.accessKind === "paid" || args.hasMvpAccessPass) {
+  if (
+    args.accessKind === "paid" ||
+    args.hasMvpAccessPass ||
+    args.accessState === "active"
+  ) {
     return {
       label: "Active",
       className: "border-[#BFDCCB] bg-[#EDF7F1] text-[#0E5A3F]",

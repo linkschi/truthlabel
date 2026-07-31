@@ -72,8 +72,13 @@ Truthlabel MVP currently does not require private API keys for core scanning.
 - `NEXT_PUBLIC_ENABLE_DEMO_PRODUCTS`
 - `NEXT_PUBLIC_ENABLE_TEST_FEEDBACK`
 - `NEXT_PUBLIC_ENABLE_DEBUG_OUTPUT`
+- `NEXT_PUBLIC_ENABLE_SIGNED_IN_MVP_ACCESS`
 
 `NEXT_PUBLIC_ENABLE_DEBUG_OUTPUT` should stay `false` in production.
+`NEXT_PUBLIC_ENABLE_SIGNED_IN_MVP_ACCESS` is a temporary MVP launch setting
+that lets any successfully signed-in account use the app while checkout
+activation matching is being hardened. Turn it off for stricter paid-only
+access.
 
 ## MVP behavior and trust notes
 

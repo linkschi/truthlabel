@@ -96,6 +96,7 @@ export function getAccessState(args: {
   userPresent: boolean;
   subscription: TruthlabelSubscription | null;
   trialAccess: TruthlabelTrialAccess | null;
+  allowSignedInMvpAccess?: boolean;
 }): AccessState {
   if (args.authLoading) {
     return "loading";
@@ -103,6 +104,10 @@ export function getAccessState(args: {
 
   if (!args.userPresent) {
     return "signed_out";
+  }
+
+  if (args.allowSignedInMvpAccess) {
+    return "active";
   }
 
   return getAccessKind(args) === "none" ? "inactive" : "active";

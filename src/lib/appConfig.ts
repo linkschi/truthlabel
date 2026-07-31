@@ -87,6 +87,10 @@ export const publicAppConfig = {
       "NEXT_PUBLIC_ENABLE_INTERNAL_ANALYTICS_DASHBOARD",
       isDevelopmentRuntime,
     ),
+    enableSignedInMvpAccess: readBooleanEnv(
+      "NEXT_PUBLIC_ENABLE_SIGNED_IN_MVP_ACCESS",
+      true,
+    ),
     enableLocalDevBypass:
       isDevelopmentRuntime &&
       readBooleanEnv("NEXT_PUBLIC_ENABLE_LOCAL_DEV_BYPASS", true),
