@@ -1244,11 +1244,10 @@ export default function AccountScreen() {
                   >
                     Need to cancel?
                   </h2>
-                  <p className="mt-2 text-[13px] leading-6 text-[#56635C]">
-                    Open the receipt email from checkout and click the
-                    subscription settings or manage membership button. If you
-                    cannot find the receipt, send us your checkout email and
-                    we will resend it.
+                  <p className="mt-2 text-[15px] font-semibold leading-7 text-[#101613]">
+                    Open the receipt from your checkout email and click the
+                    subscription settings or manage membership button to
+                    cancel.
                   </p>
                 </div>
                 <button
@@ -1267,7 +1266,7 @@ export default function AccountScreen() {
                   onClick={closeCancelDialog}
                   className="inline-flex min-h-12 items-center justify-center rounded-full bg-[#0E5A3F] px-4 text-[13px] font-extrabold text-white transition hover:bg-[#0B4732] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
                 >
-                  I will check my receipt email
+                  Go check my email
                 </button>
                 <button
                   type="button"
@@ -1275,7 +1274,7 @@ export default function AccountScreen() {
                   aria-expanded={cancelReceiptHelpOpen}
                   className="inline-flex min-h-12 items-center justify-center rounded-full border border-[#DCE5DF] bg-white px-4 text-[13px] font-extrabold text-[#0E5A3F] transition hover:bg-[#EDF7F1] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
                 >
-                  I cannot find my receipt
+                  I cannot find my email
                 </button>
               </div>
 
@@ -1285,9 +1284,8 @@ export default function AccountScreen() {
                     We can resend it for you.
                   </p>
                   <p className="mt-1.5 text-[12.5px] leading-5 text-[#56635C]">
-                    Enter the email you used at checkout. Your signed-in
-                    account is included automatically so we can match the
-                    request.
+                    It may be the same email you signed in with, or it could
+                    be different. Simply enter the email you used at checkout.
                   </p>
 
                   <div className="mt-3 rounded-[16px] border border-[#DCE5DF] bg-white px-3 py-2.5">
