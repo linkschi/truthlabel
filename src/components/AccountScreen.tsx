@@ -877,8 +877,16 @@ export default function AccountScreen() {
             </span>
           </div>
           {errorMessage ? (
-            <p className="mt-3 rounded-[14px] border border-[#F4C7C9] bg-[#FFF6F6] px-3 py-2 text-[12px] font-semibold leading-5 text-[#B42318]">
-              Access lookup failed. Try checking access again.
+            <p
+              className={`mt-3 rounded-[14px] border px-3 py-2 text-[12px] font-semibold leading-5 ${
+                accessIsActive
+                  ? "border-[#BFDCCB] bg-[#EDF7F1] text-[#0E5A3F]"
+                  : "border-[#F4C7C9] bg-[#FFF6F6] text-[#B42318]"
+              }`}
+            >
+              {accessIsActive
+                ? "Access is active. The latest refresh did not finish, so Truthlabel is using the last confirmed account access."
+                : "Access lookup failed. Try checking access again."}
             </p>
           ) : null}
           {hasMvpAccessPass && accessKind !== "paid" ? (

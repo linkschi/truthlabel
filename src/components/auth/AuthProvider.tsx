@@ -7,6 +7,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import type { User } from "@supabase/supabase-js";
@@ -14,6 +15,7 @@ import {
   getAccessKind,
   getAccessState,
   getTrialDaysRemaining,
+  hasPaidAccess,
   type AccessKind,
   type AccessState,
   type TruthlabelSubscription,
@@ -21,6 +23,11 @@ import {
 } from "@/lib/auth/access";
 import { clearMvpActivationAccess } from "@/lib/auth/mvpActivationAccess";
 import { getSupabaseBrowserClient } from "@/lib/auth/supabaseClient";
+import {
+  safeLocalStorageGetItem,
+  safeLocalStorageRemoveItem,
+  safeLocalStorageSetItem,
+} from "@/lib/browserStorage";
 import { getUserSettings } from "@/lib/userSettings/userSettingsStorage";
 
 type AuthContextValue = {
@@ -37,9 +44,77 @@ type AuthContextValue = {
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
+const activeAccessCachePrefix = "truthlabel.accountAccess.active.";
+
+type CachedAccountAccess = {
+  userId: string;
+  subscription: TruthlabelSubscription;
+  trialAccess: TruthlabelTrialAccess | null;
+  cachedAt: string;
+};
 
 function uniqueStrings(values: string[]) {
   return Array.from(new Set(values.map((value) => value.trim()).filter(Boolean)));
+}
+
+function getActiveAccessCacheKey(userId: string) {
+  return `${activeAccessCachePrefix}${userId}`;
+}
+
+function isCachedAccountAccess(value: unknown): value is CachedAccountAccess {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return false;
+  }
+
+  const record = value as Partial<CachedAccountAccess>;
+
+  return Boolean(
+    record.userId &&
+      record.subscription &&
+      typeof record.subscription === "object" &&
+      hasPaidAccess(record.subscription),
+  );
+}
+
+function readCachedAccountAccess(userId: string) {
+  const rawValue = safeLocalStorageGetItem(getActiveAccessCacheKey(userId));
+
+  if (!rawValue) {
+    return null;
+  }
+
+  try {
+    const parsedValue: unknown = JSON.parse(rawValue);
+
+    if (!isCachedAccountAccess(parsedValue) || parsedValue.userId !== userId) {
+      return null;
+    }
+
+    return parsedValue;
+  } catch {
+    return null;
+  }
+}
+
+function saveCachedAccountAccess(
+  userId: string,
+  subscription: TruthlabelSubscription | null,
+  trialAccess: TruthlabelTrialAccess | null,
+) {
+  if (!subscription || !hasPaidAccess(subscription)) {
+    safeLocalStorageRemoveItem(getActiveAccessCacheKey(userId));
+    return;
+  }
+
+  safeLocalStorageSetItem(
+    getActiveAccessCacheKey(userId),
+    JSON.stringify({
+      userId,
+      subscription,
+      trialAccess,
+      cachedAt: new Date().toISOString(),
+    } satisfies CachedAccountAccess),
+  );
 }
 
 async function ensureUserSettingsRow(userId: string) {
@@ -147,6 +222,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const supabase = getSupabaseBrowserClient();
+  const currentUserRef = useRef<User | null>(null);
 
   const refreshAccess = useCallback(async () => {
     if (!supabase) {
@@ -157,6 +233,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     setIsLoading(true);
     setErrorMessage("");
+    let currentUser: User | null = currentUserRef.current;
 
     try {
       const { data, error } = await supabase.auth.getSession();
@@ -165,7 +242,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw error;
       }
 
-      const currentUser = data.session?.user ?? null;
+      currentUser = data.session?.user ?? null;
+      currentUserRef.current = currentUser;
       setUser(currentUser);
 
       if (!currentUser) {
@@ -174,16 +252,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      await ensureUserSettingsRow(currentUser.id);
+      await ensureUserSettingsRow(currentUser.id).catch(() => undefined);
       const [nextSubscription, nextTrialAccess] = await Promise.all([
         loadSubscription(currentUser.id),
         loadTrialAccess(currentUser.id),
       ]);
       setSubscription(nextSubscription);
       setTrialAccess(nextTrialAccess);
+      saveCachedAccountAccess(
+        currentUser.id,
+        nextSubscription,
+        nextTrialAccess,
+      );
     } catch (error) {
-      setSubscription(null);
-      setTrialAccess(null);
+      if (currentUser) {
+        const cachedAccess = readCachedAccountAccess(currentUser.id);
+
+        if (cachedAccess) {
+          setUser(currentUser);
+          currentUserRef.current = currentUser;
+          setSubscription(cachedAccess.subscription);
+          setTrialAccess(cachedAccess.trialAccess);
+        }
+      }
+
       setErrorMessage(
         error instanceof Error
           ? error.message
@@ -205,6 +297,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const { data } = supabase.auth.onAuthStateChange((_event, session) => {
       const nextUser = session?.user ?? null;
+      currentUserRef.current = nextUser;
       setUser(nextUser);
       setIsLoading(true);
 
@@ -216,6 +309,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       void ensureUserSettingsRow(nextUser.id)
+        .catch(() => undefined)
         .then(() =>
           Promise.all([
             loadSubscription(nextUser.id),
@@ -225,11 +319,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .then(([nextSubscription, nextTrialAccess]) => {
           setSubscription(nextSubscription);
           setTrialAccess(nextTrialAccess);
+          saveCachedAccountAccess(
+            nextUser.id,
+            nextSubscription,
+            nextTrialAccess,
+          );
           setErrorMessage("");
         })
         .catch((error: unknown) => {
-          setSubscription(null);
-          setTrialAccess(null);
+          const cachedAccess = readCachedAccountAccess(nextUser.id);
+
+          if (cachedAccess) {
+            setSubscription(cachedAccess.subscription);
+            setTrialAccess(cachedAccess.trialAccess);
+          }
+
           setErrorMessage(
             error instanceof Error
               ? error.message
@@ -294,12 +398,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       refreshAccess,
       signOut: async () => {
         clearMvpActivationAccess();
+        const signedOutUserId = user?.id;
 
         if (!supabase) {
+          if (signedOutUserId) {
+            safeLocalStorageRemoveItem(getActiveAccessCacheKey(signedOutUserId));
+          }
           return;
         }
 
         await supabase.auth.signOut();
+        if (signedOutUserId) {
+          safeLocalStorageRemoveItem(getActiveAccessCacheKey(signedOutUserId));
+        }
+        currentUserRef.current = null;
         setUser(null);
         setSubscription(null);
         setTrialAccess(null);
