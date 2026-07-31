@@ -165,21 +165,44 @@ async function waitFor<T>(assertion: () => T, timeoutMs = 2000): Promise<T> {
   throw lastError ?? new Error("Timed out while waiting for assertion.");
 }
 
+async function clickButton(rendered: RenderedScanner, label: RegExp) {
+  const button = Array.from(
+    rendered.container.querySelectorAll("button"),
+  ).find((candidate) => label.test(candidate.textContent ?? ""));
+  assert.ok(button, `Expected button matching ${label}`);
+
+  await act(async () => {
+    button.dispatchEvent(
+      new rendered.dom.window.MouseEvent("click", { bubbles: true }),
+    );
+  });
+}
+
+async function allowCamera(rendered: RenderedScanner) {
+  await clickButton(rendered, /Allow camera/i);
+}
+
 test("CameraBarcodeScanner renders the scanner shell", async () => {
+  let cameraRequested = false;
   const rendered = await renderScanner(undefined, {
     configureDom() {
       Object.defineProperty(globalThis.navigator, "mediaDevices", {
         configurable: true,
         value: {
-          getUserMedia: () => new Promise(() => undefined),
+          getUserMedia: () => {
+            cameraRequested = true;
+            return new Promise(() => undefined);
+          },
         },
       });
     },
   });
 
   try {
-    assert.match(rendered.container.textContent ?? "", /Scan Barcode/i);
-    assert.match(rendered.container.textContent ?? "", /Allow camera access/i);
+    assert.match(rendered.container.textContent ?? "", /Camera permission/i);
+    assert.match(rendered.container.textContent ?? "", /Truthlabel needs your camera/i);
+    assert.match(rendered.container.textContent ?? "", /Allow camera/i);
+    assert.equal(cameraRequested, false);
   } finally {
     await rendered.cleanup();
   }
@@ -202,6 +225,7 @@ test("CameraBarcodeScanner shows permission denied message", async () => {
   });
 
   try {
+    await allowCamera(rendered);
     await waitFor(() => {
       assert.match(
         rendered.container.textContent ?? "",
@@ -230,6 +254,7 @@ test("CameraBarcodeScanner shows no camera message", async () => {
   });
 
   try {
+    await allowCamera(rendered);
     await waitFor(() => {
       assert.match(rendered.container.textContent ?? "", /No camera was found/i);
     });
@@ -352,6 +377,7 @@ test("CameraBarcodeScanner detects a barcode and stops the stream", async () => 
   );
 
   try {
+    await allowCamera(rendered);
     await waitFor(() => {
       assert.deepEqual(detectedBarcodes, ["0123456789012"]);
       assert.equal(getStopCount(), 1);
@@ -398,6 +424,7 @@ test("CameraBarcodeScanner keeps a pending lookup alive when its parent callback
   );
 
   try {
+    await allowCamera(rendered);
     await waitFor(() => {
       assert.match(rendered.container.textContent ?? "", /Finding product/i);
     });
@@ -458,9 +485,10 @@ test("CameraBarcodeScanner recovers when product lookup times out", async () => 
   );
 
   try {
+    await allowCamera(rendered);
     await waitFor(() => {
       assert.match(rendered.container.textContent ?? "", /Lookup took too long/i);
-      assert.match(rendered.container.textContent ?? "", /scan the ingredients instead/i);
+      assert.match(rendered.container.textContent ?? "", /enter the details manually/i);
     });
   } finally {
     await rendered.cleanup();
@@ -501,6 +529,11 @@ test("CameraBarcodeScanner close button cleans up the stream", async () => {
   );
 
   try {
+    await allowCamera(rendered);
+    await waitFor(() => {
+      assert.match(rendered.container.textContent ?? "", /Align the barcode/i);
+    });
+
     const closeButton = rendered.container.querySelector("button");
     assert.ok(closeButton);
 

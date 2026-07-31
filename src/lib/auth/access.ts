@@ -12,6 +12,9 @@ export type TruthlabelSubscription = {
   status: SubscriptionStatus;
   access_ends_at: string | null;
   last_verified_at?: string | null;
+  last_gumroad_event_at?: string | null;
+  last_gumroad_ping_received_at?: string | null;
+  cancellation_detected_at?: string | null;
 };
 
 export type TruthlabelTrialAccess = {

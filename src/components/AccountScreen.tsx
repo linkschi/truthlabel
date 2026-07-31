@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import AllergyProfileSettings from "@/components/AllergyProfileSettings";
 import ScanPreferencesSettings from "@/components/ScanPreferencesSettings";
 import SupportContactLink from "@/components/SupportContactLink";
 import { useTruthlabelAuth } from "@/components/auth/AuthProvider";
+import { publicAppConfig } from "@/lib/appConfig";
+import { hasMvpActivationAccess } from "@/lib/auth/mvpActivationAccess";
 import { getBrowserStorageNotice } from "@/lib/browserStorage";
 import {
   clearUserSettings,
@@ -172,6 +174,60 @@ function getAccountFirstName(metadata: unknown) {
   return typeof firstName === "string" ? firstName.trim() : "";
 }
 
+function formatAccountDate(value: string | null | undefined) {
+  if (!value) {
+    return "";
+  }
+
+  const timestamp = new Date(value).getTime();
+
+  if (!Number.isFinite(timestamp)) {
+    return "";
+  }
+
+  return new Intl.DateTimeFormat(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(timestamp);
+}
+
+function getSubscriptionAccessLabel(
+  subscription: ReturnType<typeof useTruthlabelAuth>["subscription"],
+) {
+  if (!subscription) {
+    return "";
+  }
+
+  const accessEndDate = formatAccountDate(subscription.access_ends_at);
+
+  switch (subscription.status) {
+    case "active":
+      return "Active subscription";
+    case "active_until_end":
+      return accessEndDate
+        ? `Canceled, active until ${accessEndDate}`
+        : "Canceled, active until period end";
+    case "payment_failed":
+      return "Payment issue";
+    case "expired":
+      return "Expired";
+    case "refunded":
+      return "Refunded";
+    case "disputed":
+      return "Payment disputed";
+    case "chargebacked":
+      return "Chargebacked";
+    case "inactive":
+    default:
+      return "Inactive";
+  }
+}
+
+function subscribeToMvpAccessStore() {
+  return () => undefined;
+}
+
 export default function AccountScreen() {
   const router = useRouter();
   const settings = useUserSettings();
@@ -186,12 +242,24 @@ export default function AccountScreen() {
   } = useTruthlabelAuth();
   const [statusMessage, setStatusMessage] = useState("");
   const [isPreferencesOpen, setIsPreferencesOpen] = useState(false);
+  const [isCancelConfirmOpen, setIsCancelConfirmOpen] = useState(false);
+  const hasMvpAccessPass = useSyncExternalStore(
+    subscribeToMvpAccessStore,
+    hasMvpActivationAccess,
+    () => false,
+  );
   const storageNotice = getBrowserStorageNotice();
+  const manageSubscriptionUrl =
+    publicAppConfig.gumroadManageSubscriptionUrl ||
+    publicAppConfig.gumroadCheckoutUrl;
+  const subscriptionAccessLabel = getSubscriptionAccessLabel(subscription);
 
   const accessLabel =
     accessKind === "paid"
-      ? "Active subscription or trial"
-      : subscription?.status ?? "Inactive";
+      ? subscriptionAccessLabel || "Active subscription"
+      : hasMvpAccessPass
+        ? "Active MVP access on this device"
+        : subscriptionAccessLabel || "Inactive";
   const accountFirstName = getAccountFirstName(user?.user_metadata);
   void trialAccess;
   void trialDaysRemaining;
@@ -228,7 +296,12 @@ export default function AccountScreen() {
 
   async function handleRefreshAccess() {
     await refreshAccess();
-    setStatusMessage("Access status refreshed.");
+    const nextHasMvpAccessPass = hasMvpActivationAccess();
+    setStatusMessage(
+      nextHasMvpAccessPass
+        ? "MVP access is active on this device."
+        : "Access status refreshed.",
+    );
   }
 
   return (
@@ -304,6 +377,12 @@ export default function AccountScreen() {
             Truthlabel keeps you signed in on this device unless you sign out
             or clear the app&apos;s browser data.
           </p>
+          {hasMvpAccessPass && accessKind !== "paid" ? (
+            <p className="mt-3 rounded-[14px] border border-[#D7E7DD] bg-[#F3FAF6] px-3 py-2 text-[12px] font-semibold leading-5 text-[#0E5A3F]">
+              Your activation link has opened MVP access on this device. Full
+              checkout/subscription linking can still be completed later.
+            </p>
+          ) : null}
           {statusMessage ? (
             <p className="mt-3 rounded-[14px] border border-[#D7E7DD] bg-[#F3FAF6] px-3 py-2 text-[12px] font-semibold text-[#0E5A3F]">
               {statusMessage}
@@ -323,6 +402,12 @@ export default function AccountScreen() {
             >
               Activation
             </Link>
+            <Link
+              href="/app/onboarding?review=1&restart=1"
+              className="inline-flex h-10 items-center rounded-full border border-[#D7E7DD] bg-[#F3FAF6] px-4 text-[12px] font-bold text-[#0E5A3F] transition hover:bg-[#E8F6EF] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
+            >
+              View onboarding again
+            </Link>
             <button
               type="button"
               onClick={() => void handleSignOut()}
@@ -330,6 +415,90 @@ export default function AccountScreen() {
             >
               Sign out
             </button>
+          </div>
+        </section>
+
+        <section className="mt-4 rounded-[18px] border border-[#F1DDAD] bg-[#FFFBEC] px-4 py-4">
+          <div className="flex items-start gap-3">
+            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-white text-[#8A6500]">
+              <Icon name="lock" className="h-5 w-5" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <h2 className="text-[16px] font-extrabold text-[#101613]">
+                Subscription
+              </h2>
+              <p className="mt-1 text-[13px] leading-[1.5] text-[#66716B]">
+                Manage billing or cancel your Truthlabel subscription from the
+                checkout account page. If you cancel, access should remain on
+                until the current billing period ends.
+              </p>
+              {subscription?.status === "active_until_end" ? (
+                <p className="mt-3 rounded-[14px] border border-[#F1DDAD] bg-white px-3 py-2 text-[12px] font-semibold leading-5 text-[#8A6500]">
+                  Cancellation received. {accessLabel}
+                </p>
+              ) : null}
+              {isCancelConfirmOpen ? (
+                <div className="mt-3 rounded-[16px] border border-[#F3D2D4] bg-white px-3 py-3">
+                  <p className="text-[13px] font-extrabold text-[#101613]">
+                    Are you sure you want to cancel?
+                  </p>
+                  <p className="mt-1 text-[12.5px] leading-5 text-[#66716B]">
+                    This opens your subscription management page. Truthlabel
+                    will update access when the checkout cancellation signal is
+                    received.
+                  </p>
+                  <div className="mt-3 rounded-[14px] border border-[#D7E7DD] bg-[#F8FBF9] px-3 py-2.5 text-left">
+                    <p className="text-[12.5px] font-extrabold text-[#101613]">
+                      Different checkout email?
+                    </p>
+                    <p className="mt-1 text-[12px] leading-5 text-[#66716B]">
+                      Link your license key before canceling so Truthlabel knows
+                      which account and checkout belong together. You can
+                      usually find the key in your purchase email or receipt.
+                    </p>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      <Link
+                        href="/activate"
+                        className="inline-flex h-9 items-center rounded-full border border-[#BFDCCB] bg-white px-3.5 text-[11px] font-bold text-[#0E5A3F] transition hover:bg-[#E8F6EF] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
+                      >
+                        Link license key
+                      </Link>
+                      <SupportContactLink
+                        context="Lost license key or cancel help"
+                        className="inline-flex h-9 items-center rounded-full border border-[#E2E8E4] bg-white px-3.5 text-[11px] font-bold text-[#66716B] transition hover:bg-[#F6F8F7] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
+                      >
+                        I lost my key
+                      </SupportContactLink>
+                    </div>
+                  </div>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <a
+                      href={manageSubscriptionUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex h-10 items-center rounded-full bg-[#A33A3F] px-4 text-[12px] font-bold text-white transition hover:bg-[#8D3035] focus-visible:ring-2 focus-visible:ring-[#A33A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
+                    >
+                      Continue to cancel
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => setIsCancelConfirmOpen(false)}
+                      className="inline-flex h-10 items-center rounded-full border border-[#D7E7DD] bg-white px-4 text-[12px] font-bold text-[#0E5A3F] transition hover:bg-[#F3FAF6] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
+                    >
+                      Keep subscription
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setIsCancelConfirmOpen(true)}
+                  className="mt-3 inline-flex h-10 items-center rounded-full border border-[#F3D2D4] bg-white px-4 text-[12px] font-bold text-[#A33A3F] transition hover:bg-[#FFF6F6] focus-visible:ring-2 focus-visible:ring-[#A33A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
+                >
+                  Cancel subscription
+                </button>
+              )}
+            </div>
           </div>
         </section>
 

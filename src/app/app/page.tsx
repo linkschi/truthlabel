@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import HomeScreen from "@/components/HomeScreen";
+import AppHomeOnboardingGate from "@/components/onboarding/AppHomeOnboardingGate";
 
 export const metadata: Metadata = {
   title: "App",
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function AppHomePage() {
-  return <HomeScreen />;
+  return (
+    <AppHomeOnboardingGate>
+      <HomeScreen />
+    </AppHomeOnboardingGate>
+  );
 }

@@ -20,6 +20,17 @@ type SubscriptionStatus =
   | "disputed"
   | "chargebacked";
 
+type GumroadEventType =
+  | "purchase"
+  | "renewal"
+  | "cancellation"
+  | "expiration"
+  | "payment_failed"
+  | "refund"
+  | "dispute"
+  | "chargeback"
+  | "unknown";
+
 type ParsedGumroadPayload = Record<string, string>;
 
 const corsHeaders = {
@@ -86,6 +97,24 @@ function firstValue(payload: ParsedGumroadPayload, names: string[]) {
   return "";
 }
 
+function toIsoTimestamp(value: string | null | undefined) {
+  const timestamp = value ? Date.parse(value) : NaN;
+
+  return Number.isFinite(timestamp) ? new Date(timestamp).toISOString() : null;
+}
+
+function firstTimestamp(payload: ParsedGumroadPayload, names: string[]) {
+  for (const name of names) {
+    const timestamp = toIsoTimestamp(cleanString(payload[name]));
+
+    if (timestamp) {
+      return timestamp;
+    }
+  }
+
+  return null;
+}
+
 async function parsePayload(request: Request): Promise<ParsedGumroadPayload> {
   const contentType = request.headers.get("content-type")?.toLowerCase() ?? "";
 
@@ -140,48 +169,136 @@ function validateWebhookSecret(request: Request) {
 function inferSubscriptionStatus(payload: ParsedGumroadPayload): {
   status: SubscriptionStatus;
   accessEndsAt: string | null;
+  eventType: GumroadEventType;
+  gumroadEventAt: string | null;
+  cancellationDetectedAt: string | null;
 } {
   if (booleanValue(payload.chargebacked)) {
-    return { status: "chargebacked", accessEndsAt: null };
+    const eventAt = firstTimestamp(payload, [
+      "chargebacked_at",
+      "chargeback_at",
+      "chargeback_date",
+      "updated_at",
+    ]);
+
+    return {
+      status: "chargebacked",
+      accessEndsAt: null,
+      eventType: "chargeback",
+      gumroadEventAt: eventAt,
+      cancellationDetectedAt: eventAt,
+    };
   }
 
   if (booleanValue(payload.refunded)) {
-    return { status: "refunded", accessEndsAt: null };
+    const eventAt = firstTimestamp(payload, [
+      "refunded_at",
+      "refund_at",
+      "refund_date",
+      "updated_at",
+    ]);
+
+    return {
+      status: "refunded",
+      accessEndsAt: null,
+      eventType: "refund",
+      gumroadEventAt: eventAt,
+      cancellationDetectedAt: eventAt,
+    };
   }
 
   if (booleanValue(payload.disputed) && !booleanValue(payload.dispute_won)) {
-    return { status: "disputed", accessEndsAt: null };
+    const eventAt = firstTimestamp(payload, [
+      "disputed_at",
+      "dispute_at",
+      "dispute_created_at",
+      "updated_at",
+    ]);
+
+    return {
+      status: "disputed",
+      accessEndsAt: null,
+      eventType: "dispute",
+      gumroadEventAt: eventAt,
+      cancellationDetectedAt: eventAt,
+    };
+  }
+
+  const cancelledAt = firstTimestamp(payload, [
+    "subscription_cancelled_at",
+    "cancelled_at",
+    "canceled_at",
+  ]);
+
+  if (cancelledAt) {
+    const accessEndsAt = firstTimestamp(payload, [
+      "subscription_ended_at",
+      "subscription_ends_at",
+      "access_ends_at",
+      "ended_at",
+      "ends_at",
+      "current_period_end",
+      "paid_until",
+    ]);
+
+    return {
+      status: "active_until_end",
+      accessEndsAt,
+      eventType: "cancellation",
+      gumroadEventAt: cancelledAt,
+      cancellationDetectedAt: cancelledAt,
+    };
+  }
+
+  const paymentFailedAt = firstTimestamp(payload, [
+    "subscription_failed_at",
+    "failed_at",
+    "payment_failed_at",
+    "updated_at",
+  ]);
+
+  if (paymentFailedAt) {
+    return {
+      status: "payment_failed",
+      accessEndsAt: null,
+      eventType: "payment_failed",
+      gumroadEventAt: paymentFailedAt,
+      cancellationDetectedAt: paymentFailedAt,
+    };
   }
 
   const endedAt = firstValue(payload, [
     "subscription_ended_at",
     "ended_at",
-    "cancelled_at",
   ]);
+  const endedAtTimestamp = toIsoTimestamp(endedAt);
 
-  if (endedAt) {
-    return { status: "expired", accessEndsAt: endedAt };
-  }
-
-  if (firstValue(payload, ["subscription_failed_at", "failed_at"])) {
-    return { status: "payment_failed", accessEndsAt: null };
-  }
-
-  const cancelledAt = firstValue(payload, [
-    "subscription_cancelled_at",
-    "cancelled_at",
-  ]);
-
-  if (cancelledAt) {
+  if (endedAtTimestamp) {
     return {
-      status: "active_until_end",
-      accessEndsAt:
-        firstValue(payload, ["subscription_ended_at", "access_ends_at"]) ||
-        null,
+      status: "expired",
+      accessEndsAt: endedAtTimestamp,
+      eventType: "expiration",
+      gumroadEventAt: endedAtTimestamp,
+      cancellationDetectedAt: endedAtTimestamp,
     };
   }
 
-  return { status: "active", accessEndsAt: null };
+  const eventAt = firstTimestamp(payload, [
+    "purchase_created_at",
+    "sale_created_at",
+    "created_at",
+    "sale_timestamp",
+    "timestamp",
+    "updated_at",
+  ]);
+
+  return {
+    status: "active",
+    accessEndsAt: null,
+    eventType: "purchase",
+    gumroadEventAt: eventAt,
+    cancellationDetectedAt: null,
+  };
 }
 
 function productMatches(payload: ParsedGumroadPayload) {
@@ -246,6 +363,46 @@ async function findUserIdByEmail(
   }
 
   return data?.user_id ?? null;
+}
+
+async function findUserIdByPurchaseId(
+  serviceClient: ReturnType<typeof createClient>,
+  saleId: string,
+  subscriptionId: string,
+) {
+  if (subscriptionId) {
+    const { data, error } = await serviceClient
+      .from("subscriptions")
+      .select("user_id")
+      .eq("gumroad_subscription_id", subscriptionId)
+      .maybeSingle();
+
+    if (error) {
+      throw error;
+    }
+
+    if (data?.user_id) {
+      return data.user_id as string;
+    }
+  }
+
+  if (saleId) {
+    const { data, error } = await serviceClient
+      .from("subscriptions")
+      .select("user_id")
+      .eq("gumroad_sale_id", saleId)
+      .maybeSingle();
+
+    if (error) {
+      throw error;
+    }
+
+    if (data?.user_id) {
+      return data.user_id as string;
+    }
+  }
+
+  return null;
 }
 
 Deno.serve(async (request) => {
@@ -327,23 +484,48 @@ Deno.serve(async (request) => {
     });
   }
 
-  if (!productMatches(payload)) {
-    return json({
-      received: true,
-      activated: false,
-      ignored: true,
-      message:
-        "Gumroad purchase received, but the product did not match Truthlabel settings.",
-    });
-  }
-
   try {
     const serviceClient = createClient(supabaseUrl, serviceRoleKey);
-    const matchedUserId = await findUserIdByEmail(serviceClient, gumroadEmail);
-    const { status, accessEndsAt } = inferSubscriptionStatus(payload);
-    const eventConflictKey = saleId
-      ? "gumroad_sale_id"
-      : "gumroad_subscription_id";
+    const matchedUserIdByPurchase = await findUserIdByPurchaseId(
+      serviceClient,
+      saleId,
+      subscriptionId,
+    );
+
+    if (!productMatches(payload) && !matchedUserIdByPurchase) {
+      return json({
+        received: true,
+        activated: false,
+        ignored: true,
+        message:
+          "Gumroad purchase received, but the product did not match Truthlabel settings.",
+      });
+    }
+
+    const matchedUserId =
+      matchedUserIdByPurchase ||
+      (gumroadEmail ? await findUserIdByEmail(serviceClient, gumroadEmail) : null);
+    const pingReceivedAt = new Date().toISOString();
+    const {
+      status,
+      accessEndsAt,
+      eventType,
+      gumroadEventAt,
+      cancellationDetectedAt,
+    } = inferSubscriptionStatus(payload);
+    const endingStatus = [
+      "active_until_end",
+      "payment_failed",
+      "expired",
+      "refunded",
+      "disputed",
+      "chargebacked",
+    ].includes(status);
+    const effectiveCancellationDetectedAt =
+      cancellationDetectedAt || (endingStatus ? pingReceivedAt : null);
+    const eventConflictKey = subscriptionId
+      ? "gumroad_subscription_id"
+      : "gumroad_sale_id";
 
     const { error: eventWriteError } = await serviceClient
       .from("gumroad_purchase_events")
@@ -355,8 +537,12 @@ Deno.serve(async (request) => {
           gumroad_product_id: productId || null,
           gumroad_permalink: permalink || null,
           status,
+          event_type: eventType,
+          gumroad_event_at: gumroadEventAt,
+          ping_received_at: pingReceivedAt,
+          cancellation_detected_at: effectiveCancellationDetectedAt,
           matched_user_id: matchedUserId,
-          processed_at: new Date().toISOString(),
+          processed_at: pingReceivedAt,
           raw_payload: payload,
         },
         { onConflict: eventConflictKey },
@@ -385,7 +571,10 @@ Deno.serve(async (request) => {
       gumroad_email: gumroadEmail,
       status,
       access_ends_at: accessEndsAt,
-      last_verified_at: new Date().toISOString(),
+      last_gumroad_event_at: gumroadEventAt,
+      last_gumroad_ping_received_at: pingReceivedAt,
+      cancellation_detected_at: effectiveCancellationDetectedAt,
+      last_verified_at: pingReceivedAt,
     };
 
     if (licenseKeyHash) {

@@ -54,6 +54,14 @@ export const publicAppConfig = {
     "NEXT_PUBLIC_ANALYTICS_ROUTE_PATH",
     "/api/analytics/events",
   ),
+  gumroadCheckoutUrl: readStringEnv(
+    "NEXT_PUBLIC_GUMROAD_CHECKOUT_URL",
+    "https://truthlabel.gumroad.com/l/fnoakd?wanted=true",
+  ),
+  gumroadManageSubscriptionUrl: readStringEnv(
+    "NEXT_PUBLIC_GUMROAD_MANAGE_SUBSCRIPTION_URL",
+    "https://gumroad.com/library",
+  ),
   flags: {
     enableBarcodeLookup: readBooleanEnv(
       "NEXT_PUBLIC_ENABLE_BARCODE_LOOKUP",

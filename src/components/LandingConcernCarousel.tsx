@@ -17,16 +17,13 @@ const concernCards: ConcernCard[] = [
     label: "Banned or Restricted Ingredients",
     headline: (
       <>
-        Some foods are <span className="landing-highlight">banned</span> in one
-        country for <span className="landing-highlight">safety concerns</span>{" "}
-        but still sold in another.
+        Restricted ingredients still reach shelves.
       </>
     ),
     copy: (
       <>
-        Truthlabel brings those <span className="landing-highlight">warnings</span>{" "}
-        forward when a product or ingredient matches a supported restriction
-        signal.
+        Truthlabel flags supported{" "}
+        <span className="landing-highlight">banned or restricted</span> matches.
       </>
     ),
     tone: "red",
@@ -35,26 +32,22 @@ const concernCards: ConcernCard[] = [
     label: "Cancer-Linked Ingredients and Foods",
     headline: (
       <>
-        Some everyday foods carry{" "}
-        <span className="landing-highlight">serious long-term warnings</span>.
+        Long-term concern signals can hide in ordinary food.
       </>
     ),
     copy: (
       <>
-        Truthlabel shows these as <span className="landing-highlight">warning signals</span>{" "}
-        so they are not buried inside the label.
+        Truthlabel highlights cancer-related ingredient and food markers.
       </>
     ),
     tone: "red",
   },
   {
     label: "Lab-Made and Bioengineered Food",
-    headline: "Lab-made and bioengineered food.",
+    headline: "Lab-made food signals are easy to miss.",
     copy: (
       <>
-        Truthlabel flags wording linked to{" "}
-        <span className="landing-highlight">genetic changes</span>,
-        bioengineering, or laboratory food-production methods.
+        Truthlabel flags bioengineered, cell-cultured, and lab-made wording.
       </>
     ),
     tone: "yellow",
@@ -63,27 +56,22 @@ const concernCards: ConcernCard[] = [
     label: "Misleading Labels and Troubling Company Records",
     headline: (
       <>
-        Truthlabel shows warning letters for{" "}
-        <span className="landing-highlight">misbranding</span>, undeclared
-        allergens, contamination, and misleading claims.
+        Brand history can change how a label looks.
       </>
     ),
     copy: (
       <>
-        Truthlabel can show <span className="landing-highlight">warning letters</span>,
-        lawsuits, and safety actions when verified data is available.
+        Truthlabel checks verified recall, misbranding, and safety-action records.
       </>
     ),
-    tone: "green",
+    tone: "yellow",
   },
   {
     label: "Hundreds More Review Signals",
-    headline: "Truthlabel scans far beyond the obvious ingredients.",
+    headline: "More checks behind every scan.",
     copy: (
       <>
-        The app checks many more additives, processing markers,{" "}
-        <span className="landing-highlight">safety signals</span>, and product
-        warnings as the database grows.
+        Additives, processing markers, safety signals, and more.
       </>
     ),
     tone: "yellow",

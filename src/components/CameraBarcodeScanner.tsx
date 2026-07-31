@@ -554,6 +554,90 @@ function ErrorRecoveryScreen({
   );
 }
 
+function CameraPermissionStartScreen({
+  mode,
+  ingredientModeEnabled,
+  onAllowCamera,
+  onChoosePhoto,
+  onManualEntry,
+  onClose,
+}: {
+  mode: CameraScannerMode;
+  ingredientModeEnabled: boolean;
+  onAllowCamera: () => void;
+  onChoosePhoto?: () => void;
+  onManualEntry: () => void;
+  onClose: () => void;
+}) {
+  const isIngredientsMode = mode === "ingredients";
+
+  return (
+    <div className="fixed inset-0 z-50 min-h-[100dvh] bg-white px-5 py-[calc(18px+env(safe-area-inset-top))] text-[#101613]">
+      <div className="mx-auto flex min-h-[calc(100dvh-36px)] w-full max-w-[440px] flex-col">
+        <div className="flex items-center justify-between">
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close scanner"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[#F6F8F7] text-[#101613]"
+          >
+            <CloseGlyph />
+          </button>
+          <p className="text-[15px] font-bold">Scan product</p>
+          <span className="h-11 w-11" />
+        </div>
+
+        <div className="flex flex-1 items-center">
+          <section className="w-full overflow-hidden rounded-[30px] border border-[#DCE9E1] bg-[linear-gradient(145deg,#F4FAF6_0%,#FFFFFF_54%,#FFF8D7_100%)] px-5 py-6 text-center shadow-[0_18px_44px_rgba(15,40,28,0.08)]">
+            <span className="mx-auto inline-flex h-16 w-16 items-center justify-center rounded-[22px] bg-[#0E5A3F] text-white shadow-[0_10px_24px_rgba(14,90,63,0.2)]">
+              <CameraIcon className="h-8 w-8" />
+            </span>
+            <p className="mt-4 text-[11px] font-black uppercase tracking-[0.18em] text-[#8A7244]">
+              Camera permission
+            </p>
+            <h1 className="mt-2 text-[26px] font-extrabold tracking-[-0.03em]">
+              Truthlabel needs your camera
+            </h1>
+            <p className="mx-auto mt-2 max-w-[330px] text-[14px] leading-6 text-[#66716B]">
+              We need camera access to scan{" "}
+              {isIngredientsMode
+                ? "the ingredient label."
+                : "the product barcode."}{" "}
+              Photos and video stay on this device for scanning.
+            </p>
+
+            <div className="mt-5 grid gap-2.5">
+              <button
+                type="button"
+                onClick={onAllowCamera}
+                className="min-h-12 rounded-[16px] bg-[#12583D] px-4 text-[14px] font-bold text-white shadow-[0_12px_24px_rgba(18,88,61,0.18)]"
+              >
+                Allow camera
+              </button>
+              {ingredientModeEnabled && onChoosePhoto ? (
+                <button
+                  type="button"
+                  onClick={onChoosePhoto}
+                  className="min-h-12 rounded-[16px] border border-[#D7E7DD] bg-white px-4 text-[14px] font-bold text-[#12583D]"
+                >
+                  Choose a photo instead
+                </button>
+              ) : null}
+              <button
+                type="button"
+                onClick={onManualEntry}
+                className="min-h-12 rounded-[16px] border border-[#E2E8E4] bg-white px-4 text-[14px] font-bold text-[#101613]"
+              >
+                Use manual scan
+              </button>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function getOutcomeStatus(outcome: CameraScannerBarcodeOutcome) {
   return outcome?.lookupStatus ?? outcome?.status ?? "";
 }
@@ -1936,16 +2020,11 @@ export default function CameraBarcodeScanner({
   ]);
 
   useEffect(() => {
-    const startupTimer = window.setTimeout(() => {
-      void startCamera();
-    }, 0);
-
     return () => {
-      window.clearTimeout(startupTimer);
       stopScannerResources();
       revokePreviewUrl(previewUrlRef.current);
     };
-  }, [startCamera, stopScannerResources]);
+  }, [stopScannerResources]);
 
   useEffect(() => {
     if (mode !== "barcode" || phase !== "detecting") {
@@ -1991,6 +2070,31 @@ export default function CameraBarcodeScanner({
     "ocr_review",
     "submitting",
   ].includes(phase);
+
+  if (phase === "initializing") {
+    return (
+      <>
+        {ingredientModeEnabled ? (
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleFileSelected}
+            className="hidden"
+            data-testid="camera-ingredient-upload-input"
+          />
+        ) : null}
+        <CameraPermissionStartScreen
+          mode={mode}
+          ingredientModeEnabled={ingredientModeEnabled}
+          onAllowCamera={() => void startCamera()}
+          onChoosePhoto={ingredientModeEnabled ? handleChoosePhoto : undefined}
+          onManualEntry={handleManualEntry}
+          onClose={handleClose}
+        />
+      </>
+    );
+  }
 
   if (phase === "permission_denied") {
     return (
