@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { ActivateScreen } from "@/components/auth/AuthScreens";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
-  title: "Activate access",
-  description: "Activate your Truthlabel subscription access.",
+  title: "Opening Truthlabel",
+  description: "Continue into the Truthlabel app.",
 };
 
 export default function ActivatePage() {
-  return <ActivateScreen />;
+  redirect("/app");
 }

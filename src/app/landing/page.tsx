@@ -147,7 +147,7 @@ const faqItems: LandingFaqItem[] = [
   {
     question: "How does the 7-day free trial work?",
     answer:
-      "Begin the trial from checkout, then sign in to activate access, set preferences, and start scanning. Trial and billing details are confirmed before checkout is completed.",
+      "Begin the trial from checkout, then sign in to Truthlabel, set your preferences, and start scanning. Trial and billing details are confirmed before checkout is completed.",
   },
   {
     question: "Can I cancel anytime?",
@@ -157,7 +157,7 @@ const faqItems: LandingFaqItem[] = [
   {
     question: "How do I access Truthlabel after checkout?",
     answer:
-      "After checkout, sign in with your account. If access does not connect automatically, use the activation link or license key from your purchase email.",
+      "After checkout, sign in with your Truthlabel account. Once you are signed in, the app opens so you can start scanning.",
   },
   {
     question: "Is my scan history private?",

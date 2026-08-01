@@ -791,8 +791,8 @@ export function ForgotPasswordScreen() {
           Need access sooner?
         </p>
         <p className="mt-1 text-[13px] leading-5 text-[var(--text-secondary)]">
-          If reset email is unavailable, create a new account or sign in, then
-          activate access with the license key from your purchase email.
+          If reset email is unavailable, create a new account or sign in with
+          an account you already registered.
         </p>
         <div className="mt-3 flex flex-wrap gap-2">
           <Link
@@ -802,10 +802,10 @@ export function ForgotPasswordScreen() {
             Create account
           </Link>
           <Link
-            href="/activate"
+            href="/sign-in"
             className="rounded-full border border-[var(--border-soft)] bg-white px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--text-main)]"
           >
-            Activate access
+            Sign in
           </Link>
         </div>
       </div>

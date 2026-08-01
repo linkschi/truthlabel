@@ -974,7 +974,7 @@ export default function AccountScreen() {
           ) : null}
           {hasMvpAccessPass && accessKind !== "paid" ? (
             <p className="mt-3 rounded-[14px] border border-[#BFDCCB] bg-[#EDF7F1] px-3 py-2 text-[12px] font-semibold leading-5 text-[#0E5A3F]">
-              Your activation link has opened MVP access on this device. Full
+              Truthlabel MVP access is open on this device. Full
               checkout/subscription linking can still be completed later.
             </p>
           ) : null}
@@ -994,10 +994,10 @@ export default function AccountScreen() {
               </button>
             ) : (
               <Link
-                href="/activate"
+                href="/app"
                 className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#0E5A3F] px-4 text-[13px] font-extrabold text-white transition hover:bg-[#0B4732] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
               >
-                Activate access
+                Open app
               </Link>
             )}
             {cancelButtonVisible ? (
