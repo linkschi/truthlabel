@@ -95,7 +95,13 @@ const planIncludes: Array<{ id: string; content: ReactNode }> = [
   },
   {
     id: "independent",
-    content: "Built by an independent, self-funded team - not a food company",
+    content: (
+      <>
+        Built by an{" "}
+        <span className="landing-yellow-highlight">independent, self-funded</span>{" "}
+        team - <span className="landing-yellow-highlight">not a food company</span>
+      </>
+    ),
   },
 ];
 
