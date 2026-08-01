@@ -1116,11 +1116,11 @@ function StepFourInstall({
           Your app is installed and ready whenever you need to scan a product.
         </p>
         <p className="mt-4 text-[12.5px] font-semibold text-[#66716B]">
-          You can now open TruthLabel directly from your Home Screen.
+          Open TruthLabel now, or launch it from your Home Screen anytime.
         </p>
         <div className="mt-8">
           <PrimaryButton onClick={() => onFinish("manual_confirmed", "manual_confirmed")} disabled={isSaving}>
-            {isSaving ? "Opening..." : "Start scanning"}
+            {isSaving ? "Opening..." : "Open TruthLabel app"}
           </PrimaryButton>
         </div>
       </section>
@@ -1140,9 +1140,12 @@ function StepFourInstall({
         <p className="mx-auto mt-3 max-w-[340px] text-[15px] leading-6 text-[#66716B]">
           TruthLabel is now on your Home Screen and ready whenever you need to scan a product.
         </p>
+        <p className="mt-4 text-[12.5px] font-semibold text-[#66716B]">
+          Open the app now and start scanning.
+        </p>
         <div className="mt-8">
           <PrimaryButton onClick={handlePrimaryAction} disabled={isSaving}>
-            {isSaving ? "Opening..." : "Start scanning"}
+            {isSaving ? "Opening..." : "Open TruthLabel app"}
           </PrimaryButton>
         </div>
       </section>
