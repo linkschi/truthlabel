@@ -22,8 +22,7 @@ type TruthLabelCheck = {
   Icon: CheckIcon;
 };
 
-const scrollSpeed = 30;
-const edgePauseMs = 520;
+const scrollSpeed = 34;
 
 function BanIcon(props: SVGProps<SVGSVGElement>) {
   return (
@@ -310,18 +309,12 @@ export default function TruthLabelChecksScroller() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const animationFrameRef = useRef<number | null>(null);
   const previousTimeRef = useRef<number | null>(null);
-  const edgePauseUntilRef = useRef(0);
-  const directionRef = useRef<1 | -1>(1);
   const reducedMotionRef = useRef(false);
   const scrollUpdateFrameRef = useRef<number | null>(null);
   const [isPrepared, setIsPrepared] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [activeId, setActiveId] = useState(truthLabelChecks[0].id);
-
-  const pauseForInteraction = useCallback(() => {
-    setIsPaused(true);
-  }, []);
 
   const updateActiveCard = useCallback(() => {
     const container = scrollRef.current;
@@ -460,28 +453,17 @@ export default function TruthLabelChecksScroller() {
       const delta = Math.min(time - previousTimeRef.current, 40);
       previousTimeRef.current = time;
 
-      const maxScroll = container.scrollHeight - container.clientHeight;
+      const loopPoint = container.scrollHeight / 2;
 
-      if (time >= edgePauseUntilRef.current && maxScroll > 0) {
-        container.scrollTop +=
-          directionRef.current * scrollSpeed * (delta / 1000);
+      if (loopPoint > 0) {
+        container.scrollTop += scrollSpeed * (delta / 1000);
 
-        const reachedBottom = container.scrollTop >= maxScroll - 1;
-        const reachedTop = container.scrollTop <= 1;
-
-        if (reachedBottom && directionRef.current === 1) {
-          container.scrollTop = maxScroll;
-          directionRef.current = -1;
-          edgePauseUntilRef.current = time + edgePauseMs;
-        }
-
-        if (reachedTop && directionRef.current === -1) {
-          container.scrollTop = 0;
-          directionRef.current = 1;
-          edgePauseUntilRef.current = time + edgePauseMs;
+        if (container.scrollTop >= loopPoint) {
+          container.scrollTop -= loopPoint;
         }
       }
 
+      updateActiveCard();
       animationFrameRef.current = window.requestAnimationFrame(animate);
     };
 
@@ -495,7 +477,7 @@ export default function TruthLabelChecksScroller() {
 
       previousTimeRef.current = null;
     };
-  }, [isPaused, isPrepared, isVisible]);
+  }, [isPaused, isPrepared, isVisible, updateActiveCard]);
 
   useEffect(() => {
     return () => {
@@ -521,8 +503,8 @@ export default function TruthLabelChecksScroller() {
             <p className={styles.windowTitle}>What Truthlabel checks</p>
             <p className={styles.windowStatus}>
               {isPaused
-                ? "Paused - swipe to explore"
-                : "Automatically showing each check"}
+                ? "Paused"
+                : "Running automatically"}
             </p>
           </div>
 
@@ -547,21 +529,16 @@ export default function TruthLabelChecksScroller() {
             ref={scrollRef}
             className={styles.scroller}
             tabIndex={0}
-            onClick={pauseForInteraction}
-            onFocus={pauseForInteraction}
-            onPointerDown={pauseForInteraction}
             onScroll={handleScroll}
-            onTouchStart={pauseForInteraction}
-            onWheel={pauseForInteraction}
             aria-label="Truthlabel food checks"
           >
             <div className={styles.list}>
-              {truthLabelChecks.map(({ id, title, description, tone, Icon }) => {
+              {[...truthLabelChecks, ...truthLabelChecks].map(({ id, title, description, tone, Icon }, index) => {
                 const isActive = activeId === id;
 
                 return (
                   <article
-                    key={id}
+                    key={`${id}-${index}`}
                     data-check-card
                     data-check-id={id}
                     tabIndex={0}
