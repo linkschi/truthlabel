@@ -33,8 +33,7 @@ const navLinks = [
 ];
 
 const launchMetrics = [
-  "Self-funded",
-  "Independent",
+  "Independent and self-funded",
   "7 days free",
   "Cancel anytime",
 ];
