@@ -72,6 +72,7 @@ type InstallGuideStep = {
   imageAspectRatio?: string;
   imageWidth?: number;
   imageHeight?: number;
+  tip?: string;
 };
 
 type InstallationImagePlaceholderProps = {
@@ -106,8 +107,13 @@ const iosInstallSteps: InstallGuideStep[] = [
     progress: "Step 2 of 3",
     title: 'Choose "Add to Home Screen"',
     imageKey: "ios-add-to-home-screen",
+    imageSrc: "/onboarding-ios-add-home-screen.jpeg",
     imageAlt: "Safari Share menu showing Add to Home Screen",
     placeholderLabel: "Add to Home Screen image slot",
+    imageAspectRatio: "3 / 4",
+    imageWidth: 1080,
+    imageHeight: 1440,
+    tip: 'If you do not see "Add to Home Screen" right away, keep scrolling down in the Share menu.',
   },
   {
     id: "confirm",
@@ -934,6 +940,16 @@ function InstallStepCarousel({ steps }: { steps: InstallGuideStep[] }) {
                 imageHeight={step.imageHeight}
               />
             </div>
+            {step.tip ? (
+              <details className="mt-2 rounded-full border border-[#F3D27A] bg-[#FFF8DE] px-3 py-2 text-[12px] font-bold text-[#6F4D00]">
+                <summary className="cursor-pointer list-none text-center">
+                  Tip: can&apos;t see it?
+                </summary>
+                <p className="mt-1 text-center leading-5 text-[#7A5A10]">
+                  {step.tip}
+                </p>
+              </details>
+            ) : null}
             <div className="mt-3 flex justify-center gap-1.5" aria-hidden="true">
               {steps.map((dotStep, dotIndex) => (
                 <span
