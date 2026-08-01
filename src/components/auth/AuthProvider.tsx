@@ -23,6 +23,7 @@ import {
 } from "@/lib/auth/access";
 import { trackTruthlabelEvent } from "@/lib/analytics/analyticsClient";
 import { normalizeAnalyticsError } from "@/lib/analytics/analyticsEvents";
+import { publicAppConfig } from "@/lib/appConfig";
 import { clearMvpActivationAccess } from "@/lib/auth/mvpActivationAccess";
 import { getSupabaseBrowserClient } from "@/lib/auth/supabaseClient";
 import {
@@ -227,7 +228,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const currentUserRef = useRef<User | null>(null);
   // MVP launch rule: a valid signed-in Truthlabel account can enter the app.
   // Gumroad/license checks are still recorded, but they must not block early users.
-  const allowSignedInMvpAccess = true;
+  const allowSignedInMvpAccess =
+    publicAppConfig.flags.enableSignedInMvpAccess;
 
   const refreshAccess = useCallback(async () => {
     if (!supabase) {
