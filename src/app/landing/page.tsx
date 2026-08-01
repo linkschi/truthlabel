@@ -502,8 +502,7 @@ export default function LandingPage() {
       <section id="questions" className="landing-faq">
         <SectionIntro
           centered
-          title="Questions before you start"
-          copy="Short answers for the decisions people usually need before joining."
+          title="FAQ"
         />
         <LandingFaq items={faqItems} />
       </section>
