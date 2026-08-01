@@ -33,9 +33,10 @@ const navLinks = [
 ];
 
 const launchMetrics = [
-  { label: "Independent", value: "Self-funded" },
-  { label: "Trial", value: "7 days free" },
-  { label: "Access", value: "$4.99/month" },
+  "Self-funded",
+  "Independent",
+  "7 days free",
+  "Cancel anytime",
 ];
 
 const planIncludes: Array<{ id: string; content: ReactNode }> = [
@@ -43,8 +44,8 @@ const planIncludes: Array<{ id: string; content: ReactNode }> = [
     id: "shop",
     content: (
       <>
-        Shop with Truthlabel: pick up a product, scan it, and see{" "}
-        <span className="landing-highlight">instant warnings</span>
+        Shop with Truthlabel and see{" "}
+        <span className="landing-highlight">instant results</span>
       </>
     ),
   },
@@ -223,10 +224,10 @@ function FullPricingSection() {
       <div className="landing-pricing__card">
         <div>
           <p className="landing-eyebrow">Truthlabel Full Access</p>
-          <h2>Protect yourself from evil brands that put profit first</h2>
+          <h2>Protect yourself from evil brands</h2>
           <p>
-            Try Truthlabel free for 7 days and start checking the food you buy,
-            eat, and bring home.
+            Try Truthlabel free for 7 days and check products from brands that
+            put profit first.
           </p>
         </div>
         <div className="landing-price">
@@ -245,14 +246,10 @@ function FullPricingSection() {
         <PrimaryCta analyticsSource="pricing_section">
           Begin my 7-day free trial
         </PrimaryCta>
-        <p className="landing-trust-line">
-          7 days free - Cancel anytime - No long-term commitment
-        </p>
         <div className="landing-launch-metrics" aria-label="Truthlabel launch facts">
           {launchMetrics.map((metric) => (
-            <span key={metric.label}>
-              <strong>{metric.value}</strong>
-              {metric.label}
+            <span key={metric}>
+              <strong>{metric}</strong>
             </span>
           ))}
         </div>
