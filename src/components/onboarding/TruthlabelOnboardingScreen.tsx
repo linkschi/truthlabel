@@ -1339,9 +1339,12 @@ function StepFourInstall({
         <div className="mt-3">
           <InstallationImagePlaceholder
             imageKey="install-opening"
+            src="/onboarding-install-home-screen.jpeg"
             alt="TruthLabel app installation preview"
             label="Install opening image slot"
-            aspectRatio="16 / 9"
+            aspectRatio="3 / 4"
+            imageWidth={1080}
+            imageHeight={1440}
           />
         </div>
       </InstallCard>
