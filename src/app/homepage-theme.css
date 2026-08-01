@@ -51,7 +51,7 @@
   position: relative;
   z-index: 30;
   display: grid;
-  grid-template-columns: auto 1fr auto auto;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
   width: min(1180px, calc(100% - 2rem));
   min-height: 4.5rem;
@@ -226,7 +226,7 @@
 .landing-button--primary {
   background: linear-gradient(135deg, var(--tl-green-700), var(--tl-green-900));
   box-shadow: 0 16px 32px rgba(13, 74, 54, 0.22);
-  color: #ffffff;
+  color: #ffffff !important;
 }
 
 .landing-button--secondary {
@@ -1371,8 +1371,7 @@
 }
 
 @media (max-width: 1040px) {
-  .landing-nav,
-  .landing-header-actions {
+  .landing-nav {
     display: none;
   }
 
@@ -1380,8 +1379,12 @@
     grid-template-columns: 1fr auto;
   }
 
-  .landing-mobile-actions {
+  .landing-header-actions {
     display: flex;
+  }
+
+  .landing-mobile-actions {
+    display: none;
   }
 
   .landing-hero,
@@ -1454,6 +1457,14 @@
   .landing-button {
     width: 100%;
     min-height: 3.25rem;
+  }
+
+  .landing-header-actions .landing-button {
+    width: auto;
+    min-height: 2.85rem;
+    padding: 0.78rem 1rem;
+    font-size: 0.82rem;
+    white-space: nowrap;
   }
 
   .landing-problem-grid,

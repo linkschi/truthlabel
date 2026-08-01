@@ -25,13 +25,6 @@ const genuineReviews: Array<{
 
 const truthlabelTrialStartUrl = "/create-account";
 
-const navLinks = [
-  { href: "#how", label: "How it works" },
-  { href: "#checks-grid", label: "What we check" },
-  ...(genuineReviews.length > 0 ? [{ href: "#reviews", label: "Reviews" }] : []),
-  { href: "#questions", label: "Questions" },
-];
-
 const launchMetrics = [
   "Independent & self-funded",
   "7 days free",
@@ -262,37 +255,8 @@ export default function LandingPage() {
           <span>Truthlabel</span>
         </Link>
 
-        <nav className="landing-nav" aria-label="Public navigation">
-          {navLinks.map((link) => (
-            <a href={link.href} key={link.href}>
-              {link.label}
-            </a>
-          ))}
-        </nav>
-
         <div className="landing-header-actions">
           <PrimaryCta analyticsSource="landing_header">Begin free trial</PrimaryCta>
-        </div>
-
-        <div className="landing-mobile-actions">
-          <details className="landing-mobile-menu">
-            <summary aria-label="Open menu">
-              <span />
-              <span />
-              <span />
-            </summary>
-            <div className="landing-mobile-panel">
-              {navLinks.map((link) => (
-                <a href={link.href} key={link.href}>
-                  {link.label}
-                </a>
-              ))}
-              <Link href="/sign-in">Sign in</Link>
-              <PrimaryCta analyticsSource="landing_mobile_menu">
-                Begin free trial
-              </PrimaryCta>
-            </div>
-          </details>
         </div>
       </header>
 
@@ -516,11 +480,6 @@ export default function LandingPage() {
           </p>
         </div>
         <nav aria-label="Footer navigation">
-          <a href="#how">How it works</a>
-          <a href="#checks-grid">What we check</a>
-          {genuineReviews.length > 0 ? <a href="#reviews">Reviews</a> : null}
-          <a href="#questions">Questions</a>
-          <Link href="/sign-in">Sign in</Link>
           <Link href="/privacy">Privacy</Link>
           <Link href="/terms">Terms</Link>
           <Link href="/health-disclaimer">Health disclaimer</Link>
