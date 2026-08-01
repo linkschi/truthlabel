@@ -76,6 +76,8 @@ type InstallationImagePlaceholderProps = {
   alt: string;
   label: string;
   aspectRatio?: string;
+  imageWidth?: number;
+  imageHeight?: number;
 };
 
 const totalSteps = 4;
@@ -776,15 +778,17 @@ function InstallationImagePlaceholder({
   alt,
   label,
   aspectRatio = "16 / 9",
+  imageWidth = 390,
+  imageHeight = 220,
 }: InstallationImagePlaceholderProps) {
   if (src) {
     return (
       <Image
         src={src}
         alt={alt}
-        width={390}
-        height={220}
-        className="mx-auto block h-auto w-full rounded-[18px] object-contain shadow-[0_12px_24px_rgba(15,40,28,0.07)]"
+        width={imageWidth}
+        height={imageHeight}
+        className="mx-auto block max-h-[430px] w-auto max-w-full rounded-[18px] object-contain shadow-[0_12px_24px_rgba(15,40,28,0.07)]"
         data-image-key={imageKey}
       />
     );
@@ -1180,13 +1184,24 @@ function StepFourInstall({
           <div className="mt-3">
             <InstallationImagePlaceholder
               imageKey={isAndroid ? "in-app-open-chrome" : "in-app-open-safari"}
-              alt="Social browser open-in-browser installation step"
+              src={
+                isAndroid
+                  ? "/onboarding-android-social-open-chrome.jpeg"
+                  : undefined
+              }
+              alt={
+                isAndroid
+                  ? "Android Instagram browser menu showing Open in Chrome"
+                  : "Social browser open-in-browser installation step"
+              }
               label={
                 isAndroid
                   ? "Chrome install handoff image slot"
                   : "Safari install handoff image slot"
               }
-              aspectRatio="16 / 9"
+              aspectRatio={isAndroid ? "9 / 16" : "16 / 9"}
+              imageWidth={isAndroid ? 720 : undefined}
+              imageHeight={isAndroid ? 1280 : undefined}
             />
           </div>
         </InstallCard>
