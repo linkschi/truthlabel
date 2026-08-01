@@ -22,7 +22,7 @@ type TruthLabelCheck = {
   Icon: CheckIcon;
 };
 
-const scrollSpeed = 54;
+const scrollSpeed = 74;
 
 function BanIcon(props: SVGProps<SVGSVGElement>) {
   return (

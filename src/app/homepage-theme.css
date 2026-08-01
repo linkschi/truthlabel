@@ -732,7 +732,7 @@
 
 .landing-concern-visual {
   position: relative;
-  min-height: 16.25rem;
+  min-height: 18.75rem;
   overflow: hidden;
   background:
     radial-gradient(circle at 24% 16%, rgba(255, 255, 255, 0.62), transparent 7rem),
@@ -761,7 +761,7 @@
 .landing-concern-image {
   display: block;
   width: 100%;
-  height: 16.25rem;
+  height: 18.75rem;
   object-fit: cover;
   object-position: center;
 }
@@ -1516,6 +1516,14 @@
   .landing-concern-card {
     flex: 0 0 86%;
     min-width: 15.5rem;
+  }
+
+  .landing-concern-visual {
+    min-height: 19.5rem;
+  }
+
+  .landing-concern-image {
+    height: 19.5rem;
   }
 
   .landing-demo-video-card {
