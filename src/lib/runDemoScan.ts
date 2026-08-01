@@ -95,6 +95,8 @@ export function runDemoScan(
     userAllergyProfile,
     externalSignals,
     scanSource: demoProduct.scanSource,
+    productImageUrl: demoProduct.imageUrl,
+    productImageSource: demoProduct.imageUrl ? "product_database" : undefined,
   });
 
   return {

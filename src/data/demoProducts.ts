@@ -5,6 +5,7 @@ export type DemoProduct = {
   productName: string;
   brandName: string;
   barcode: string;
+  imageUrl?: string;
   productCategory: string;
   ingredients: string[];
   allergenStatement: string;
@@ -38,6 +39,49 @@ export const demoProducts: DemoProduct[] = [
     ],
     allergenStatement: "Contains milk and soy",
     packagingText: "Wrapped snack bar",
+    scanSource: "demo",
+    externalSignals: [],
+  },
+  {
+    id: "only-plastic-free-spring-salt",
+    productName: "Only Plastic-Free Spring Salt",
+    brandName: "Only",
+    barcode: "",
+    imageUrl: "https://scouthealthapp.com/img/Only-Plastic-Free-Spring-Salt.png",
+    productCategory: "Fresh / Simple Foods",
+    ingredients: ["Spring salt"],
+    allergenStatement: "",
+    packagingText: "Plastic-free refill pouch",
+    scanSource: "demo",
+    externalSignals: [],
+  },
+  {
+    id: "bristol-bay-wild-caught-sockeye-salmon",
+    productName: "Bristol Bay Alaska Wild Caught Sockeye Salmon",
+    brandName: "Bristol Bay",
+    barcode: "",
+    imageUrl:
+      "https://scouthealthapp.com/images/products/Bristol_Bay_Alaska_Wild_Caught_Sockeye_Salmon_fish_fillet_package_white_background.webp",
+    productCategory: "Seafood",
+    ingredients: ["Sockeye salmon"],
+    allergenStatement: "Contains fish",
+    packagingText:
+      "Frozen wild-caught sockeye salmon. Scout notes: no added colors, no antibiotics, flash-frozen at sea, MSC certified.",
+    scanSource: "demo",
+    externalSignals: [],
+  },
+  {
+    id: "copper-river-wild-alaska-king-salmon",
+    productName: "Copper River Seafoods Wild Alaska King Salmon",
+    brandName: "Copper River Seafoods",
+    barcode: "",
+    imageUrl:
+      "https://scouthealthapp.com/img/Copper-River-Seafoods-Wild-Alaska-King-Salmon.png",
+    productCategory: "Seafood",
+    ingredients: ["King salmon"],
+    allergenStatement: "Contains fish",
+    packagingText:
+      "Wild-caught Alaskan king salmon. Scout notes: no antibiotics, no hormones, no color added, MSC-certified sustainable fishery.",
     scanSource: "demo",
     externalSignals: [],
   },
@@ -285,6 +329,12 @@ export const primaryDemoProductIds = [
   "chocolate-milk-drink",
 ] as const;
 
+export const thiislincornSampleProductIds = [
+  "only-plastic-free-spring-salt",
+  "bristol-bay-wild-caught-sockeye-salmon",
+  "copper-river-wild-alaska-king-salmon",
+] as const;
+
 const defaultDemoProductIdByCategorySlug: Record<string, string> = {
   "packaged-processed-foods": defaultDemoProductId,
   "meat-fast-food": "chicken-sausage",
@@ -311,4 +361,8 @@ export function getDefaultDemoProductIdForCategorySlug(
 
 export function getPrimaryDemoProducts() {
   return primaryDemoProductIds.map((id) => getDemoProductById(id));
+}
+
+export function getThiislincornSampleProducts() {
+  return thiislincornSampleProductIds.map((id) => getDemoProductById(id));
 }

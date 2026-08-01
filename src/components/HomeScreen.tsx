@@ -8,6 +8,7 @@ import {
   defaultDemoProductId,
   demoProducts,
   getDemoProductById,
+  getThiislincornSampleProducts,
 } from "@/data/demoProducts";
 import { publicAppConfig } from "@/lib/appConfig";
 import { saveProfile, useStoredProfile } from "@/lib/profileStorage";
@@ -38,6 +39,7 @@ type Tint = "green" | "yellow" | "red" | "neutral";
 
 const defaultProductHref = `/app/results?category=packaged-processed-foods&demo=${defaultDemoProductId}`;
 const defaultDemoProduct = getDemoProductById(defaultDemoProductId);
+const thiislincornSampleProducts = getThiislincornSampleProducts();
 const featureFlags = publicAppConfig.flags;
 const showLocalInternalTools = featureFlags.enableLocalDevBypass;
 
@@ -610,6 +612,26 @@ function DeveloperDemoTools({ onNavigate }: { onNavigate: () => void }) {
       />
       {featureFlags.enableDemoProducts ? (
         <>
+          {thiislincornSampleProducts.length > 0 ? (
+            <div className="rounded-[14px] border border-[#EEF1EF] bg-[#FAFBFA] px-2 py-2">
+              <p className="px-1 pb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-[#879089]">
+                Thiislincorn sample tests
+              </p>
+              <div className="divide-y divide-[#EEF1EF]">
+                {thiislincornSampleProducts.map((product) => (
+                  <ToolRow
+                    key={`thiislincorn-${product.id}`}
+                    href={`/app/results?demo=${product.id}`}
+                    title={product.productName}
+                    detail={`${product.brandName} - ${product.productCategory}`}
+                    meta="Scanned"
+                    icon="spark"
+                    onNavigate={onNavigate}
+                  />
+                ))}
+              </div>
+            </div>
+          ) : null}
           <ToolRow
             href={defaultProductHref}
             title={defaultDemoProduct.productName}

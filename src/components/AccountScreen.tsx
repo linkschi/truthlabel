@@ -10,6 +10,7 @@ import ScanPreferencesSettings from "@/components/ScanPreferencesSettings";
 import SupportContactLink from "@/components/SupportContactLink";
 import { useTruthlabelAuth } from "@/components/auth/AuthProvider";
 import { avoidOptions, type AvoidConcern } from "@/data/fakeProduct";
+import { getThiislincornSampleProducts } from "@/data/demoProducts";
 import { trackTruthlabelEvent } from "@/lib/analytics/analyticsClient";
 import { normalizeAnalyticsError } from "@/lib/analytics/analyticsEvents";
 import { hasMvpActivationAccess } from "@/lib/auth/mvpActivationAccess";
@@ -54,6 +55,8 @@ type ConfirmationAction =
   | "reset_preferences"
   | "clear_device_data"
   | "delete_account";
+
+const thiislincornSampleProducts = getThiislincornSampleProducts();
 
 function Icon({
   name,
@@ -1108,6 +1111,25 @@ export default function AccountScreen() {
               title="Test Android manual install"
               href="/app/onboarding?review=1&install=1&installEnv=android-manual"
             />
+          </SectionCard>
+        ) : null}
+
+        {isThiislincornTester && thiislincornSampleProducts.length > 0 ? (
+          <SectionCard title="Thiislincorn sample tests">
+            <p className="pb-2 text-[12.5px] font-semibold leading-5 text-[#56635C]">
+              Products you send me can live here. Tap one to open the current
+              Truthlabel result as if it was scanned.
+            </p>
+            {thiislincornSampleProducts.map((product) => (
+              <RowLink
+                key={`thiislincorn-sample-${product.id}`}
+                icon="clipboard"
+                title={product.productName}
+                detail={`${product.brandName} - ${product.productCategory}`}
+                meta="Open scan"
+                href={`/app/results?demo=${product.id}`}
+              />
+            ))}
           </SectionCard>
         ) : null}
 
