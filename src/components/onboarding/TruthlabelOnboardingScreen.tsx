@@ -1187,21 +1187,21 @@ function StepFourInstall({
               src={
                 isAndroid
                   ? "/onboarding-android-social-open-chrome.jpeg"
-                  : undefined
+                  : "/onboarding-ios-social-open-safari.jpeg"
               }
               alt={
                 isAndroid
                   ? "Android Instagram browser menu showing Open in Chrome"
-                  : "Social browser open-in-browser installation step"
+                  : "iPhone Instagram browser menu showing Open in Safari"
               }
               label={
                 isAndroid
                   ? "Chrome install handoff image slot"
                   : "Safari install handoff image slot"
               }
-              aspectRatio={isAndroid ? "9 / 16" : "16 / 9"}
-              imageWidth={isAndroid ? 720 : undefined}
-              imageHeight={isAndroid ? 1280 : undefined}
+              aspectRatio="9 / 16"
+              imageWidth={720}
+              imageHeight={1280}
             />
           </div>
         </InstallCard>
