@@ -395,14 +395,13 @@ function TrialActivationLoadingScreen({ email }: { email: string }) {
           </div>
 
           <p className="mt-6 text-[11px] font-black uppercase tracking-[0.22em] text-[var(--green-main)]">
-            Account created
+            Truthlabel
           </p>
           <h1 className="mt-2 font-heading text-[2.2rem] font-semibold leading-tight tracking-[-0.05em] text-[var(--text-main)]">
-            Activating your free trial.
+            Preparing your free trial.
           </h1>
           <p className="mx-auto mt-3 max-w-[390px] text-[14px] leading-6 text-[var(--text-secondary)]">
-            Truthlabel is preparing your free trial access and opening
-            checkout.
+            Truthlabel is preparing checkout so you can continue.
           </p>
 
           {email ? (
@@ -412,7 +411,7 @@ function TrialActivationLoadingScreen({ email }: { email: string }) {
           ) : null}
 
           <div className="mt-6 grid gap-2 text-left">
-            {["Creating your account", "Preparing trial access", "Opening checkout"].map(
+            {["Checking your account", "Preparing trial access", "Opening checkout"].map(
               (item, index) => (
                 <div
                   key={item}
@@ -529,7 +528,7 @@ export function CreateAccountScreen() {
     const handle = window.setTimeout(() => {
       continueToCheckout({
         checkoutEmail: user.email,
-        message: "Account found. Taking you to checkout.",
+        message: "Taking you to checkout.",
         source: "create_account_signed_in",
         userId: user.id,
       });
@@ -587,9 +586,11 @@ export function CreateAccountScreen() {
             });
 
           if (signInError) {
+            // Do not sign the user in without a matching password. This path
+            // only lets a returning trial attempt continue to checkout.
             continueToCheckout({
               checkoutEmail: email,
-              message: "Account found. Taking you to checkout.",
+              message: "Taking you to checkout.",
               source: "create_account_existing_email_without_login",
               userId: null,
             });
@@ -605,7 +606,7 @@ export function CreateAccountScreen() {
           );
           continueToCheckout({
             checkoutEmail: email,
-            message: "Account found. Taking you to checkout.",
+            message: "Taking you to checkout.",
             source: "create_account_existing_account",
             userId: signInData.user?.id,
           });
@@ -622,7 +623,7 @@ export function CreateAccountScreen() {
       ) {
         continueToCheckout({
           checkoutEmail: email,
-          message: "Account found. Taking you to checkout.",
+          message: "Taking you to checkout.",
           source: "create_account_existing_email_identity_hint",
           userId: data.user.id,
         });
@@ -647,7 +648,7 @@ export function CreateAccountScreen() {
       if (isExistingAccountSignupError(error)) {
         continueToCheckout({
           checkoutEmail: email,
-          message: "Account found. Taking you to checkout.",
+          message: "Taking you to checkout.",
           source: "create_account_existing_email_catchall",
           userId: null,
         });
