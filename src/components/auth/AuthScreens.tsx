@@ -489,7 +489,23 @@ export function CreateAccountScreen() {
         },
         { userId },
       );
-      window.location.assign(checkoutUrl);
+      try {
+        window.location.assign(checkoutUrl);
+      } catch (error) {
+        trackTruthlabelEvent(
+          "checkout_open_failed",
+          {
+            source,
+            error_type: normalizeAnalyticsError(error),
+          },
+          { userId },
+        );
+        setIsRedirectingToCheckout(false);
+        setStatus({
+          tone: "red",
+          message: "Checkout could not open. Try again.",
+        });
+      }
     }, 1900);
   }
 

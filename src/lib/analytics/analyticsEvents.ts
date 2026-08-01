@@ -7,14 +7,22 @@ export const ANALYTICS_EVENT_NAMES = [
   "signup_success",
   "signup_failed",
   "checkout_started",
+  "checkout_open_failed",
   "checkout_returned",
   "checkout_handoff_shown",
   "activation_viewed",
   "activation_success",
   "activation_failed",
+  "access_check_started",
+  "access_check_success",
+  "access_check_failed",
+  "access_cached_fallback_used",
   "subscription_cancel_started",
   "subscription_cancel_email_started",
   "subscription_manage_opened",
+  "signout_started",
+  "signout_success",
+  "signout_failed",
   "login_started",
   "login_success",
   "login_failed",
@@ -51,6 +59,9 @@ export const ANALYTICS_EVENT_NAMES = [
   "ocr_scan_failed",
   "result_page_loaded",
   "app_error",
+  "client_error_captured",
+  "resource_load_failed",
+  "unhandled_rejection",
 ] as const;
 
 export type AnalyticsEventName = (typeof ANALYTICS_EVENT_NAMES)[number];
@@ -169,6 +180,27 @@ export function normalizeAnalyticsError(error: unknown) {
     return "network_error";
   }
 
+  if (
+    normalized.includes("permission") ||
+    normalized.includes("notallowed") ||
+    normalized.includes("not allowed") ||
+    normalized.includes("denied")
+  ) {
+    return "permission_error";
+  }
+
+  if (
+    normalized.includes("timeout") ||
+    normalized.includes("timed out") ||
+    normalized.includes("abort")
+  ) {
+    return "timeout_error";
+  }
+
+  if (normalized.includes("cors") || normalized.includes("cross-origin")) {
+    return "cors_error";
+  }
+
   if (normalized.includes("password") || normalized.includes("credential")) {
     return "auth_credentials_error";
   }
@@ -179,6 +211,15 @@ export function normalizeAnalyticsError(error: unknown) {
 
   if (normalized.includes("barcode")) {
     return "barcode_error";
+  }
+
+  if (
+    normalized.includes("supabase") ||
+    normalized.includes("database") ||
+    normalized.includes("postgres") ||
+    normalized.includes("relation")
+  ) {
+    return "database_error";
   }
 
   if (normalized.includes("ingredient") || normalized.includes("label")) {

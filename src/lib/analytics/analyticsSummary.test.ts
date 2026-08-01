@@ -91,13 +91,23 @@ test("analytics summary counts safe error types for reliability review", () => {
       event("ocr_scan_failed", {
         metadata: { error_type: "ocr_timeout" },
       }),
+      event("access_check_failed", {
+        metadata: { error_type: "database_error" },
+      }),
+      event("client_error_captured", {
+        metadata: { error_type: "app_error" },
+      }),
     ],
     purchases: [],
     subscriptions: [],
   });
 
-  assert.deepEqual(summary.reliability.topErrorTypes.slice(0, 2), [
+  assert.deepEqual(summary.reliability.topErrorTypes.slice(0, 4), [
     { label: "network_error", count: 2 },
+    { label: "app_error", count: 1 },
+    { label: "database_error", count: 1 },
     { label: "ocr_timeout", count: 1 },
   ]);
+  assert.ok(summary.alerts.some((alert) => alert.id === "access_check_failures"));
+  assert.ok(summary.alerts.some((alert) => alert.id === "client_errors"));
 });

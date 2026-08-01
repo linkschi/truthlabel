@@ -22,6 +22,8 @@ import {
   type TruthlabelTrialAccess,
 } from "@/lib/auth/access";
 import { publicAppConfig } from "@/lib/appConfig";
+import { trackTruthlabelEvent } from "@/lib/analytics/analyticsClient";
+import { normalizeAnalyticsError } from "@/lib/analytics/analyticsEvents";
 import { clearMvpActivationAccess } from "@/lib/auth/mvpActivationAccess";
 import { getSupabaseBrowserClient } from "@/lib/auth/supabaseClient";
 import {
@@ -230,6 +232,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!supabase) {
       setIsLoading(false);
       setErrorMessage("Supabase is not configured for this deployment.");
+      trackTruthlabelEvent("access_check_failed", {
+        error_type: "configuration_error",
+        source: "auth_provider",
+        signed_in: Boolean(currentUserRef.current),
+      });
       return;
     }
 
@@ -267,17 +274,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         nextTrialAccess,
       );
     } catch (error) {
+      let cachedFallbackUsed = false;
+
       if (currentUser) {
         const cachedAccess = readCachedAccountAccess(currentUser.id);
 
         if (cachedAccess) {
+          cachedFallbackUsed = true;
           setUser(currentUser);
           currentUserRef.current = currentUser;
           setSubscription(cachedAccess.subscription);
           setTrialAccess(cachedAccess.trialAccess);
+          trackTruthlabelEvent(
+            "access_cached_fallback_used",
+            {
+              source: "refresh_access",
+              access_status: cachedAccess.subscription.status,
+            },
+            { userId: currentUser.id },
+          );
         }
       }
 
+      trackTruthlabelEvent(
+        "access_check_failed",
+        {
+          error_type: normalizeAnalyticsError(error),
+          source: "refresh_access",
+          signed_in: Boolean(currentUser),
+          cached_fallback_used: cachedFallbackUsed,
+        },
+        { userId: currentUser?.id },
+      );
       setErrorMessage(
         error instanceof Error
           ? error.message
@@ -330,12 +358,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         })
         .catch((error: unknown) => {
           const cachedAccess = readCachedAccountAccess(nextUser.id);
+          let cachedFallbackUsed = false;
 
           if (cachedAccess) {
+            cachedFallbackUsed = true;
             setSubscription(cachedAccess.subscription);
             setTrialAccess(cachedAccess.trialAccess);
+            trackTruthlabelEvent(
+              "access_cached_fallback_used",
+              {
+                source: "auth_state_change",
+                access_status: cachedAccess.subscription.status,
+              },
+              { userId: nextUser.id },
+            );
           }
 
+          trackTruthlabelEvent(
+            "access_check_failed",
+            {
+              error_type: normalizeAnalyticsError(error),
+              source: "auth_state_change",
+              signed_in: true,
+              cached_fallback_used: cachedFallbackUsed,
+            },
+            { userId: nextUser.id },
+          );
           setErrorMessage(
             error instanceof Error
               ? error.message

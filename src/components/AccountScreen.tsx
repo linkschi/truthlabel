@@ -10,6 +10,7 @@ import SupportContactLink from "@/components/SupportContactLink";
 import { useTruthlabelAuth } from "@/components/auth/AuthProvider";
 import { avoidOptions, type AvoidConcern } from "@/data/fakeProduct";
 import { trackTruthlabelEvent } from "@/lib/analytics/analyticsClient";
+import { normalizeAnalyticsError } from "@/lib/analytics/analyticsEvents";
 import { hasMvpActivationAccess } from "@/lib/auth/mvpActivationAccess";
 import {
   getBrowserStorageNotice,
@@ -805,12 +806,51 @@ export default function AccountScreen() {
   }, []);
 
   async function handleSignOut() {
-    await signOut();
-    router.replace("/");
+    trackTruthlabelEvent(
+      "signout_started",
+      {
+        access_status: accessStatus.label,
+        subscription_status: subscription?.status ?? "unknown",
+      },
+      { userId: user?.id },
+    );
+
+    try {
+      await signOut();
+      trackTruthlabelEvent("signout_success", {
+        source: "account_page",
+      });
+      router.replace("/");
+    } catch (error) {
+      trackTruthlabelEvent(
+        "signout_failed",
+        {
+          error_type: normalizeAnalyticsError(error),
+          source: "account_page",
+        },
+        { userId: user?.id },
+      );
+      setStatusMessage("We couldn't sign out. Try again.");
+    }
   }
 
   async function handleRefreshAccess() {
+    trackTruthlabelEvent(
+      "access_check_started",
+      {
+        source: "account_page_button",
+        access_status: accessStatus.label,
+      },
+      { userId: user?.id },
+    );
     await refreshAccess();
+    trackTruthlabelEvent(
+      "access_check_success",
+      {
+        source: "account_page_button",
+      },
+      { userId: user?.id },
+    );
     const nextHasMvpAccessPass = hasMvpActivationAccess();
     setStatusMessage(
       nextHasMvpAccessPass

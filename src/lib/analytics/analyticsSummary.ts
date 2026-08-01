@@ -69,12 +69,18 @@ export type AnalyticsSummary = {
 
 const seriousFailureEvents = new Set<string>([
   "signup_failed",
+  "checkout_open_failed",
   "activation_failed",
+  "access_check_failed",
   "manual_scan_failed",
   "barcode_lookup_failed",
   "ocr_scan_failed",
   "password_reset_failed",
+  "signout_failed",
   "app_error",
+  "client_error_captured",
+  "resource_load_failed",
+  "unhandled_rejection",
 ]);
 
 function countBy<T extends string | null | undefined>(
@@ -136,6 +142,9 @@ function buildAlerts(args: {
   barcodeFailures: number;
   ocrFailures: number;
   manualScanFailures: number;
+  accessCheckFailures: number;
+  clientErrors: number;
+  resourceLoadFailures: number;
 }) {
   const alerts: AnalyticsAlert[] = [];
 
@@ -202,6 +211,33 @@ function buildAlerts(args: {
     });
   }
 
+  if (args.accessCheckFailures > 0) {
+    alerts.push({
+      id: "access_check_failures",
+      tone: "red",
+      title: "Access checks are failing",
+      message: "Users may be seeing inactive access or account-check warnings.",
+    });
+  }
+
+  if (args.clientErrors > 0) {
+    alerts.push({
+      id: "client_errors",
+      tone: "red",
+      title: "Browser errors were captured",
+      message: "Review client-side crashes or unhandled promise failures by device and browser.",
+    });
+  }
+
+  if (args.resourceLoadFailures >= 3) {
+    alerts.push({
+      id: "resource_load_failures",
+      tone: "yellow",
+      title: "Resources are failing to load",
+      message: "Images, scripts, styles, or videos may be failing for some visitors.",
+    });
+  }
+
   return alerts;
 }
 
@@ -247,6 +283,11 @@ export function buildAnalyticsSummary({
     getEventCount(eventCounts, "ocr_no_text_detected");
   const manualScanFailures = getEventCount(eventCounts, "manual_scan_failed");
   const resultPagesLoaded = getEventCount(eventCounts, "result_page_loaded");
+  const accessCheckFailures = getEventCount(eventCounts, "access_check_failed");
+  const clientErrors =
+    getEventCount(eventCounts, "client_error_captured") +
+    getEventCount(eventCounts, "unhandled_rejection");
+  const resourceLoadFailures = getEventCount(eventCounts, "resource_load_failed");
 
   const activeSubscriptions = subscriptions.filter((subscription) =>
     ["active", "active_until_end"].includes(subscription.status),
@@ -286,6 +327,24 @@ export function buildAnalyticsSummary({
       manualScanFailures,
       "Core manual scan failures.",
       manualScanFailures > 0 ? "red" : "green",
+    ),
+    metric(
+      "Access check failures",
+      accessCheckFailures,
+      "Account access checks that failed or fell back to cached access.",
+      accessCheckFailures > 0 ? "red" : "green",
+    ),
+    metric(
+      "Browser errors",
+      clientErrors,
+      "Client crashes or unhandled app promises captured in browsers.",
+      clientErrors > 0 ? "red" : "green",
+    ),
+    metric(
+      "Resource load failures",
+      resourceLoadFailures,
+      "Images, scripts, styles, videos, or source files that failed to load.",
+      resourceLoadFailures >= 3 ? "yellow" : "green",
     ),
   ];
 
@@ -380,6 +439,9 @@ export function buildAnalyticsSummary({
       barcodeFailures,
       ocrFailures,
       manualScanFailures,
+      accessCheckFailures,
+      clientErrors,
+      resourceLoadFailures,
     }),
   };
 }

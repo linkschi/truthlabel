@@ -31,6 +31,8 @@ test("analytics metadata removes sensitive fields but keeps safe context", () =>
 test("analytics event names are allow-listed", () => {
   assert.equal(isAnalyticsEventName("page_view"), true);
   assert.equal(isAnalyticsEventName("barcode_lookup_failed"), true);
+  assert.equal(isAnalyticsEventName("access_check_failed"), true);
+  assert.equal(isAnalyticsEventName("client_error_captured"), true);
   assert.equal(isAnalyticsEventName("totally_random_event"), false);
 });
 
@@ -42,5 +44,9 @@ test("analytics errors are normalized into safe categories", () => {
   assert.equal(
     normalizeAnalyticsError(new Error("Account access is not configured yet.")),
     "configuration_error",
+  );
+  assert.equal(
+    normalizeAnalyticsError(new Error("Camera permission denied")),
+    "permission_error",
   );
 });
