@@ -196,6 +196,33 @@ function PrimaryCta({
   );
 }
 
+function LandingHeaderMenu() {
+  return (
+    <details className="landing-mobile-menu">
+      <summary aria-label="Open landing page menu">
+        <span className="landing-menu-bars" aria-hidden="true">
+          <span />
+          <span />
+          <span />
+        </span>
+      </summary>
+      <div className="landing-mobile-panel">
+        <Link href="/sign-in">Home</Link>
+        <Link href="/landing" aria-current="page">
+          Landing
+        </Link>
+        <a
+          href={truthlabelTrialStartUrl}
+          data-analytics-event="trial_cta_clicked"
+          data-analytics-source="landing_menu"
+        >
+          Begin my free trial
+        </a>
+      </div>
+    </details>
+  );
+}
+
 function SectionIntro({
   eyebrow,
   title,
@@ -265,6 +292,7 @@ export default function LandingPage() {
           <PrimaryCta analyticsSource="landing_header">
             Try Truthlabel free for 7 days
           </PrimaryCta>
+          <LandingHeaderMenu />
         </div>
       </header>
 

@@ -173,8 +173,20 @@
 }
 
 .landing-mobile-menu summary::before {
-  content: "Menu";
-  font-size: 0.8rem;
+  content: none;
+}
+
+.landing-menu-bars {
+  display: grid;
+  width: 1.15rem;
+  gap: 0.23rem;
+}
+
+.landing-menu-bars span {
+  display: block;
+  height: 0.16rem;
+  border-radius: 999px;
+  background: currentColor;
 }
 
 .landing-mobile-panel {
@@ -192,15 +204,31 @@
 }
 
 .landing-mobile-panel a {
-  min-height: 2.75rem;
+  display: flex;
+  min-height: 2.8rem;
+  align-items: center;
   border-radius: 0.95rem;
   padding: 0.75rem 0.9rem;
   font-weight: 800;
   color: var(--tl-green-900);
 }
 
+.landing-mobile-panel a[aria-current="page"] {
+  background: var(--tl-green-50);
+  color: var(--tl-green-950);
+}
+
+.landing-mobile-panel a:last-child {
+  background: var(--tl-green-900);
+  color: #ffffff;
+}
+
 .landing-mobile-panel a:hover {
   background: var(--tl-green-50);
+}
+
+.landing-mobile-panel a:last-child:hover {
+  background: var(--tl-green-800);
 }
 
 .landing-button {
@@ -1411,6 +1439,12 @@
   }
 }
 
+@media (max-width: 620px) {
+  .landing-header-actions > .landing-button {
+    display: none;
+  }
+}
+
 @media (max-width: 760px) {
   .landing-header {
     width: min(100% - 1rem, 1180px);
@@ -1470,6 +1504,10 @@
     padding: 0.78rem 1rem;
     font-size: 0.82rem;
     white-space: nowrap;
+  }
+
+  .landing-header-actions {
+    gap: 0.5rem;
   }
 
   .landing-problem-grid,
