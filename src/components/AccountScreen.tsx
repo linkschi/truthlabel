@@ -1059,12 +1059,6 @@ export default function AccountScreen() {
         </SectionCard>
 
         <SectionCard title="App settings">
-          <RowButton
-            icon="settings"
-            title="Result display preferences"
-            detail="External safety sections, confidence notes, and default category."
-            onClick={() => setProtectionPanel("scan")}
-          />
           <RowLink
             icon="check"
             title="Install TruthLabel"
