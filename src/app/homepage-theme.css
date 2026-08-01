@@ -48,8 +48,7 @@
 }
 
 .landing-header {
-  position: sticky;
-  top: 0.75rem;
+  position: relative;
   z-index: 30;
   display: grid;
   grid-template-columns: auto 1fr auto auto;
@@ -1401,7 +1400,6 @@
 
 @media (max-width: 760px) {
   .landing-header {
-    top: 0.5rem;
     width: min(100% - 1rem, 1180px);
     min-height: 4rem;
     padding: 0.55rem 0.65rem;
