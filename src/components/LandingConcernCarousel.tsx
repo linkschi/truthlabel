@@ -27,8 +27,8 @@ const concernCards: ConcernCard[] = [
     ),
     copy: (
       <>
-        Truthlabel flags supported{" "}
-        <span className="landing-highlight">banned or restricted</span> matches.
+        <span className="landing-highlight">Banned or restricted</span>{" "}
+        matches can still appear in ordinary products.
       </>
     ),
     tone: "red",
@@ -46,7 +46,7 @@ const concernCards: ConcernCard[] = [
     ),
     copy: (
       <>
-        Truthlabel highlights cancer-related ingredient and food markers.
+        Cancer-related ingredient and food markers deserve closer review.
       </>
     ),
     tone: "red",
@@ -60,7 +60,8 @@ const concernCards: ConcernCard[] = [
     headline: "Lab-made food signals are easy to miss.",
     copy: (
       <>
-        Truthlabel flags bioengineered, cell-cultured, and lab-made wording.
+        Bioengineered, cell-cultured, and lab-made wording can be buried in
+        labels.
       </>
     ),
     tone: "yellow",
@@ -78,7 +79,7 @@ const concernCards: ConcernCard[] = [
     ),
     copy: (
       <>
-        Truthlabel checks verified recall, misbranding, and safety-action records.
+        Verified recall, misbranding, and safety-action records can matter.
       </>
     ),
     tone: "yellow",
@@ -86,16 +87,6 @@ const concernCards: ConcernCard[] = [
     imageAlt: "Protest signs and crop testing imagery related to food-label and GMO concerns",
     imageWidth: 1280,
     imageHeight: 1280,
-  },
-  {
-    label: "Hundreds More Review Signals",
-    headline: "More checks behind every scan.",
-    copy: (
-      <>
-        Additives, processing markers, safety signals, and more.
-      </>
-    ),
-    tone: "yellow",
   },
 ];
 

@@ -33,7 +33,7 @@ const navLinks = [
 ];
 
 const launchMetrics = [
-  "Independent and self-funded",
+  "Independent & self-funded",
   "7 days free",
   "Cancel anytime",
 ];
@@ -223,11 +223,7 @@ function FullPricingSection() {
       <div className="landing-pricing__card">
         <div>
           <p className="landing-eyebrow">Truthlabel Full Access</p>
-          <h2>Protect yourself from evil brands</h2>
-          <p>
-            Try Truthlabel free for 7 days and check products from brands that
-            put profit first.
-          </p>
+          <h2>Try Truthlabel free for 7 days</h2>
         </div>
         <div className="landing-price">
           <strong>$4.99</strong>
@@ -321,17 +317,6 @@ export default function LandingPage() {
             , and{" "}
             <span className="landing-highlight">warning signals</span>{" "}
             that are easy to miss.
-          </p>
-          <p>
-            We expose brands with a history of{" "}
-            <span className="landing-highlight">
-              &quot;misleading labels&quot;
-            </span>
-            ,{" "}
-            <span className="landing-highlight">safety violations</span>
-            , or{" "}
-            <span className="landing-highlight">serious product warnings</span>
-            .
           </p>
         </div>
         <FloatingInsights

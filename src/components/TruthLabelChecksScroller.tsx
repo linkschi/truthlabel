@@ -22,7 +22,7 @@ type TruthLabelCheck = {
   Icon: CheckIcon;
 };
 
-const scrollSpeed = 34;
+const scrollSpeed = 54;
 
 function BanIcon(props: SVGProps<SVGSVGElement>) {
   return (
@@ -564,8 +564,6 @@ export default function TruthLabelChecksScroller() {
             </div>
           </div>
 
-          <div className={styles.topFade} aria-hidden="true" />
-          <div className={styles.bottomFade} aria-hidden="true" />
         </div>
       </div>
     </div>

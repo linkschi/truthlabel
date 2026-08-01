@@ -596,7 +596,7 @@
 .landing-brand-shopping-image {
   display: block;
   width: 100%;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 3 / 4;
   object-fit: cover;
   object-position: center;
 }
@@ -663,11 +663,12 @@
 
 .landing-concerns {
   overflow: hidden;
+  padding-bottom: clamp(1.5rem, 3vw, 2.6rem);
 }
 
 .landing-concerns__note {
   max-width: 52rem;
-  margin: 1.25rem auto 0;
+  margin: 0.85rem auto 0;
   color: var(--tl-muted);
   font-size: clamp(1rem, 1.6vw, 1.1rem);
   font-weight: 800;
@@ -725,7 +726,7 @@
 
 .landing-concern-visual {
   position: relative;
-  min-height: 13.5rem;
+  min-height: 16.25rem;
   overflow: hidden;
   background:
     radial-gradient(circle at 24% 16%, rgba(255, 255, 255, 0.62), transparent 7rem),
@@ -754,7 +755,7 @@
 .landing-concern-image {
   display: block;
   width: 100%;
-  height: 13.5rem;
+  height: 16.25rem;
   object-fit: cover;
   object-position: center;
 }
@@ -913,6 +914,10 @@
   padding: 1rem;
 }
 
+.landing-checks {
+  padding-top: clamp(1.6rem, 3.5vw, 3rem);
+}
+
 .landing-check-grid .landing-icon {
   width: 2.45rem;
   height: 2.45rem;
@@ -995,11 +1000,11 @@
 }
 
 .landing-personal--compact {
-  padding-block: clamp(1.4rem, 3vw, 2.4rem);
+  padding-block: clamp(1rem, 2.2vw, 1.65rem);
 }
 
 .landing-personal--compact .landing-section-intro {
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
 }
 
 .landing-personal-summary {
@@ -1014,7 +1019,7 @@
   border: 1px solid rgba(13, 74, 54, 0.13);
   border-radius: 1.25rem;
   background: rgba(255, 255, 255, 0.9);
-  padding: 0.9rem;
+  padding: 0.72rem 0.82rem;
   box-shadow: 0 12px 28px rgba(13, 52, 39, 0.07);
 }
 
@@ -1026,10 +1031,10 @@
 }
 
 .landing-personal-summary p {
-  margin: 0.35rem 0 0;
+  margin: 0.22rem 0 0;
   color: var(--tl-muted);
   font-size: 0.94rem;
-  line-height: 1.45;
+  line-height: 1.32;
 }
 
 .landing-chip-list {
@@ -1207,9 +1212,9 @@
   align-items: center;
   gap: 0.65rem;
   border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.76);
-  padding: 0.75rem 0.85rem;
-  color: var(--tl-muted);
+  background: var(--tl-yellow-100);
+  padding: 0.72rem 0.85rem;
+  color: var(--tl-yellow-700);
   font-size: 0.76rem;
   font-weight: 900;
   letter-spacing: 0.08em;
@@ -1220,7 +1225,7 @@
   width: 0.55rem;
   height: 0.55rem;
   border-radius: 999px;
-  background: var(--tl-green-700);
+  background: var(--tl-yellow-700);
   content: "";
 }
 
