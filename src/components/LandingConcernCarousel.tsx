@@ -64,6 +64,10 @@ const concernCards: ConcernCard[] = [
       </>
     ),
     tone: "yellow",
+    imageSrc: "/landing-labmade-carousel.jpeg",
+    imageAlt: "Lab-grown meat in a laboratory setting with meat samples",
+    imageWidth: 1024,
+    imageHeight: 1280,
   },
   {
     label: "Misleading Labels and Troubling Company Records",
