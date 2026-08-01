@@ -7,7 +7,7 @@ test("meatSpecificConcernsDataPack stores the requested starter dataset", () => 
   assert.equal(meatSpecificConcernsDataPack.id, "meat_specific_concerns");
   assert.equal(
     meatSpecificConcernsDataPack.categoryName,
-    "Meat-Specific Concerns",
+    "Meat / Seafood Concerns",
   );
   assert.equal(meatSpecificConcernsDataPack.items.length, 20);
 });

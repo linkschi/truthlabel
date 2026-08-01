@@ -39,17 +39,17 @@ function findIngredient(
   );
 }
 
-test("27 ordinary ingredients produce a 45/100 moderate ingredient load", () => {
+test("27 ordinary ingredients produce a 55/100 moderate ingredient score", () => {
   const result = calculate(
     Array.from({ length: 27 }, (_, index) => `Simple ingredient ${index + 1}`),
   );
 
   assert.equal(result.rawLoad, 27);
-  assert.equal(result.score, 45);
-  assert.equal(result.level, "Moderate Ingredient Load");
+  assert.equal(result.score, 55);
+  assert.equal(result.level, "Moderate Ingredient Score");
 });
 
-test("one red ingredient and six ordinary ingredients produce 52/100", () => {
+test("one red ingredient and six ordinary ingredients produce a 48/100 ingredient score", () => {
   const result = calculate([
     "Red No. 3",
     "Water",
@@ -61,12 +61,12 @@ test("one red ingredient and six ordinary ingredients produce 52/100", () => {
   ]);
 
   assert.equal(result.rawLoad, 31);
-  assert.equal(result.score, 52);
-  assert.equal(result.level, "High Ingredient Load");
+  assert.equal(result.score, 48);
+  assert.equal(result.level, "Poor Ingredient Score");
   assert.equal(findIngredient(result, "Red No. 3")?.loadClass, "red");
 });
 
-test("five yellow concerns and eight ordinary ingredients produce 55/100", () => {
+test("five yellow concerns and eight ordinary ingredients produce a 45/100 ingredient score", () => {
   const result = calculate([
     "Sucralose",
     "Acesulfame potassium",
@@ -84,8 +84,8 @@ test("five yellow concerns and eight ordinary ingredients produce 55/100", () =>
   ]);
 
   assert.equal(result.rawLoad, 33);
-  assert.equal(result.score, 55);
-  assert.equal(result.level, "High Ingredient Load");
+  assert.equal(result.score, 45);
+  assert.equal(result.level, "Poor Ingredient Score");
   assert.equal(
     result.scoredIngredients.filter((ingredient) => ingredient.loadClass === "yellow")
       .length,
@@ -93,14 +93,14 @@ test("five yellow concerns and eight ordinary ingredients produce 55/100", () =>
   );
 });
 
-test("100 ordinary ingredients cap the ingredient load at 100", () => {
+test("100 ordinary ingredients cap the ingredient score at 0", () => {
   const result = calculate(
     Array.from({ length: 100 }, (_, index) => `Ordinary item ${index + 1}`),
   );
 
   assert.equal(result.rawLoad, 100);
-  assert.equal(result.score, 100);
-  assert.equal(result.level, "Very High Ingredient Load");
+  assert.equal(result.score, 0);
+  assert.equal(result.level, "Poor Ingredient Score");
 });
 
 test("name and code aliases contribute only once by canonical ingredient id", () => {
@@ -137,6 +137,6 @@ test("a selected personal allergen stays ingredient-scored separately from its u
   const result = calculate(["Milk"], ["milk"]);
 
   assert.equal(result.rawLoad, 1);
-  assert.equal(result.score, 2);
+  assert.equal(result.score, 98);
   assert.equal(result.scoredIngredients[0]?.loadClass, "simple");
 });

@@ -57,7 +57,7 @@ export const truthlabelCategoryDisplayNames: Record<string, string> = {
   allergy_risk: "Allergy Risk",
   natural_positive: "Natural / Positive Ingredients",
   unknown_review: "Unknown / Review Ingredients",
-  meat_specific_concerns: "Meat-Specific Concerns",
+  meat_specific_concerns: "Meat / Seafood Concerns",
   fry_oil_fast_food_oil: "Fry Oil / Fast Food Oil",
   heavy_metals: "Heavy Metals",
   microplastics: "Microplastics",

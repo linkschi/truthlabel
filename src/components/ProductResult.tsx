@@ -493,7 +493,7 @@ function getScanSourceBadgeLabel(scanSource: ScanSourceLabel) {
       return "OCR";
     case "demo":
     default:
-      return "Demo";
+      return "Sample";
   }
 }
 
@@ -544,6 +544,7 @@ function ProductVisual({
   const imageSourceLabel = getProductImageSourceLabel(imageSource);
   const [failedImageUrl, setFailedImageUrl] = useState("");
   const hasImage = Boolean(imageUrl && failedImageUrl !== imageUrl);
+  const showScanSourceBadge = scanSource !== "demo";
 
   return (
     <div className="relative h-[96px] w-[96px] overflow-hidden rounded-[20px] border border-[var(--border-strong)] bg-[linear-gradient(165deg,var(--bg-page)_0%,var(--bg-soft)_52%,var(--border-strong)_100%)] shadow-[0_14px_28px_rgba(23,20,18,0.08)]">
@@ -568,9 +569,11 @@ function ProductVisual({
       <div className="absolute left-2 top-2 rounded-full border border-white/80 bg-white/90 px-2 py-1 text-[8px] font-semibold uppercase tracking-[0.16em] text-[var(--text-secondary)] shadow-[0_8px_18px_rgba(23,20,18,0.08)]">
         {hasImage ? imageSourceLabel : sourceLabel}
       </div>
-      <div className="absolute bottom-2 right-2 rounded-full border border-white/80 bg-white/90 px-2 py-1 text-[8px] font-semibold uppercase tracking-[0.16em] text-[var(--text-secondary)] shadow-[0_8px_18px_rgba(23,20,18,0.08)]">
-        {sourceLabel}
-      </div>
+      {showScanSourceBadge ? (
+        <div className="absolute bottom-2 right-2 rounded-full border border-white/80 bg-white/90 px-2 py-1 text-[8px] font-semibold uppercase tracking-[0.16em] text-[var(--text-secondary)] shadow-[0_8px_18px_rgba(23,20,18,0.08)]">
+          {sourceLabel}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -685,30 +688,35 @@ function ScoreRing({
       : tone === "yellow"
         ? "var(--amber-main)"
         : "var(--green-main)";
+  const shortScoreLabel = scoreLabel.replace(" Ingredient Score", "");
 
   return (
-    <div className="relative flex h-[118px] w-[118px] items-center justify-center rounded-full border border-[var(--border-soft)] bg-[var(--bg-surface)] shadow-[0_18px_34px_rgba(23,20,18,0.08)]">
-      <div
-        className="absolute inset-0 rounded-full"
-        style={{
-          background: `conic-gradient(${ringColor} ${degrees}deg, var(--border-soft) ${degrees}deg 360deg)`,
-        }}
-      />
-      <div className="absolute inset-[9px] rounded-full bg-[var(--bg-page)]" />
-      <div className="relative text-center">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--text-secondary)]">
-          Ingredient load
-        </p>
-        <p className="mt-1 font-heading text-[2.15rem] font-semibold leading-none text-[var(--text-main)]">
-          {displayedScore}
-        </p>
-        <p className="mt-0.5 text-[11px] font-semibold text-[var(--text-secondary)]">/100</p>
-        <p
-          className={`mt-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] ${scoreLabelClasses[tone]}`}
-        >
-          {scoreLabel}
-        </p>
+    <div className="flex w-[124px] flex-col items-center">
+      <div className="relative flex h-[112px] w-[112px] items-center justify-center rounded-full border border-[var(--border-soft)] bg-[var(--bg-surface)] shadow-[0_18px_34px_rgba(23,20,18,0.08)]">
+        <div
+          className="absolute inset-0 rounded-full"
+          style={{
+            background: `conic-gradient(${ringColor} ${degrees}deg, var(--border-soft) ${degrees}deg 360deg)`,
+          }}
+        />
+        <div className="absolute inset-[9px] rounded-full bg-[var(--bg-page)] shadow-[inset_0_1px_6px_rgba(23,20,18,0.06)]" />
+        <div className="relative text-center">
+          <p className="font-heading text-[2.35rem] font-semibold leading-none text-[var(--text-main)]">
+            {displayedScore}
+          </p>
+          <p className="mt-0.5 text-[11px] font-semibold text-[var(--text-secondary)]">
+            /100
+          </p>
+        </div>
       </div>
+      <p className="mt-2 text-center text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--text-secondary)]">
+        Ingredient Score
+      </p>
+      <p
+        className={`mt-1 text-center text-[11px] font-extrabold uppercase tracking-[0.12em] ${scoreLabelClasses[tone]}`}
+      >
+        {shortScoreLabel}
+      </p>
     </div>
   );
 }
@@ -1043,88 +1051,6 @@ function AnimatedIssueBadge({
   );
 }
 
-function ResultSummaryCounts({
-  ingredientCount,
-  yellowCount,
-  redCount,
-  watchListMatchCount,
-  animate,
-}: {
-  ingredientCount: number;
-  yellowCount: number;
-  redCount: number;
-  watchListMatchCount: number;
-  animate: boolean;
-}) {
-  const items = [
-    {
-      id: "ingredients",
-      label: "Ingredients reviewed",
-      value: ingredientCount,
-      tone: "green" as RowTone,
-    },
-    {
-      id: "yellow",
-      label: "Yellow findings",
-      value: yellowCount,
-      tone: "yellow" as RowTone,
-    },
-    {
-      id: "red",
-      label: "Red findings",
-      value: redCount,
-      tone: "red" as RowTone,
-    },
-    {
-      id: "watch",
-      label: "Watch List matches",
-      value: watchListMatchCount,
-      tone: watchListMatchCount > 0 ? ("red" as RowTone) : ("green" as RowTone),
-    },
-  ];
-
-  return (
-    <div className="grid grid-cols-2 gap-2">
-      {items.map((item) => (
-        <ResultSummaryCountCard
-          key={item.id}
-          label={item.label}
-          value={item.value}
-          tone={item.tone}
-          animate={animate}
-        />
-      ))}
-    </div>
-  );
-}
-
-function ResultSummaryCountCard({
-  label,
-  value,
-  tone,
-  animate,
-}: {
-  label: string;
-  value: number;
-  tone: RowTone;
-  animate: boolean;
-}) {
-  const displayedValue = useCountUp(value, animate && value > 0, 620);
-
-  return (
-    <div
-      className={`rounded-[18px] border px-3 py-3 ${groupSurfaceClasses[tone]}`}
-    >
-      <p className={`font-heading text-[1.45rem] font-semibold leading-none ${groupTitleClasses[tone]}`}>
-        {displayedValue}
-      </p>
-      <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.11em] text-[var(--text-secondary)]">
-        {label}
-      </p>
-    </div>
-  );
-}
-
 function formatMatchSummary(matchCount: number, matchedItemsPreview: string[]) {
   if (matchCount <= 0 && matchedItemsPreview.length === 0) {
     return "";
@@ -1413,7 +1339,7 @@ function getFinalWarningReasonLabel(reason: ScanResult["finalVerdict"]["mainReas
       flavour_enhancers_flavourings: `High flavour-system load${countLabel}`,
       fry_oil_fast_food_oil: `High frying-oil processing load${countLabel}`,
       harmful_additives: `High additive concern load${countLabel}`,
-      meat_specific_concerns: `High meat-processing marker load${countLabel}`,
+      meat_specific_concerns: `High meat or seafood processing-marker load${countLabel}`,
       preservatives_shelf_life_systems: `High preservative load${countLabel}`,
       seed_oils_processed_oils: `Multiple processed oils or fats found${countLabel}`,
       ultra_processed_indicators: `Very high ultra-processing marker load${countLabel}`,
@@ -1493,8 +1419,8 @@ function getFinalWarningReasonLabel(reason: ScanResult["finalVerdict"]["mainReas
 
   if (reason.categoryId === "meat_specific_concerns") {
     return primaryItem
-      ? `Meat-processing marker found: ${primaryItem}`
-      : `Meat-processing markers found${countLabel}`;
+      ? `Meat or seafood processing marker found: ${primaryItem}`
+      : `Meat or seafood processing markers found${countLabel}`;
   }
 
   if (reason.categoryId === "fry_oil_fast_food_oil") {
@@ -2064,8 +1990,15 @@ export default function ProductResult({
         ),
     ];
 
-    return [...withRequiredRows].sort((left, right) => left.sortOrder - right.sortOrder);
-  }, [scanResult.quickOverview]);
+    return [...withRequiredRows]
+      .filter(
+        (row) =>
+          row.categoryId !== "allergy_risk" ||
+          savedAllergyProfile.length > 0 ||
+          row.severity !== "green",
+      )
+      .sort((left, right) => left.sortOrder - right.sortOrder);
+  }, [savedAllergyProfile.length, scanResult.quickOverview]);
 
   const ingredientGroups = useMemo<IngredientGroupCard[]>(
     () => [
@@ -2116,21 +2049,6 @@ export default function ProductResult({
       badgeTone: hasNeutral ? "neutral" : undefined,
     });
   }, [deepCheckRows]);
-
-  const resultSummaryCounts = useMemo(() => {
-    const redCount = deepCheckRows.filter((row) => row.severity === "red").length;
-    const yellowCount = deepCheckRows.filter((row) => row.severity === "yellow").length;
-    const watchListMatchCount = deepCheckRows
-      .filter((row) => row.categoryId === "allergy_risk" && row.severity === "red")
-      .reduce((total, row) => total + Math.max(1, row.matchCount), 0);
-
-    return {
-      ingredientCount: scanResult.ingredientBreakdown.totalIngredients,
-      yellowCount,
-      redCount,
-      watchListMatchCount,
-    };
-  }, [deepCheckRows, scanResult.ingredientBreakdown.totalIngredients]);
 
   const brandTrustBadges = useMemo(() => {
     const severity = scanResult.brandTrustSafety.severity;
@@ -2421,28 +2339,14 @@ export default function ProductResult({
           </section>
 
           <section
-            className={`mt-5 ${shouldAnimateFreshResult ? "truthlabel-reveal" : ""}`}
-            style={shouldAnimateFreshResult ? getRevealStyle(3) : undefined}
-            aria-label="Result summary counts"
-          >
-            <ResultSummaryCounts
-              ingredientCount={resultSummaryCounts.ingredientCount}
-              yellowCount={resultSummaryCounts.yellowCount}
-              redCount={resultSummaryCounts.redCount}
-              watchListMatchCount={resultSummaryCounts.watchListMatchCount}
-              animate={shouldAnimateFreshResult}
-            />
-          </section>
-
-          <section
             className={`mt-6 border-t border-[var(--border-soft)] pt-5 ${
               shouldAnimateFreshResult ? "truthlabel-reveal" : ""
             }`}
             style={shouldAnimateFreshResult ? getRevealStyle(4) : undefined}
           >
             <SectionHeading
-              title="Quick Overview"
-              subtitle="Compact checklist of the checks applied to this product."
+              title="Closer look"
+              subtitle="A clean checklist of what Truthlabel found on this product."
             />
             <div className="mt-3 divide-y divide-[var(--border-soft)]">
               {overviewRows.map((item, index) => (
@@ -2463,7 +2367,8 @@ export default function ProductResult({
             style={shouldAnimateFreshResult ? getRevealStyle(5) : undefined}
           >
             <SectionHeading
-              title="A Closer Look"
+              title="Flagged items"
+              subtitle="Deep analysis of yellow and red findings."
               extra={
                 <IssueBadgeStack
                   badges={deepCheckSectionBadges}
@@ -2695,7 +2600,7 @@ export default function ProductResult({
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--text-secondary)]">
-                    Ingredient load score
+                    Ingredient Score
                   </p>
                   <h3 className="mt-1 font-heading text-[1.45rem] font-semibold leading-none text-[var(--text-main)]">
                     {scanResult.ingredientLoad.score} / 100

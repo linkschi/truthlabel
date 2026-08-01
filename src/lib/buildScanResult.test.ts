@@ -78,9 +78,9 @@ test("clean product builds a green hero and natural ingredient grouping", () => 
   assert.equal(result.productHero.verdictTone, "green");
   assert.equal(result.finalVerdict.headline, "No major concerns");
   assert.equal(result.ingredientLoad.rawLoad, 3);
-  assert.equal(result.ingredientLoad.score, 5);
-  assert.equal(result.ingredientLoad.level, "Low Ingredient Load");
-  assert.equal(result.productHero.ingredientLoadScore, 5);
+  assert.equal(result.ingredientLoad.score, 95);
+  assert.equal(result.ingredientLoad.level, "Excellent Ingredient Score");
+  assert.equal(result.productHero.ingredientLoadScore, 95);
   assert.equal(result.ingredientBreakdown.naturalPositive.length, 3);
   assert.equal(result.ingredientBreakdown.processedArtificial.length, 0);
   assert.equal(result.ingredientBreakdown.unknownReview.length, 0);
@@ -265,7 +265,7 @@ test("milk allergy profile match creates a red allergy check and do-not-consume 
   assert.equal(result.finalVerdict.headline, "Do not consume");
   assert.equal(result.finalVerdict.immediateStopReason, "selected_allergen");
   assert.equal(result.ingredientLoad.rawLoad, 2);
-  assert.equal(result.ingredientLoad.score, 3);
+  assert.equal(result.ingredientLoad.score, 97);
 });
 
 test("milk without a matching allergy profile stays informational and hides from Deep Exposure", () => {

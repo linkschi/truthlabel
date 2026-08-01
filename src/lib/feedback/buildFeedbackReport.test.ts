@@ -25,7 +25,7 @@ test("buildFeedbackReport includes product context, warnings, and privacy note",
   assert.ok(report.includes("Product name: Tester Soda"));
   assert.ok(report.includes("Brand name: Truthlabel Labs"));
   assert.ok(report.includes("Scan method: manual"));
-  assert.ok(report.includes("Ingredient Load:"));
+  assert.ok(report.includes("Ingredient Score:"));
   assert.ok(!report.includes("Exposure Risk:"));
   assert.ok(report.includes("Top warnings shown:"));
   assert.ok(report.includes("Banned / Restricted Items"));

@@ -19,10 +19,9 @@ export const INGREDIENT_LOAD_REFERENCE = 60;
 export type IngredientLoadClass = keyof typeof INGREDIENT_LOAD_POINTS;
 export type IngredientLoadTone = "green" | "yellow" | "red";
 export type IngredientLoadLevel =
-  | "Low Ingredient Load"
-  | "Moderate Ingredient Load"
-  | "High Ingredient Load"
-  | "Very High Ingredient Load";
+  | "Poor Ingredient Score"
+  | "Moderate Ingredient Score"
+  | "Excellent Ingredient Score";
 
 export type ScoredIngredient = {
   canonicalIngredientId: string;
@@ -143,42 +142,33 @@ function uniqueStrings(values: string[]) {
   return [...new Set(values.filter(Boolean))];
 }
 
-function getIngredientLoadPresentation(score: number): Pick<
+function getIngredientScorePresentation(score: number): Pick<
   IngredientLoadResult,
   "level" | "tone" | "message"
 > {
-  if (score <= 24) {
+  if (score >= 75) {
     return {
-      level: "Low Ingredient Load",
+      level: "Excellent Ingredient Score",
       tone: "green",
       message:
-        "This product has a lighter overall ingredient load. Most ingredients make only a small contribution to the score.",
+        "This product has a strong ingredient score based on the current ingredient list. Fewer serious or highly processed markers were found.",
     };
   }
 
-  if (score <= 49) {
+  if (score >= 50) {
     return {
-      level: "Moderate Ingredient Load",
+      level: "Moderate Ingredient Score",
       tone: "yellow",
       message:
-        "This product has a noticeable ingredient load. This does not mean you need to avoid it, but you may want to consume it in moderation.",
-    };
-  }
-
-  if (score <= 74) {
-    return {
-      level: "High Ingredient Load",
-      tone: "red",
-      message:
-        "This product has a heavy ingredient load from its overall formula, processed ingredients, or serious concerns. Consider limiting how often you consume it.",
+        "This product has a mixed ingredient score. Some ingredient or processing signals deserve a closer look.",
     };
   }
 
   return {
-    level: "Very High Ingredient Load",
+    level: "Poor Ingredient Score",
     tone: "red",
     message:
-      "This product has a very heavy ingredient load with multiple serious, moderate, or highly processed ingredients. Truthlabel recommends choosing a simpler alternative.",
+      "This product has a poor ingredient score because the formula contains heavier processing signals, flagged ingredients, or a high overall ingredient burden.",
   };
 }
 
@@ -317,7 +307,7 @@ export function calculateIngredientLoad(
       yellow,
     );
     // Allergen groups intentionally group related foods, but butter and milk are
-    // still separate label ingredients and must each contribute to ingredient load.
+    // still separate label ingredients and must each contribute to Ingredient Score.
     const representativeCanonicalId = representative?.canonicalIngredientId;
     const canonicalIngredientId =
       representativeCanonicalId && !representativeCanonicalId.startsWith("allergy_")
@@ -360,16 +350,20 @@ export function calculateIngredientLoad(
     (total, ingredient) => total + ingredient.points,
     0,
   );
-  const score = Math.min(
-    100,
-    Math.round((rawLoad / INGREDIENT_LOAD_REFERENCE) * 100),
-  );
+  const loadScore =
+    scoredIngredients.length > 0
+      ? Math.min(
+          100,
+          Math.round((rawLoad / INGREDIENT_LOAD_REFERENCE) * 100),
+        )
+      : 100;
+  const score = Math.max(0, 100 - loadScore);
 
   return {
     rawLoad,
     score,
     referenceLoad: INGREDIENT_LOAD_REFERENCE,
-    ...getIngredientLoadPresentation(score),
+    ...getIngredientScorePresentation(score),
     scoredIngredients,
   };
 }

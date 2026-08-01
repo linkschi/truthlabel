@@ -25,7 +25,7 @@ export type MeatSpecificConcernsItem = {
 
 export const meatSpecificConcernsDataPack = {
   id: "meat_specific_concerns",
-  categoryName: "Meat-Specific Concerns",
+  categoryName: "Meat / Seafood Concerns",
   categoryMeaning:
     "This category detects meat-specific ingredient and label markers that suggest a product may be processed, formed, extended, cured, structurally modified, or less transparent about meat source or treatment. It is a review and transparency category, not proof of harm.",
   dataStatus: "starter_needs_expansion",
