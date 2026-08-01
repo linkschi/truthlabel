@@ -156,8 +156,12 @@ const androidInstallSteps: InstallGuideStep[] = [
     progress: "Step 3 of 3",
     title: "Confirm the TruthLabel installation",
     imageKey: "android-confirm-install",
+    imageSrc: "/onboarding-android-confirm-install.jpeg",
     imageAlt: "Android installation confirmation for TruthLabel",
     placeholderLabel: "Android confirmation image slot",
+    imageAspectRatio: "2 / 3",
+    imageWidth: 1024,
+    imageHeight: 1536,
   },
 ];
 
