@@ -100,6 +100,66 @@ function submitButtonClass(isBusy: boolean) {
   }`;
 }
 
+function PasswordField({
+  autoComplete,
+  className = "",
+  helper,
+  helperId,
+  label,
+  minLength,
+  onChange,
+  required = true,
+  value,
+}: {
+  autoComplete: string;
+  className?: string;
+  helper?: React.ReactNode;
+  helperId?: string;
+  label: string;
+  minLength?: number;
+  onChange: (value: string) => void;
+  required?: boolean;
+  value: string;
+}) {
+  const [isVisible, setIsVisible] = useState(false);
+
+  return (
+    <label className={`block ${className}`}>
+      <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--text-secondary)]">
+        {label}
+      </span>
+      <span className="relative mt-2 block">
+        <input
+          className="w-full rounded-[18px] border border-[var(--border-soft)] bg-white px-4 py-3 pr-[5.25rem] text-[14px] text-[var(--text-main)] outline-none transition placeholder:text-[var(--text-muted)] focus:border-[var(--green-main)] focus:ring-2 focus:ring-[rgba(21,128,61,0.14)]"
+          type={isVisible ? "text" : "password"}
+          autoComplete={autoComplete}
+          minLength={minLength}
+          required={required}
+          aria-describedby={helper ? helperId : undefined}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+        />
+        <button
+          type="button"
+          aria-pressed={isVisible}
+          className="absolute right-2 top-1/2 inline-flex min-h-9 -translate-y-1/2 items-center rounded-full border border-[var(--border-soft)] bg-[var(--bg-soft)] px-3 text-[12px] font-bold text-[var(--green-main)] transition hover:border-[var(--green-border)] focus-visible:ring-2 focus-visible:ring-[var(--green-main)] focus-visible:ring-offset-2"
+          onClick={() => setIsVisible((current) => !current)}
+        >
+          {isVisible ? "Hide" : "Show"}
+        </button>
+      </span>
+      {helper ? (
+        <span
+          id={helperId}
+          className="mt-2 block text-[12px] leading-5 text-[var(--text-muted)]"
+        >
+          {helper}
+        </span>
+      ) : null}
+    </label>
+  );
+}
+
 function getPasswordResetErrorMessage(error: unknown) {
   const message = error instanceof Error ? error.message : "";
   const normalized = message.toLowerCase();
@@ -337,19 +397,13 @@ function SignInFormInner() {
             onChange={(event) => setEmail(event.target.value)}
           />
         </label>
-        <label className="mt-4 block">
-          <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--text-secondary)]">
-            Password
-          </span>
-          <input
-            className={inputClass}
-            type="password"
-            autoComplete="current-password"
-            required
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-          />
-        </label>
+        <PasswordField
+          className="mt-4"
+          label="Password"
+          autoComplete="current-password"
+          value={password}
+          onChange={setPassword}
+        />
         {status ? <StatusMessage tone={status.tone} message={status.message} /> : null}
         <button disabled={isBusy} className={submitButtonClass(isBusy)}>
           {isBusy ? "Signing in..." : "Sign in"}
@@ -708,41 +762,24 @@ export function CreateAccountScreen() {
                 onChange={(event) => setEmail(event.target.value)}
               />
             </label>
-            <label className="mt-4 block">
-              <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--text-secondary)]">
-                Password
-              </span>
-              <input
-                className={inputClass}
-                type="password"
-                autoComplete="new-password"
-                minLength={8}
-                required
-                aria-describedby="signup-password-help"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-              />
-              <span
-                id="signup-password-help"
-                className="mt-2 block text-[12px] leading-5 text-[var(--text-muted)]"
-              >
-                Use at least 8 characters.
-              </span>
-            </label>
-            <label className="mt-4 block">
-              <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--text-secondary)]">
-                Confirm password
-              </span>
-              <input
-                className={inputClass}
-                type="password"
-                autoComplete="new-password"
-                minLength={8}
-                required
-                value={confirmPassword}
-                onChange={(event) => setConfirmPassword(event.target.value)}
-              />
-            </label>
+            <PasswordField
+              className="mt-4"
+              label="Password"
+              autoComplete="new-password"
+              minLength={8}
+              helper="Use at least 8 characters."
+              helperId="signup-password-help"
+              value={password}
+              onChange={setPassword}
+            />
+            <PasswordField
+              className="mt-4"
+              label="Confirm password"
+              autoComplete="new-password"
+              minLength={8}
+              value={confirmPassword}
+              onChange={setConfirmPassword}
+            />
             {status ? <StatusMessage tone={status.tone} message={status.message} /> : null}
             <button disabled={isBusy} className={submitButtonClass(isBusy)}>
               {isBusy ? "Creating..." : "Create account"}
@@ -931,34 +968,21 @@ export function UpdatePasswordScreen() {
       message="This page works after opening a valid Truthlabel password reset link."
     >
       <form onSubmit={handleSubmit} className="mt-5">
-        <label className="block">
-          <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--text-secondary)]">
-            New password
-          </span>
-          <input
-            className={inputClass}
-            type="password"
-            autoComplete="new-password"
-            minLength={8}
-            required
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-          />
-        </label>
-        <label className="mt-4 block">
-          <span className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[var(--text-secondary)]">
-            Confirm password
-          </span>
-          <input
-            className={inputClass}
-            type="password"
-            autoComplete="new-password"
-            minLength={8}
-            required
-            value={confirmPassword}
-            onChange={(event) => setConfirmPassword(event.target.value)}
-          />
-        </label>
+        <PasswordField
+          label="New password"
+          autoComplete="new-password"
+          minLength={8}
+          value={password}
+          onChange={setPassword}
+        />
+        <PasswordField
+          className="mt-4"
+          label="Confirm password"
+          autoComplete="new-password"
+          minLength={8}
+          value={confirmPassword}
+          onChange={setConfirmPassword}
+        />
         {status ? <StatusMessage tone={status.tone} message={status.message} /> : null}
         <button disabled={isBusy} className={submitButtonClass(isBusy)}>
           {isBusy ? "Updating..." : "Update password"}
