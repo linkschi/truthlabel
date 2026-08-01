@@ -170,7 +170,7 @@ function BrandMark() {
 }
 
 function PrimaryCta({
-  children = "Begin my 7-day free trial",
+  children = "Try Truthlabel free for 7 days",
   className = "",
   analyticsSource = "landing_cta",
 }: {
@@ -232,7 +232,7 @@ function FullPricingSection() {
           <p>No long-term commitment. Cancel future renewals whenever you choose.</p>
         </div>
         <PrimaryCta analyticsSource="pricing_section">
-          Begin my 7-day free trial
+          Try Truthlabel free for 7 days
         </PrimaryCta>
         <div className="landing-launch-metrics" aria-label="Truthlabel launch facts">
           {launchMetrics.map((metric) => (
@@ -256,7 +256,9 @@ export default function LandingPage() {
         </Link>
 
         <div className="landing-header-actions">
-          <PrimaryCta analyticsSource="landing_header">Begin free trial</PrimaryCta>
+          <PrimaryCta analyticsSource="landing_header">
+            Try Truthlabel free for 7 days
+          </PrimaryCta>
         </div>
       </header>
 
@@ -292,7 +294,7 @@ export default function LandingPage() {
       <section className="landing-post-exposure-cta" aria-label="Start your Truthlabel trial">
         <div className="landing-hero__actions">
           <PrimaryCta className="landing-hero__primary" analyticsSource="post_exposure_cta">
-            Begin my 7-day free trial
+            Try Truthlabel free for 7 days
           </PrimaryCta>
         </div>
         <p className="landing-trust-line">
@@ -463,7 +465,9 @@ export default function LandingPage() {
           <span className="landing-highlight">warnings</span>, and make the
           choice with greater confidence.
         </p>
-        <PrimaryCta analyticsSource="final_cta">Begin my 7-day free trial</PrimaryCta>
+        <PrimaryCta analyticsSource="final_cta">
+          Try Truthlabel free for 7 days
+        </PrimaryCta>
         <span>Cancel anytime - No long-term commitment</span>
       </section>
 
