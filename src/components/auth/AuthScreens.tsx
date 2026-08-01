@@ -110,7 +110,7 @@ function getPasswordResetErrorMessage(error: unknown) {
     normalized.includes("too many") ||
     normalized.includes("email rate")
   ) {
-    return "Password reset is temporarily busy. Try again later, or create a new account and activate access with your license key.";
+    return "Password reset is temporarily busy. Try again later, or create a new account to continue.";
   }
 
   return message || "Truthlabel could not send the reset email.";
@@ -437,6 +437,7 @@ function TrialActivationLoadingScreen({ email }: { email: string }) {
 }
 
 export function CreateAccountScreen() {
+  const { user } = useTruthlabelAuth();
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -455,59 +456,87 @@ export function CreateAccountScreen() {
     });
   }, []);
 
-  function continueToCheckout({
-    message,
-    source,
-    userId,
-  }: {
-    message: string;
-    source: string;
-    userId?: string | null;
-  }) {
-    trackTruthlabelEvent(
-      "checkout_handoff_shown",
-      {
-        source,
-      },
-      { userId },
-    );
-    storePendingCheckoutEmail(email);
-    setFirstName("");
-    setPassword("");
-    setConfirmPassword("");
-    setIsRedirectingToCheckout(true);
-    setStatus({
-      tone: "green",
+  const continueToCheckout = useCallback(
+    ({
+      checkoutEmail,
       message,
-    });
-
-    window.setTimeout(() => {
+      source,
+      userId,
+    }: {
+      checkoutEmail?: string | null;
+      message: string;
+      source: string;
+      userId?: string | null;
+    }) => {
       trackTruthlabelEvent(
-        "checkout_started",
+        "checkout_handoff_shown",
         {
           source,
         },
         { userId },
       );
-      try {
-        window.location.assign(checkoutUrl);
-      } catch (error) {
+      const nextCheckoutEmail = checkoutEmail || email;
+
+      if (nextCheckoutEmail) {
+        storePendingCheckoutEmail(nextCheckoutEmail);
+        setEmail(nextCheckoutEmail);
+      }
+
+      setFirstName("");
+      setPassword("");
+      setConfirmPassword("");
+      setIsRedirectingToCheckout(true);
+      setStatus({
+        tone: "green",
+        message,
+      });
+
+      window.setTimeout(() => {
         trackTruthlabelEvent(
-          "checkout_open_failed",
+          "checkout_started",
           {
             source,
-            error_type: normalizeAnalyticsError(error),
           },
           { userId },
         );
-        setIsRedirectingToCheckout(false);
-        setStatus({
-          tone: "red",
-          message: "Checkout could not open. Try again.",
-        });
-      }
-    }, 1900);
-  }
+        try {
+          window.location.assign(checkoutUrl);
+        } catch (error) {
+          trackTruthlabelEvent(
+            "checkout_open_failed",
+            {
+              source,
+              error_type: normalizeAnalyticsError(error),
+            },
+            { userId },
+          );
+          setIsRedirectingToCheckout(false);
+          setStatus({
+            tone: "red",
+            message: "Checkout could not open. Try again.",
+          });
+        }
+      }, 1900);
+    },
+    [checkoutUrl, email],
+  );
+
+  useEffect(() => {
+    if (!user || isRedirectingToCheckout) {
+      return;
+    }
+
+    const handle = window.setTimeout(() => {
+      continueToCheckout({
+        checkoutEmail: user.email,
+        message: "Account found. Taking you to checkout.",
+        source: "create_account_signed_in",
+        userId: user.id,
+      });
+    }, 0);
+
+    return () => window.clearTimeout(handle);
+  }, [continueToCheckout, isRedirectingToCheckout, user]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -545,7 +574,7 @@ export function CreateAccountScreen() {
           emailRedirectTo:
             typeof window === "undefined"
               ? undefined
-              : `${window.location.origin}/activate`,
+              : `${window.location.origin}/app`,
         },
       });
 
@@ -558,9 +587,13 @@ export function CreateAccountScreen() {
             });
 
           if (signInError) {
-            throw new Error(
-              "This email already has a Truthlabel account. Sign in with the existing password to continue.",
-            );
+            continueToCheckout({
+              checkoutEmail: email,
+              message: "Account found. Taking you to checkout.",
+              source: "create_account_existing_email_without_login",
+              userId: null,
+            });
+            return;
           }
 
           trackTruthlabelEvent(
@@ -571,6 +604,7 @@ export function CreateAccountScreen() {
             { userId: signInData.user?.id },
           );
           continueToCheckout({
+            checkoutEmail: email,
             message: "Account found. Taking you to checkout.",
             source: "create_account_existing_account",
             userId: signInData.user?.id,
@@ -579,6 +613,20 @@ export function CreateAccountScreen() {
         }
 
         throw error;
+      }
+
+      if (
+        data.user &&
+        Array.isArray(data.user.identities) &&
+        data.user.identities.length === 0
+      ) {
+        continueToCheckout({
+          checkoutEmail: email,
+          message: "Account found. Taking you to checkout.",
+          source: "create_account_existing_email_identity_hint",
+          userId: data.user.id,
+        });
+        return;
       }
 
       trackTruthlabelEvent(
@@ -590,11 +638,22 @@ export function CreateAccountScreen() {
         { userId: data.user?.id },
       );
       continueToCheckout({
+        checkoutEmail: email,
         message: "Account created. Taking you to checkout.",
         source: "create_account_auto_redirect",
         userId: data.user?.id,
       });
     } catch (error) {
+      if (isExistingAccountSignupError(error)) {
+        continueToCheckout({
+          checkoutEmail: email,
+          message: "Account found. Taking you to checkout.",
+          source: "create_account_existing_email_catchall",
+          userId: null,
+        });
+        return;
+      }
+
       trackTruthlabelEvent("signup_failed", {
         error_type: normalizeAnalyticsError(error),
       });
@@ -683,22 +742,17 @@ export function CreateAccountScreen() {
                 onChange={(event) => setConfirmPassword(event.target.value)}
               />
             </label>
-            {status ? (
-              <StatusMessage tone={status.tone} message={status.message} />
-            ) : null}
+            {status ? <StatusMessage tone={status.tone} message={status.message} /> : null}
             <button disabled={isBusy} className={submitButtonClass(isBusy)}>
-              {isBusy ? "Creating account..." : "Create account now"}
+              {isBusy ? "Creating..." : "Create account"}
             </button>
           </form>
-          <p className="mt-3 text-[13px] leading-5 text-[var(--text-secondary)]">
-            Already have an account?{" "}
-            <Link
-              href="/sign-in"
-              className="font-semibold text-[var(--green-main)]"
-            >
-              Sign in
-            </Link>
-          </p>
+          <Link
+            href="/sign-in"
+            className="mt-5 inline-flex text-[13px] font-semibold text-[var(--green-main)]"
+          >
+            Already have an account? Sign in
+          </Link>
       </div>
     </AuthShell>
   );
