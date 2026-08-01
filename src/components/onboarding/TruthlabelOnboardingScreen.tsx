@@ -133,7 +133,7 @@ const iosInstallSteps: InstallGuideStep[] = [
 const androidInstallSteps: InstallGuideStep[] = [
   {
     id: "browser-menu",
-    progress: "Step 1 of 3",
+    progress: "Step 1 of 4",
     title: "Open your browser menu",
     imageKey: "android-browser-menu",
     imageSrc: "/onboarding-android-browser-menu.jpeg",
@@ -145,7 +145,7 @@ const androidInstallSteps: InstallGuideStep[] = [
   },
   {
     id: "install-app",
-    progress: "Step 2 of 3",
+    progress: "Step 2 of 4",
     title: 'Choose "Install app" or "Add to Home screen"',
     imageKey: "android-install-app",
     imageAlt: "Android browser menu showing the install app option",
@@ -153,7 +153,7 @@ const androidInstallSteps: InstallGuideStep[] = [
   },
   {
     id: "confirm-install",
-    progress: "Step 3 of 3",
+    progress: "Step 3 of 4",
     title: "Confirm the TruthLabel installation",
     imageKey: "android-confirm-install",
     imageSrc: "/onboarding-android-confirm-install.jpeg",
@@ -162,6 +162,19 @@ const androidInstallSteps: InstallGuideStep[] = [
     imageAspectRatio: "2 / 3",
     imageWidth: 1024,
     imageHeight: 1536,
+  },
+  {
+    id: "install-choice",
+    progress: "Step 4 of 4",
+    title: "Tap Install",
+    imageKey: "android-install-choice",
+    imageSrc: "/onboarding-android-install-choice.jpeg",
+    imageAlt: "Android install and create shortcut prompt with Install selected",
+    placeholderLabel: "Android install choice image slot",
+    imageAspectRatio: "2 / 3",
+    imageWidth: 1024,
+    imageHeight: 1536,
+    tip: "If Android gives you a choice, choose Install instead of Create shortcut.",
   },
 ];
 
