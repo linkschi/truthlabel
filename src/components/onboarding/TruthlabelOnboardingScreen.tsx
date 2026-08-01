@@ -136,8 +136,12 @@ const androidInstallSteps: InstallGuideStep[] = [
     progress: "Step 1 of 3",
     title: "Open your browser menu",
     imageKey: "android-browser-menu",
+    imageSrc: "/onboarding-android-browser-menu.jpeg",
     imageAlt: "Android browser showing its menu button",
     placeholderLabel: "Android browser menu image slot",
+    imageAspectRatio: "2 / 3",
+    imageWidth: 1024,
+    imageHeight: 1536,
   },
   {
     id: "install-app",
