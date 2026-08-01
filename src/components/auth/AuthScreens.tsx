@@ -239,21 +239,31 @@ function SignInFormInner() {
   );
   const [isBusy, setIsBusy] = useState(false);
   const nextPath = searchParams.get("next") || "/app";
+  const isAlreadySignedIn = accessState === "active";
 
-  if (accessState === "active") {
+  useEffect(() => {
+    if (isAlreadySignedIn) {
+      router.replace("/app");
+    }
+  }, [isAlreadySignedIn, router]);
+
+  if (isAlreadySignedIn) {
     return (
-      <AuthShell
-        eyebrow="Signed in"
-        title="Truthlabel is ready."
-        message="You are already signed in on this device."
-      >
-        <Link
-          href="/app"
-          className="mt-5 inline-flex w-full justify-center rounded-full border border-transparent bg-[var(--text-main)] px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-white shadow-[0_18px_36px_rgba(23,20,18,0.16)]"
-        >
-          Open Truthlabel
-        </Link>
-      </AuthShell>
+      <main className="min-h-screen px-4 py-6 sm:px-5">
+        <section className="mx-auto flex min-h-[70vh] max-w-[440px] items-center justify-center">
+          <div className="w-full rounded-[32px] border border-[var(--border-soft)] bg-[var(--bg-surface)] px-5 py-6 text-center shadow-[var(--shadow)]">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--green-main)]">
+              Signed in
+            </p>
+            <h1 className="mt-2 font-heading text-[1.85rem] font-semibold leading-tight text-[var(--text-main)]">
+              Opening Truthlabel...
+            </h1>
+            <p className="mt-2 text-[14px] leading-6 text-[var(--text-secondary)]">
+              You are already signed in. Taking you to the app now.
+            </p>
+          </div>
+        </section>
+      </main>
     );
   }
 
