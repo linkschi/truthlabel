@@ -120,8 +120,13 @@ const iosInstallSteps: InstallGuideStep[] = [
     progress: "Step 3 of 3",
     title: "Finish adding TruthLabel",
     imageKey: "ios-confirm-install",
+    imageSrc: "/onboarding-ios-confirm-home-screen.jpeg",
     imageAlt: "iPhone Add to Home Screen confirmation",
     placeholderLabel: "Install confirmation image slot",
+    imageAspectRatio: "3 / 4",
+    imageWidth: 1080,
+    imageHeight: 1440,
+    tip: 'Keep "Open as Web App" turned on, then tap Add.',
   },
 ];
 
