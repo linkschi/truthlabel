@@ -148,8 +148,13 @@ const androidInstallSteps: InstallGuideStep[] = [
     progress: "Step 2 of 4",
     title: 'Choose "Install app" or "Add to Home screen"',
     imageKey: "android-install-app",
+    imageSrc: "/onboarding-android-install-menu.jpeg",
     imageAlt: "Android browser menu showing the install app option",
     placeholderLabel: "Android install option image slot",
+    imageAspectRatio: "2 / 3",
+    imageWidth: 1024,
+    imageHeight: 1536,
+    tip: "If Install is lower in the menu, scroll down until you see it.",
   },
   {
     id: "confirm-install",
