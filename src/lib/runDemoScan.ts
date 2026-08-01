@@ -96,7 +96,7 @@ export function runDemoScan(
     externalSignals,
     scanSource: demoProduct.scanSource,
     productImageUrl: demoProduct.imageUrl,
-    productImageSource: demoProduct.imageUrl ? "product_database" : undefined,
+    productImageSource: demoProduct.imageUrl ? "sample_scan" : undefined,
   });
 
   return {

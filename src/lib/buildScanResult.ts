@@ -31,7 +31,7 @@ type IngredientGroup =
   | "unknown_review"
   | "unmatched";
 type ScanSource = "manual_paste" | "barcode" | "ocr" | "demo";
-type ProductImageSource = "product_database" | "captured_scan";
+type ProductImageSource = "product_database" | "captured_scan" | "sample_scan";
 type DeepCheckStatus = "checked" | "not_checked";
 type BrandTrustStatus =
   | "not_checked"

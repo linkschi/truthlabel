@@ -503,8 +503,29 @@ function getProductImageSourceLabel(imageSource?: ProductImageSourceLabel) {
       return "Open Food Facts";
     case "captured_scan":
       return "Scan photo";
+    case "sample_scan":
+      return "Sample scan";
     default:
       return "Product";
+  }
+}
+
+function getProductVisualAltText({
+  imageSource,
+  productName,
+}: {
+  imageSource?: ProductImageSourceLabel;
+  productName: string;
+}) {
+  switch (imageSource) {
+    case "sample_scan":
+      return `${productName} sample scan preview`;
+    case "captured_scan":
+      return `${productName} scan photo`;
+    case "product_database":
+      return `${productName} product database image`;
+    default:
+      return `${productName} product image`;
   }
 }
 
@@ -529,7 +550,7 @@ function ProductVisual({
       {hasImage ? (
         <img
           src={imageUrl}
-          alt={`${productName} product image`}
+          alt={getProductVisualAltText({ imageSource, productName })}
           className="h-full w-full object-cover"
           loading="lazy"
           onError={() => setFailedImageUrl(imageUrl)}
