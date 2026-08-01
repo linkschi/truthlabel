@@ -1311,7 +1311,7 @@ function StepFourInstall({
       <section className="flex flex-1 flex-col py-6">
         <InstallationEyebrow>Install the app</InstallationEyebrow>
         <h1 className="mt-2 text-[32px] font-black leading-[1.04] tracking-[-0.04em] text-[#101613]">
-          Install the TruthLabel app
+          Install TruthLabel on this phone
         </h1>
         <InstallCard compact>
           <InstallBenefitList
@@ -1345,7 +1345,7 @@ function StepFourInstall({
       <section className="flex flex-1 flex-col py-6">
         <InstallationEyebrow>Install the app</InstallationEyebrow>
         <h1 className="mt-2 text-[32px] font-black leading-[1.04] tracking-[-0.04em] text-[#101613]">
-          Install TruthLabel manually
+          Install TruthLabel on this phone
         </h1>
         <InstallStepCarousel steps={androidInstallSteps} />
         {installCheckStatus ? (
