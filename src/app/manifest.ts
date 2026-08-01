@@ -6,8 +6,8 @@ export default function manifest(): MetadataRoute.Manifest {
     short_name: "Truthlabel",
     description:
       "Truthlabel scans ingredient labels, barcodes, and safety signals before you trust the product.",
-    id: "/",
-    start_url: "/",
+    id: "/app",
+    start_url: "/app",
     scope: "/",
     display: "standalone",
     background_color: "#FFFFFF",

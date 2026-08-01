@@ -1056,11 +1056,6 @@ export default function AccountScreen() {
             meta={scanHistoryCount === null ? undefined : `${scanHistoryCount} scans`}
             href="/app/history"
           />
-          <RowLink
-            icon="check"
-            title="Saved products"
-            href="/app/saved"
-          />
         </SectionCard>
 
         <SectionCard title="App settings">

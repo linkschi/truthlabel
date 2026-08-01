@@ -7,7 +7,7 @@ test("Truthlabel manifest has installable PNG and maskable icons", () => {
   const result = manifest();
 
   assert.equal(result.display, "standalone");
-  assert.equal(result.start_url, "/");
+  assert.equal(result.start_url, "/app");
   assert.equal(result.scope, "/");
   assert.ok(
     result.icons?.some(

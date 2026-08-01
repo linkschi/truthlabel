@@ -1324,9 +1324,12 @@ function StepFourInstall({
           <div className="mt-3">
             <InstallationImagePlaceholder
               imageKey="android-native-install"
+              src="/onboarding-android-confirm-install.jpeg"
               alt="Android install prompt"
               label="Android install prompt image slot"
-              aspectRatio="16 / 9"
+              aspectRatio="2 / 3"
+              imageWidth={1024}
+              imageHeight={1536}
             />
           </div>
         </InstallCard>

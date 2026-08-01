@@ -176,7 +176,7 @@ export default function AppBottomNavigation() {
               href={item.href}
               aria-label={item.ariaLabel}
               aria-current={active ? "page" : undefined}
-              className={`flex min-h-11 min-w-0 flex-col items-center justify-center gap-1 rounded-[12px] px-0.5 text-[10px] font-semibold leading-none outline-none transition focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 ${
+              className={`flex min-h-11 min-w-0 flex-col items-center justify-center gap-1 rounded-[12px] px-0.5 text-[9px] font-semibold leading-none outline-none transition focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 min-[360px]:text-[10px] ${
                 active ? "text-[#0E5A3F]" : "text-[#5F6C65] hover:text-[#0E5A3F]"
               }`}
             >
@@ -187,7 +187,7 @@ export default function AppBottomNavigation() {
               >
                 <AppNavIcon name={item.icon} />
               </span>
-              <span className="w-full truncate text-center">{item.label}</span>
+              <span className="whitespace-nowrap text-center">{item.label}</span>
             </Link>
           );
         })}
