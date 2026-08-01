@@ -66,8 +66,12 @@ type InstallGuideStep = {
   progress: string;
   title: string;
   imageKey: string;
+  imageSrc?: string;
   imageAlt: string;
   placeholderLabel: string;
+  imageAspectRatio?: string;
+  imageWidth?: number;
+  imageHeight?: number;
 };
 
 type InstallationImagePlaceholderProps = {
@@ -90,8 +94,12 @@ const iosInstallSteps: InstallGuideStep[] = [
     progress: "Step 1 of 3",
     title: "Tap Safari's Share button",
     imageKey: "ios-share-button",
+    imageSrc: "/onboarding-ios-safari-share-button.jpeg",
     imageAlt: "Safari showing the TruthLabel page and Share button",
     placeholderLabel: "Safari Share button image slot",
+    imageAspectRatio: "3 / 4",
+    imageWidth: 1080,
+    imageHeight: 1440,
   },
   {
     id: "add-home-screen",
@@ -918,9 +926,12 @@ function InstallStepCarousel({ steps }: { steps: InstallGuideStep[] }) {
             <div className="mt-2.5">
               <InstallationImagePlaceholder
                 imageKey={step.imageKey}
+                src={step.imageSrc}
                 alt={step.imageAlt}
                 label={step.placeholderLabel}
-                aspectRatio="16 / 9"
+                aspectRatio={step.imageAspectRatio ?? "16 / 9"}
+                imageWidth={step.imageWidth}
+                imageHeight={step.imageHeight}
               />
             </div>
             <div className="mt-3 flex justify-center gap-1.5" aria-hidden="true">
