@@ -23,6 +23,7 @@ export const ANALYTICS_EVENT_NAMES = [
   "signout_started",
   "signout_success",
   "signout_failed",
+  "better_picks_reminder_enabled",
   "login_started",
   "login_success",
   "login_failed",

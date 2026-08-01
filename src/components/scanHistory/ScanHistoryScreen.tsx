@@ -4,6 +4,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, useTransition } from "react";
+import AppBottomNavigation from "@/components/AppBottomNavigation";
 import ScanHistoryScoreRing from "@/components/scanHistory/ScanHistoryScoreRing";
 import {
   buildHistoryScoreLabel,
@@ -43,92 +44,6 @@ const timeFilterOptions: Array<{
   { value: "last_30_days", label: "Last 30 days" },
   { value: "all_time", label: "All time" },
 ];
-
-type NavIconName = "home" | "manual" | "camera" | "history" | "account";
-
-function NavIcon({ name }: { name: NavIconName }) {
-  const commonProps = {
-    "aria-hidden": true,
-    className: "h-5 w-5",
-    fill: "none",
-    viewBox: "0 0 24 24",
-    xmlns: "http://www.w3.org/2000/svg",
-  };
-
-  switch (name) {
-    case "manual":
-      return (
-        <svg {...commonProps}>
-          <path
-            d="M8 6h8M8 10h8M8 14h5"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeWidth="1.7"
-          />
-          <path
-            d="M7 3.5h10A1.5 1.5 0 0 1 18.5 5v14A1.5 1.5 0 0 1 17 20.5H7A1.5 1.5 0 0 1 5.5 19V5A1.5 1.5 0 0 1 7 3.5Z"
-            stroke="currentColor"
-            strokeWidth="1.7"
-          />
-        </svg>
-      );
-    case "camera":
-      return (
-        <svg {...commonProps}>
-          <path
-            d="M5 8.5h3l1.4-2h5.2l1.4 2h3A1.8 1.8 0 0 1 20.8 10v7A1.8 1.8 0 0 1 19 18.8H5A1.8 1.8 0 0 1 3.2 17v-7A1.8 1.8 0 0 1 5 8.5Z"
-            stroke="currentColor"
-            strokeLinejoin="round"
-            strokeWidth="1.7"
-          />
-          <path d="M12 16a3.1 3.1 0 1 0 0-6.2 3.1 3.1 0 0 0 0 6.2Z" stroke="currentColor" strokeWidth="1.7" />
-        </svg>
-      );
-    case "history":
-      return (
-        <svg {...commonProps}>
-          <path
-            d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3L4.5 8.9"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="1.7"
-          />
-          <path
-            d="M4.5 5v4h4M12 8v4.3l3 1.7"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="1.7"
-          />
-        </svg>
-      );
-    case "account":
-      return (
-        <svg {...commonProps}>
-          <path
-            d="M12 12.2a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4.8 20.2c.7-3.6 3.4-5.7 7.2-5.7s6.5 2.1 7.2 5.7"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="1.7"
-          />
-        </svg>
-      );
-    case "home":
-    default:
-      return (
-        <svg {...commonProps}>
-          <path
-            d="M4 10.8 12 4l8 6.8V20a1 1 0 0 1-1 1h-4.2v-5.6H9.2V21H5a1 1 0 0 1-1-1v-9.2Z"
-            stroke="currentColor"
-            strokeLinejoin="round"
-            strokeWidth="1.7"
-          />
-        </svg>
-      );
-  }
-}
 
 function ProductImage({
   imageUrl,
@@ -713,39 +628,7 @@ export default function ScanHistoryScreen() {
         </div>
       ) : null}
 
-      <nav
-        aria-label="Primary navigation"
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-[#DCE7E1] bg-white shadow-[0_-8px_22px_rgba(15,40,28,0.06)]"
-      >
-        <div className="mx-auto grid h-[66px] max-w-[480px] grid-cols-4 px-2 pb-[env(safe-area-inset-bottom)]">
-          {[
-            { href: "/app", label: "Home", icon: "home" as const },
-            {
-              href: "/app/manual?mode=camera",
-              label: "Scan",
-              icon: "camera" as const,
-              ariaLabel: "Scan a product",
-            },
-            { href: "/app/history", label: "History", icon: "history" as const },
-            { href: "/app/account", label: "Account", icon: "account" as const },
-          ].map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              aria-label={"ariaLabel" in item ? item.ariaLabel : undefined}
-              aria-current={item.href === "/app/history" ? "page" : undefined}
-              className={`flex min-h-11 flex-col items-center justify-center gap-1 rounded-[12px] text-[11px] font-semibold outline-none transition focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 ${
-                item.href === "/app/history"
-                  ? "text-[#0E5A3F]"
-                  : "text-[#5F6C65] hover:text-[#0E5A3F]"
-              }`}
-            >
-              <NavIcon name={item.icon} />
-              <span>{item.label}</span>
-            </Link>
-          ))}
-        </div>
-      </nav>
+      <AppBottomNavigation />
     </main>
   );
 }

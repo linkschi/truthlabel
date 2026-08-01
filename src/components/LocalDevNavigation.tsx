@@ -8,6 +8,7 @@ const localNavigationLinks = [
   { href: "/app", label: "Home" },
   { href: "/app/manual", label: "Manual" },
   { href: "/app/history", label: "History" },
+  { href: "/app/better-picks", label: "Better Picks" },
   { href: "/app/account", label: "Account" },
   {
     href: "/app/results?category=packaged-processed-foods&demo=red-berry-soda",

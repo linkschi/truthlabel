@@ -33,6 +33,7 @@ test("analytics event names are allow-listed", () => {
   assert.equal(isAnalyticsEventName("barcode_lookup_failed"), true);
   assert.equal(isAnalyticsEventName("access_check_failed"), true);
   assert.equal(isAnalyticsEventName("client_error_captured"), true);
+  assert.equal(isAnalyticsEventName("better_picks_reminder_enabled"), true);
   assert.equal(isAnalyticsEventName("totally_random_event"), false);
 });
 

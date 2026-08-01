@@ -26,6 +26,11 @@ const navItems = [
     label: "History",
     detail: "Review previous completed scans saved under this account.",
   },
+  {
+    href: "/app/better-picks",
+    label: "Better Picks",
+    detail: "Preview the coming product-alternatives experience.",
+  },
   ...(publicAppConfig.flags.enableDemoProducts
     ? [
         {

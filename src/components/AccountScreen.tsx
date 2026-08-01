@@ -2,8 +2,9 @@
 
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useState, useSyncExternalStore } from "react";
+import AppBottomNavigation from "@/components/AppBottomNavigation";
 import AllergyProfileSettings from "@/components/AllergyProfileSettings";
 import ScanPreferencesSettings from "@/components/ScanPreferencesSettings";
 import SupportContactLink from "@/components/SupportContactLink";
@@ -638,70 +639,7 @@ function getConfirmationCopy(action: ConfirmationAction) {
   }
 }
 
-function BottomNavigation({ pathname }: { pathname: string }) {
-  const items = [
-    { href: "/app", label: "Home", icon: "home" as const, active: pathname === "/app" },
-    {
-      href: "/app/manual?mode=camera",
-      label: "Scan",
-      icon: "camera" as const,
-      active: pathname === "/app/manual",
-      ariaLabel: "Scan a product",
-    },
-    {
-      href: "/app/history",
-      label: "History",
-      icon: "history" as const,
-      active: pathname === "/app/history",
-    },
-    {
-      href: "/app/account",
-      label: "Account",
-      icon: "user" as const,
-      active:
-        pathname.startsWith("/app/account") ||
-        pathname === "/app/settings" ||
-        pathname === "/settings" ||
-        pathname === "/privacy" ||
-        pathname === "/terms" ||
-        pathname === "/health-disclaimer" ||
-        pathname === "/update-password",
-    },
-  ];
-
-  return (
-    <nav
-      aria-label="Primary navigation"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-[#DCE5DF] bg-white shadow-[0_-8px_22px_rgba(15,40,28,0.06)]"
-    >
-      <div className="mx-auto grid h-[66px] max-w-[480px] grid-cols-4 px-2 pb-[env(safe-area-inset-bottom)]">
-        {items.map((item) => (
-          <Link
-            key={`${item.label}-${item.href}`}
-            href={item.href}
-            aria-label={"ariaLabel" in item ? item.ariaLabel : undefined}
-            aria-current={item.active ? "page" : undefined}
-            className={`flex min-h-11 flex-col items-center justify-center gap-1 rounded-[12px] text-[11px] font-semibold outline-none transition focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 ${
-              item.active ? "text-[#0E5A3F]" : "text-[#5F6C65] hover:text-[#0E5A3F]"
-            }`}
-          >
-            <span
-              className={`inline-flex h-[30px] w-9 items-center justify-center rounded-[12px] ${
-                item.active ? "bg-[#EDF7F1]" : ""
-              }`}
-            >
-              <Icon name={item.icon} className="h-[20px] w-[20px]" />
-            </span>
-            <span>{item.label}</span>
-          </Link>
-        ))}
-      </div>
-    </nav>
-  );
-}
-
 export default function AccountScreen() {
-  const pathname = usePathname();
   const router = useRouter();
   const settings = useUserSettings();
   const profile = useStoredProfile();
@@ -1510,7 +1448,7 @@ export default function AccountScreen() {
           </div>
         ) : null}
       </div>
-      <BottomNavigation pathname={pathname} />
+      <AppBottomNavigation />
     </main>
   );
 }
