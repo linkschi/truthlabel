@@ -833,7 +833,7 @@ function InstallationImagePlaceholder({
         alt={alt}
         width={imageWidth}
         height={imageHeight}
-        className="mx-auto block max-h-[430px] w-auto max-w-full rounded-[18px] object-contain shadow-[0_12px_24px_rgba(15,40,28,0.07)]"
+        className="mx-auto block max-h-[500px] w-auto max-w-full rounded-[18px] object-contain shadow-[0_12px_24px_rgba(15,40,28,0.07)]"
         data-image-key={imageKey}
       />
     );
@@ -952,7 +952,7 @@ function InstallStepCarousel({ steps }: { steps: InstallGuideStep[] }) {
         {steps.map((step, index) => (
           <article
             key={step.id}
-            className="min-w-[84%] snap-center rounded-[22px] border border-[#D7E7DD] bg-white px-3.5 py-3.5 shadow-[0_12px_28px_rgba(15,40,28,0.06)]"
+            className="min-w-[90%] snap-center rounded-[22px] border border-[#D7E7DD] bg-white px-2.5 py-3 shadow-[0_12px_28px_rgba(15,40,28,0.06)]"
           >
             <p className="text-[11px] font-black uppercase tracking-[0.14em] text-[#0E5A3F]">
               {step.progress}
