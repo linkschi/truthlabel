@@ -128,18 +128,16 @@ export default function RecentScansSection({
 }) {
   const [records, setRecords] = useState<ScanHistoryListItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLElement | null>(null);
 
   async function loadRecentScans() {
     setLoading(true);
-    setError("");
 
     try {
       setRecords(await listScanHistory({ limit: 5 }));
     } catch {
-      setError("Recent scans are temporarily unavailable.");
+      setRecords([]);
     } finally {
       setLoading(false);
     }
@@ -224,24 +222,13 @@ export default function RecentScansSection({
           <div className="px-[18px] sm:px-5">
             <RecentScanSkeleton />
           </div>
-        ) : error ? (
-          <div className="mx-[18px] rounded-[18px] border border-[#F4C7C9] bg-white px-4 py-4 shadow-[0_6px_18px_rgba(159,29,36,0.06)] sm:mx-5">
-            <p className="text-[13px] font-bold text-[#9F1D24]">{error}</p>
-            <button
-              type="button"
-              onClick={() => void loadRecentScans()}
-              className="mt-3 inline-flex min-h-9 items-center justify-center rounded-full bg-[#9F1D24] px-4 text-[12px] font-extrabold text-white outline-none transition focus-visible:ring-2 focus-visible:ring-[#9F1D24] focus-visible:ring-offset-2 active:scale-[0.99]"
-            >
-              Retry
-            </button>
-          </div>
         ) : records.length === 0 ? (
           <div className="mx-[18px] rounded-[18px] border border-[#DCE7E1] bg-white px-4 py-4 shadow-[0_6px_18px_rgba(15,40,28,0.045)] sm:mx-5">
             <h3 className="text-[14px] font-extrabold text-[#101613]">
-              No recent scans yet
+              Your recent scans will show up here
             </h3>
             <p className="mt-1.5 text-[13px] leading-5 text-[#66716B]">
-              Your latest products will appear here.
+              Scan a product to start building your history.
             </p>
             <Link
               href="/app/manual"
