@@ -2114,6 +2114,10 @@ export default function ProductResult({
     () => getFinalVerdictClosing(scanResult),
     [scanResult],
   );
+  const ingredientScoreLabel = scanResult.ingredientLoad.level.replace(
+    " Ingredient Score",
+    "",
+  );
   const simpleIngredientSummary = useMemo(
     () => getSimpleIngredientSummary(scanResult),
     [scanResult],
@@ -2636,6 +2640,11 @@ export default function ProductResult({
                   <h3 className="mt-1 font-heading text-[1.45rem] font-semibold leading-none text-[var(--text-main)]">
                     {scanResult.ingredientLoad.score} / 100
                   </h3>
+                  <p
+                    className={`mt-1 text-[12px] font-extrabold uppercase tracking-[0.12em] ${scoreLabelClasses[scanResult.ingredientLoad.tone]}`}
+                  >
+                    {ingredientScoreLabel}
+                  </p>
                   <p className="mt-1 text-[12px] font-semibold text-[var(--text-secondary)]">
                     {scanResult.finalVerdict.headline}
                   </p>
@@ -2748,9 +2757,6 @@ export default function ProductResult({
               ) : null}
               </div>
 
-              <p className="mt-4 text-[11px] leading-5 text-[var(--text-secondary)]">
-                Truthlabel helps explain ingredient labels and safety signals. It is not medical advice. Always check the package label, especially for allergies.
-              </p>
             </div>
 
             <TestingFeedbackPanel
