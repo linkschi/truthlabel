@@ -534,20 +534,28 @@ function ProductVisual({
   scanSource,
   imageUrl,
   imageSource,
+  variant = "compact",
 }: {
   productName: string;
   scanSource: ScanSourceLabel;
   imageUrl: string;
   imageSource?: ProductImageSourceLabel;
+  variant?: "compact" | "wide";
 }) {
   const sourceLabel = getScanSourceBadgeLabel(scanSource);
   const imageSourceLabel = getProductImageSourceLabel(imageSource);
   const [failedImageUrl, setFailedImageUrl] = useState("");
   const hasImage = Boolean(imageUrl && failedImageUrl !== imageUrl);
   const showScanSourceBadge = scanSource !== "demo";
+  const visualSizeClass =
+    variant === "wide"
+      ? "h-[158px] w-full rounded-[26px]"
+      : "h-[96px] w-[96px] rounded-[20px]";
 
   return (
-    <div className="relative h-[96px] w-[96px] overflow-hidden rounded-[20px] border border-[var(--border-strong)] bg-[linear-gradient(165deg,var(--bg-page)_0%,var(--bg-soft)_52%,var(--border-strong)_100%)] shadow-[0_14px_28px_rgba(23,20,18,0.08)]">
+    <div
+      className={`relative overflow-hidden border border-[var(--border-strong)] bg-[linear-gradient(165deg,var(--bg-page)_0%,var(--bg-soft)_52%,var(--border-strong)_100%)] shadow-[0_14px_28px_rgba(23,20,18,0.08)] ${visualSizeClass}`}
+    >
       {hasImage ? (
         <img
           src={imageUrl}
@@ -557,7 +565,11 @@ function ProductVisual({
           onError={() => setFailedImageUrl(imageUrl)}
         />
       ) : (
-        <div className="absolute inset-x-3 bottom-3 rounded-[14px] border border-white/80 bg-white/92 px-2.5 py-2 shadow-[0_10px_18px_rgba(23,20,18,0.08)]">
+        <div
+          className={`absolute inset-x-3 rounded-[14px] border border-white/80 bg-white/92 px-2.5 py-2 shadow-[0_10px_18px_rgba(23,20,18,0.08)] ${
+            variant === "wide" ? "bottom-4" : "bottom-3"
+          }`}
+        >
           <div className="mx-auto h-2 rounded-full bg-[var(--neutral-text)]" />
           <div className="mx-auto mt-1 h-2 rounded-full bg-[var(--amber-main)]" />
           <div className="mx-auto mt-1 h-2 rounded-full bg-[var(--green-main)]" />
@@ -2132,6 +2144,7 @@ export default function ProductResult({
   const heroTone = toRowTone(scanResult.productHero.verdictTone);
   const brandTrustTone = toRowTone(scanResult.brandTrustSafety.severity);
   const showBrandTrustSafety = shouldShowBrandTrustSafety(scanResult, userSettings);
+  const hasProductHeroImage = Boolean(scanResult.productHero.imageUrl);
   const doneHref =
     historyScanId
       ? "/app/history"
@@ -2314,15 +2327,33 @@ export default function ProductResult({
             className={`mt-6 ${shouldAnimateFreshResult ? "truthlabel-reveal" : ""}`}
             style={shouldAnimateFreshResult ? getRevealStyle(0) : undefined}
           >
-            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
-              <div>
-                <ProductVisual
-                  productName={scanResult.productHero.productName}
-                  scanSource={scanResult.productHero.scanSource}
-                  imageUrl={scanResult.productHero.imageUrl ?? ""}
-                  imageSource={scanResult.productHero.imageSource}
-                />
-                <h2 className="mt-4 font-heading text-[1.45rem] font-semibold leading-tight text-[var(--text-main)]">
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-4 gap-y-4">
+              {hasProductHeroImage ? (
+                <div className="col-span-2">
+                  <ProductVisual
+                    productName={scanResult.productHero.productName}
+                    scanSource={scanResult.productHero.scanSource}
+                    imageUrl={scanResult.productHero.imageUrl ?? ""}
+                    imageSource={scanResult.productHero.imageSource}
+                    variant="wide"
+                  />
+                </div>
+              ) : null}
+
+              <div className="min-w-0">
+                {!hasProductHeroImage ? (
+                  <ProductVisual
+                    productName={scanResult.productHero.productName}
+                    scanSource={scanResult.productHero.scanSource}
+                    imageUrl={scanResult.productHero.imageUrl ?? ""}
+                    imageSource={scanResult.productHero.imageSource}
+                  />
+                ) : null}
+                <h2
+                  className={`font-heading text-[1.34rem] font-extrabold leading-[1.08] tracking-[-0.035em] text-[var(--text-main)] ${
+                    hasProductHeroImage ? "" : "mt-4"
+                  }`}
+                >
                   {scanResult.productHero.productName}
                 </h2>
                 <p className="mt-1 text-[13px] text-[var(--text-secondary)]">
