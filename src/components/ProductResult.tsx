@@ -703,29 +703,29 @@ function ScoreRing({
   const shortScoreLabel = scoreLabel.replace(" Ingredient Score", "");
 
   return (
-    <div className="flex w-[124px] flex-col items-center">
-      <div className="relative flex h-[112px] w-[112px] items-center justify-center rounded-full border border-[var(--border-soft)] bg-[var(--bg-surface)] shadow-[0_18px_34px_rgba(23,20,18,0.08)]">
+    <div className="flex w-[102px] flex-col items-center">
+      <p className="mb-1.5 text-center text-[9px] font-bold uppercase tracking-[0.13em] text-[var(--text-secondary)]">
+        Ingredient Score
+      </p>
+      <div className="relative flex h-[92px] w-[92px] items-center justify-center rounded-full border border-[var(--border-soft)] bg-[var(--bg-surface)] shadow-[0_14px_26px_rgba(23,20,18,0.07)]">
         <div
           className="absolute inset-0 rounded-full"
           style={{
             background: `conic-gradient(${ringColor} ${degrees}deg, var(--border-soft) ${degrees}deg 360deg)`,
           }}
         />
-        <div className="absolute inset-[9px] rounded-full bg-[var(--bg-page)] shadow-[inset_0_1px_6px_rgba(23,20,18,0.06)]" />
+        <div className="absolute inset-[7px] rounded-full bg-[var(--bg-page)] shadow-[inset_0_1px_6px_rgba(23,20,18,0.06)]" />
         <div className="relative text-center">
-          <p className="font-heading text-[2.35rem] font-semibold leading-none text-[var(--text-main)]">
+          <p className="font-heading text-[1.9rem] font-semibold leading-none text-[var(--text-main)]">
             {displayedScore}
           </p>
-          <p className="mt-0.5 text-[11px] font-semibold text-[var(--text-secondary)]">
+          <p className="mt-0.5 text-[10px] font-semibold text-[var(--text-secondary)]">
             /100
           </p>
         </div>
       </div>
-      <p className="mt-2 text-center text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--text-secondary)]">
-        Ingredient Score
-      </p>
       <p
-        className={`mt-1 text-center text-[11px] font-extrabold uppercase tracking-[0.12em] ${scoreLabelClasses[tone]}`}
+        className={`mt-1.5 text-center text-[10px] font-extrabold uppercase tracking-[0.1em] ${scoreLabelClasses[tone]}`}
       >
         {shortScoreLabel}
       </p>
@@ -2327,7 +2327,7 @@ export default function ProductResult({
             className={`mt-6 ${shouldAnimateFreshResult ? "truthlabel-reveal" : ""}`}
             style={shouldAnimateFreshResult ? getRevealStyle(0) : undefined}
           >
-            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-4 gap-y-4">
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-4">
               {hasProductHeroImage ? (
                 <div className="col-span-2">
                   <ProductVisual
