@@ -10,7 +10,10 @@ import {
   isThiislincornOnboardingTestAccount,
   markThiislincornOnboardingReplaySeen,
 } from "@/lib/onboarding/onboardingTestMode";
-import { loadOnboardingState } from "@/lib/onboarding/truthlabelOnboardingState";
+import {
+  hasCompletedOnboarding,
+  loadOnboardingState,
+} from "@/lib/onboarding/truthlabelOnboardingState";
 
 export default function AppHomeOnboardingGate({
   children,
@@ -29,7 +32,10 @@ export default function AppHomeOnboardingGate({
     publicAppConfig.flags.enableLocalDevBypass ||
     hasMvpAccessPass;
   const shouldCheckOnboarding = hasEffectiveAppAccess && Boolean(userId);
-  const [checkedUserId, setCheckedUserId] = useState<string | null>(null);
+  const shouldShowOnboardingReplay =
+    isThiislincornOnboardingTestAccount(userEmail) &&
+    Boolean(userId) &&
+    !hasSeenThiislincornOnboardingReplay(userId ?? "");
 
   useEffect(() => {
     const handle = window.setTimeout(() => {
@@ -47,6 +53,10 @@ export default function AppHomeOnboardingGate({
     const activeUserId = userId;
     let cancelled = false;
 
+    if (!shouldShowOnboardingReplay && hasCompletedOnboarding(activeUserId)) {
+      return;
+    }
+
     async function checkOnboarding() {
       const state = await loadOnboardingState(activeUserId);
 
@@ -55,8 +65,7 @@ export default function AppHomeOnboardingGate({
       }
 
       if (
-        isThiislincornOnboardingTestAccount(userEmail) &&
-        !hasSeenThiislincornOnboardingReplay(activeUserId)
+        shouldShowOnboardingReplay
       ) {
         markThiislincornOnboardingReplaySeen(activeUserId);
         router.replace("/app/onboarding?review=1&restart=1&test=thiislincorn");
@@ -67,8 +76,6 @@ export default function AppHomeOnboardingGate({
         router.replace("/app/onboarding");
         return;
       }
-
-      setCheckedUserId(activeUserId);
     }
 
     void checkOnboarding();
@@ -76,27 +83,7 @@ export default function AppHomeOnboardingGate({
     return () => {
       cancelled = true;
     };
-  }, [router, shouldCheckOnboarding, userEmail, userId]);
-
-  if (accessState === "loading" || (shouldCheckOnboarding && checkedUserId !== userId)) {
-    return (
-      <main className="min-h-screen bg-[#FBFDFB] px-5 py-6 text-[#101613]">
-        <section className="mx-auto flex min-h-[70vh] max-w-[440px] items-center justify-center">
-          <div className="w-full rounded-[28px] border border-[#D7E7DD] bg-white px-5 py-6 text-center shadow-[0_18px_44px_rgba(15,40,28,0.08)]">
-            <p className="text-[11px] font-black uppercase tracking-[0.16em] text-[#0E5A3F]">
-              Truthlabel
-            </p>
-            <h1 className="mt-2 text-[22px] font-black">
-              Checking setup
-            </h1>
-            <p className="mt-2 text-[14px] leading-6 text-[#66716B]">
-              We&apos;re checking whether onboarding is complete.
-            </p>
-          </div>
-        </section>
-      </main>
-    );
-  }
+  }, [router, shouldCheckOnboarding, shouldShowOnboardingReplay, userId]);
 
   return children;
 }

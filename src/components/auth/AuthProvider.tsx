@@ -49,6 +49,12 @@ type AuthContextValue = {
 const AuthContext = createContext<AuthContextValue | null>(null);
 const activeAccessCachePrefix = "truthlabel.accountAccess.active.";
 
+type RefreshAccessOptions = {
+  showErrors?: boolean;
+  showLoading?: boolean;
+  source?: string;
+};
+
 type CachedAccountAccess = {
   userId: string;
   subscription: TruthlabelSubscription;
@@ -231,7 +237,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const allowSignedInMvpAccess =
     publicAppConfig.flags.enableSignedInMvpAccess;
 
-  const refreshAccess = useCallback(async () => {
+  const refreshAccess = useCallback(async (options: RefreshAccessOptions = {}) => {
     if (!supabase) {
       setIsLoading(false);
       setErrorMessage("Supabase is not configured for this deployment.");
@@ -243,7 +249,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    setIsLoading(true);
+    const currentKnownUser = currentUserRef.current;
+    const shouldShowLoading =
+      options.showLoading ??
+      (!allowSignedInMvpAccess || !currentKnownUser);
+    const shouldShowErrors = options.showErrors ?? true;
+    const source = options.source ?? "refresh_access";
+
+    if (shouldShowLoading) {
+      setIsLoading(true);
+    }
+
     setErrorMessage("");
     let currentUser: User | null = currentUserRef.current;
 
@@ -262,6 +278,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSubscription(null);
         setTrialAccess(null);
         return;
+      }
+
+      if (allowSignedInMvpAccess) {
+        // MVP launch rule: once Supabase confirms the user is signed in, app
+        // access should not wait on subscription-table checks.
+        setIsLoading(false);
       }
 
       await ensureUserSettingsRow(currentUser.id).catch(() => undefined);
@@ -291,7 +313,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           trackTruthlabelEvent(
             "access_cached_fallback_used",
             {
-              source: "refresh_access",
+              source,
               access_status: cachedAccess.subscription.status,
             },
             { userId: currentUser.id },
@@ -303,25 +325,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         "access_check_failed",
         {
           error_type: normalizeAnalyticsError(error),
-          source: "refresh_access",
+          source,
           signed_in: Boolean(currentUser),
           cached_fallback_used: cachedFallbackUsed,
         },
         { userId: currentUser?.id },
       );
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Truthlabel could not check account access.",
-      );
+
+      if (shouldShowErrors || !allowSignedInMvpAccess || !currentUser) {
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "Truthlabel could not check account access.",
+        );
+      } else {
+        setErrorMessage("");
+      }
     } finally {
       setIsLoading(false);
     }
-  }, [supabase]);
+  }, [allowSignedInMvpAccess, supabase]);
 
   useEffect(() => {
     const refreshHandle = window.setTimeout(() => {
-      void refreshAccess();
+      void refreshAccess({
+        showErrors: false,
+        showLoading: true,
+        source: "initial_session",
+      });
     }, 0);
 
     if (!supabase) {
@@ -330,15 +361,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const { data } = supabase.auth.onAuthStateChange((_event, session) => {
       const nextUser = session?.user ?? null;
+      const useSignedInFastPass = allowSignedInMvpAccess && Boolean(nextUser);
       currentUserRef.current = nextUser;
       setUser(nextUser);
-      setIsLoading(true);
+      setIsLoading(!useSignedInFastPass);
 
       if (!nextUser) {
         setSubscription(null);
         setTrialAccess(null);
         setIsLoading(false);
         return;
+      }
+
+      if (useSignedInFastPass) {
+        setErrorMessage("");
       }
 
       void ensureUserSettingsRow(nextUser.id)
@@ -388,9 +424,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             { userId: nextUser.id },
           );
           setErrorMessage(
-            error instanceof Error
-              ? error.message
-              : "Truthlabel could not refresh account access.",
+            useSignedInFastPass
+              ? ""
+              : error instanceof Error
+                ? error.message
+                : "Truthlabel could not refresh account access.",
           );
         })
         .finally(() => setIsLoading(false));
@@ -400,15 +438,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       window.clearTimeout(refreshHandle);
       data.subscription.unsubscribe();
     };
-  }, [refreshAccess, supabase]);
+  }, [allowSignedInMvpAccess, refreshAccess, supabase]);
 
   useEffect(() => {
-    if (!supabase) {
+    if (!supabase || allowSignedInMvpAccess) {
       return;
     }
 
     const refreshStoredSession = () => {
-      void refreshAccess();
+      void refreshAccess({
+        showErrors: false,
+        showLoading: false,
+        source: "stored_session_refresh",
+      });
     };
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible") {
@@ -427,7 +469,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.clearInterval(intervalId);
     };
-  }, [refreshAccess, supabase]);
+  }, [allowSignedInMvpAccess, refreshAccess, supabase]);
 
   const accessState = getAccessState({
     authLoading: isLoading,
