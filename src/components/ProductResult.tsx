@@ -2376,8 +2376,8 @@ export default function ProductResult({
             style={shouldAnimateFreshResult ? getRevealStyle(4) : undefined}
           >
             <SectionHeading
-              title="Closer look"
-              subtitle="A clean checklist of what Truthlabel found on this product."
+              title="Full checklist"
+              subtitle="Everything Truthlabel can list for this product, including clear checks, review items, and warnings."
             />
             <div className="mt-3 divide-y divide-[var(--border-soft)]">
               {overviewRows.map((item, index) => (
@@ -2398,8 +2398,8 @@ export default function ProductResult({
             style={shouldAnimateFreshResult ? getRevealStyle(5) : undefined}
           >
             <SectionHeading
-              title="Flagged items"
-              subtitle="Deep analysis of yellow and red findings."
+              title="Most important findings"
+              subtitle="Only yellow and red findings that may need attention."
               extra={
                 <IssueBadgeStack
                   badges={deepCheckSectionBadges}
@@ -2436,7 +2436,7 @@ export default function ProductResult({
                 ) : (
                   <div className="rounded-[18px] bg-[var(--bg-soft)] px-4 py-3.5">
                     <p className="text-[13px] font-semibold text-[var(--text-main)]">
-                      No yellow or red issue categories found.
+                      No important findings found.
                     </p>
                     <p className="mt-1.5 text-[13px] leading-5 text-[var(--text-secondary)]">
                       This does not guarantee the product is risk-free; it only reflects the current label data.
