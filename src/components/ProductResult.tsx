@@ -1503,50 +1503,26 @@ function getSimpleIngredientSummary(scanResult: ScanResult) {
   };
 }
 
-function OverviewRow({
-  item,
-  animate,
-  index,
-}: {
-  item: ScanResultOverviewRow;
-  animate: boolean;
-  index: number;
-}) {
-  const tone = toRowTone(item.severity);
-  const overviewValue =
-    item.categoryId === "total_ingredients"
-      ? item.displayValue
-      : item.matchCount > 0
-        ? String(item.matchCount)
-        : item.severity === "green"
-          ? "No"
-          : item.displayValue;
-  const badges = buildIssueBadges({
-    value: overviewValue,
-    tone,
-    badgeTone: tone,
-  });
-
-  return (
-    <div
-      className={`grid min-h-[48px] w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 py-2.5 ${
-        animate ? "truthlabel-category-enter" : ""
-      }`}
-      style={animate ? getRevealStyle(index) : undefined}
-    >
-      <RowIcon tone={tone} categoryId={item.categoryId} />
-      <div className="min-w-0">
-        <p className="truncate text-[15px] font-medium text-[var(--text-main)]">
-          {item.label}
-        </p>
-      </div>
-      <IssueBadgeStack
-        badges={badges}
-        className="justify-self-end"
-        animate={animate}
-      />
-    </div>
-  );
+function overviewRowToChecklistRow(
+  item: ScanResultOverviewRow,
+): ScanResultDeepExposureCheck {
+  return {
+    categoryId: item.categoryId,
+    label: item.label,
+    severity: item.severity,
+    displayValue: item.displayValue,
+    reason: item.reason,
+    title: item.title,
+    message: item.message,
+    action: item.action,
+    shortMessage: item.shortMessage,
+    redReasonType: item.redReasonType,
+    matchCount: item.matchCount,
+    matchedItemsPreview: item.matchedItemsPreview,
+    matchedItemDetails: [],
+    displayAllowed: item.displayAllowed,
+    status: "checked",
+  };
 }
 
 function IngredientChip({
@@ -2037,30 +2013,27 @@ export default function ProductResult({
     () => getVisibleDeepExposureChecks(scanResult),
     [scanResult],
   );
-  const hasDeepCheckOverflow = deepCheckRows.length > 10;
+  const fullChecklistRows = useMemo(() => {
+    const deepRowsByCategoryId = new Map(
+      deepCheckRows.map((row) => [row.categoryId, row]),
+    );
+    const overviewCategoryIds = new Set(overviewRows.map((row) => row.categoryId));
+    const overviewBasedRows = overviewRows.map(
+      (row) => deepRowsByCategoryId.get(row.categoryId) ?? overviewRowToChecklistRow(row),
+    );
+    const deepOnlyRows = deepCheckRows.filter(
+      (row) => !overviewCategoryIds.has(row.categoryId),
+    );
+
+    return [...overviewBasedRows, ...deepOnlyRows];
+  }, [deepCheckRows, overviewRows]);
+  const hasDeepCheckOverflow = fullChecklistRows.length > 10;
   const deepCheckPreviewHeightClass =
     hasDeepCheckOverflow && !isDeepChecksExpanded
       ? expandedDeepCheckId
         ? "max-h-[900px]"
         : "max-h-[760px]"
       : "max-h-[1400px]";
-
-  const deepCheckSectionBadges = useMemo(() => {
-    const redCount = deepCheckRows.filter((row) => row.severity === "red").length;
-    const yellowCount = deepCheckRows.filter((row) => row.severity === "yellow").length;
-    const hasNeutral = deepCheckRows.some((row) => row.status === "not_checked");
-
-    return buildIssueBadges({
-      redCount,
-      yellowCount,
-      tone: redCount > 0 ? "red" : yellowCount > 0 ? "yellow" : hasNeutral ? "neutral" : "green",
-      clearLabel:
-        redCount === 0 && yellowCount === 0 && !hasNeutral ? "Clear" : undefined,
-      value:
-        redCount === 0 && yellowCount === 0 && hasNeutral ? "Not found" : undefined,
-      badgeTone: hasNeutral ? "neutral" : undefined,
-    });
-  }, [deepCheckRows]);
 
   const brandTrustBadges = useMemo(() => {
     const severity = scanResult.brandTrustSafety.severity;
@@ -2377,40 +2350,9 @@ export default function ProductResult({
             className={`mt-6 border-t border-[var(--border-soft)] pt-5 ${
               shouldAnimateFreshResult ? "truthlabel-reveal" : ""
             }`}
-            style={shouldAnimateFreshResult ? getRevealStyle(4) : undefined}
-          >
-            <SectionHeading
-              title="Full checklist"
-              subtitle="Everything Truthlabel can list for this product, including clear checks, review items, and warnings."
-            />
-            <div className="mt-3 divide-y divide-[var(--border-soft)]">
-              {overviewRows.map((item, index) => (
-                <OverviewRow
-                  key={item.categoryId}
-                  item={item}
-                  animate={shouldAnimateFreshResult}
-                  index={index}
-                />
-              ))}
-            </div>
-          </section>
-
-          <section
-            className={`mt-6 border-t border-[var(--border-soft)] pt-5 ${
-              shouldAnimateFreshResult ? "truthlabel-reveal" : ""
-            }`}
             style={shouldAnimateFreshResult ? getRevealStyle(5) : undefined}
           >
-            <SectionHeading
-              title="Most important findings"
-              subtitle="Only yellow and red findings that may need attention."
-              extra={
-                <IssueBadgeStack
-                  badges={deepCheckSectionBadges}
-                  animate={shouldAnimateFreshResult}
-                />
-              }
-            />
+            <SectionHeading title="Full checklist" />
 
             <div className="mt-4">
               <div
@@ -2420,9 +2362,9 @@ export default function ProductResult({
                     : `${deepCheckPreviewHeightClass} overflow-hidden`
                 }`}
               >
-                {deepCheckRows.length > 0 ? (
+                {fullChecklistRows.length > 0 ? (
                   <div className="divide-y divide-[var(--border-soft)]">
-                    {deepCheckRows.map((item, index) => (
+                    {fullChecklistRows.map((item, index) => (
                       <DeepCheckRow
                         key={item.categoryId}
                         item={item}
@@ -2440,7 +2382,7 @@ export default function ProductResult({
                 ) : (
                   <div className="rounded-[18px] bg-[var(--bg-soft)] px-4 py-3.5">
                     <p className="text-[13px] font-semibold text-[var(--text-main)]">
-                      No important findings found.
+                      No checklist items found.
                     </p>
                     <p className="mt-1.5 text-[13px] leading-5 text-[var(--text-secondary)]">
                       This does not guarantee the product is risk-free; it only reflects the current label data.

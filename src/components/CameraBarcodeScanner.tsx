@@ -34,6 +34,11 @@ import {
   type OcrProgressUpdate,
 } from "@/lib/localIngredientOcr";
 import { createCapturedImageThumbnail } from "@/lib/createCapturedImageThumbnail";
+import {
+  meatLookupFallbackIntro,
+  meatLookupFallbackRedFlags,
+  meatLookupFallbackTitle,
+} from "@/lib/meatLookupFallback";
 
 export type CameraScannerMode = "barcode" | "ingredients";
 
@@ -2352,8 +2357,8 @@ export default function CameraBarcodeScanner({
           ? "The barcode was read, but Truthlabel did not receive a clear lookup result. Try again, scan the ingredients, or enter the details manually."
           : "The barcode was read, but Truthlabel did not receive a clear lookup result. Try again or enter the details manually."
         : ingredientModeEnabled
-          ? "This barcode is not in the product data yet. Scan the ingredients to analyse the product another way."
-          : "This barcode is not in the product data yet. Enter the ingredients manually to analyse the product another way.";
+          ? "Truthlabel does not have this barcode in the product data yet, or the product record may have changed. Coverage will be updated soon. Scan the label to check the most important red flags."
+          : "Truthlabel does not have this barcode in the product data yet, or the product record may have changed. Coverage will be updated soon. Enter the label details to check the most important red flags.";
   const switchableCameraCount = cameraCandidates.filter(
     (candidate) => !candidate.isLikelyFront && candidate.deviceId,
   ).length;
@@ -2578,6 +2583,21 @@ export default function CameraBarcodeScanner({
           <p className="mt-2 text-[14px] leading-6 text-[#66716B]">
             {barcodeNotFoundMessage}
           </p>
+          {barcodeLookupStatus !== "found_missing_ingredients" ? (
+            <div className="mt-4 rounded-[18px] border border-[#F3D2D4] bg-[#FFF8F7] px-4 py-3">
+              <p className="text-[12px] font-black uppercase tracking-[0.08em] text-[#B42318]">
+                {meatLookupFallbackTitle}
+              </p>
+              <p className="mt-1.5 text-[12.5px] leading-5 text-[#71524D]">
+                {meatLookupFallbackIntro}
+              </p>
+              <ul className="mt-2 space-y-1 text-[12.5px] leading-5 text-[#5E403A]">
+                {meatLookupFallbackRedFlags.map((item) => (
+                  <li key={item}>- {item}</li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
           <div className="mt-4 grid gap-2.5">
             {ingredientModeEnabled ? (
               <button

@@ -13,6 +13,11 @@ import { saveLatestBarcodeScan } from "@/lib/barcodeScanStorage";
 import { saveLatestManualScan } from "@/lib/manualScanStorage";
 import type { NormalizedProductForScan } from "@/lib/productDatabase/productDatabaseTypes";
 import type { BarcodeScanLookupStatus } from "@/lib/runBarcodeScan";
+import {
+  meatLookupFallbackIntro,
+  meatLookupFallbackRedFlags,
+  meatLookupFallbackTitle,
+} from "@/lib/meatLookupFallback";
 import type { ManualScanInput } from "@/lib/runManualScan";
 import { saveCompletedScanToHistory } from "@/lib/scanHistory/scanHistoryClient";
 import {
@@ -984,6 +989,23 @@ export default function ManualScanScreen({
                 <p className="mt-1 text-[13px] leading-5 text-[#55645c]">
                   {barcodeFeedback.message}
                 </p>
+
+                {barcodeFeedback.status === "not_found" ||
+                barcodeFeedback.status === "error" ? (
+                  <div className="mt-3 rounded-[16px] border border-[#f0d2d0] bg-white px-3 py-3">
+                    <p className="text-[12px] font-black text-[#a1362f]">
+                      {meatLookupFallbackTitle}
+                    </p>
+                    <p className="mt-1 text-[12px] leading-5 text-[#6f5f59]">
+                      {meatLookupFallbackIntro}
+                    </p>
+                    <ul className="mt-2 space-y-1 text-[12px] leading-5 text-[#563f3a]">
+                      {meatLookupFallbackRedFlags.map((item) => (
+                        <li key={item}>- {item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
 
                 {barcodeFeedback.productData ? (
                   <p className="mt-2 text-[12px] font-semibold text-[#33443c]">

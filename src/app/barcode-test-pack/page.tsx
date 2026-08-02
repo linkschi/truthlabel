@@ -64,7 +64,7 @@ type BarcodeCard = {
   barcode: string;
   title: string;
   note: string;
-  expected: "lookup" | "camera-only" | "south-africa";
+  expected: "lookup" | "camera-only";
 };
 
 const lookupExamples: BarcodeCard[] = [
@@ -88,9 +88,9 @@ const lookupExamples: BarcodeCard[] = [
   },
   {
     barcode: "6003678052405",
-    title: "South Africa test code",
-    note: "Useful for checking the South African fallback message.",
-    expected: "south-africa",
+    title: "Unknown-product test code",
+    note: "Useful for checking the general missing-product fallback message.",
+    expected: "camera-only",
   },
 ];
 
@@ -238,18 +238,11 @@ function Ean13Svg({ barcode }: { barcode: string }) {
 }
 
 function StatusBadge({ expected }: { expected: BarcodeCard["expected"] }) {
-  const copy =
-    expected === "lookup"
-      ? "Lookup test"
-      : expected === "south-africa"
-        ? "SA fallback test"
-        : "Camera-only";
+  const copy = expected === "lookup" ? "Lookup test" : "Camera-only";
   const className =
     expected === "lookup"
       ? "bg-[#E8F6EF] text-[#0E5A3F]"
-      : expected === "south-africa"
-        ? "bg-[#FFFBEC] text-[#8A6500]"
-        : "bg-[#FFF6F6] text-[#A33A3F]";
+      : "bg-[#FFF6F6] text-[#A33A3F]";
 
   return (
     <span
