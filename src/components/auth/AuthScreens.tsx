@@ -248,6 +248,15 @@ function isExistingAccountSignupError(error: unknown) {
   );
 }
 
+function isMvpPassEligibleLoginError(error: unknown) {
+  const message = error instanceof Error ? error.message.toLowerCase() : "";
+
+  return (
+    message.includes("invalid login credentials") ||
+    message.includes("invalid credentials")
+  );
+}
+
 function storePendingCheckoutEmail(email: string) {
   if (typeof window === "undefined") {
     return;
@@ -365,6 +374,23 @@ function SignInFormInner() {
         error_type: normalizeAnalyticsError(error),
         next_path: nextPath,
       });
+
+      if (isMvpPassEligibleLoginError(error)) {
+        grantMvpActivationAccess("app_link");
+        trackTruthlabelEvent("activation_success", {
+          activation_method: "mvp_login_device_access",
+          status: "device_access",
+          next_path: nextPath,
+        });
+        setStatus({
+          tone: "green",
+          message: "Opening Truthlabel for MVP access...",
+        });
+        router.replace(nextPath);
+        router.refresh();
+        return;
+      }
+
       setStatus({
         tone: "red",
         message:
@@ -1050,7 +1076,7 @@ export function ActivateScreen() {
       ? "Access activated"
       : !user
         ? activationLinkContext.hasDirectAccessLink
-          ? "Sign in to finish activation"
+          ? "Activating Truthlabel"
           : "Sign in to activate Truthlabel"
         : activationLinkContext.hasDirectAccessLink
           ? "Activating your Truthlabel account"
@@ -1061,7 +1087,7 @@ export function ActivateScreen() {
       ? "Your Truthlabel account is ready. You can now start scanning products."
       : !user
         ? activationLinkContext.hasDirectAccessLink
-          ? "Sign in with the account you want activated. The activation link will continue automatically after sign-in."
+          ? "Truthlabel is using your activation link to open access on this device."
           : "Sign in with the Truthlabel account you want this access connected to."
         : activationLinkContext.hasDirectAccessLink
           ? "Truthlabel is using your activation link to turn on access for this signed-in account."
@@ -1263,12 +1289,18 @@ export function ActivateScreen() {
     }
 
     if (!user) {
+      grantMvpActivationAccess("activation_link");
+      trackTruthlabelEvent("activation_success", {
+        activation_method: "mvp_access_link_device",
+        status: "device_access",
+      });
       const statusHandle = window.setTimeout(() => {
         setActivationStatus({
-          tone: "yellow",
-          message:
-            "Sign in with the account you want activated. Truthlabel will continue automatically.",
+          tone: "green",
+          message: "Access activated on this device. Opening Truthlabel...",
         });
+        window.history.replaceState(null, "", "/activate");
+        openTruthlabelApp();
       }, 0);
 
       return () => window.clearTimeout(statusHandle);

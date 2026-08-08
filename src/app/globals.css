@@ -71,6 +71,15 @@ a {
   text-decoration: none;
 }
 
+button[class*="bg-[#0E5A3F]"],
+a[class*="bg-[#0E5A3F]"],
+button[class*="bg-[#1c3028]"],
+a[class*="bg-[#1c3028]"],
+button[class*="bg-[var(--green-main)]"],
+a[class*="bg-[var(--green-main)]"] {
+  color: #ffffff;
+}
+
 button {
   cursor: pointer;
 }

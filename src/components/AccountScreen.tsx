@@ -355,6 +355,39 @@ function buildCancellationSupportBody({
   ].join("\n");
 }
 
+function buildReceiptInboxHref(email: string) {
+  const cleanEmail = email.trim().toLowerCase();
+  const domain = cleanEmail.split("@").at(1) ?? "";
+  const searchQuery = encodeURIComponent("Truthlabel checkout receipt subscription");
+
+  if (domain === "gmail.com" || domain === "googlemail.com") {
+    return `https://mail.google.com/mail/u/${encodeURIComponent(cleanEmail)}/#search/${searchQuery}`;
+  }
+
+  if (
+    domain === "outlook.com" ||
+    domain === "hotmail.com" ||
+    domain === "live.com" ||
+    domain === "msn.com"
+  ) {
+    return `https://outlook.live.com/mail/0/search?q=${searchQuery}`;
+  }
+
+  if (domain === "yahoo.com" || domain === "ymail.com" || domain === "rocketmail.com") {
+    return "https://mail.yahoo.com/";
+  }
+
+  if (domain === "icloud.com" || domain === "me.com" || domain === "mac.com") {
+    return "https://www.icloud.com/mail/";
+  }
+
+  if (domain === "proton.me" || domain === "protonmail.com") {
+    return "https://mail.proton.me/";
+  }
+
+  return "https://mail.google.com/";
+}
+
 function getAccessStatus(args: {
   accessState: ReturnType<typeof useTruthlabelAuth>["accessState"];
   accessKind: ReturnType<typeof useTruthlabelAuth>["accessKind"];
@@ -689,6 +722,7 @@ export default function AccountScreen() {
   const cancelCheckoutEmailReady = /\S+@\S+\.\S+/.test(
     cancelCheckoutEmail.trim(),
   );
+  const receiptInboxHref = buildReceiptInboxHref(accountEmail);
   const cancellationSupportHref = buildSupportMailtoHref({
     subject: "Truthlabel receipt resend request",
     body: buildCancellationSupportBody({
@@ -1250,13 +1284,15 @@ export default function AccountScreen() {
               </div>
 
               <div className="mt-4 grid gap-2">
-                <button
-                  type="button"
+                <a
+                  href={receiptInboxHref}
+                  target="_blank"
+                  rel="noreferrer"
                   onClick={closeCancelDialog}
                   className="inline-flex min-h-12 items-center justify-center rounded-full bg-[#0E5A3F] px-4 text-[13px] font-extrabold text-white transition hover:bg-[#0B4732] focus-visible:ring-2 focus-visible:ring-[#0E5A3F] focus-visible:ring-offset-2 active:scale-[0.98]"
                 >
                   Go check my email
-                </button>
+                </a>
                 <button
                   type="button"
                   onClick={() => setCancelReceiptHelpOpen((isOpen) => !isOpen)}
