@@ -1,0 +1,186 @@
+.productPage {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.backLink {
+  min-height: 40px;
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  color: var(--ha-primary-green);
+  font-size: 14px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.backLink:focus-visible,
+.amazonButton:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--ha-primary-green) 28%, transparent);
+  outline-offset: 3px;
+}
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.category {
+  color: var(--ha-primary-green);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.brand {
+  color: var(--ha-text-secondary);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.title {
+  margin: 0;
+  color: var(--ha-text-primary);
+  font-size: clamp(2rem, 11vw, 3rem);
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.055em;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  padding-top: 4px;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  border: 1px solid #dbe8df;
+  border-radius: 9px;
+  background: var(--ha-soft-green);
+  color: var(--ha-primary-green);
+  padding: 5px 8px;
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.15;
+}
+
+.description {
+  margin: 0;
+  color: var(--ha-text-secondary);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  border-top: 1px solid var(--ha-border);
+  padding-top: 22px;
+}
+
+.sectionTitle {
+  margin: 0;
+  color: var(--ha-text-primary);
+  font-size: 23px;
+  font-weight: 780;
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+}
+
+.sectionText,
+.unavailableText {
+  margin: 0;
+  color: var(--ha-text-secondary);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+.ingredientList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ingredientItem {
+  border: 1px solid var(--ha-border);
+  border-radius: 10px;
+  background: var(--ha-surface);
+  color: var(--ha-text-primary);
+  padding: 8px 10px;
+  font-size: 13.5px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.ctaSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-top: 1px solid var(--ha-border);
+  padding-top: 22px;
+}
+
+.amazonButton {
+  min-height: 50px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 15px;
+  background: var(--ha-primary-green);
+  color: #ffffff;
+  padding: 12px 16px;
+  font-size: 15px;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+.affiliateNote {
+  margin: 0;
+  color: var(--ha-text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.similarRail {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  margin-inline: -16px;
+  padding: 2px 16px 12px;
+  scroll-padding-inline: 16px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.similarRail > * {
+  flex: 0 0 min(70vw, 226px);
+  scroll-snap-align: start;
+}
+
+.similarRail::-webkit-scrollbar {
+  height: 0;
+}
+
+@media (max-width: 340px) {
+  .productPage {
+    gap: 22px;
+  }
+
+  .similarRail > * {
+    flex-basis: 72vw;
+  }
+}

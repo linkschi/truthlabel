@@ -1,0 +1,54 @@
+.imageFrame {
+  display: grid;
+  width: 100%;
+  aspect-ratio: 1 / 0.88;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid var(--ha-border);
+  border-radius: 22px;
+  background: var(--ha-image-surface);
+}
+
+.productImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 20px;
+}
+
+.fallback {
+  display: grid;
+  min-height: 100%;
+  width: 100%;
+  place-items: center;
+  padding: 24px 18px;
+  color: var(--ha-text-secondary);
+  text-align: center;
+}
+
+.fallbackMark {
+  display: inline-grid;
+  width: 58px;
+  height: 58px;
+  place-items: center;
+  border: 1px solid var(--ha-border);
+  border-radius: 18px;
+  background: var(--ha-soft-green);
+  color: var(--ha-primary-green);
+  font-size: 18px;
+  font-weight: 850;
+  letter-spacing: -0.03em;
+}
+
+.fallbackText {
+  margin-top: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+@media (max-width: 340px) {
+  .productImage {
+    padding: 16px;
+  }
+}

@@ -1,0 +1,248 @@
+.home {
+  display: flex;
+  flex-direction: column;
+  gap: 52px;
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.heroCopy {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.heroTitle {
+  margin: 0;
+  color: var(--ha-text-primary);
+  font-size: clamp(2.35rem, 12vw, 3.35rem);
+  font-weight: 780;
+  line-height: 0.98;
+  letter-spacing: -0.06em;
+}
+
+.heroText {
+  max-width: 520px;
+  margin: 0;
+  color: var(--ha-text-secondary);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.55;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.sectionTitle {
+  margin: 0;
+  color: var(--ha-text-primary);
+  font-size: 23px;
+  font-weight: 760;
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+}
+
+.sectionText {
+  margin: 6px 0 0;
+  color: var(--ha-text-secondary);
+  font-size: 14px;
+  font-weight: 560;
+  line-height: 1.5;
+}
+
+.textLink {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  color: var(--ha-primary-green);
+  font-size: 14px;
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.textLink:focus-visible,
+.categoryCard:focus-visible,
+.swapCard:focus-visible,
+.primaryCta:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--ha-primary-green) 28%, transparent);
+  outline-offset: 3px;
+}
+
+.categoryGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.categoryCard {
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+  border: 1px solid var(--ha-border);
+  border-radius: 16px;
+  background: var(--ha-surface);
+  padding: 14px;
+  color: var(--ha-text-primary);
+  text-decoration: none;
+}
+
+.categoryName {
+  font-size: 14.5px;
+  font-weight: 760;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+}
+
+.categoryAction {
+  color: var(--ha-primary-green);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.productRail {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  margin-inline: -16px;
+  padding: 2px 16px 12px;
+  scroll-padding-inline: 16px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.productRail > * {
+  flex: 0 0 min(70vw, 226px);
+  scroll-snap-align: start;
+}
+
+.productRail::-webkit-scrollbar {
+  height: 0;
+}
+
+.swapList,
+.trustList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.swapCard,
+.trustRow {
+  border: 1px solid var(--ha-border);
+  border-radius: 16px;
+  background: var(--ha-surface);
+  padding: 14px;
+}
+
+.swapCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  color: var(--ha-text-primary);
+  text-decoration: none;
+}
+
+.swapFrom,
+.trustTitle {
+  display: block;
+  color: var(--ha-text-primary);
+  font-size: 15px;
+  font-weight: 760;
+  line-height: 1.25;
+}
+
+.swapAction,
+.trustText {
+  display: block;
+  margin-top: 4px;
+  color: var(--ha-text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.swapArrow {
+  color: var(--ha-primary-green);
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.trustSection {
+  border: 1px solid var(--ha-border);
+  border-radius: 18px;
+  background: var(--ha-surface);
+  padding: 18px;
+}
+
+.trustIntro {
+  margin: 0 0 16px;
+}
+
+.finalCta {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border: 1px solid var(--ha-border);
+  border-radius: 18px;
+  background: var(--ha-surface);
+  padding: 18px;
+}
+
+.primaryCta {
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  background: var(--ha-primary-green);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.footer {
+  border-top: 1px solid var(--ha-border);
+  padding-top: 18px;
+  color: var(--ha-text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+@media (max-width: 340px) {
+  .home {
+    gap: 48px;
+  }
+
+  .categoryGrid {
+    gap: 10px;
+  }
+
+  .categoryCard {
+    min-height: 96px;
+    padding: 12px;
+  }
+
+  .productRail > * {
+    flex-basis: 72vw;
+  }
+}
