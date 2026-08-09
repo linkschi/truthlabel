@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { type ReactNode, useEffect, useState } from "react";
 import { useTruthlabelAuth } from "@/components/auth/AuthProvider";
-import { publicAppConfig } from "@/lib/appConfig";
 import { getSupabaseBrowserClient } from "@/lib/auth/supabaseClient";
 import type { AnalyticsSummary } from "@/lib/analytics/analyticsSummary";
 
@@ -277,10 +276,6 @@ export default function InternalAnalyticsDashboard() {
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    if (!publicAppConfig.flags.enableInternalAnalyticsDashboard) {
-      return;
-    }
-
     let active = true;
 
     async function loadSummary() {
@@ -342,30 +337,6 @@ export default function InternalAnalyticsDashboard() {
       active = false;
     };
   }, [periodDays]);
-
-  if (!publicAppConfig.flags.enableInternalAnalyticsDashboard) {
-    return (
-      <main className="min-h-screen px-4 py-5 sm:px-5 sm:py-6">
-        <section className="mx-auto max-w-[520px] rounded-[30px] border border-[#E4DED2] bg-white px-5 py-6 shadow-[var(--shadow)]">
-          <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#7C6D4F]">
-            Internal analytics
-          </p>
-          <h1 className="mt-2 text-[1.6rem] font-black tracking-[-0.04em] text-[#111D18]">
-            Dashboard disabled
-          </h1>
-          <p className="mt-2 text-[14px] font-semibold leading-6 text-[#53635A]">
-            Enable `NEXT_PUBLIC_ENABLE_INTERNAL_ANALYTICS_DASHBOARD` for controlled internal testing.
-          </p>
-          <Link
-            href="/app"
-            className="mt-5 inline-flex rounded-full bg-[#182B22] px-4 py-2.5 text-[12px] font-black uppercase tracking-[0.14em] text-white"
-          >
-            Back to app
-          </Link>
-        </section>
-      </main>
-    );
-  }
 
   return (
     <main className="min-h-screen px-4 py-5 sm:px-5 sm:py-6">

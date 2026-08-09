@@ -5,6 +5,7 @@ import {
   type GumroadPurchaseAnalyticsRow,
   type SubscriptionAnalyticsRow,
 } from "@/lib/analytics/analyticsSummary";
+import { isTruthlabelAdminEmail } from "@/lib/auth/adminAccess";
 
 export const runtime = "nodejs";
 
@@ -22,15 +23,6 @@ function getPublishableKey() {
 
 function getServiceRoleKey() {
   return process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() ?? "";
-}
-
-function getAdminEmails() {
-  return new Set(
-    (process.env.TRUTHLABEL_ADMIN_EMAILS ?? "")
-      .split(",")
-      .map((email) => email.trim().toLowerCase())
-      .filter(Boolean),
-  );
 }
 
 function getBearerToken(request: Request) {
@@ -66,9 +58,8 @@ async function getAuthorizedAdminEmail(request: Request) {
   }
 
   const normalizedEmail = data.user.email.trim().toLowerCase();
-  const adminEmails = getAdminEmails();
 
-  return adminEmails.has(normalizedEmail) ? normalizedEmail : null;
+  return isTruthlabelAdminEmail(normalizedEmail) ? normalizedEmail : null;
 }
 
 function getPeriodDays(request: Request) {
