@@ -148,6 +148,28 @@ test("product not found returns manual fallback", async () => {
   assert.equal(output.scanResult, undefined);
 });
 
+test("local seafood research can rescue a public barcode lookup miss", async () => {
+  const output = await runBarcodeScan(
+    { barcode: "078742126647" },
+    {
+      lookupProduct: async (input) => ({
+        found: false,
+        provider: "open_food_facts",
+        barcode: input.barcode,
+        dataQualityWarnings: ["product not found"],
+      }),
+    },
+  );
+
+  assert.equal(output.lookupStatus, "found");
+  assert.equal(output.manualInputNeeded, false);
+  assert.equal(
+    output.productData?.productName,
+    "Great Value Frozen Tilapia Skinless and Boneless Fillets, 4 lb",
+  );
+  assert.match(output.productData?.ingredientText ?? "", /carbon monoxide/i);
+});
+
 test("unknown regional barcode not found returns general manual fallback guidance", async () => {
   const output = await runBarcodeScan(
     { barcode: "6003678052405" },
@@ -163,8 +185,8 @@ test("unknown regional barcode not found returns general manual fallback guidanc
 
   assert.equal(output.lookupStatus, "not_found");
   assert.equal(output.manualInputNeeded, true);
-  assert.match(output.message, /does not have this barcode/i);
-  assert.match(output.message, /product record may have changed/i);
+  assert.match(output.message, /could not find this barcode/i);
+  assert.match(output.message, /kept hidden/i);
   assert.ok(
     output.dataQualityWarnings.every(
       (warning) => !/South African|South Africa/i.test(warning),

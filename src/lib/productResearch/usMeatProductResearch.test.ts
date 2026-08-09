@@ -19,7 +19,7 @@ function signalType(value: unknown) {
 }
 
 test("US meat research batch contains the first researched records plus batch 1 replacements", () => {
-  assert.equal(getUsMeatProductResearchCount(), 226);
+  assert.equal(getUsMeatProductResearchCount(), 261);
 });
 
 test("known UPC resolves to a local meat product with ingredients and safety context", () => {
@@ -1551,6 +1551,84 @@ test("batch 22 adds organ meats and specialty meat markers without double-counti
   assert.equal(porkTenderloin.markerFacts.phosphates, "yes");
   assert.equal(gizzards.ingredientDisclosure, "not_exposed");
   assert.match(JSON.stringify(gizzards.productSpecificChecks), /chicken gizzards/);
+});
+
+test("batch 23 adds bison, turkey-bacon, and no-barcode meat fallback records", () => {
+  const turkeyBacon = lookupUsMeatProductResearch({ barcode: "085239108628" });
+  const turkeySticks = lookupUsMeatProductResearch({ barcode: "085239292761" });
+  const summerSausage = findUsMeatProductResearch({
+    productName: "365 Organic Grass-Fed Beef Summer Sausage",
+    brandName: "365 by Whole Foods Market",
+  });
+  const beefTongue = findUsMeatProductResearch({
+    productName: "H-E-B Fresh Beef Tongue",
+    brandName: "H-E-B",
+  });
+  const lamb = findUsMeatProductResearch({
+    productName: "GreenWise Lamb Loin Chops Raised Without Antibiotics",
+    brandName: "GreenWise",
+  });
+
+  assert.ok(turkeyBacon);
+  assert.ok(turkeySticks);
+  assert.ok(summerSausage);
+  assert.ok(beefTongue);
+  assert.ok(lamb);
+  assert.ok(turkeyBacon.ingredients?.includes("Cultured Celery Powder"));
+  assert.match(JSON.stringify(turkeyBacon.raw), /"celeryPowder":"yes"/);
+  assert.ok(turkeySticks.ingredients?.includes("Carrageenan"));
+  assert.equal(summerSausage.markerFacts.highSodium, "yes");
+  assert.deepEqual(beefTongue.ingredients, ["Beef Tongue"]);
+  assert.equal(lamb.ingredientDisclosure, "not_exposed");
+  assert.equal(lamb.markerFacts.antibiotics, "no");
+});
+
+test("batch 24 imports fast MVP meat records with barcode and name fallback markers", () => {
+  const appleGouda = lookupUsMeatProductResearch({ barcode: "085239070093" });
+  const beefBites = lookupUsMeatProductResearch({ barcode: "085239292785" });
+  const porkChops = findUsMeatProductResearch({
+    productName: "Good & Gather Bone-in Thick Cut Center Cut Pork Chops",
+    brandName: "Good & Gather",
+  });
+  const applegate = findUsMeatProductResearch({
+    productName: "Applegate Organic Sweet Apple Chicken Sausage",
+    brandName: "Applegate",
+  });
+  const bafar = findUsMeatProductResearch({
+    productName: "Bafar Turkey Ham Custom Sliced",
+    brandName: "Bafar",
+  });
+  const smithfield = findUsMeatProductResearch({
+    productName: "Smithfield Hickory Smoked Sausage Rope",
+    brandName: "Smithfield",
+  });
+
+  assert.ok(appleGouda);
+  assert.ok(beefBites);
+  assert.ok(porkChops);
+  assert.ok(applegate);
+  assert.ok(bafar);
+  assert.ok(smithfield);
+  assert.ok(
+    appleGouda.ingredients?.some((ingredient) =>
+      ingredient.toLowerCase().includes("gouda cheese"),
+    ),
+  );
+  assert.match(JSON.stringify(appleGouda.raw), /"labGrownOrCellCultured":"no"/);
+  assert.ok(
+    beefBites.ingredients?.some((ingredient) =>
+      ingredient.toLowerCase().includes("cultured celery powder"),
+    ),
+  );
+  assert.match(JSON.stringify(beefBites.raw), /"cancerLinked":"yes"/);
+  assert.equal(porkChops.ingredientDisclosure, "inconsistent");
+  assert.equal(porkChops.markerFacts.phosphates, "yes");
+  assert.equal(applegate.markerFacts.gmoOrBioengineered, "no");
+  assert.equal(applegate.markerFacts.organic, "yes");
+  assert.equal(bafar.markerFacts.carrageenan, "yes");
+  assert.equal(bafar.markerFacts.sodiumNitrite, "yes");
+  assert.equal(smithfield.markerFacts.mechanicallySeparated, "yes");
+  assert.equal(smithfield.markerFacts.msg, "yes");
 });
 
 test("product-name fallback can find meat records when barcode is unavailable", () => {

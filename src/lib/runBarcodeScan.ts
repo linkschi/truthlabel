@@ -17,6 +17,7 @@ import type {
   ExternalProductLookupResult,
   NormalizedProductForScan,
 } from "@/lib/productDatabase/productDatabaseTypes";
+import { enrichWithLocalProductResearch } from "@/lib/productResearch/localProductResearch";
 import {
   getSavedAllergyProfile,
   getUserSettings,
@@ -334,11 +335,13 @@ export async function runBarcodeScan(
       userSettings.scanPreferences.autoRunExternalSafetyLookup);
 
   try {
-    const lookupResult = await lookupProduct({
-      barcode,
-      country: resolvedCountry,
-      language: resolvedLanguage,
-    });
+    const lookupResult = enrichWithLocalProductResearch(
+      await lookupProduct({
+        barcode,
+        country: resolvedCountry,
+        language: resolvedLanguage,
+      }),
+    );
 
     if (!lookupResult.found) {
       return {

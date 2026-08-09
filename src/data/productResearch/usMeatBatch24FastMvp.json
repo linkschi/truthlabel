@@ -1,0 +1,938 @@
+{
+  "dataset": "Truthlabel US Meat",
+  "batch": 24,
+  "productRange": "231-255",
+  "researchDate": "2026-08-09",
+  "format": "Official Fast Product Data Guide v1",
+  "productCount": 25,
+  "products": [
+    {
+      "productName": "Good & Gather Bone-in Thick Cut Center Cut Pork Chops",
+      "brand": "Good & Gather",
+      "retailer": "Target",
+      "barcode": null,
+      "category": "Fresh Pork",
+      "productUrl": "https://www.target.com/p/bone-in-thick-cut-center-cut-pork-chops-0-90-3-00-lbs-price-per-lb-good-38-gather-8482/-/A-47909636",
+      "imageUrl": null,
+      "ingredientsText": "Pork chops described as marinated with pork stock, potassium lactate, sodium phosphate, salt and natural flavor.",
+      "ingredientsStatus": "unclear",
+      "keyMarkers": {
+        "bannedOrRestrictedIngredient": "hidden",
+        "harmfulAdditives": "yes",
+        "ultraProcessed": "yes",
+        "seedOils": "hidden",
+        "cancerLinked": "hidden",
+        "gmoOrBioengineered": "hidden",
+        "labGrownOrCellCultured": "no",
+        "addedWater": "yes",
+        "phosphates": "yes",
+        "celeryPowderOrNitrite": "hidden",
+        "mechanicallySeparatedMeat": "not_applicable",
+        "antibiotics": "hidden",
+        "growthHormones": "hidden",
+        "grassFed": "not_applicable",
+        "organic": "hidden"
+      },
+      "markerDetails": {
+        "addedWater": "Marinated with pork stock.",
+        "phosphates": "Sodium phosphate confirmed in Target description."
+      }
+    },
+    {
+      "productName": "Good & Gather Apple & Gouda Chicken Sausage",
+      "brand": "Good & Gather",
+      "retailer": "Target",
+      "barcode": "085239070093",
+      "category": "Smoked Sausage/Kielbasa",
+      "productUrl": "https://www.target.com/p/apple-38-gouda-chicken-sausage-12oz-good-38-gather-8482/-/A-78901007",
+      "imageUrl": null,
+      "ingredientsText": "Chicken, apples, gouda cheese (pasteurized milk, cheese cultures, salt, enzymes, annatto [color]), contains 2% or less of: kosher salt, water, evaporated cane sugar, vinegar, spices, extract of rosemary, pork casing.",
+      "ingredientsStatus": "confirmed",
+      "keyMarkers": {
+        "bannedOrRestrictedIngredient": "no",
+        "harmfulAdditives": "no",
+        "ultraProcessed": "hidden",
+        "seedOils": "no",
+        "cancerLinked": "no",
+        "gmoOrBioengineered": "hidden",
+        "labGrownOrCellCultured": "no",
+        "addedWater": "yes",
+        "phosphates": "no",
+        "celeryPowderOrNitrite": "no",
+        "mechanicallySeparatedMeat": "no",
+        "antibiotics": "no",
+        "growthHormones": "not_applicable",
+        "grassFed": "not_applicable",
+        "organic": "hidden"
+      },
+      "markerDetails": {
+        "antibiotics": "Chicken raised without antibiotics.",
+        "casing": "Pork casing."
+      }
+    },
+    {
+      "productName": "Good & Gather Beef Sausage Snack Bites",
+      "brand": "Good & Gather",
+      "retailer": "Target",
+      "barcode": "085239292785",
+      "category": "Other Specialty Meat",
+      "productUrl": "https://www.target.com/p/beef-sausage-snack-bites-8oz-good-38-gather-8482/-/A-84743607",
+      "imageUrl": null,
+      "ingredientsText": "Beef, sea salt. Contains 2% or less of: evaporated cane sugar, spices, mustard seed, cultured celery powder, cherry powder, dextrose, lactic acid starter culture, natural flavors, yeast extract.",
+      "ingredientsStatus": "confirmed",
+      "keyMarkers": {
+        "bannedOrRestrictedIngredient": "no",
+        "harmfulAdditives": "no",
+        "ultraProcessed": "yes",
+        "seedOils": "no",
+        "cancerLinked": "yes",
+        "gmoOrBioengineered": "hidden",
+        "labGrownOrCellCultured": "no",
+        "addedWater": "no",
+        "phosphates": "no",
+        "celeryPowderOrNitrite": "yes",
+        "mechanicallySeparatedMeat": "no",
+        "antibiotics": "hidden",
+        "growthHormones": "hidden",
+        "grassFed": "hidden",
+        "organic": "hidden"
+      },
+      "markerDetails": {
+        "celeryPowderOrNitrite": "Cultured celery powder."
+      }
+    },
+    {
+      "productName": "Good & Gather All-Natural Pork Sausage Roll",
+      "brand": "Good & Gather",
+      "retailer": "Target",
+      "barcode": null,
+      "category": "Breakfast Sausage",
+      "productUrl": "https://www.target.com/p/all-natural-pork-sausage-roll-1lb-good-38-gather-8482/-/A-83387120",
+      "imageUrl": null,
+      "ingredientsText": "Pork, water, contains 2% or less of pork broth, salt, spices, yeast extract, sugar, natural flavor.",
+      "ingredientsStatus": "confirmed",
+      "keyMarkers": {
+        "bannedOrRestrictedIngredient": "no",
+        "harmfulAdditives": "no",
+        "ultraProcessed": "yes",
+        "seedOils": "no",
+        "cancerLinked": "no",
+        "gmoOrBioengineered": "hidden",
+        "labGrownOrCellCultured": "no",
+        "addedWater": "yes",
+        "phosphates": "no",
+        "celeryPowderOrNitrite": "no",
+        "mechanicallySeparatedMeat": "no",
+        "antibiotics": "hidden",
+        "growthHormones": "hidden",
+        "grassFed": "not_applicable",
+        "organic": "hidden"
+      },
+      "markerDetails": {
+        "addedWater": "Water and pork broth listed."
+      }
+    },
+    {
+      "productName": "Good & Gather Turkey Sausage Snack Bites",
+      "brand": "Good & Gather",
+      "retailer": "Target",
+      "barcode": "085239292778",
+      "category": "Other Specialty Meat",
+      "productUrl": "https://www.target.com/p/turkey-sausage-snack-bites-8oz-good-38-gather-8482/-/A-84743604",
+      "imageUrl": null,
+      "ingredientsText": "Turkey, sea salt. Contains 2% or less of: evaporated cane sugar, mustard, spices, dextrose, lactic acid starter culture, carrageenan, cultured celery powder, cherry powder, garlic powder. In beef collagen casing.",
+      "ingredientsStatus": "confirmed",
+      "keyMarkers": {
+        "bannedOrRestrictedIngredient": "no",
+        "harmfulAdditives": "yes",
+        "ultraProcessed": "yes",
+        "seedOils": "no",
+        "cancerLinked": "yes",
+        "gmoOrBioengineered": "hidden",
+        "labGrownOrCellCultured": "no",
+        "addedWater": "no",
+        "phosphates": "no",
+        "celeryPowderOrNitrite": "yes",
+        "mechanicallySeparatedMeat": "no",
+        "antibiotics": "hidden",
+        "growthHormones": "not_applicable",
+        "grassFed": "not_applicable",
+        "organic": "hidden"
+      },
+      "markerDetails": {
+        "harmfulAdditives": "Carrageenan concern marker.",
+        "celeryPowderOrNitrite": "Cultured celery powder.",
+        "casing": "Beef collagen casing."
+      }
+    },
+    {
+      "productName": "Applegate Organic Sweet Apple Chicken Sausage",
+      "brand": "Applegate",
+      "retailer": "Whole Foods Market",
+      "barcode": null,
+      "category": "Smoked Sausage/Kielbasa",
+      "productUrl": "https://www.wholefoodsmarket.com/grocery/product/organic-chicken%20%26%20apple%20sausage-b001jo4o80",
+      "imageUrl": null,
+      "ingredientsText": "Organic Chicken, Organic Dried Apples. Contains Less Than 2% Of The Following: Sea Salt, Organic Vinegar, Baking Soda, Organic Apple Juice Concentrate, Organic Spices, Organic Garlic.",
+      "ingredientsStatus": "confirmed",
+      "keyMarkers": {
+        "bannedOrRestrictedIngredient": "no",
+        "harmfulAdditives": "no",
+        "ultraProcessed": "hidden",
+        "seedOils": "no",
+        "cancerLinked": "no",
+        "gmoOrBioengineered": "no",
+        "labGrownOrCellCultured": "no",
+        "addedWater": "no",
+        "phosphates": "no",
+        "celeryPowderOrNitrite": "no",
+        "mechanicallySeparatedMeat": "no",
+        "antibiotics": "no",
+        "growthHormones": "no",
+        "grassFed": "not_applicable",
+        "organic": "yes"
+      },
+      "markerDetails": {
+        "gmoOrBioengineered": "Non-GMO Project Verified and USDA Organic.",
+        "antibiotics": "No antibiotics claim.",
+        "growthHormones": "No added hormones claim."
+      }
+    },
+    {
+      "productName": "365 Organic Oven Roasted Sliced Turkey",
+      "brand": "365 by Whole Foods Market",
+      "retailer": "Whole Foods Market",
+      "barcode": null,
+      "category": "Deli Turkey/Chicken",
+      "productUrl": "https://www.wholefoodsmarket.com/product/365-by-whole-foods-market-organic-oven-roasted-sliced-turkey-b0clfqygld",
+      "imageUrl": null,
+      "ingredientsText": "Organic turkey breast, water, organic vinegar, sea salt, organic potato starch, organic cultured celery powder, organic rosemary extract.",
+      "ingredientsStatus": "confirmed",
+      "keyMarkers": {
+        "bannedOrRestrictedIngredient": "no",
+        "harmfulAdditives": "no",
+        "ultraProcessed": "yes",
+        "seedOils": "no",
+        "cancerLinked": "yes",
+        "gmoOrBioengineered": "no",
+        "labGrownOrCellCultured": "no",
+        "addedWater": "yes",
+        "phosphates": "no",
+        "celeryPowderOrNitrite": "yes",
+        "mechanicallySeparatedMeat": "no",
+        "antibiotics": "hidden",
+        "growthHormones": "hidden",
+        "grassFed": "not_applicable",
+        "organic": "yes"
+      },
+      "markerDetails": {
+        "celeryPowderOrNitrite": "Organic cultured celery powder."
+      }
+    },
+    {
+      "productName": "365 Mild Italian Pork Sausage",
+      "brand": "365 by Whole Foods Market",
+      "retailer": "Whole Foods Market",
+      "barcode": null,
+      "category": "Fresh Sausage/Bratwurst",
+      "productUrl": "https://www.wholefoodsmarket.com/grocery/product/365-by-whole-foods-market-365-by-whole-foods-market-365-mild-italian-pork-sausage-16-oz-b0914sp14r",
+      "imageUrl": null,
+      "ingredientsText": "Pork, seasoning (natural salt), sea salt, organic distilled white vinegar, cane sugar, fennel seed, paprika, anise, white pepper, ground fennel, chile peppers, oregano, nutmeg, cayenne pepper.",
+      "ingredientsStatus": "confirmed",
+      "keyMarkers": {
+        "bannedOrRestrictedIngredient": "no",
+        "harmfulAdditives": "no",
+        "ultraProcessed": "hidden",
+        "seedOils": "no",
+        "cancerLinked": "no",
+        "gmoOrBioengineered": "no",
+        "labGrownOrCellCultured": "no",
+        "addedWater": "no",
+        "phosphates": "no",
+        "celeryPowderOrNitrite": "no",
+        "mechanicallySeparatedMeat": "no",
+        "antibiotics": "hidden",
+        "growthHormones": "hidden",
+        "grassFed": "not_applicable",
+        "organic": "hidden"
+      },
+      "markerDetails": {
+        "gmoOrBioengineered": "Whole Foods states Non-GMO certified standards for this product line."
+      }
+    },
+    {
+      "productName": "365 Organic Applewood Smoked Sliced Turkey",
+      "brand": "365 by Whole Foods Market",
+      "retailer": "Whole Foods Market",
+      "barcode": null,
+      "category": "Deli Turkey/Chicken",
+      "productUrl": "https://www.wholefoodsmarket.com/grocery/product/365-by-whole-foods-market-365-by-whole-foods-market-organic-applewood-smoked-sliced-turkey-6-oz-b0clf8ft33",
+      "imageUrl": null,
+      "ingredientsText": "Organic turkey breast, water, organic vinegar, sea salt, organic potato starch, organic cultured celery powder, organic rosemary extract.",
+      "ingredientsStatus": "confirmed",
+      "keyMarkers": {
+        "bannedOrRestrictedIngredient": "no",
+        "harmfulAdditives": "no",
+        "ultraProcessed": "yes",
+        "seedOils": "no",
+        "cancerLinked": "yes",
+        "gmoOrBioengineered": "no",
+        "labGrownOrCellCultured": "no",
+        "addedWater": "yes",
+        "phosphates": "no",
+        "celeryPowderOrNitrite": "yes",
+        "mechanicallySeparatedMeat": "no",
+        "antibiotics": "hidden",
+        "growthHormones": "hidden",
+        "grassFed": "not_applicable",
+        "organic": "yes"
+      },
+      "markerDetails": {
+        "celeryPowderOrNitrite": "Organic cultured celery powder."
+      }
+    },
+    {
+      "productName": "365 Hot Italian Pork Sausage",
+      "brand": "365 by Whole Foods Market",
+      "retailer": "Whole Foods Market",
+      "barcode": null,
+      "category": "Fresh Sausage/Bratwurst",
+      "productUrl": "https://www.wholefoodsmarket.com/grocery/product/365-by-whole-foods-market-365-by-whole-foods-market-365-hot-italian-pork-sausage-16-oz-b0914qk3gx",
+      "imageUrl": null,
+      "ingredientsText": "Pork, seasoning (natural flavors, water, sea salt, cane sugar, organic distilled white vinegar, white wine [white wine, salt], fennel seed, chile flakes, paprika, cayenne pepper, ground fennel, oregano).",
+      "ingredientsStatus": "confirmed",
+      "keyMarkers": {
+        "bannedOrRestrictedIngredient": "no",
+        "harmfulAdditives": "no",
+        "ultraProcessed": "hidden",
+        "seedOils": "no",
+        "cancerLinked": "no",
+        "gmoOrBioengineered": "no",
+        "labGrownOrCellCultured": "no",
+        "addedWater": "yes",
+        "phosphates": "no",
+        "celeryPowderOrNitrite": "no",
+        "mechanicallySeparatedMeat": "no",
+        "antibiotics": "hidden",
+        "growthHormones": "hidden",
+        "grassFed": "not_applicable",
+        "organic": "hidden"
+      },
+      "markerDetails": {
+        "gmoOrBioengineered": "Whole Foods states Non-GMO certified standards for this product line."
+      }
+    },
+    {
+      "productName": "Godshall's Uncured Turkey Bacon",
+      "brand": "Godshall's",
+      "retailer": "Publix",
+      "barcode": null,
+      "category": "Bacon",
+      "productUrl": "https://www.publix.com/pd/godshalls-uncured-turkey-bacon/RIO-PCI-523656",
+      "imageUrl": null,
+      "ingredientsText": "Turkey thigh, turkey, water, sea salt, vinegar, cane sugar, cultured celery powder.",
+      "ingredientsStatus": "confirmed",
+      "keyMarkers": {
+        "bannedOrRestrictedIngredient": "no",
+        "harmfulAdditives": "no",
+        "ultraProcessed": "yes",
+        "seedOils": "no",
+        "cancerLinked": "yes",
+        "gmoOrBioengineered": "hidden",
+        "labGrownOrCellCultured": "no",
+        "addedWater": "yes",
+        "phosphates": "no",
+        "celeryPowderOrNitrite": "yes",
+        "mechanicallySeparatedMeat": "no",
+        "antibiotics": "hidden",
+        "growthHormones": "not_applicable",
+        "grassFed": "not_applicable",
+        "organic": "hidden"
+      },
+      "markerDetails": {
+        "celeryPowderOrNitrite": "Cultured celery powder."
+      }
+    },
+    {
+      "productName": "HORMEL Always Tender Peppercorn Pork Tenderloin",
+      "brand": "HORMEL",
+      "retailer": "Publix",
+      "barcode": null,
+      "category": "Enhanced/Marinated Pork",
+      "productUrl": "https://www.publix.com/pd/hormel-always-tender-peppercorn-pork-tenderloin/RIO-PCI-163350",
+      "imageUrl": null,
+      "ingredientsText": "Pork tenderloin containing up to 30% flavoring solution. Solution ingredients: pork broth, cultured dextrose (contains maltodextrin), dried vinegar, flavoring, salt, soybean oil, flavor (yeast extract, natural flavor), spices, vinegar.",
+      "ingredientsStatus": "confirmed",
+      "keyMarkers": {
+        "bannedOrRestrictedIngredient": "no",
+        "harmfulAdditives": "no",
+        "ultraProcessed": "yes",
+        "seedOils": "yes",
+        "cancerLinked": "no",
+        "gmoOrBioengineered": "hidden",
+        "labGrownOrCellCultured": "no",
+        "addedWater": "yes",
+        "phosphates": "no",
+        "celeryPowderOrNitrite": "no",
+        "mechanicallySeparatedMeat": "no",
+        "antibiotics": "hidden",
+        "growthHormones": "hidden",
+        "grassFed": "not_applicable",
+        "organic": "hidden"
+      },
+      "markerDetails": {
+        "addedWater": "Up to 30% flavoring solution based on pork broth.",
+        "seedOils": "Soybean oil."
+      }
+    },
+    {
+      "productName": "Smithfield Hickory Smoked Sausage Rope",
+      "brand": "Smithfield",
+      "retailer": "Publix",
+      "barcode": null,
+      "category": "Smoked Sausage/Kielbasa",
+      "productUrl": "https://www.publix.com/pd/smithfield-hickory-smoked-sausage-rope/RIO-PCI-604199",
+      "imageUrl": null,
+      "ingredientsText": "Meat ingredients (pork, beef), mechanically separated turkey, water, corn syrup, contains 2% or less of modified food starch, salt, dextrose, autolyzed yeast, monosodium glutamate, flavorings, potassium and sodium lactate, sodium phosphates, sodium diacetate, ascorbic acid, sodium nitrite.",
+      "ingredientsStatus": "confirmed",
+      "keyMarkers": {
+        "bannedOrRestrictedIngredient": "no",
+        "harmfulAdditives": "yes",
+        "ultraProcessed": "yes",
+        "seedOils": "no",
+        "cancerLinked": "yes",
+        "gmoOrBioengineered": "hidden",
+        "labGrownOrCellCultured": "no",
+        "addedWater": "yes",
+        "phosphates": "yes",
+        "celeryPowderOrNitrite": "yes",
+        "mechanicallySeparatedMeat": "yes",
+        "antibiotics": "hidden",
+        "growthHormones": "hidden",
+        "grassFed": "hidden",
+        "organic": "hidden"
+      },
+      "markerDetails": {
+        "phosphates": "Sodium phosphates.",
+        "celeryPowderOrNitrite": "Sodium nitrite.",
+        "mechanicallySeparatedMeat": "Mechanically separated turkey.",
+        "harmfulAdditives": "MSG, sodium phosphate and sodium nitrite."
+      }
+    },
+    {
+      "productName": "Oscar Mayer Oven Roasted Turkey Breast & Honey Uncured Ham Variety Pack",
+      "brand": "Oscar Mayer",
+      "retailer": "Publix",
+      "barcode": null,
+      "category": "Deli Turkey/Chicken",
+      "productUrl": "https://delivery.publix.com/store/publix/products/2814165-oscar-mayer-oven-roasted-turkey-breast-honey-uncured-ham-sliced-lunch-meat-variety-pack-family-size-15-oz",
+      "imageUrl": null,
+      "ingredientsText": "Oven roasted turkey breast: turkey breast, water, modified cornstarch, less than 2% vinegar, salt, sugar, cultured dextrose, sodium phosphates, carrageenan, caramel color. Honey uncured ham: ham, water, honey, vinegar, less than 2% salt, sugar, cultured celery juice and cherry powder; browned with caramel color.",
+      "ingredientsStatus": "unclear",
+      "keyMarkers": {
+        "bannedOrRestrictedIngredient": "hidden",
+        "harmfulAdditives": "yes",
+        "ultraProcessed": "yes",
+        "seedOils": "no",
+        "cancerLinked": "yes",
+        "gmoOrBioengineered": "hidden",
+        "labGrownOrCellCultured": "no",
+        "addedWater": "yes",
+        "phosphates": "yes",
+        "celeryPowderOrNitrite": "yes",
+        "mechanicallySeparatedMeat": "no",
+        "antibiotics": "hidden",
+        "growthHormones": "hidden",
+        "grassFed": "not_applicable",
+        "organic": "hidden"
+      },
+      "markerDetails": {
+        "phosphates": "Sodium phosphates in turkey portion.",
+        "celeryPowderOrNitrite": "Cultured celery juice in ham portion.",
+        "harmfulAdditives": "Sodium phosphates and carrageenan."
+      }
+    },
+    {
+      "productName": "HORMEL Always Tender Original Pork Tenderloin",
+      "brand": "HORMEL",
+      "retailer": "Publix",
+      "barcode": null,
+      "category": "Enhanced/Marinated Pork",
+      "productUrl": "https://www.publix.com/pd/hormel-always-tender-original-pork-tenderloin/RIO-PCI-171533",
+      "imageUrl": null,
+      "ingredientsText": "Pork tenderloin containing up to 30% flavoring solution. Solution ingredients: pork broth, soybean oil, cultured dextrose (contains maltodextrin), dried vinegar, flavor (yeast extract, natural flavor), seasoning (potato maltodextrin, natural flavor, salt), salt, cornstarch, flavoring.",
+      "ingredientsStatus": "confirmed",
+      "keyMarkers": {
+        "bannedOrRestrictedIngredient": "no",
+        "harmfulAdditives": "no",
+        "ultraProcessed": "yes",
+        "seedOils": "yes",
+        "cancerLinked": "no",
+        "gmoOrBioengineered": "hidden",
+        "labGrownOrCellCultured": "no",
+        "addedWater": "yes",
+        "phosphates": "no",
+        "celeryPowderOrNitrite": "no",
+        "mechanicallySeparatedMeat": "no",
+        "antibiotics": "hidden",
+        "growthHormones": "hidden",
+        "grassFed": "not_applicable",
+        "organic": "hidden"
+      },
+      "markerDetails": {
+        "addedWater": "Up to 30% flavoring solution based on pork broth.",
+        "seedOils": "Soybean oil."
+      }
+    },
+    {
+      "productName": "Rosina Homestyle Meatballs",
+      "brand": "Rosina",
+      "retailer": "Publix",
+      "barcode": null,
+      "category": "Meatballs/Meatloaf Blends",
+      "productUrl": "https://www.publix.com/pd/rosina-meatballs-homestyle/RIO-PCI-590625",
+      "imageUrl": null,
+      "ingredientsText": "Beef and pork, chicken, water, textured soy flour, egg whites, contains 2% or less of Romano cheese, onions, natural flavors, eggs, bread crumbs, soy protein concentrate, corn syrup solids, salt, non-fat dry milk, sodium phosphate.",
+      "ingredientsStatus": "confirmed",
+      "keyMarkers": {
+        "bannedOrRestrictedIngredient": "no",
+        "harmfulAdditives": "yes",
+        "ultraProcessed": "yes",
+        "seedOils": "no",
+        "cancerLinked": "no",
+        "gmoOrBioengineered": "hidden",
+        "labGrownOrCellCultured": "no",
+        "addedWater": "yes",
+        "phosphates": "yes",
+        "celeryPowderOrNitrite": "no",
+        "mechanicallySeparatedMeat": "no",
+        "antibiotics": "hidden",
+        "growthHormones": "hidden",
+        "grassFed": "hidden",
+        "organic": "hidden"
+      },
+      "markerDetails": {
+        "phosphates": "Sodium phosphate."
+      }
+    },
+    {
+      "productName": "Eckrich Skinless Turkey Smoked Sausage",
+      "brand": "Eckrich",
+      "retailer": "Publix",
+      "barcode": null,
+      "category": "Smoked Sausage/Kielbasa",
+      "productUrl": "https://www.publix.com/pd/eckrich-skinless-turkey-smoked-sausage/RIO-PCI-140456",
+      "imageUrl": null,
+      "ingredientsText": "Poultry ingredients (mechanically separated turkey, turkey), water, corn syrup, contains 2% or less of salt, modified food starch, flavorings, autolyzed yeast extract, dextrose, sodium phosphates, potassium acetate, potassium lactate, monosodium glutamate, sodium diacetate, sodium nitrite.",
+      "ingredientsStatus": "confirmed",
+      "keyMarkers": {
+        "bannedOrRestrictedIngredient": "no",
+        "harmfulAdditives": "yes",
+        "ultraProcessed": "yes",
+        "seedOils": "no",
+        "cancerLinked": "yes",
+        "gmoOrBioengineered": "hidden",
+        "labGrownOrCellCultured": "no",
+        "addedWater": "yes",
+        "phosphates": "yes",
+        "celeryPowderOrNitrite": "yes",
+        "mechanicallySeparatedMeat": "yes",
+        "antibiotics": "hidden",
+        "growthHormones": "not_applicable",
+        "grassFed": "not_applicable",
+        "organic": "hidden"
+      },
+      "markerDetails": {
+        "phosphates": "Sodium phosphates.",
+        "celeryPowderOrNitrite": "Sodium nitrite.",
+        "mechanicallySeparatedMeat": "Mechanically separated turkey."
+      }
+    },
+    {
+      "productName": "Applegate Naturals Hickory Smoked Uncured Turkey Bacon",
+      "brand": "Applegate",
+      "retailer": "Publix",
+      "barcode": null,
+      "category": "Bacon",
+      "productUrl": "https://www.publix.com/pd/applegate-naturals-hickory-smoked-uncured-turkey-bacon/RIO-PCI-101172",
+      "imageUrl": null,
+      "ingredientsText": "Turkey, water, contains less than 2% of: sea salt, celery powder, onion powder, spices.",
+      "ingredientsStatus": "confirmed",
+      "keyMarkers": {
+        "bannedOrRestrictedIngredient": "no",
+        "harmfulAdditives": "no",
+        "ultraProcessed": "yes",
+        "seedOils": "no",
+        "cancerLinked": "yes",
+        "gmoOrBioengineered": "hidden",
+        "labGrownOrCellCultured": "no",
+        "addedWater": "yes",
+        "phosphates": "no",
+        "celeryPowderOrNitrite": "yes",
+        "mechanicallySeparatedMeat": "no",
+        "antibiotics": "no",
+        "growthHormones": "not_applicable",
+        "grassFed": "not_applicable",
+        "organic": "hidden"
+      },
+      "markerDetails": {
+        "celeryPowderOrNitrite": "Celery powder.",
+        "antibiotics": "Turkey never administered antibiotics."
+      }
+    },
+    {
+      "productName": "HORMEL Always Tender Apple Bourbon Flavor Pork Tenderloin",
+      "brand": "HORMEL",
+      "retailer": "Publix",
+      "barcode": null,
+      "category": "Enhanced/Marinated Pork",
+      "productUrl": "https://www.publix.com/pd/hormel-always-tender-apple-bourbon-flavor-pork-tenderloin/RIO-PCI-164490",
+      "imageUrl": null,
+      "ingredientsText": "Pork tenderloin containing up to 30% flavoring solution. Solution includes pork broth, brown sugar, tomato powder, salt, sugar, spices, apple juice powder, applewood smoke powder (maltodextrin, natural applewood smoke flavor), onion powder, garlic powder, natural flavors, cultured dextrose (contains maltodextrin), dried vinegar, soybean oil and yeast-extract seasoning. Smoke flavoring added.",
+      "ingredientsStatus": "confirmed",
+      "keyMarkers": {
+        "bannedOrRestrictedIngredient": "no",
+        "harmfulAdditives": "no",
+        "ultraProcessed": "yes",
+        "seedOils": "yes",
+        "cancerLinked": "yes",
+        "gmoOrBioengineered": "hidden",
+        "labGrownOrCellCultured": "no",
+        "addedWater": "yes",
+        "phosphates": "no",
+        "celeryPowderOrNitrite": "no",
+        "mechanicallySeparatedMeat": "no",
+        "antibiotics": "hidden",
+        "growthHormones": "hidden",
+        "grassFed": "not_applicable",
+        "organic": "hidden"
+      },
+      "markerDetails": {
+        "addedWater": "Up to 30% flavoring solution based on pork broth.",
+        "seedOils": "Soybean oil.",
+        "cancerLinked": "Smoke flavoring marker."
+      }
+    },
+    {
+      "productName": "Publix Italian Style Meatballs",
+      "brand": "Publix",
+      "retailer": "Publix",
+      "barcode": null,
+      "category": "Meatballs/Meatloaf Blends",
+      "productUrl": "https://www.publix.com/pd/publix-italian-style-meatballs/RIO-PCI-131703",
+      "imageUrl": null,
+      "ingredientsText": "Beef and pork, water, textured soy flour, bread crumbs (wheat flour, salt, yeast), soy protein concentrate, seasoning (Parmesan cheese, spices, spice extractives on a dextrose carrier, dehydrated garlic, parsley, onion powder), salt, sodium phosphate, natural flavor.",
+      "ingredientsStatus": "confirmed",
+      "keyMarkers": {
+        "bannedOrRestrictedIngredient": "no",
+        "harmfulAdditives": "yes",
+        "ultraProcessed": "yes",
+        "seedOils": "no",
+        "cancerLinked": "no",
+        "gmoOrBioengineered": "hidden",
+        "labGrownOrCellCultured": "no",
+        "addedWater": "yes",
+        "phosphates": "yes",
+        "celeryPowderOrNitrite": "no",
+        "mechanicallySeparatedMeat": "no",
+        "antibiotics": "hidden",
+        "growthHormones": "hidden",
+        "grassFed": "hidden",
+        "organic": "hidden"
+      },
+      "markerDetails": {
+        "phosphates": "Sodium phosphate."
+      }
+    },
+    {
+      "productName": "Hillshire Farm Hot Smoked Sausage",
+      "brand": "Hillshire Farm",
+      "retailer": "Publix",
+      "barcode": null,
+      "category": "Smoked Sausage/Kielbasa",
+      "productUrl": "https://www.publix.com/pd/hillshire-farm-hot-smoked-sausage/RIO-PCI-155597",
+      "imageUrl": null,
+      "ingredientsText": "Meat ingredients (pork, beef), mechanically separated turkey, water, corn syrup, contains 2% or less of salt, natural flavors, dextrose, oat fiber, brown sugar, sodium phosphate, jalapeno peppers, monosodium glutamate, dried garlic, sodium erythorbate, sodium nitrite. Made with beef collagen casing.",
+      "ingredientsStatus": "confirmed",
+      "keyMarkers": {
+        "bannedOrRestrictedIngredient": "no",
+        "harmfulAdditives": "yes",
+        "ultraProcessed": "yes",
+        "seedOils": "no",
+        "cancerLinked": "yes",
+        "gmoOrBioengineered": "hidden",
+        "labGrownOrCellCultured": "no",
+        "addedWater": "yes",
+        "phosphates": "yes",
+        "celeryPowderOrNitrite": "yes",
+        "mechanicallySeparatedMeat": "yes",
+        "antibiotics": "hidden",
+        "growthHormones": "hidden",
+        "grassFed": "hidden",
+        "organic": "hidden"
+      },
+      "markerDetails": {
+        "phosphates": "Sodium phosphate.",
+        "celeryPowderOrNitrite": "Sodium nitrite.",
+        "mechanicallySeparatedMeat": "Mechanically separated turkey."
+      }
+    },
+    {
+      "productName": "H-E-B Texas Heritage Pork & Beef Smoked Sausage - Original",
+      "brand": "H-E-B",
+      "retailer": "H-E-B",
+      "barcode": null,
+      "category": "Smoked Sausage/Kielbasa",
+      "productUrl": "https://www.heb.com/product-detail/h-e-b-texas-heritage-pork-beef-smoked-sausage-original/1670967",
+      "imageUrl": null,
+      "ingredientsText": "Pork, beef, water, seasoning (sugar, mustard, spices, dehydrated garlic), sea salt, contains 2% or less of sodium phosphate, cultured celery powder, yeast extract, beef stock, cultured cherry powder.",
+      "ingredientsStatus": "confirmed",
+      "keyMarkers": {
+        "bannedOrRestrictedIngredient": "no",
+        "harmfulAdditives": "yes",
+        "ultraProcessed": "yes",
+        "seedOils": "no",
+        "cancerLinked": "yes",
+        "gmoOrBioengineered": "hidden",
+        "labGrownOrCellCultured": "no",
+        "addedWater": "yes",
+        "phosphates": "yes",
+        "celeryPowderOrNitrite": "yes",
+        "mechanicallySeparatedMeat": "no",
+        "antibiotics": "hidden",
+        "growthHormones": "hidden",
+        "grassFed": "hidden",
+        "organic": "hidden"
+      },
+      "markerDetails": {
+        "phosphates": "Sodium phosphate.",
+        "celeryPowderOrNitrite": "Cultured celery powder."
+      }
+    },
+    {
+      "productName": "Bafar Turkey Ham, Custom Sliced",
+      "brand": "Bafar",
+      "retailer": "H-E-B",
+      "barcode": null,
+      "category": "Deli Turkey/Chicken",
+      "productUrl": "https://www.heb.com/product-detail/bafar-turkey-ham-custom-sliced/16514043",
+      "imageUrl": null,
+      "ingredientsText": "Turkey ham (turkey thigh meat, water, soy protein concentrate, potato starch, salt, soy protein isolate, carrageenan, sodium phosphate, seasoning, hydrolyzed soy and corn protein [salt, monosodium glutamate, flavorings, hydrolyzed starch, spices], sodium benzoate, potassium sorbate, smoke flavoring, sodium erythorbate, sodium nitrite, carmine).",
+      "ingredientsStatus": "confirmed",
+      "keyMarkers": {
+        "bannedOrRestrictedIngredient": "no",
+        "harmfulAdditives": "yes",
+        "ultraProcessed": "yes",
+        "seedOils": "no",
+        "cancerLinked": "yes",
+        "gmoOrBioengineered": "hidden",
+        "labGrownOrCellCultured": "no",
+        "addedWater": "yes",
+        "phosphates": "yes",
+        "celeryPowderOrNitrite": "yes",
+        "mechanicallySeparatedMeat": "no",
+        "antibiotics": "hidden",
+        "growthHormones": "not_applicable",
+        "grassFed": "not_applicable",
+        "organic": "hidden"
+      },
+      "markerDetails": {
+        "phosphates": "Sodium phosphate.",
+        "celeryPowderOrNitrite": "Sodium nitrite.",
+        "harmfulAdditives": "Carrageenan, sodium phosphate, MSG and sodium nitrite."
+      }
+    },
+    {
+      "productName": "H-E-B Oven-Roasted Turkey Breast & Black Forest Ham Lunch Meat Combo Pack",
+      "brand": "H-E-B",
+      "retailer": "H-E-B",
+      "barcode": null,
+      "category": "Deli Turkey/Chicken",
+      "productUrl": "https://www.heb.com/product-detail/h-e-b-oven-roasted-turkey-breast-black-forest-ham-lunch-meat-combo-pack/1980520",
+      "imageUrl": null,
+      "ingredientsText": "Oven roasted turkey: turkey breast, water, corn starch, sea salt, dehydrated turkey broth, sugar, salt, yeast extract, natural flavor, vinegar, cultured celery powder, cherry powder, sodium phosphates, sea salt. Black Forest uncured ham: pork, water, seasoning (sea salt, sugar, garlic powder, natural flavors, spice, oil of juniper), vinegar, sodium phosphates, cultured celery powder, cherry powder, sea salt.",
+      "ingredientsStatus": "confirmed",
+      "keyMarkers": {
+        "bannedOrRestrictedIngredient": "no",
+        "harmfulAdditives": "yes",
+        "ultraProcessed": "yes",
+        "seedOils": "no",
+        "cancerLinked": "yes",
+        "gmoOrBioengineered": "hidden",
+        "labGrownOrCellCultured": "no",
+        "addedWater": "yes",
+        "phosphates": "yes",
+        "celeryPowderOrNitrite": "yes",
+        "mechanicallySeparatedMeat": "no",
+        "antibiotics": "hidden",
+        "growthHormones": "hidden",
+        "grassFed": "not_applicable",
+        "organic": "hidden"
+      },
+      "markerDetails": {
+        "phosphates": "Sodium phosphates in both portions.",
+        "celeryPowderOrNitrite": "Cultured celery powder in both portions."
+      }
+    },
+    {
+      "productName": "V&V Pork & Beef Smoked Sausage",
+      "brand": "V&V",
+      "retailer": "H-E-B",
+      "barcode": null,
+      "category": "Smoked Sausage/Kielbasa",
+      "productUrl": "https://www.heb.com/product-detail/v-v-pork-beef-smoked-sausage/486290",
+      "imageUrl": null,
+      "ingredientsText": "Pork, beef, water, soy flour, salt, flavoring, paprika, granulated garlic, sodium acetate, sodium diacetate, monosodium glutamate, hydrolyzed soy protein, sodium nitrite. Encased in natural pork casings.",
+      "ingredientsStatus": "confirmed",
+      "keyMarkers": {
+        "bannedOrRestrictedIngredient": "no",
+        "harmfulAdditives": "yes",
+        "ultraProcessed": "yes",
+        "seedOils": "no",
+        "cancerLinked": "yes",
+        "gmoOrBioengineered": "hidden",
+        "labGrownOrCellCultured": "no",
+        "addedWater": "yes",
+        "phosphates": "no",
+        "celeryPowderOrNitrite": "yes",
+        "mechanicallySeparatedMeat": "no",
+        "antibiotics": "hidden",
+        "growthHormones": "hidden",
+        "grassFed": "hidden",
+        "organic": "hidden"
+      },
+      "markerDetails": {
+        "celeryPowderOrNitrite": "Sodium nitrite.",
+        "harmfulAdditives": "MSG and sodium nitrite.",
+        "casing": "Natural pork casing."
+      }
+    }
+  ],
+  "batchAudit": [
+    {
+      "productNumber": 231,
+      "productName": "Good & Gather Bone-in Thick Cut Center Cut Pork Chops",
+      "pass": true
+    },
+    {
+      "productNumber": 232,
+      "productName": "Good & Gather Apple & Gouda Chicken Sausage",
+      "pass": true
+    },
+    {
+      "productNumber": 233,
+      "productName": "Good & Gather Beef Sausage Snack Bites",
+      "pass": true
+    },
+    {
+      "productNumber": 234,
+      "productName": "Good & Gather All-Natural Pork Sausage Roll",
+      "pass": true
+    },
+    {
+      "productNumber": 235,
+      "productName": "Good & Gather Turkey Sausage Snack Bites",
+      "pass": true
+    },
+    {
+      "productNumber": 236,
+      "productName": "Applegate Organic Sweet Apple Chicken Sausage",
+      "pass": true
+    },
+    {
+      "productNumber": 237,
+      "productName": "365 Organic Oven Roasted Sliced Turkey",
+      "pass": true
+    },
+    {
+      "productNumber": 238,
+      "productName": "365 Mild Italian Pork Sausage",
+      "pass": true
+    },
+    {
+      "productNumber": 239,
+      "productName": "365 Organic Applewood Smoked Sliced Turkey",
+      "pass": true
+    },
+    {
+      "productNumber": 240,
+      "productName": "365 Hot Italian Pork Sausage",
+      "pass": true
+    },
+    {
+      "productNumber": 241,
+      "productName": "Godshall's Uncured Turkey Bacon",
+      "pass": true
+    },
+    {
+      "productNumber": 242,
+      "productName": "HORMEL Always Tender Peppercorn Pork Tenderloin",
+      "pass": true
+    },
+    {
+      "productNumber": 243,
+      "productName": "Smithfield Hickory Smoked Sausage Rope",
+      "pass": true
+    },
+    {
+      "productNumber": 244,
+      "productName": "Oscar Mayer Oven Roasted Turkey Breast & Honey Uncured Ham Variety Pack",
+      "pass": true
+    },
+    {
+      "productNumber": 245,
+      "productName": "HORMEL Always Tender Original Pork Tenderloin",
+      "pass": true
+    },
+    {
+      "productNumber": 246,
+      "productName": "Rosina Homestyle Meatballs",
+      "pass": true
+    },
+    {
+      "productNumber": 247,
+      "productName": "Eckrich Skinless Turkey Smoked Sausage",
+      "pass": true
+    },
+    {
+      "productNumber": 248,
+      "productName": "Applegate Naturals Hickory Smoked Uncured Turkey Bacon",
+      "pass": true
+    },
+    {
+      "productNumber": 249,
+      "productName": "HORMEL Always Tender Apple Bourbon Flavor Pork Tenderloin",
+      "pass": true
+    },
+    {
+      "productNumber": 250,
+      "productName": "Publix Italian Style Meatballs",
+      "pass": true
+    },
+    {
+      "productNumber": 251,
+      "productName": "Hillshire Farm Hot Smoked Sausage",
+      "pass": true
+    },
+    {
+      "productNumber": 252,
+      "productName": "H-E-B Texas Heritage Pork & Beef Smoked Sausage - Original",
+      "pass": true
+    },
+    {
+      "productNumber": 253,
+      "productName": "Bafar Turkey Ham, Custom Sliced",
+      "pass": true
+    },
+    {
+      "productNumber": 254,
+      "productName": "H-E-B Oven-Roasted Turkey Breast & Black Forest Ham Lunch Meat Combo Pack",
+      "pass": true
+    },
+    {
+      "productNumber": 255,
+      "productName": "V&V Pork & Beef Smoked Sausage",
+      "pass": true
+    }
+  ]
+}

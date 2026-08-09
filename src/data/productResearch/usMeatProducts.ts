@@ -21,12 +21,15 @@ import { usMeatBatch19Records } from "./usMeatBatch19";
 import { usMeatBatch20Records } from "./usMeatBatch20";
 import { usMeatBatch21Records } from "./usMeatBatch21";
 import { usMeatBatch22Records } from "./usMeatBatch22";
+import { usMeatBatch23Records } from "./usMeatBatch23";
+import { usMeatBatch24Records } from "./usMeatBatch24";
 
 export type MeatResearchMarkerValue =
   | "yes"
   | "no"
   | "hidden"
   | "not_listed"
+  | "not_applicable"
   | "context_only";
 
 export type ProductResearchClaimDetail = {
@@ -68,6 +71,13 @@ export type UsMeatResearchRecord = {
   markerFacts: Partial<Record<
     | "grassFed"
     | "organic"
+    | "bannedOrRestrictedIngredient"
+    | "harmfulAdditives"
+    | "ultraProcessed"
+    | "seedOils"
+    | "cancerLinked"
+    | "gmoOrBioengineered"
+    | "labGrownOrCellCultured"
     | "antibiotics"
     | "growthHormones"
     | "addedWater"
@@ -79,6 +89,7 @@ export type UsMeatResearchRecord = {
     | "bha"
     | "propylGallate"
     | "msg"
+    | "carrageenan"
     | "highSodium"
     | "retainedWater"
     | "addedColor",
@@ -1074,5 +1085,7 @@ export const usMeatProductResearchRecords = uniqueById([
   ...usMeatBatch20Records,
   ...usMeatBatch21Records,
   ...usMeatBatch22Records,
+  ...usMeatBatch23Records,
+  ...usMeatBatch24Records,
   ...legacyUsMeatProductResearchRecords,
 ]);

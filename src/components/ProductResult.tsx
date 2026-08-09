@@ -141,6 +141,13 @@ const pillToneClasses: Record<RowTone, string> = {
     "border border-[var(--border-soft)] bg-[var(--neutral-bg)] text-[var(--neutral-text)]",
 };
 
+const iconWrapClasses: Record<RowTone, string> = {
+  green: "border border-[var(--green-border)] bg-[var(--green-bg)]",
+  yellow: "border border-[var(--amber-border)] bg-[var(--amber-bg)]",
+  red: "border border-[var(--red-border)] bg-[var(--red-bg)]",
+  neutral: "border border-[var(--border-soft)] bg-[var(--neutral-bg)]",
+};
+
 const categoryIconColorClasses: Record<RowTone, string> = {
   green: "text-[var(--green-main)]",
   yellow: "text-[var(--amber-main)]",
@@ -696,7 +703,6 @@ function ProductSummary({
         <ScoreRing
           score={scanResult.ingredientLoad.score}
           scoreLabel={scanResult.ingredientLoad.level}
-          qualityLabel={qualityLabel}
           tone={scanResult.ingredientLoad.tone}
           animate={animate}
         />
@@ -711,6 +717,17 @@ function ProductSummary({
             {displayBrand}
           </p>
         ) : null}
+        <div className="mt-3 flex items-center gap-2.5">
+          <span className="text-[13px] font-bold text-[var(--text-secondary)]">
+            Health Grade
+          </span>
+          <TonePill
+            tone={scanResult.ingredientLoad.tone}
+            className="px-3 py-1.5 text-[11px] font-black tracking-[0.08em]"
+          >
+            {qualityLabel}
+          </TonePill>
+        </div>
       </div>
     </section>
   );
@@ -809,13 +826,11 @@ function getManualScanStoreServerSnapshot() {
 function ScoreRing({
   score,
   scoreLabel,
-  qualityLabel,
   tone,
   animate = false,
 }: {
   score: number;
   scoreLabel: string;
-  qualityLabel: string;
   tone: Exclude<RowTone, "neutral">;
   animate?: boolean;
 }) {
@@ -831,7 +846,7 @@ function ScoreRing({
   return (
     <div
       className="flex w-[112px] flex-col items-center gap-2"
-      aria-label={`${scoreLabel}: ${score} out of 100. Quality: ${qualityLabel}`}
+      aria-label={`${scoreLabel}: ${score} out of 100`}
     >
       <p className="text-center text-[9px] font-black uppercase tracking-[0.16em] text-[var(--text-secondary)]">
         Ingredient Score
@@ -853,12 +868,6 @@ function ScoreRing({
           </p>
         </div>
       </div>
-      <TonePill
-        tone={tone}
-        className="px-3 py-1.5 text-[11px] font-black tracking-[0.08em]"
-      >
-        {qualityLabel}
-      </TonePill>
     </div>
   );
 }
@@ -892,7 +901,7 @@ function StatusPill({
 }) {
   return (
     <span
-      className={`inline-flex h-7 min-w-[44px] items-center justify-center whitespace-nowrap rounded-full px-2.5 text-[12px] font-black leading-none ${pillToneClasses[tone]} ${className}`}
+      className={`inline-flex h-8 min-w-[48px] items-center justify-center whitespace-nowrap rounded-full px-3 text-[14px] font-black leading-none ${pillToneClasses[tone]} ${className}`}
     >
       {children}
     </span>
@@ -912,7 +921,7 @@ function CountBadge({
 
   return (
     <span
-      className={`inline-flex h-7 min-w-7 items-center justify-center rounded-full px-2 text-[12px] font-black leading-none ${pillToneClasses[tone]}`}
+      className={`inline-flex h-8 min-w-8 items-center justify-center rounded-full px-2 text-[13px] font-black leading-none ${pillToneClasses[tone]}`}
       aria-label={`${count} finding${count === 1 ? "" : "s"}`}
     >
       {displayedCount}
@@ -1157,7 +1166,7 @@ function RowIcon({
 
   return (
     <span
-      className={`inline-flex h-7 w-7 shrink-0 items-center justify-center ${categoryIconColorClasses[tone]}`}
+      className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${iconWrapClasses[tone]} ${categoryIconColorClasses[tone]}`}
     >
       <CategoryGlyph name={resolvedIconName} />
     </span>
@@ -1817,7 +1826,7 @@ function DeepCheckRow({
         aria-expanded={isExpanded}
         aria-controls={detailId}
         onClick={() => onToggle(item.categoryId)}
-        className={`grid min-h-[54px] w-full grid-cols-[auto_minmax(0,1fr)_auto_auto_auto] items-center gap-2 rounded-[14px] px-1 py-2 text-left transition-colors active:bg-[var(--bg-soft)] ${
+        className={`grid min-h-[68px] w-full grid-cols-[auto_minmax(0,1fr)_auto_auto_auto] items-center gap-3 rounded-[16px] px-1 py-3 text-left transition-colors active:bg-[var(--bg-soft)] ${
           animate && tone === "red"
             ? "truthlabel-pulse-red"
             : animate && tone === "yellow"
@@ -1833,7 +1842,7 @@ function DeepCheckRow({
           />
         </div>
         <div className="min-w-0">
-          <span className="line-clamp-2 block text-[14px] font-bold leading-tight tracking-[-0.01em] text-[var(--text-main)]">
+          <span className="line-clamp-2 block text-[17px] font-bold leading-tight tracking-[-0.01em] text-[var(--text-main)]">
             {item.label}
           </span>
         </div>
