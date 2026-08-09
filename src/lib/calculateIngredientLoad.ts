@@ -21,6 +21,7 @@ export type IngredientLoadTone = "green" | "yellow" | "red";
 export type IngredientLoadLevel =
   | "Poor Ingredient Score"
   | "Moderate Ingredient Score"
+  | "Good Ingredient Score"
   | "Excellent Ingredient Score";
 
 export type ScoredIngredient = {

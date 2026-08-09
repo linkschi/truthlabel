@@ -2,6 +2,7 @@ import type { ExternalSafetySignal } from "@/lib/externalSafety/externalSafetyTy
 
 export type ProductDatabaseProvider =
   | "open_food_facts"
+  | "truthlabel_local_research"
   | "mock"
   | "unknown";
 
@@ -27,6 +28,7 @@ export type ExternalProductLookupResult = {
   rawLabels?: string[];
   rawAllergens?: string[];
   rawTraces?: string[];
+  externalSignals?: BarcodeExternalSignal[];
   dataQualityWarnings: string[];
   raw?: unknown;
 };

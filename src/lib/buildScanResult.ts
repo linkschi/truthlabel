@@ -116,9 +116,12 @@ export type ScanResultIngredientBreakdown = {
 
 export type ScanResultDeepExposureCheck = {
   categoryId: string;
+  iconName?: string;
   label: string;
   severity: Severity | null;
   displayValue: string;
+  manualStatusLabel?: string;
+  manualStatusTone?: Severity;
   reason: string;
   title: string;
   message: string;
@@ -135,6 +138,8 @@ export type ScanResultDeepExposureCheck = {
 export type ScanResultMatchedItemDetail = {
   displayName: string;
   canonicalIngredientId: string;
+  severity?: Severity;
+  explanation?: string;
   userFacingReason: string;
   restrictionRegions: string[];
   restrictionReasons: string[];

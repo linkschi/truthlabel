@@ -176,12 +176,12 @@ export function mapExternalProductCategory(result: ExternalProductLookupResult) 
     return "Seafood";
   }
 
-  if (containsAnyTerm(searchableText, drinkTerms)) {
-    return "Drinks / Beverages";
-  }
-
   if (containsAnyTerm(searchableText, meatTerms)) {
     return "Meat / Fast Food";
+  }
+
+  if (containsAnyTerm(searchableText, drinkTerms)) {
+    return "Drinks / Beverages";
   }
 
   if (containsAnyTerm(searchableText, dairyEggTerms)) {
@@ -289,7 +289,7 @@ export function normalizeExternalProduct(
     packagingText,
     imageUrl: result.imageUrl?.trim() || undefined,
     scanSource: "barcode",
-    externalSignals: [],
+    externalSignals: result.externalSignals ?? [],
     dataQualityWarnings: [...warnings],
   };
 }

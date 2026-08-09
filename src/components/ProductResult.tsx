@@ -68,6 +68,35 @@ type CategoryIconName =
   | "spark"
   | "texture";
 
+const categoryIconNames: CategoryIconName[] = [
+  "additive",
+  "allergy",
+  "ban",
+  "barcode",
+  "beaker",
+  "candy",
+  "colour",
+  "drop",
+  "eye",
+  "factory",
+  "flame",
+  "leaf",
+  "list",
+  "meat",
+  "metal",
+  "micro",
+  "oil",
+  "question",
+  "scale",
+  "shield",
+  "spark",
+  "texture",
+];
+
+function isCategoryIconName(value: string | undefined): value is CategoryIconName {
+  return categoryIconNames.includes(value as CategoryIconName);
+}
+
 type BadgeDescriptor = {
   color: RowTone;
   count?: number;
@@ -84,7 +113,6 @@ type ResultDetail = {
   }>;
 };
 
-type ScanSourceLabel = ScanResult["productHero"]["scanSource"];
 type ProductImageSourceLabel = ScanResult["productHero"]["imageSource"];
 
 type IngredientGroupCard = {
@@ -92,6 +120,14 @@ type IngredientGroupCard = {
   label: string;
   tone: RowTone;
   items: ScanResultIngredientItem[];
+};
+
+type CheckRowPresentation = {
+  statusLabel: string;
+  statusTone: RowTone;
+  iconTone: RowTone;
+  count?: number;
+  countTone: RowTone;
 };
 
 const pillToneClasses: Record<RowTone, string> = {
@@ -210,6 +246,41 @@ const finalVerdictCardClasses: Record<Exclude<RowTone, "neutral">, string> = {
   red: "border-[var(--red-border)] bg-[var(--red-bg)]",
 };
 
+const resultScreenThemeClasses = [
+  "[--bg-page:#FFFDF8]",
+  "[--bg-soft:#F7F9F7]",
+  "[--border-soft:#DCE5DF]",
+  "[--border-strong:#CAD8D0]",
+  "[--text-main:#101613]",
+  "[--text-secondary:#56635C]",
+  "[--green-main:#20A653]",
+  "[--green-dark:#168A43]",
+  "[--green-bg:#E9F8EE]",
+  "[--green-border:#BFECCB]",
+  "[--amber-main:#D99516]",
+  "[--amber-dark:#9A610B]",
+  "[--amber-bg:#FFF5D9]",
+  "[--amber-border:#F4D681]",
+  "[--red-main:#D94040]",
+  "[--red-dark:#A82424]",
+  "[--red-bg:#FDECEC]",
+  "[--red-border:#F3B6B6]",
+].join(" ");
+
+const positiveAttributeCategoryIds = new Set([
+  "natural_positive",
+  "organic",
+  "grass_fed",
+  "grass_fed_grass_finished",
+  "wild_caught",
+  "no_antibiotics",
+]);
+
+const informationalCheckCategoryIds = new Set([
+  "total_ingredients",
+  "natural_vs_processed",
+]);
+
 function normalizeClearLabel(value: string) {
   if (value.trim().toLowerCase() === "none found") {
     return "No";
@@ -224,6 +295,91 @@ function toRowTone(severity: "green" | "yellow" | "red" | null | undefined): Row
 
 function toModalTone(severity: "green" | "yellow" | "red" | null | undefined) {
   return severity ?? "yellow";
+}
+
+function getDisplayBrand(brandName: string) {
+  const normalized = brandName.trim();
+
+  if (!normalized || normalized.toLowerCase() === "unknown brand") {
+    return "";
+  }
+
+  return normalized;
+}
+
+function isPositiveAttributeCheck(item: ScanResultDeepExposureCheck) {
+  const normalized = item.categoryId.toLowerCase();
+
+  return (
+    positiveAttributeCategoryIds.has(normalized) ||
+    /\b(organic|grass|wild|antibiotic|air_chilled|air-chilled)\b/.test(normalized)
+  );
+}
+
+function isInformationalCheck(item: ScanResultDeepExposureCheck) {
+  return informationalCheckCategoryIds.has(item.categoryId);
+}
+
+function getCheckRowPresentation(item: ScanResultDeepExposureCheck) {
+  if (item.status === "not_checked" || !item.displayAllowed || !item.severity) {
+    return {
+      statusLabel: "Unknown",
+      statusTone: "neutral",
+      iconTone: "neutral",
+      countTone: "neutral",
+    } satisfies CheckRowPresentation;
+  }
+
+  const severityTone = toRowTone(item.severity);
+
+  if (item.manualStatusLabel) {
+    const normalizedManualLabel = item.manualStatusLabel.trim();
+    const manualTone = toRowTone(item.manualStatusTone ?? item.severity);
+
+    return {
+      statusLabel: normalizedManualLabel,
+      statusTone:
+        normalizedManualLabel.toLowerCase() === "no" ? "neutral" : manualTone,
+      iconTone: manualTone,
+      count: item.matchCount > 0 ? item.matchCount : undefined,
+      countTone: manualTone,
+    } satisfies CheckRowPresentation;
+  }
+
+  if (isInformationalCheck(item)) {
+    return {
+      statusLabel: item.displayValue || "Checked",
+      statusTone: severityTone,
+      iconTone: severityTone,
+      countTone: severityTone,
+    } satisfies CheckRowPresentation;
+  }
+
+  if (isPositiveAttributeCheck(item)) {
+    const confirmed =
+      item.matchCount > 0 ||
+      /\b(yes|confirmed|organic|grass|wild|raised without|no antibiotics)\b/i.test(
+        item.displayValue,
+      );
+
+    return {
+      statusLabel: confirmed ? "Yes" : "No",
+      statusTone: confirmed ? severityTone : "neutral",
+      iconTone: confirmed ? severityTone : "neutral",
+      countTone: severityTone,
+    } satisfies CheckRowPresentation;
+  }
+
+  const detected = item.matchCount > 0 || item.severity !== "green";
+  const tone = detected ? severityTone : "green";
+
+  return {
+    statusLabel: detected ? "Yes" : "No",
+    statusTone: tone,
+    iconTone: tone,
+    count: detected && item.matchCount > 0 ? item.matchCount : undefined,
+    countTone: tone,
+  } satisfies CheckRowPresentation;
 }
 
 function getInitialReducedMotionPreference() {
@@ -443,24 +599,6 @@ function getIngredientGroupBadges(group: IngredientGroupCard): BadgeDescriptor[]
   });
 }
 
-function getDeepCheckStatusBadges(item: ScanResultDeepExposureCheck): BadgeDescriptor[] {
-  const tone = toRowTone(item.severity);
-  const statusBadge =
-    item.status === "not_checked"
-      ? ({ color: "neutral", label: "Not found" } satisfies BadgeDescriptor)
-      : item.severity === "red"
-        ? ({ color: "red", label: "High" } satisfies BadgeDescriptor)
-        : item.severity === "yellow"
-          ? ({ color: "yellow", label: "Detected" } satisfies BadgeDescriptor)
-          : ({ color: tone, label: "Minimum" } satisfies BadgeDescriptor);
-
-  if (item.status === "not_checked" || item.matchCount <= 1) {
-    return [statusBadge];
-  }
-
-  return [statusBadge, { color: statusBadge.color, count: item.matchCount }];
-}
-
 function BrandMark() {
   return (
     <div className="mt-4 flex flex-col items-center gap-1.5">
@@ -481,33 +619,6 @@ function BrandMark() {
       </div>
     </div>
   );
-}
-
-function getScanSourceBadgeLabel(scanSource: ScanSourceLabel) {
-  switch (scanSource) {
-    case "manual_paste":
-      return "Manual";
-    case "barcode":
-      return "Barcode";
-    case "ocr":
-      return "OCR";
-    case "demo":
-    default:
-      return "Sample";
-  }
-}
-
-function getProductImageSourceLabel(imageSource?: ProductImageSourceLabel) {
-  switch (imageSource) {
-    case "product_database":
-      return "Open Food Facts";
-    case "captured_scan":
-      return "Scan photo";
-    case "sample_scan":
-      return "Sample scan";
-    default:
-      return "Product";
-  }
 }
 
 function getProductVisualAltText({
@@ -531,62 +642,94 @@ function getProductVisualAltText({
 
 function ProductVisual({
   productName,
-  scanSource,
   imageUrl,
   imageSource,
-  variant = "compact",
 }: {
   productName: string;
-  scanSource: ScanSourceLabel;
   imageUrl: string;
   imageSource?: ProductImageSourceLabel;
-  variant?: "compact" | "wide";
 }) {
-  const sourceLabel = getScanSourceBadgeLabel(scanSource);
-  const imageSourceLabel = getProductImageSourceLabel(imageSource);
   const [failedImageUrl, setFailedImageUrl] = useState("");
   const hasImage = Boolean(imageUrl && failedImageUrl !== imageUrl);
-  const showScanSourceBadge = scanSource !== "demo";
-  const visualSizeClass =
-    variant === "wide"
-      ? "h-[158px] w-full rounded-[26px]"
-      : "h-[96px] w-[96px] rounded-[20px]";
 
   return (
     <div
-      className={`relative overflow-hidden border border-[var(--border-strong)] bg-[linear-gradient(165deg,var(--bg-page)_0%,var(--bg-soft)_52%,var(--border-strong)_100%)] shadow-[0_14px_28px_rgba(23,20,18,0.08)] ${visualSizeClass}`}
+      className="relative h-[118px] w-[118px] shrink-0 overflow-hidden rounded-[26px] border border-[var(--border-soft)] bg-white shadow-[0_14px_28px_rgba(16,22,19,0.08)]"
     >
       {hasImage ? (
         <img
           src={imageUrl}
           alt={getProductVisualAltText({ imageSource, productName })}
-          className="h-full w-full object-cover"
+          className="h-full w-full object-contain p-2"
           loading="lazy"
           onError={() => setFailedImageUrl(imageUrl)}
         />
       ) : (
-        <div
-          className={`absolute inset-x-3 rounded-[14px] border border-white/80 bg-white/92 px-2.5 py-2 shadow-[0_10px_18px_rgba(23,20,18,0.08)] ${
-            variant === "wide" ? "bottom-4" : "bottom-3"
-          }`}
-        >
-          <div className="mx-auto h-2 rounded-full bg-[var(--neutral-text)]" />
-          <div className="mx-auto mt-1 h-2 rounded-full bg-[var(--amber-main)]" />
-          <div className="mx-auto mt-1 h-2 rounded-full bg-[var(--green-main)]" />
-          <p className="mt-2 line-clamp-2 text-center text-[8px] font-semibold uppercase tracking-[0.18em] text-[var(--text-secondary)]">
+        <div className="absolute inset-3 flex flex-col items-center justify-center rounded-[20px] border border-[var(--border-soft)] bg-[var(--bg-soft)] px-2.5 py-2">
+          <div className="h-2 w-12 rounded-full bg-[var(--red-main)]" />
+          <div className="mt-1.5 h-2 w-12 rounded-full bg-[var(--amber-main)]" />
+          <div className="mt-1.5 h-2 w-12 rounded-full bg-[var(--green-main)]" />
+          <p className="mt-3 line-clamp-2 text-center text-[9px] font-bold uppercase tracking-[0.14em] text-[var(--text-secondary)]">
             {productName}
           </p>
         </div>
       )}
-      <div className="absolute left-2 top-2 rounded-full border border-white/80 bg-white/90 px-2 py-1 text-[8px] font-semibold uppercase tracking-[0.16em] text-[var(--text-secondary)] shadow-[0_8px_18px_rgba(23,20,18,0.08)]">
-        {hasImage ? imageSourceLabel : sourceLabel}
-      </div>
-      {showScanSourceBadge ? (
-        <div className="absolute bottom-2 right-2 rounded-full border border-white/80 bg-white/90 px-2 py-1 text-[8px] font-semibold uppercase tracking-[0.16em] text-[var(--text-secondary)] shadow-[0_8px_18px_rgba(23,20,18,0.08)]">
-          {sourceLabel}
-        </div>
-      ) : null}
     </div>
+  );
+}
+
+function ProductSummary({
+  scanResult,
+  ingredientScoreLabel,
+  animate,
+}: {
+  scanResult: ScanResult;
+  ingredientScoreLabel: string;
+  animate: boolean;
+}) {
+  const displayBrand = getDisplayBrand(scanResult.productHero.brandName);
+
+  return (
+    <section
+      className={`pt-4 ${animate ? "truthlabel-reveal" : ""}`}
+      style={animate ? getRevealStyle(0) : undefined}
+    >
+      <div className="flex items-start justify-between gap-4">
+        <ProductVisual
+          productName={scanResult.productHero.productName}
+          imageUrl={scanResult.productHero.imageUrl ?? ""}
+          imageSource={scanResult.productHero.imageSource}
+        />
+        <ScoreRing
+          score={scanResult.ingredientLoad.score}
+          scoreLabel={scanResult.ingredientLoad.level}
+          tone={scanResult.ingredientLoad.tone}
+          animate={animate}
+        />
+      </div>
+
+      <div className="mt-4">
+        <h2 className="font-heading text-[1.6rem] font-black leading-[1.05] tracking-[-0.045em] text-[var(--text-main)]">
+          {scanResult.productHero.productName}
+        </h2>
+        {displayBrand ? (
+          <p className="mt-1.5 text-[15px] font-semibold leading-5 text-[var(--text-secondary)]">
+            {displayBrand}
+          </p>
+        ) : null}
+        <div className="mt-3 flex items-center gap-2.5">
+          <TonePill
+            tone={scanResult.ingredientLoad.tone}
+            className="px-3 py-1.5 text-[11px] font-black tracking-[0.08em]"
+          >
+            {ingredientScoreLabel}
+          </TonePill>
+          <span className="text-[13px] font-bold text-[var(--text-secondary)]">
+            Product Quality
+          </span>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -700,23 +843,24 @@ function ScoreRing({
       : tone === "yellow"
         ? "var(--amber-main)"
         : "var(--green-main)";
-  const shortScoreLabel = scoreLabel.replace(" Ingredient Score", "");
-
   return (
-    <div className="flex w-[102px] flex-col items-center">
-      <p className="mb-1.5 text-center text-[9px] font-bold uppercase tracking-[0.13em] text-[var(--text-secondary)]">
+    <div
+      className="flex w-[112px] flex-col items-center gap-2"
+      aria-label={`${scoreLabel}: ${score} out of 100`}
+    >
+      <p className="text-center text-[9px] font-black uppercase tracking-[0.16em] text-[var(--text-secondary)]">
         Ingredient Score
       </p>
-      <div className="relative flex h-[92px] w-[92px] items-center justify-center rounded-full border border-[var(--border-soft)] bg-[var(--bg-surface)] shadow-[0_14px_26px_rgba(23,20,18,0.07)]">
+      <div className="relative flex h-[104px] w-[104px] items-center justify-center rounded-full border border-[var(--border-soft)] bg-white shadow-[0_16px_30px_rgba(16,22,19,0.08)]">
         <div
           className="absolute inset-0 rounded-full"
           style={{
             background: `conic-gradient(${ringColor} ${degrees}deg, var(--border-soft) ${degrees}deg 360deg)`,
           }}
         />
-        <div className="absolute inset-[7px] rounded-full bg-[var(--bg-page)] shadow-[inset_0_1px_6px_rgba(23,20,18,0.06)]" />
+        <div className="absolute inset-[8px] rounded-full bg-[var(--bg-page)] shadow-[inset_0_1px_6px_rgba(23,20,18,0.06)]" />
         <div className="relative text-center">
-          <p className="font-heading text-[1.9rem] font-semibold leading-none text-[var(--text-main)]">
+          <p className="font-heading text-[2rem] font-black leading-none text-[var(--text-main)]">
             {displayedScore}
           </p>
           <p className="mt-0.5 text-[10px] font-semibold text-[var(--text-secondary)]">
@@ -724,11 +868,6 @@ function ScoreRing({
           </p>
         </div>
       </div>
-      <p
-        className={`mt-1.5 text-center text-[10px] font-extrabold uppercase tracking-[0.1em] ${scoreLabelClasses[tone]}`}
-      >
-        {shortScoreLabel}
-      </p>
     </div>
   );
 }
@@ -751,7 +890,50 @@ function TonePill({
   );
 }
 
-function getCategoryIconName(categoryId?: string): CategoryIconName {
+function StatusPill({
+  tone,
+  children,
+  className = "",
+}: {
+  tone: RowTone;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <span
+      className={`inline-flex h-8 min-w-[48px] items-center justify-center whitespace-nowrap rounded-full px-3 text-[14px] font-black leading-none ${pillToneClasses[tone]} ${className}`}
+    >
+      {children}
+    </span>
+  );
+}
+
+function CountBadge({
+  count,
+  tone,
+  animate,
+}: {
+  count: number;
+  tone: RowTone;
+  animate: boolean;
+}) {
+  const displayedCount = useCountUp(count, animate, 580);
+
+  return (
+    <span
+      className={`inline-flex h-8 min-w-8 items-center justify-center rounded-full px-2 text-[13px] font-black leading-none ${pillToneClasses[tone]}`}
+      aria-label={`${count} finding${count === 1 ? "" : "s"}`}
+    >
+      {displayedCount}
+    </span>
+  );
+}
+
+function getCategoryIconName(categoryId?: string, iconName?: string): CategoryIconName {
+  if (isCategoryIconName(iconName)) {
+    return iconName;
+  }
+
   switch (categoryId) {
     case "additives_preservatives":
       return "beaker";
@@ -813,7 +995,7 @@ function CategoryGlyph({
 }) {
   const commonProps = {
     "aria-hidden": true,
-    className: `h-3.5 w-3.5 ${className}`,
+    className: `h-5 w-5 ${className}`,
     fill: "none",
     viewBox: "0 0 24 24",
     xmlns: "http://www.w3.org/2000/svg",
@@ -974,17 +1156,19 @@ function CategoryGlyph({
 function RowIcon({
   tone,
   categoryId,
+  iconName,
 }: {
   tone: RowTone;
   categoryId?: string;
+  iconName?: string;
 }) {
-  const iconName = getCategoryIconName(categoryId);
+  const resolvedIconName = getCategoryIconName(categoryId, iconName);
 
   return (
     <span
-      className={`inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${iconWrapClasses[tone]} ${categoryIconColorClasses[tone]}`}
+      className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${iconWrapClasses[tone]} ${categoryIconColorClasses[tone]}`}
     >
-      <CategoryGlyph name={iconName} />
+      <CategoryGlyph name={resolvedIconName} />
     </span>
   );
 }
@@ -1580,6 +1764,23 @@ function getDeepCheckReasonStatement(item: ScanResultDeepExposureCheck) {
   return `${title}: ${reason}`;
 }
 
+function getUniqueMatchedItemDetails(item: ScanResultDeepExposureCheck) {
+  const seen = new Set<string>();
+
+  return item.matchedItemDetails
+    .filter((detail) => {
+      const key = detail.displayName.trim().toLowerCase();
+
+      if (!key || seen.has(key)) {
+        return false;
+      }
+
+      seen.add(key);
+      return true;
+    })
+    .slice(0, 6);
+}
+
 function DeepCheckRow({
   item,
   isExpanded,
@@ -1594,12 +1795,11 @@ function DeepCheckRow({
   index: number;
 }) {
   const tone = toRowTone(item.severity);
-  const badges = getDeepCheckStatusBadges(item);
+  const presentation = getCheckRowPresentation(item);
   const detailId = `deep-check-detail-${item.categoryId}`;
   const isBannedRestrictedRow = item.categoryId === "banned_restricted_items";
-  const matchedItems = uniqueLabels(
-    item.matchedItemDetails.map((detail) => detail.displayName),
-  ).slice(0, 6);
+  const matchedItemDetails = getUniqueMatchedItemDetails(item);
+  const matchedItems = matchedItemDetails.map((detail) => detail.displayName);
   const matchedItemsText =
     item.matchCount > 0
       ? `${item.matchCount} match${item.matchCount === 1 ? "" : "es"} found`
@@ -1626,7 +1826,7 @@ function DeepCheckRow({
         aria-expanded={isExpanded}
         aria-controls={detailId}
         onClick={() => onToggle(item.categoryId)}
-        className={`grid min-h-[52px] w-full grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-3 py-3 text-left transition-colors active:bg-[var(--bg-soft)] ${
+        className={`grid min-h-[68px] w-full grid-cols-[auto_minmax(0,1fr)_auto_auto_auto] items-center gap-3 px-1 py-3 text-left transition-colors active:bg-[var(--bg-soft)] ${
           animate && tone === "red"
             ? "truthlabel-pulse-red"
             : animate && tone === "yellow"
@@ -1635,18 +1835,27 @@ function DeepCheckRow({
         }`}
       >
         <div>
-          <RowIcon tone={tone} categoryId={item.categoryId} />
+          <RowIcon
+            tone={presentation.iconTone}
+            categoryId={item.categoryId}
+            iconName={item.iconName}
+          />
         </div>
         <div className="min-w-0">
-          <span className="block truncate text-[15px] font-medium text-[var(--text-main)]">
+          <span className="line-clamp-2 block text-[17px] font-bold leading-tight tracking-[-0.01em] text-[var(--text-main)]">
             {item.label}
           </span>
         </div>
-        <IssueBadgeStack
-          badges={badges}
-          className="justify-self-end"
-          animate={animate}
-        />
+        <StatusPill tone={presentation.statusTone} className="justify-self-end">
+          {presentation.statusLabel}
+        </StatusPill>
+        {presentation.count ? (
+          <CountBadge
+            count={presentation.count}
+            tone={presentation.countTone}
+            animate={animate}
+          />
+        ) : null}
         <ChevronIcon
           className={`text-[var(--text-secondary)] transition-transform ${
             isExpanded ? "-rotate-90" : "rotate-90"
@@ -1717,16 +1926,37 @@ function DeepCheckRow({
                   </span>
                 </div>
 
-                {matchedItems.length > 0 ? (
-                  <div className="mt-2 flex flex-wrap gap-1.5">
-                    {matchedItems.map((matchedItem) => (
-                      <span
-                        key={`${item.categoryId}-${matchedItem}`}
-                        className={`rounded-full border px-2 py-1 text-[11px] font-medium ${chipToneClasses[tone]}`}
-                      >
-                        {matchedItem}
-                      </span>
-                    ))}
+                {matchedItemDetails.length > 0 ? (
+                  <div className="mt-2 grid gap-1.5">
+                    {matchedItemDetails.map((matchedItem) => {
+                      const itemTone = toRowTone(matchedItem.severity ?? item.severity);
+                      const itemExplanation =
+                        matchedItem.explanation || matchedItem.userFacingReason;
+
+                      return (
+                        <div
+                          key={`${item.categoryId}-${matchedItem.displayName}`}
+                          className={`rounded-[13px] border px-2.5 py-2 ${chipToneClasses[itemTone]}`}
+                        >
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="text-[11px] font-bold">
+                              {matchedItem.displayName}
+                            </span>
+                            <TonePill
+                              tone={itemTone}
+                              className="px-2 py-0.5 text-[8px] tracking-[0.08em]"
+                            >
+                              {itemTone}
+                            </TonePill>
+                          </div>
+                          {itemExplanation ? (
+                            <p className="mt-1 text-[11px] font-medium leading-4 opacity-85">
+                              {itemExplanation}
+                            </p>
+                          ) : null}
+                        </div>
+                      );
+                    })}
                   </div>
                 ) : null}
               </div>
@@ -1805,17 +2035,23 @@ function HeartIcon({ filled }: { filled: boolean }) {
 export default function ProductResult({
   barcodeScanKey,
   category,
+  demoScanResult,
   demoProductId,
+  doneHrefOverride,
   freshResult = false,
   historyScanId,
   manualScanKey,
+  showTestingFeedback,
 }: {
   barcodeScanKey?: string;
   category?: string;
+  demoScanResult?: ScanResult;
   demoProductId?: string;
+  doneHrefOverride?: string;
   freshResult?: boolean;
   historyScanId?: string;
   manualScanKey?: string;
+  showTestingFeedback?: boolean;
 }) {
   const router = useRouter();
   const { user } = useTruthlabelAuth();
@@ -1865,10 +2101,15 @@ export default function ProductResult({
     [category, demoProductId, savedAllergyProfile],
   );
   const scanResult =
-    historyScanResult ?? barcodeScanResult ?? manualScanResult ?? fallbackScanResult;
+    demoScanResult ??
+    historyScanResult ??
+    barcodeScanResult ??
+    manualScanResult ??
+    fallbackScanResult;
+  const isDemoOverride = Boolean(demoScanResult);
 
   useEffect(() => {
-    if (!historyScanId) {
+    if (isDemoOverride || !historyScanId) {
       return;
     }
 
@@ -1904,7 +2145,7 @@ export default function ProductResult({
     return () => {
       active = false;
     };
-  }, [historyScanId]);
+  }, [historyScanId, isDemoOverride]);
 
   const prefersReducedMotion = usePrefersReducedMotion();
   const resultMotionKey = buildResultMotionKey({
@@ -1919,6 +2160,10 @@ export default function ProductResult({
     scanResult,
   });
   useEffect(() => {
+    if (isDemoOverride) {
+      return;
+    }
+
     if (historyScanId && historyStatus === "loading") {
       return;
     }
@@ -1953,6 +2198,7 @@ export default function ProductResult({
     freshResult,
     historyScanId,
     historyStatus,
+    isDemoOverride,
     manualScanKey,
     resultMotionKey,
     scanResult,
@@ -1981,12 +2227,13 @@ export default function ProductResult({
     return [...withRequiredRows]
       .filter(
         (row) =>
+          isDemoOverride ||
           row.categoryId !== "allergy_risk" ||
           savedAllergyProfile.length > 0 ||
           row.severity !== "green",
       )
       .sort((left, right) => left.sortOrder - right.sortOrder);
-  }, [savedAllergyProfile.length, scanResult.quickOverview]);
+  }, [isDemoOverride, savedAllergyProfile.length, scanResult.quickOverview]);
 
   const ingredientGroups = useMemo<IngredientGroupCard[]>(
     () => [
@@ -2010,8 +2257,11 @@ export default function ProductResult({
   );
 
   const deepCheckRows = useMemo(
-    () => getVisibleDeepExposureChecks(scanResult),
-    [scanResult],
+    () =>
+      isDemoOverride
+        ? scanResult.deepExposureChecks.filter((row) => row.displayAllowed)
+        : getVisibleDeepExposureChecks(scanResult),
+    [isDemoOverride, scanResult],
   );
   const fullChecklistRows = useMemo(() => {
     const deepRowsByCategoryId = new Map(
@@ -2120,15 +2370,18 @@ export default function ProductResult({
 
   const heroTone = toRowTone(scanResult.productHero.verdictTone);
   const brandTrustTone = toRowTone(scanResult.brandTrustSafety.severity);
-  const showBrandTrustSafety = shouldShowBrandTrustSafety(scanResult, userSettings);
-  const hasProductHeroImage = Boolean(scanResult.productHero.imageUrl);
+  const showBrandTrustSafety = isDemoOverride
+    ? scanResult.brandTrustSafety.status !== "not_checked" ||
+      scanResult.brandTrustSafety.signals.length > 0
+    : shouldShowBrandTrustSafety(scanResult, userSettings);
   const doneHref =
-    historyScanId
+    doneHrefOverride ??
+    (historyScanId
       ? "/app/history"
       : scanResult.productHero.scanSource === "manual_paste" ||
           scanResult.productHero.scanSource === "barcode"
-      ? "/app/manual"
-      : "/app";
+        ? "/app/manual"
+        : "/app");
   const feedbackIngredientText =
     historyRecord?.resultSnapshot.ingredientsText ??
     latestManualScan?.input.ingredientText ??
@@ -2150,7 +2403,7 @@ export default function ProductResult({
     }
   }
 
-  if (historyScanId && historyStatus === "loading") {
+  if (!isDemoOverride && historyScanId && historyStatus === "loading") {
     return (
       <ResultStateView
         title="Opening saved scan"
@@ -2159,7 +2412,7 @@ export default function ProductResult({
     );
   }
 
-  if (historyScanId && historyStatus === "not_found") {
+  if (!isDemoOverride && historyScanId && historyStatus === "not_found") {
     return (
       <ResultStateView
         title="Saved scan not found"
@@ -2172,7 +2425,7 @@ export default function ProductResult({
     );
   }
 
-  if (historyScanId && historyStatus === "error") {
+  if (!isDemoOverride && historyScanId && historyStatus === "error") {
     return (
       <ResultStateView
         title="History unavailable"
@@ -2185,7 +2438,7 @@ export default function ProductResult({
     );
   }
 
-  if (barcodeScanKey && !barcodeScanResolved) {
+  if (!isDemoOverride && barcodeScanKey && !barcodeScanResolved) {
     return (
       <ResultStateView
         title="Opening barcode scan"
@@ -2194,7 +2447,7 @@ export default function ProductResult({
     );
   }
 
-  if (barcodeScanKey && !barcodeScanResult) {
+  if (!isDemoOverride && barcodeScanKey && !barcodeScanResult) {
     return (
       <ResultStateView
         title="Barcode scan not found"
@@ -2207,7 +2460,7 @@ export default function ProductResult({
     );
   }
 
-  if (manualScanKey && !manualScanResolved) {
+  if (!isDemoOverride && manualScanKey && !manualScanResolved) {
     return (
       <ResultStateView
         title="Opening manual scan"
@@ -2216,7 +2469,7 @@ export default function ProductResult({
     );
   }
 
-  if (manualScanKey && !manualScanResult) {
+  if (!isDemoOverride && manualScanKey && !manualScanResult) {
     return (
       <ResultStateView
         title="Manual scan not found"
@@ -2230,54 +2483,53 @@ export default function ProductResult({
   }
 
   return (
-    <main className="min-h-screen px-4 py-4 sm:px-6 sm:py-6">
-      <article className="mx-auto w-full max-w-[430px] overflow-hidden rounded-[36px] border border-[var(--border-soft)] bg-[var(--bg-surface)] shadow-[0_28px_60px_rgba(23,20,18,0.1)]">
-        <div className="px-5 pb-6 pt-4">
-          <header className="grid grid-cols-[1fr_auto_1fr] items-center">
-            <Link
-              href={doneHref}
-              className="justify-self-start text-[15px] font-medium text-[var(--text-secondary)]"
-            >
-              Done
-            </Link>
-            <h1 className="text-[15px] font-semibold text-[var(--text-main)]">Results</h1>
-            {historyScanId ? (
-              <button
-                type="button"
-                onClick={() => void handleDeleteHistoryScan()}
-                className="justify-self-end rounded-full border border-[var(--red-border)] bg-[var(--red-bg)] px-3 py-2 text-[12px] font-bold text-[var(--red-dark)] transition-colors"
-              >
-                Delete
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setSaved((current) => !current)}
-                className={`justify-self-end rounded-full border p-2.5 transition-colors ${
-                  saved
-                    ? "border-[var(--red-border)] bg-[var(--red-bg)] text-[var(--red-dark)]"
-                    : "border-[var(--border-soft)] bg-[var(--bg-surface)] text-[var(--text-secondary)]"
-                }`}
-                aria-label={saved ? "Remove saved result" : "Save result"}
-              >
-                <HeartIcon filled={saved} />
-              </button>
-            )}
-          </header>
-
-          <BrandMark />
+    <main
+      className={`min-h-screen bg-[var(--bg-page)] px-4 pb-24 pt-[max(14px,env(safe-area-inset-top))] sm:px-6 sm:py-6 ${resultScreenThemeClasses}`}
+    >
+      <div className="mx-auto w-full max-w-[430px]">
+          <header className="grid min-h-12 grid-cols-[1fr_auto_1fr] items-center">
+          <Link
+            href={doneHref}
+            className="justify-self-start text-[17px] font-bold text-[var(--green-dark)] transition active:scale-[0.98]"
+          >
+            Done
+          </Link>
+          <h1 className="font-heading text-[21px] font-black tracking-[-0.02em] text-[var(--text-main)]">
+            Results
+          </h1>
+          <button
+            type="button"
+            onClick={() => setSaved((current) => !current)}
+            className={`justify-self-end rounded-full border p-2.5 transition-colors ${
+              saved
+                ? "border-[var(--red-border)] bg-[var(--red-bg)] text-[var(--red-dark)]"
+                : "border-[var(--border-soft)] bg-white text-[var(--text-secondary)]"
+            }`}
+            aria-label={saved ? "Remove saved result" : "Save result"}
+          >
+            <HeartIcon filled={saved} />
+          </button>
+        </header>
 
           {historyRecord ? (
-            <section className="mt-4 rounded-[22px] border border-[#D7E7DD] bg-[#F6FBF8] px-4 py-3">
-              <p className="text-[11px] font-black uppercase tracking-[0.16em] text-[#0E5A3F]">
-                Saved scan
-              </p>
-              <p className="mt-1 text-[13px] leading-5 text-[#4F5D56]">
-                Scanned {formatFullScanDate(historyRecord.scannedAt)}.
-              </p>
-              <p className="mt-2 text-[12px] leading-5 text-[#66716B]">
-                This is the original saved snapshot. Truthlabel will not silently recalculate it.
-              </p>
+            <section className="mt-3 rounded-[20px] border border-[var(--border-soft)] bg-white px-4 py-3 shadow-[0_10px_24px_rgba(16,22,19,0.05)]">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-[12px] font-black uppercase tracking-[0.14em] text-[var(--green-dark)]">
+                    Saved scan
+                  </p>
+                  <p className="mt-1 text-[13px] leading-5 text-[var(--text-secondary)]">
+                    Scanned {formatFullScanDate(historyRecord.scannedAt)}.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => void handleDeleteHistoryScan()}
+                  className="rounded-full border border-[var(--red-border)] bg-[var(--red-bg)] px-3 py-1.5 text-[12px] font-bold text-[var(--red-dark)] transition-colors"
+                >
+                  Delete
+                </button>
+              </div>
               {historyActionError ? (
                 <p className="mt-2 text-[12px] font-bold text-[var(--red-dark)]">
                   {historyActionError}
@@ -2286,13 +2538,13 @@ export default function ProductResult({
               <div className="mt-3 grid grid-cols-2 gap-2">
                 <Link
                   href="/app/manual"
-                  className="flex min-h-10 items-center justify-center rounded-full border border-[#D7E7DD] bg-white px-3 text-center text-[12px] font-extrabold text-[#0E5A3F]"
+                  className="flex min-h-10 items-center justify-center rounded-full border border-[var(--border-soft)] bg-white px-3 text-center text-[12px] font-extrabold text-[var(--green-dark)]"
                 >
                   Scan again
                 </Link>
                 <Link
                   href="/app/manual"
-                  className="flex min-h-10 items-center justify-center rounded-full bg-[#0E5A3F] px-3 text-center text-[12px] font-extrabold text-white"
+                  className="flex min-h-10 items-center justify-center rounded-full bg-[var(--green-dark)] px-3 text-center text-[12px] font-extrabold text-white"
                 >
                   Check for updated information
                 </Link>
@@ -2300,51 +2552,11 @@ export default function ProductResult({
             </section>
           ) : null}
 
-          <section
-            className={`mt-6 ${shouldAnimateFreshResult ? "truthlabel-reveal" : ""}`}
-            style={shouldAnimateFreshResult ? getRevealStyle(0) : undefined}
-          >
-            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-4">
-              {hasProductHeroImage ? (
-                <div className="col-span-2">
-                  <ProductVisual
-                    productName={scanResult.productHero.productName}
-                    scanSource={scanResult.productHero.scanSource}
-                    imageUrl={scanResult.productHero.imageUrl ?? ""}
-                    imageSource={scanResult.productHero.imageSource}
-                    variant="wide"
-                  />
-                </div>
-              ) : null}
-
-              <div className="min-w-0">
-                {!hasProductHeroImage ? (
-                  <ProductVisual
-                    productName={scanResult.productHero.productName}
-                    scanSource={scanResult.productHero.scanSource}
-                    imageUrl={scanResult.productHero.imageUrl ?? ""}
-                    imageSource={scanResult.productHero.imageSource}
-                  />
-                ) : null}
-                <h2
-                  className={`font-heading text-[1.34rem] font-extrabold leading-[1.08] tracking-[-0.035em] text-[var(--text-main)] ${
-                    hasProductHeroImage ? "" : "mt-4"
-                  }`}
-                >
-                  {scanResult.productHero.productName}
-                </h2>
-                <p className="mt-1 text-[13px] text-[var(--text-secondary)]">
-                  Brand name: {scanResult.productHero.brandName}
-                </p>
-              </div>
-              <ScoreRing
-                score={scanResult.ingredientLoad.score}
-                scoreLabel={scanResult.ingredientLoad.level}
-                tone={scanResult.ingredientLoad.tone}
-                animate={shouldAnimateFreshResult}
-              />
-            </div>
-          </section>
+          <ProductSummary
+            scanResult={scanResult}
+            ingredientScoreLabel={ingredientScoreLabel}
+            animate={shouldAnimateFreshResult}
+          />
 
           <section
             className={`mt-6 border-t border-[var(--border-soft)] pt-5 ${
@@ -2352,7 +2564,7 @@ export default function ProductResult({
             }`}
             style={shouldAnimateFreshResult ? getRevealStyle(5) : undefined}
           >
-            <SectionHeading title="Full checklist" />
+            <SectionHeading title="Product Checks" />
 
             <div className="mt-4">
               <div
@@ -2390,7 +2602,7 @@ export default function ProductResult({
                   </div>
                 )}
                 {hasDeepCheckOverflow && !isDeepChecksExpanded ? (
-                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-[linear-gradient(180deg,rgba(255,255,255,0)_0%,var(--bg-surface)_82%)]" />
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-[linear-gradient(180deg,rgba(255,255,255,0)_0%,var(--bg-page)_82%)]" />
                 ) : null}
               </div>
 
@@ -2701,16 +2913,17 @@ export default function ProductResult({
 
             </div>
 
-            <TestingFeedbackPanel
-              scanResult={scanResult}
-              ingredientText={feedbackIngredientText}
-              initialProductName={scanResult.productHero.productName}
-              initialBrandName={scanResult.productHero.brandName}
-              initialBarcode={scanResult.productHero.barcode}
-            />
+            {showTestingFeedback ?? !isDemoOverride ? (
+              <TestingFeedbackPanel
+                scanResult={scanResult}
+                ingredientText={feedbackIngredientText}
+                initialProductName={scanResult.productHero.productName}
+                initialBrandName={scanResult.productHero.brandName}
+                initialBarcode={scanResult.productHero.barcode}
+              />
+            ) : null}
           </section>
         </div>
-      </article>
 
       <InfoModal
         isOpen={activeDetail !== null}
