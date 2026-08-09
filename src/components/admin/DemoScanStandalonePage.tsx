@@ -1,8 +1,9 @@
 "use client";
 
-import Link from "next/link";
-import { useMemo, useSyncExternalStore } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import ProductResult from "@/components/ProductResult";
+import DemoAdminLoadingScreen from "@/components/admin/DemoAdminLoadingScreen";
 import { buildDemoScanResult } from "@/lib/demoScanBuilder/buildDemoScanResult";
 import {
   listDemoScans,
@@ -18,6 +19,9 @@ export default function DemoScanStandalonePage({
   demoId,
   adminEmail,
 }: DemoScanStandalonePageProps) {
+  const router = useRouter();
+  const [isPreparing, setIsPreparing] = useState(true);
+  const [loadingMessage, setLoadingMessage] = useState("");
   const records = useSyncExternalStore(
     subscribeToDemoScans,
     listDemoScans,
@@ -29,6 +33,28 @@ export default function DemoScanStandalonePage({
     () => (record ? buildDemoScanResult(record) : null),
     [record],
   );
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setIsPreparing(false), 850);
+
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  function openBuilder() {
+    setLoadingMessage("Opening demo editor");
+
+    window.setTimeout(() => {
+      router.push(record ? `/app/admin/demo-scan-builder?demo=${record.id}` : "/app/admin/demo-scan-builder");
+    }, 750);
+  }
+
+  if (isPreparing || loadingMessage) {
+    return (
+      <DemoAdminLoadingScreen
+        message={loadingMessage || "Preparing demo result"}
+      />
+    );
+  }
 
   if (!record || !demoScanResult) {
     return (
@@ -44,12 +70,13 @@ export default function DemoScanStandalonePage({
             Demo examples are private admin records stored locally in your browser.
             Open the builder on the device where you saved it.
           </p>
-          <Link
-            href="/app/admin/demo-scan-builder"
+          <button
+            type="button"
+            onClick={openBuilder}
             className="mt-5 inline-flex h-11 items-center justify-center rounded-full bg-[#0E5A3F] px-5 text-[14px] font-black text-white"
           >
             Back to builder
-          </Link>
+          </button>
         </div>
       </main>
     );
@@ -66,12 +93,13 @@ export default function DemoScanStandalonePage({
             {adminEmail}
           </p>
         </div>
-        <Link
-          href={`/app/admin/demo-scan-builder?demo=${record.id}`}
+        <button
+          type="button"
+          onClick={openBuilder}
           className="inline-flex h-9 items-center justify-center rounded-full border border-[#DCE5DF] bg-white px-3 text-[13px] font-black text-[#101613]"
         >
           Edit demo
-        </Link>
+        </button>
       </div>
       <ProductResult
         demoScanResult={demoScanResult}

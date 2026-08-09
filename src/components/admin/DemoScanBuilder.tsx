@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
-import { useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import ProductResult from "@/components/ProductResult";
+import DemoAdminLoadingScreen from "@/components/admin/DemoAdminLoadingScreen";
 import { buildDemoScanResult } from "@/lib/demoScanBuilder/buildDemoScanResult";
 import {
   createBlankDemoCategory,
@@ -447,6 +448,7 @@ export default function DemoScanBuilder({
   adminEmail,
   initialDemoId,
 }: DemoScanBuilderProps) {
+  const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const records = useSyncExternalStore(
     subscribeToDemoScans,
@@ -457,6 +459,8 @@ export default function DemoScanBuilder({
   const [selectedDemoId, setSelectedDemoId] = useState(initialDemoId ?? "");
   const [draftRecord, setDraftRecord] = useState<DemoScanRecord | null>(null);
   const [statusMessage, setStatusMessage] = useState("Demo is not saved yet.");
+  const [initialPreparing, setInitialPreparing] = useState(true);
+  const [loadingMessage, setLoadingMessage] = useState("");
   const selectedRecord =
     records.find((record) => record.id === selectedDemoId) ??
     records.find((record) => record.id === initialDemoId) ??
@@ -470,6 +474,35 @@ export default function DemoScanBuilder({
   );
   const standaloneUrl = getDemoUrl(activeRecord.id);
 
+  useEffect(() => {
+    const timer = window.setTimeout(() => setInitialPreparing(false), 750);
+
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  function runDemoTask(message: string, task: () => void | Promise<void>) {
+    setLoadingMessage(message);
+
+    window.setTimeout(() => {
+      void Promise.resolve()
+        .then(task)
+        .catch(() => {
+          setStatusMessage("That demo action failed. Try again.");
+        })
+        .finally(() => {
+          setLoadingMessage("");
+        });
+    }, 750);
+  }
+
+  function openDemoRoute(message: string, href: string) {
+    setLoadingMessage(message);
+
+    window.setTimeout(() => {
+      router.push(href);
+    }, 750);
+  }
+
   function updateActiveRecord(nextRecord: DemoScanRecord) {
     setDraftRecord({
       ...nextRecord,
@@ -480,24 +513,30 @@ export default function DemoScanBuilder({
   }
 
   function saveCurrentDemo() {
-    const savedRecord = saveDemoScan(activeRecord);
-    setSelectedDemoId(savedRecord.id);
-    setDraftRecord(savedRecord);
-    setStatusMessage("Demo saved locally.");
+    runDemoTask("Saving demo", () => {
+      const savedRecord = saveDemoScan(activeRecord);
+      setSelectedDemoId(savedRecord.id);
+      setDraftRecord(savedRecord);
+      setStatusMessage("Demo saved locally.");
+    });
   }
 
   function createNewDemo() {
-    const nextRecord = createStarterDemoScan();
-    setSelectedDemoId(nextRecord.id);
-    setDraftRecord(nextRecord);
-    setStatusMessage("Started a new unsaved demo.");
+    runDemoTask("Preparing new demo", () => {
+      const nextRecord = createStarterDemoScan();
+      setSelectedDemoId(nextRecord.id);
+      setDraftRecord(nextRecord);
+      setStatusMessage("Started a new unsaved demo.");
+    });
   }
 
   function duplicateCurrentDemo() {
-    const duplicatedRecord = duplicateDemoScan(activeRecord);
-    setSelectedDemoId(duplicatedRecord.id);
-    setDraftRecord(duplicatedRecord);
-    setStatusMessage("Demo duplicated.");
+    runDemoTask("Duplicating demo", () => {
+      const duplicatedRecord = duplicateDemoScan(activeRecord);
+      setSelectedDemoId(duplicatedRecord.id);
+      setDraftRecord(duplicatedRecord);
+      setStatusMessage("Demo duplicated.");
+    });
   }
 
   function deleteCurrentDemo() {
@@ -505,12 +544,14 @@ export default function DemoScanBuilder({
       return;
     }
 
-    deleteDemoScan(activeRecord.id);
-    const nextRecords = listDemoScans();
-    const nextRecord = nextRecords[0] ?? createStarterDemoScan();
-    setSelectedDemoId(nextRecord.id);
-    setDraftRecord(nextRecords[0] ? null : nextRecord);
-    setStatusMessage("Demo deleted from this device.");
+    runDemoTask("Deleting demo", () => {
+      deleteDemoScan(activeRecord.id);
+      const nextRecords = listDemoScans();
+      const nextRecord = nextRecords[0] ?? createStarterDemoScan();
+      setSelectedDemoId(nextRecord.id);
+      setDraftRecord(nextRecords[0] ? null : nextRecord);
+      setStatusMessage("Demo deleted from this device.");
+    });
   }
 
   function updateCategory(categoryIndex: number, nextCategory: DemoScanCategory) {
@@ -552,15 +593,22 @@ export default function DemoScanBuilder({
   }
 
   async function copyStandaloneLink() {
-    const origin = window.location.origin;
-    const url = `${origin}${standaloneUrl}`;
+    runDemoTask("Copying demo URL", async () => {
+      const origin = window.location.origin;
+      const url = `${origin}${standaloneUrl}`;
 
-    await navigator.clipboard?.writeText(url);
-    setStatusMessage("Standalone demo URL copied.");
+      await navigator.clipboard?.writeText(url);
+      setStatusMessage("Standalone demo URL copied.");
+    });
   }
 
   return (
     <main className="min-h-screen bg-[#F7F9F7] px-4 py-5 text-[#101613] sm:px-6 lg:px-8">
+      {initialPreparing || loadingMessage ? (
+        <DemoAdminLoadingScreen
+          message={loadingMessage || "Preparing Demo Scan Builder"}
+        />
+      ) : null}
       <div className="mx-auto max-w-[1420px]">
         <header className="rounded-[28px] border border-[#DCE5DF] bg-white p-5 shadow-[0_18px_42px_rgba(16,22,19,0.08)]">
           <div className="flex flex-wrap items-start justify-between gap-4">
@@ -593,12 +641,13 @@ export default function DemoScanBuilder({
             <SmallButton onClick={createNewDemo}>New demo</SmallButton>
             <SmallButton onClick={duplicateCurrentDemo}>Duplicate demo</SmallButton>
             <SmallButton onClick={copyStandaloneLink}>Copy demo URL</SmallButton>
-            <Link
-              href={standaloneUrl}
+            <button
+              type="button"
+              onClick={() => openDemoRoute("Opening demo result", standaloneUrl)}
               className="inline-flex h-9 items-center justify-center rounded-full border border-[#DCE5DF] bg-white px-3 text-[13px] font-bold text-[#101613] transition active:scale-[0.98]"
             >
               Open demo URL
-            </Link>
+            </button>
             <SmallButton tone="danger" onClick={deleteCurrentDemo}>
               Delete demo
             </SmallButton>
@@ -632,11 +681,13 @@ export default function DemoScanBuilder({
                     <button
                       key={record.id}
                       type="button"
-                      onClick={() => {
-                        setSelectedDemoId(record.id);
-                        setDraftRecord(record);
-                        setStatusMessage("Opened saved demo.");
-                      }}
+                      onClick={() =>
+                        runDemoTask("Opening saved demo", () => {
+                          setSelectedDemoId(record.id);
+                          setDraftRecord(record);
+                          setStatusMessage("Opened saved demo.");
+                        })
+                      }
                       className={`rounded-[18px] border px-3 py-3 text-left transition active:scale-[0.99] ${
                         record.id === activeRecord.id
                           ? "border-[#0E5A3F] bg-[#EDF7F1]"
