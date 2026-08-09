@@ -53,7 +53,7 @@ export const truthlabelCategoryDisplayNames: Record<string, string> = {
   artificial_engineered_food_construction:
     "Artificial / Engineered Food Construction",
   harmful_additives: "Harmful Additives",
-  cancer_linked_watch: "Cancer-linked Watch",
+  cancer_linked_watch: "Cancer linked",
   allergy_risk: "Allergy Risk",
   natural_positive: "Natural / Positive Ingredients",
   unknown_review: "Unknown / Review Ingredients",

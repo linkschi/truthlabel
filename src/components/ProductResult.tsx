@@ -141,13 +141,6 @@ const pillToneClasses: Record<RowTone, string> = {
     "border border-[var(--border-soft)] bg-[var(--neutral-bg)] text-[var(--neutral-text)]",
 };
 
-const iconWrapClasses: Record<RowTone, string> = {
-  green: "border border-[var(--green-border)] bg-[var(--green-bg)]",
-  yellow: "border border-[var(--amber-border)] bg-[var(--amber-bg)]",
-  red: "border border-[var(--red-border)] bg-[var(--red-bg)]",
-  neutral: "border border-[var(--border-soft)] bg-[var(--neutral-bg)]",
-};
-
 const categoryIconColorClasses: Record<RowTone, string> = {
   green: "text-[var(--green-main)]",
   yellow: "text-[var(--amber-main)]",
@@ -247,7 +240,7 @@ const finalVerdictCardClasses: Record<Exclude<RowTone, "neutral">, string> = {
 };
 
 const resultScreenThemeClasses = [
-  "[--bg-page:#FFFDF8]",
+  "[--bg-page:#FFFFFF]",
   "[--bg-soft:#F7F9F7]",
   "[--border-soft:#DCE5DF]",
   "[--border-strong:#CAD8D0]",
@@ -680,11 +673,11 @@ function ProductVisual({
 
 function ProductSummary({
   scanResult,
-  ingredientScoreLabel,
+  qualityLabel,
   animate,
 }: {
   scanResult: ScanResult;
-  ingredientScoreLabel: string;
+  qualityLabel: string;
   animate: boolean;
 }) {
   const displayBrand = getDisplayBrand(scanResult.productHero.brandName);
@@ -703,6 +696,7 @@ function ProductSummary({
         <ScoreRing
           score={scanResult.ingredientLoad.score}
           scoreLabel={scanResult.ingredientLoad.level}
+          qualityLabel={qualityLabel}
           tone={scanResult.ingredientLoad.tone}
           animate={animate}
         />
@@ -717,17 +711,6 @@ function ProductSummary({
             {displayBrand}
           </p>
         ) : null}
-        <div className="mt-3 flex items-center gap-2.5">
-          <TonePill
-            tone={scanResult.ingredientLoad.tone}
-            className="px-3 py-1.5 text-[11px] font-black tracking-[0.08em]"
-          >
-            {ingredientScoreLabel}
-          </TonePill>
-          <span className="text-[13px] font-bold text-[var(--text-secondary)]">
-            Product Quality
-          </span>
-        </div>
       </div>
     </section>
   );
@@ -826,11 +809,13 @@ function getManualScanStoreServerSnapshot() {
 function ScoreRing({
   score,
   scoreLabel,
+  qualityLabel,
   tone,
   animate = false,
 }: {
   score: number;
   scoreLabel: string;
+  qualityLabel: string;
   tone: Exclude<RowTone, "neutral">;
   animate?: boolean;
 }) {
@@ -846,7 +831,7 @@ function ScoreRing({
   return (
     <div
       className="flex w-[112px] flex-col items-center gap-2"
-      aria-label={`${scoreLabel}: ${score} out of 100`}
+      aria-label={`${scoreLabel}: ${score} out of 100. Quality: ${qualityLabel}`}
     >
       <p className="text-center text-[9px] font-black uppercase tracking-[0.16em] text-[var(--text-secondary)]">
         Ingredient Score
@@ -868,6 +853,12 @@ function ScoreRing({
           </p>
         </div>
       </div>
+      <TonePill
+        tone={tone}
+        className="px-3 py-1.5 text-[11px] font-black tracking-[0.08em]"
+      >
+        {qualityLabel}
+      </TonePill>
     </div>
   );
 }
@@ -901,7 +892,7 @@ function StatusPill({
 }) {
   return (
     <span
-      className={`inline-flex h-8 min-w-[48px] items-center justify-center whitespace-nowrap rounded-full px-3 text-[14px] font-black leading-none ${pillToneClasses[tone]} ${className}`}
+      className={`inline-flex h-7 min-w-[44px] items-center justify-center whitespace-nowrap rounded-full px-2.5 text-[12px] font-black leading-none ${pillToneClasses[tone]} ${className}`}
     >
       {children}
     </span>
@@ -921,7 +912,7 @@ function CountBadge({
 
   return (
     <span
-      className={`inline-flex h-8 min-w-8 items-center justify-center rounded-full px-2 text-[13px] font-black leading-none ${pillToneClasses[tone]}`}
+      className={`inline-flex h-7 min-w-7 items-center justify-center rounded-full px-2 text-[12px] font-black leading-none ${pillToneClasses[tone]}`}
       aria-label={`${count} finding${count === 1 ? "" : "s"}`}
     >
       {displayedCount}
@@ -1166,7 +1157,7 @@ function RowIcon({
 
   return (
     <span
-      className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${iconWrapClasses[tone]} ${categoryIconColorClasses[tone]}`}
+      className={`inline-flex h-7 w-7 shrink-0 items-center justify-center ${categoryIconColorClasses[tone]}`}
     >
       <CategoryGlyph name={resolvedIconName} />
     </span>
@@ -1185,7 +1176,7 @@ function SectionHeading({
   return (
     <div className="flex items-start justify-between gap-4">
       <div>
-        <h2 className="text-[1.12rem] font-semibold tracking-[-0.01em] text-[var(--text-main)]">
+        <h2 className="text-[1.02rem] font-semibold tracking-[-0.01em] text-[var(--text-main)]">
           {title}
         </h2>
         {subtitle ? (
@@ -1565,8 +1556,8 @@ function getFinalWarningReasonLabel(reason: ScanResult["finalVerdict"]["mainReas
 
   if (reason.categoryId === "cancer_linked_watch") {
     return primaryItem
-      ? `Cancer-linked review signal: ${primaryItem}`
-      : "Cancer-linked review signal found";
+      ? `Cancer linked: ${primaryItem}`
+      : "Cancer linked";
   }
 
   if (reason.categoryId === "ultra_processed_indicators") {
@@ -1826,7 +1817,7 @@ function DeepCheckRow({
         aria-expanded={isExpanded}
         aria-controls={detailId}
         onClick={() => onToggle(item.categoryId)}
-        className={`grid min-h-[68px] w-full grid-cols-[auto_minmax(0,1fr)_auto_auto_auto] items-center gap-3 px-1 py-3 text-left transition-colors active:bg-[var(--bg-soft)] ${
+        className={`grid min-h-[54px] w-full grid-cols-[auto_minmax(0,1fr)_auto_auto_auto] items-center gap-2 rounded-[14px] px-1 py-2 text-left transition-colors active:bg-[var(--bg-soft)] ${
           animate && tone === "red"
             ? "truthlabel-pulse-red"
             : animate && tone === "yellow"
@@ -1842,7 +1833,7 @@ function DeepCheckRow({
           />
         </div>
         <div className="min-w-0">
-          <span className="line-clamp-2 block text-[17px] font-bold leading-tight tracking-[-0.01em] text-[var(--text-main)]">
+          <span className="line-clamp-2 block text-[14px] font-bold leading-tight tracking-[-0.01em] text-[var(--text-main)]">
             {item.label}
           </span>
         </div>
@@ -2484,7 +2475,7 @@ export default function ProductResult({
 
   return (
     <main
-      className={`min-h-screen bg-[var(--bg-page)] px-4 pb-24 pt-[max(14px,env(safe-area-inset-top))] sm:px-6 sm:py-6 ${resultScreenThemeClasses}`}
+      className={`min-h-screen bg-white px-4 pb-24 pt-[max(14px,env(safe-area-inset-top))] sm:px-6 sm:py-6 ${resultScreenThemeClasses}`}
     >
       <div className="mx-auto w-full max-w-[430px]">
           <header className="grid min-h-12 grid-cols-[1fr_auto_1fr] items-center">
@@ -2510,6 +2501,8 @@ export default function ProductResult({
             <HeartIcon filled={saved} />
           </button>
         </header>
+
+          <BrandMark />
 
           {historyRecord ? (
             <section className="mt-3 rounded-[20px] border border-[var(--border-soft)] bg-white px-4 py-3 shadow-[0_10px_24px_rgba(16,22,19,0.05)]">
@@ -2554,7 +2547,7 @@ export default function ProductResult({
 
           <ProductSummary
             scanResult={scanResult}
-            ingredientScoreLabel={ingredientScoreLabel}
+            qualityLabel={ingredientScoreLabel}
             animate={shouldAnimateFreshResult}
           />
 
@@ -2566,16 +2559,16 @@ export default function ProductResult({
           >
             <SectionHeading title="Product Checks" />
 
-            <div className="mt-4">
+            <div className="mt-3">
               <div
-                className={`relative border-y border-[var(--border-soft)] py-1 transition-[max-height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                className={`relative py-1 transition-[max-height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
                   hasDeepCheckOverflow && !isDeepChecksExpanded
                     ? `${deepCheckPreviewHeightClass} overflow-hidden`
                     : `${deepCheckPreviewHeightClass} overflow-hidden`
                 }`}
               >
                 {fullChecklistRows.length > 0 ? (
-                  <div className="divide-y divide-[var(--border-soft)]">
+                  <div className="space-y-1">
                     {fullChecklistRows.map((item, index) => (
                       <DeepCheckRow
                         key={item.categoryId}
@@ -2647,8 +2640,8 @@ export default function ProductResult({
                 </div>
               </div>
 
-              <div className="mt-3 flex items-center justify-between gap-4">
-                <div className="flex items-center gap-4 text-[11px] font-medium text-[var(--text-secondary)]">
+              <div className="mt-3">
+                <div className="flex items-center justify-between gap-3 text-[11px] font-medium text-[var(--text-secondary)]">
                   <span className="inline-flex items-center gap-1.5">
                     <span className="h-2 w-2 rounded-full bg-[var(--green-main)]" />
                     Natural {naturalProcessed.naturalPercent}%
@@ -2661,7 +2654,7 @@ export default function ProductResult({
                 <button
                   type="button"
                   onClick={handleViewIngredients}
-                  className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[var(--green-border)] bg-[var(--green-bg)] px-3 py-1.5 text-[11px] font-semibold text-[var(--green-dark)] shadow-[0_10px_20px_rgba(21,128,61,0.08)] transition-[transform,box-shadow,background-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:shadow-[0_14px_26px_rgba(21,128,61,0.12)] active:scale-[0.98]"
+                  className="mt-3 inline-flex min-h-12 w-full items-center justify-center gap-1.5 rounded-[16px] border border-[var(--green-dark)] bg-[var(--green-dark)] px-4 text-[13px] font-extrabold text-white shadow-[0_12px_24px_rgba(22,138,67,0.14)] transition-[transform,box-shadow,background-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:shadow-[0_16px_28px_rgba(22,138,67,0.18)] active:scale-[0.98]"
                 >
                   {isIngredientsOpen ? "Hide ingredients" : "View ingredients"}
                   <ChevronIcon

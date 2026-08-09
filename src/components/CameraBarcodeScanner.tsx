@@ -60,6 +60,8 @@ export type CameraScannerOcrDetails = {
   capturedImageUrl?: string;
 };
 
+type ManualEntryTarget = "product" | "ingredients";
+
 type ScannerPhase =
   | "initializing"
   | "requesting_permission"
@@ -142,7 +144,7 @@ type CameraBarcodeScannerProps = {
     details?: CameraScannerOcrDetails,
   ) => void | Promise<void>;
   onClose: () => void;
-  onManualEntry?: () => void;
+  onManualEntry?: (target?: ManualEntryTarget) => void;
   initialMode?: CameraScannerMode;
   ocrRunner?: IngredientOcrRunner;
   debugDiagnostics?: boolean;
@@ -1147,12 +1149,12 @@ export default function CameraBarcodeScanner({
     onClose();
   }, [onClose, replacePreviewUrl, stopScannerResources]);
 
-  const handleManualEntry = useCallback(() => {
+  const handleManualEntry = useCallback((target?: ManualEntryTarget) => {
     ocrSessionTokenRef.current += 1;
     stopScannerResources();
     replacePreviewUrl("");
     if (onManualEntry) {
-      onManualEntry();
+      onManualEntry(target);
       return;
     }
 
@@ -2311,7 +2313,7 @@ export default function CameraBarcodeScanner({
             )}
             <button
               type="button"
-              onClick={handleManualEntry}
+              onClick={() => handleManualEntry("ingredients")}
               className="mt-2 min-h-11 w-full rounded-[16px] border border-[#E2E8E4] bg-[#F6F8F7] px-4 text-[13px] font-bold text-[#101613]"
             >
               Enter ingredients manually
@@ -2338,7 +2340,7 @@ export default function CameraBarcodeScanner({
         ? "Lookup failed"
       : barcodeLookupStatus === "unknown"
         ? "Lookup needs another step"
-        : "Product not found";
+        : "Product data hidden";
   const barcodeNotFoundMessage =
     barcodeLookupStatus === "found_missing_ingredients"
       ? ingredientModeEnabled
@@ -2357,8 +2359,8 @@ export default function CameraBarcodeScanner({
           ? "The barcode was read, but Truthlabel did not receive a clear lookup result. Try again, scan the ingredients, or enter the details manually."
           : "The barcode was read, but Truthlabel did not receive a clear lookup result. Try again or enter the details manually."
         : ingredientModeEnabled
-          ? "Truthlabel does not have this barcode in the product data yet, or the product record may have changed. Coverage will be updated soon. Scan the label to check the most important red flags."
-          : "Truthlabel does not have this barcode in the product data yet, or the product record may have changed. Coverage will be updated soon. Enter the label details to check the most important red flags.";
+          ? "Truthlabel could not find this barcode. The product details may not be public yet, may have changed, or may be kept hidden. Scan or paste the ingredients so Truthlabel can still check the important warning signs."
+          : "Truthlabel could not find this barcode. The product details may not be public yet, may have changed, or may be kept hidden. Enter the product name and label details so Truthlabel can still check the important warning signs.";
   const switchableCameraCount = cameraCandidates.filter(
     (candidate) => !candidate.isLikelyFront && candidate.deviceId,
   ).length;
@@ -2610,10 +2612,17 @@ export default function CameraBarcodeScanner({
             ) : null}
             <button
               type="button"
-              onClick={handleManualEntry}
+              onClick={() => handleManualEntry("ingredients")}
               className="min-h-12 rounded-[16px] border border-[#D7E7DD] bg-white px-4 text-[14px] font-bold text-[#12583D]"
             >
-              Enter manually
+              Paste ingredients
+            </button>
+            <button
+              type="button"
+              onClick={() => handleManualEntry("product")}
+              className="min-h-12 rounded-[16px] border border-[#F3D2D4] bg-[#FFF8F7] px-4 text-[14px] font-bold text-[#B42318]"
+            >
+              Enter product name
             </button>
             <button
               type="button"
@@ -2630,7 +2639,11 @@ export default function CameraBarcodeScanner({
         <footer className="absolute inset-x-0 bottom-0 px-4 pb-[calc(16px+env(safe-area-inset-bottom))]">
           {mode === "barcode" ? (
             <div className="mx-auto flex max-w-[430px] gap-2.5">
-              <BottomAction label="Enter code" icon={<TextGlyph />} onClick={handleManualEntry} />
+              <BottomAction
+                label="Enter code"
+                icon={<TextGlyph />}
+                onClick={() => handleManualEntry("product")}
+              />
               {ingredientModeEnabled ? (
                 <BottomAction
                   label="Scan ingredients"
@@ -2651,7 +2664,11 @@ export default function CameraBarcodeScanner({
               >
                 <span className="h-[52px] w-[52px] rounded-full bg-white shadow-[inset_0_0_0_6px_#12583D]" />
               </button>
-              <BottomAction label="Manual" icon={<TextGlyph />} onClick={handleManualEntry} />
+              <BottomAction
+                label="Manual"
+                icon={<TextGlyph />}
+                onClick={() => handleManualEntry("ingredients")}
+              />
             </div>
           )}
         </footer>

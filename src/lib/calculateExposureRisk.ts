@@ -460,7 +460,7 @@ function buildDirectScoreCandidates(
       candidates.push({
         scoreEntityId: match.canonicalIngredientId,
         categoryId: "cancer_linked_watch",
-        categoryName: "Cancer-linked Watch",
+        categoryName: "Cancer linked",
         points: 30,
         reasonType: "direct_red_ingredient",
         message:

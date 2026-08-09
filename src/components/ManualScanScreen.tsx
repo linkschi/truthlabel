@@ -4,7 +4,7 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useRef, useState, useTransition } from "react";
 import { useTruthlabelAuth } from "@/components/auth/AuthProvider";
 import { splitSavedAllergyProfile } from "@/components/manualScanScreenState";
 import { SectionLabel } from "@/components/ResultUi";
@@ -396,6 +396,9 @@ export default function ManualScanScreen({
   const [errorMessage, setErrorMessage] = useState(() =>
     buildInitialErrorMessage(initialScanMode),
   );
+  const manualIngredientsRef = useRef<HTMLFormElement>(null);
+  const productNameInputRef = useRef<HTMLInputElement>(null);
+  const ingredientTextAreaRef = useRef<HTMLTextAreaElement>(null);
   const savedAllergyDefaults = useMemo(
     () => splitSavedAllergyProfile(getSavedAllergyProfile(userSettings)),
     [userSettings],
@@ -860,13 +863,30 @@ export default function ManualScanScreen({
     setIsCameraScannerOpen(true);
   }
 
+  function focusManualEntry(target: "product" | "ingredients" = "ingredients") {
+    setIsCameraScannerOpen(false);
+
+    window.setTimeout(() => {
+      manualIngredientsRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+
+      const field =
+        target === "product"
+          ? productNameInputRef.current
+          : ingredientTextAreaRef.current;
+      field?.focus({ preventScroll: true });
+    }, 40);
+  }
+
   return (
     <main className="min-h-screen px-4 py-5 sm:px-5 sm:py-6">
       {isCameraScannerOpen ? (
         <CameraBarcodeScanner
           initialMode="barcode"
           onBarcodeDetected={handleCameraBarcodeDetected}
-          onManualEntry={() => setIsCameraScannerOpen(false)}
+          onManualEntry={focusManualEntry}
           onClose={() => setIsCameraScannerOpen(false)}
         />
       ) : null}
@@ -981,7 +1001,7 @@ export default function ManualScanScreen({
                   {barcodeFeedback.status === "found_missing_ingredients"
                     ? "Product found"
                     : barcodeFeedback.status === "not_found"
-                      ? "Product not found"
+                      ? "Product data hidden"
                       : barcodeFeedback.status === "validation"
                         ? "Check barcode"
                         : "Lookup failed"}
@@ -1015,6 +1035,25 @@ export default function ManualScanScreen({
                     {barcodeFeedback.productData.productName}
                   </p>
                 ) : null}
+
+                {barcodeFeedback.status !== "validation" ? (
+                  <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                    <button
+                      type="button"
+                      onClick={() => focusManualEntry("ingredients")}
+                      className="min-h-11 rounded-[15px] bg-[#0e5a3f] px-4 text-[13px] font-bold text-white"
+                    >
+                      Paste ingredients
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => focusManualEntry("product")}
+                      className="min-h-11 rounded-[15px] border border-[#f0d2d0] bg-white px-4 text-[13px] font-bold text-[#a1362f]"
+                    >
+                      Enter product name
+                    </button>
+                  </div>
+                ) : null}
               </div>
             ) : null}
           </section>
@@ -1022,6 +1061,7 @@ export default function ManualScanScreen({
 
         <form
           id="manual-ingredients"
+          ref={manualIngredientsRef}
           onSubmit={handleSubmit}
           className="rounded-[28px] border border-[#d9e8df] bg-white px-4 py-4 shadow-[0_12px_30px_rgba(15,40,28,0.07)]"
         >
@@ -1052,9 +1092,39 @@ export default function ManualScanScreen({
             </div>
           ) : null}
 
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <label className="block">
+              <span className="text-[12px] font-bold text-[#33443c]">
+                Product name
+              </span>
+              <input
+                ref={productNameInputRef}
+                value={productName}
+                onChange={(event) => setProductName(event.target.value)}
+                className={formFieldClass}
+                placeholder="Example: Tomato ketchup"
+              />
+            </label>
+            <label className="block">
+              <span className="text-[12px] font-bold text-[#33443c]">
+                Brand
+              </span>
+              <input
+                value={brandName}
+                onChange={(event) => setBrandName(event.target.value)}
+                className={formFieldClass}
+                placeholder="Example: Heinz"
+              />
+            </label>
+          </div>
+          <p className="mt-2 text-[12px] leading-5 text-[#66716b]">
+            If barcode details are hidden or not public yet, add the product name and paste the label below.
+          </p>
+
           <label className="mt-4 block">
             <span className="sr-only">Ingredient list</span>
             <textarea
+              ref={ingredientTextAreaRef}
               value={ingredientText}
               onChange={(event) => setIngredientText(event.target.value)}
               className={textAreaClass}

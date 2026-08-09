@@ -104,7 +104,7 @@ function buildRegionalProductDataWarnings() {
 }
 
 function buildProductNotFoundMessage() {
-  return "Truthlabel does not have this barcode in the product data yet, or the product record may have changed. Coverage will be updated soon. You can still use the label to check the most important red flags.";
+  return "Truthlabel could not find this barcode. The product details may not be public yet, may have changed, or may be kept hidden. Paste the ingredients or enter the product name and label details so Truthlabel can still check the important warning signs.";
 }
 
 function buildMissingIngredientsMessage() {
