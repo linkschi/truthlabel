@@ -1166,7 +1166,7 @@ function RowIcon({
 
   return (
     <span
-      className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${iconWrapClasses[tone]} ${categoryIconColorClasses[tone]}`}
+      className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${iconWrapClasses[tone]} ${categoryIconColorClasses[tone]}`}
     >
       <CategoryGlyph name={resolvedIconName} />
     </span>
@@ -1826,7 +1826,7 @@ function DeepCheckRow({
         aria-expanded={isExpanded}
         aria-controls={detailId}
         onClick={() => onToggle(item.categoryId)}
-        className={`grid min-h-[68px] w-full grid-cols-[auto_minmax(0,1fr)_auto_auto_auto] items-center gap-3 rounded-[16px] px-1 py-3 text-left transition-colors active:bg-[var(--bg-soft)] ${
+        className={`grid min-h-[60px] w-full grid-cols-[auto_minmax(0,1fr)_auto_auto_auto] items-center gap-2.5 rounded-[14px] px-1 py-2.5 text-left transition-colors active:bg-[var(--bg-soft)] ${
           animate && tone === "red"
             ? "truthlabel-pulse-red"
             : animate && tone === "yellow"
@@ -1842,7 +1842,7 @@ function DeepCheckRow({
           />
         </div>
         <div className="min-w-0">
-          <span className="line-clamp-2 block text-[17px] font-bold leading-tight tracking-[-0.01em] text-[var(--text-main)]">
+          <span className="line-clamp-2 block text-[16px] font-bold leading-tight tracking-[-0.01em] text-[var(--text-main)]">
             {item.label}
           </span>
         </div>
@@ -2568,16 +2568,16 @@ export default function ProductResult({
           >
             <SectionHeading title="Product Checks" />
 
-            <div className="mt-3">
+            <div className="mt-2.5">
               <div
-                className={`relative py-1 transition-[max-height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                className={`relative transition-[max-height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
                   hasDeepCheckOverflow && !isDeepChecksExpanded
                     ? `${deepCheckPreviewHeightClass} overflow-hidden`
                     : `${deepCheckPreviewHeightClass} overflow-hidden`
                 }`}
               >
                 {fullChecklistRows.length > 0 ? (
-                  <div className="space-y-1">
+                  <div className="divide-y divide-[#DCE5DF] rounded-[18px] border border-[#DCE5DF] bg-white px-1">
                     {fullChecklistRows.map((item, index) => (
                       <DeepCheckRow
                         key={item.categoryId}

@@ -6,11 +6,13 @@ import { useEffect, useState } from "react";
 import AllergyProfile from "@/components/AllergyProfile";
 import { SectionLabel } from "@/components/ResultUi";
 import SupportContactLink from "@/components/SupportContactLink";
+import { useTruthlabelAuth } from "@/components/auth/AuthProvider";
 import { publicAppConfig } from "@/lib/appConfig";
 import { type AllergyConcern, type AvoidConcern } from "@/data/fakeProduct";
+import { isThiislincornOnboardingTestAccount } from "@/lib/onboarding/onboardingTestMode";
 import { saveProfile, useStoredProfile } from "@/lib/profileStorage";
 
-const navItems = [
+const baseNavItems = [
   {
     href: "/app",
     label: "Home",
@@ -45,15 +47,19 @@ const navItems = [
     label: "Account",
     detail: "Open account, access, allergy, and scan preference controls.",
   },
-  ...(publicAppConfig.flags.enableInternalAnalyticsDashboard
-    ? [
-        {
-          href: "/app/admin/analytics",
-          label: "Internal analytics",
-          detail: "Review private MVP reliability, funnel, and business signals.",
-        },
-      ]
-    : []),
+] as const;
+
+const testerNavItems = [
+  {
+    href: "/app/admin/demo-scan-builder",
+    label: "Demo Scan Builder",
+    detail: "Create customizable scan-result examples for screenshots.",
+  },
+  {
+    href: "/app/admin/analytics",
+    label: "Internal analytics",
+    detail: "Review private MVP reliability, funnel, and business signals.",
+  },
 ] as const;
 
 function toggleSelection<T extends string>(values: T[], value: T) {
@@ -64,8 +70,16 @@ function toggleSelection<T extends string>(values: T[], value: T) {
 
 export default function AppMenu() {
   const pathname = usePathname();
+  const { user } = useTruthlabelAuth();
   const profile = useStoredProfile();
   const [isOpen, setIsOpen] = useState(false);
+  const isThiislincornTester = isThiislincornOnboardingTestAccount(user?.email);
+  const navItems = [
+    ...baseNavItems,
+    ...(isThiislincornTester || publicAppConfig.flags.enableInternalAnalyticsDashboard
+      ? testerNavItems
+      : []),
+  ];
 
   function handleToggleAllergy(value: AllergyConcern) {
     saveProfile({

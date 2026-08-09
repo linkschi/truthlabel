@@ -1110,6 +1110,33 @@ export default function AccountScreen() {
         </SectionCard>
 
         {isThiislincornTester ? (
+          <SectionCard title="Admin tools">
+            <p className="pb-2 text-[12.5px] font-semibold leading-5 text-[#56635C]">
+              Visible only on thiislincorn test accounts. These are the private tools
+              for custom demo results and internal analytics.
+            </p>
+            <RowLink
+              icon="settings"
+              title="Demo Scan Builder"
+              detail="Create and reopen customizable scan-result examples."
+              href="/app/admin/demo-scan-builder"
+            />
+            <RowLink
+              icon="history"
+              title="Internal analytics"
+              detail="Review MVP reliability, funnel, and business signals."
+              href="/app/admin/analytics"
+            />
+            <RowLink
+              icon="check"
+              title="Better Picks MVP"
+              detail="Open the admin-only Healthy Alternatives preview."
+              href="/app/better-picks"
+            />
+          </SectionCard>
+        ) : null}
+
+        {isThiislincornTester ? (
           <SectionCard title="Thiislincorn tester shortcuts">
             <p className="pb-2 text-[12.5px] font-semibold leading-5 text-[#56635C]">
               Visible only on thiislincorn test accounts. Use these buttons to

@@ -1,7 +1,8 @@
+const defaultAdminEmails = ["thiislincorn@gmail.com"];
+
 export function getTruthlabelAdminEmails() {
   return new Set(
-    (process.env.TRUTHLABEL_ADMIN_EMAILS ?? "")
-      .split(",")
+    [...defaultAdminEmails, ...(process.env.TRUTHLABEL_ADMIN_EMAILS ?? "").split(",")]
       .map((email) => email.trim().toLowerCase())
       .filter(Boolean),
   );
