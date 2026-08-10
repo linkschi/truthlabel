@@ -21,6 +21,7 @@ import {
   type DemoSeverity,
 } from "@/lib/demoScanBuilder/demoScanTypes";
 import {
+  getDemoScanStoreServerSnapshot,
   deleteDemoScan,
   duplicateDemoScan,
   listDemoScans,
@@ -453,7 +454,7 @@ export default function DemoScanBuilder({
   const records = useSyncExternalStore(
     subscribeToDemoScans,
     listDemoScans,
-    () => [],
+    getDemoScanStoreServerSnapshot,
   );
   const [starterRecord] = useState(createStarterDemoScan);
   const [selectedDemoId, setSelectedDemoId] = useState(initialDemoId ?? "");

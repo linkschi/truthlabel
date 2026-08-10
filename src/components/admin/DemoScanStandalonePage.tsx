@@ -6,6 +6,7 @@ import ProductResult from "@/components/ProductResult";
 import DemoAdminLoadingScreen from "@/components/admin/DemoAdminLoadingScreen";
 import { buildDemoScanResult } from "@/lib/demoScanBuilder/buildDemoScanResult";
 import {
+  getDemoScanStoreServerSnapshot,
   listDemoScans,
   subscribeToDemoScans,
 } from "@/lib/demoScanBuilder/demoScanStorage";
@@ -25,7 +26,7 @@ export default function DemoScanStandalonePage({
   const records = useSyncExternalStore(
     subscribeToDemoScans,
     listDemoScans,
-    () => [],
+    getDemoScanStoreServerSnapshot,
   );
   const record = records.find((demoRecord) => demoRecord.id === demoId) ?? null;
 
