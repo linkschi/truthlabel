@@ -13,11 +13,6 @@ import { saveLatestBarcodeScan } from "@/lib/barcodeScanStorage";
 import { saveLatestManualScan } from "@/lib/manualScanStorage";
 import type { NormalizedProductForScan } from "@/lib/productDatabase/productDatabaseTypes";
 import type { BarcodeScanLookupStatus } from "@/lib/runBarcodeScan";
-import {
-  meatLookupFallbackIntro,
-  meatLookupFallbackRedFlags,
-  meatLookupFallbackTitle,
-} from "@/lib/meatLookupFallback";
 import type { ManualScanInput } from "@/lib/runManualScan";
 import { saveCompletedScanToHistory } from "@/lib/scanHistory/scanHistoryClient";
 import {
@@ -1014,44 +1009,35 @@ export default function ManualScanScreen({
                 barcodeFeedback.status === "error" ? (
                   <div className="mt-3 rounded-[16px] border border-[#f0d2d0] bg-white px-3 py-3">
                     <p className="text-[12px] font-black text-[#a1362f]">
-                      {meatLookupFallbackTitle}
+                      This product is hidden.
                     </p>
                     <p className="mt-1 text-[12px] leading-5 text-[#6f5f59]">
-                      {meatLookupFallbackIntro}
+                      Try entering the product name or pasting the ingredients.
                     </p>
-                    <ul className="mt-2 space-y-1 text-[12px] leading-5 text-[#563f3a]">
-                      {meatLookupFallbackRedFlags.map((item) => (
-                        <li key={item}>- {item}</li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : null}
-
-                {barcodeFeedback.productData ? (
-                  <p className="mt-2 text-[12px] font-semibold text-[#33443c]">
-                    {barcodeFeedback.productData.brandName
-                      ? `${barcodeFeedback.productData.brandName} - `
-                      : ""}
-                    {barcodeFeedback.productData.productName}
-                  </p>
-                ) : null}
-
-                {barcodeFeedback.status !== "validation" ? (
-                  <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                    <button
-                      type="button"
-                      onClick={() => focusManualEntry("ingredients")}
-                      className="min-h-11 rounded-[15px] bg-[#0e5a3f] px-4 text-[13px] font-bold text-white"
-                    >
-                      Paste ingredients
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => focusManualEntry("product")}
-                      className="min-h-11 rounded-[15px] border border-[#f0d2d0] bg-white px-4 text-[13px] font-bold text-[#a1362f]"
-                    >
-                      Enter product name
-                    </button>
+                    {barcodeFeedback.productData ? (
+                      <p className="mt-2 text-[12px] font-semibold text-[#33443c]">
+                        {barcodeFeedback.productData.brandName
+                          ? `${barcodeFeedback.productData.brandName} - `
+                          : ""}
+                        {barcodeFeedback.productData.productName}
+                      </p>
+                    ) : null}
+                    <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                      <button
+                        type="button"
+                        onClick={() => focusManualEntry("ingredients")}
+                        className="min-h-11 rounded-[15px] bg-[#0e5a3f] px-4 text-[13px] font-bold text-white"
+                      >
+                        Paste ingredients
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => focusManualEntry("product")}
+                        className="min-h-11 rounded-[15px] border border-[#f0d2d0] bg-white px-4 text-[13px] font-bold text-[#a1362f]"
+                      >
+                        Enter product name
+                      </button>
+                    </div>
                   </div>
                 ) : null}
               </div>
@@ -1118,7 +1104,7 @@ export default function ManualScanScreen({
             </label>
           </div>
           <p className="mt-2 text-[12px] leading-5 text-[#66716b]">
-            If barcode details are hidden or not public yet, add the product name and paste the label below.
+            If the product is hidden, add the name or paste the ingredients below.
           </p>
 
           <label className="mt-4 block">

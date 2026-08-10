@@ -2359,8 +2359,8 @@ export default function CameraBarcodeScanner({
           ? "The barcode was read, but Truthlabel did not receive a clear lookup result. Try again, scan the ingredients, or enter the details manually."
           : "The barcode was read, but Truthlabel did not receive a clear lookup result. Try again or enter the details manually."
         : ingredientModeEnabled
-          ? "Truthlabel could not find this barcode. The product details may not be public yet, may have changed, or may be kept hidden. Scan or paste the ingredients so Truthlabel can still check the important warning signs."
-          : "Truthlabel could not find this barcode. The product details may not be public yet, may have changed, or may be kept hidden. Enter the product name and label details so Truthlabel can still check the important warning signs.";
+          ? "This product is hidden. Try scanning or pasting the ingredients."
+          : "This product is hidden. Try entering the product name or the label details.";
   const switchableCameraCount = cameraCandidates.filter(
     (candidate) => !candidate.isLikelyFront && candidate.deviceId,
   ).length;
