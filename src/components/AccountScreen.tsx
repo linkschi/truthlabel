@@ -1310,19 +1310,19 @@ export default function AccountScreen() {
                 </button>
               </div>
 
-              <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                <figure className="overflow-hidden rounded-[18px] border border-[#DCE5DF] bg-[#F7F9F7]">
+              <div className="mt-4 grid grid-cols-2 gap-2 sm:gap-3">
+                <figure className="overflow-hidden rounded-[18px] border border-[#DCE5DF] bg-[#F7F9F7] p-1">
                   <img
                     src="/cancel-receipt-email.jpeg"
                     alt="Receipt email showing the subscription settings link"
-                    className="h-full w-full object-contain"
+                    className="h-[170px] w-full object-contain sm:h-[220px]"
                   />
                 </figure>
-                <figure className="overflow-hidden rounded-[18px] border border-[#DCE5DF] bg-[#F7F9F7]">
+                <figure className="overflow-hidden rounded-[18px] border border-[#DCE5DF] bg-[#F7F9F7] p-1">
                   <img
                     src="/cancel-membership.jpeg"
                     alt="Manage membership page showing the cancel membership button"
-                    className="h-full w-full object-contain"
+                    className="h-[170px] w-full object-contain sm:h-[220px]"
                   />
                 </figure>
               </div>
