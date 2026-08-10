@@ -1295,9 +1295,8 @@ export default function AccountScreen() {
                     Need to cancel?
                   </h2>
                   <p className="mt-2 text-[15px] font-semibold leading-7 text-[#101613]">
-                    Open the receipt from your checkout email and click the
-                    subscription settings or manage membership button to
-                    cancel.
+                    Open your receipt from your checkout email and click
+                    subscription settings or manage membership to cancel.
                   </p>
                 </div>
                 <button
@@ -1315,14 +1314,14 @@ export default function AccountScreen() {
                   <img
                     src="/cancel-receipt-email.jpeg"
                     alt="Receipt email showing the subscription settings link"
-                    className="h-[170px] w-full object-contain sm:h-[220px]"
+                    className="h-[190px] w-full object-contain sm:h-[240px]"
                   />
                 </figure>
                 <figure className="overflow-hidden rounded-[18px] border border-[#DCE5DF] bg-[#F7F9F7] p-1">
                   <img
                     src="/cancel-membership.jpeg"
                     alt="Manage membership page showing the cancel membership button"
-                    className="h-[170px] w-full object-contain sm:h-[220px]"
+                    className="h-[190px] w-full object-contain sm:h-[240px]"
                   />
                 </figure>
               </div>
