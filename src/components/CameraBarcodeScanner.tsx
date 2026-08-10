@@ -34,12 +34,6 @@ import {
   type OcrProgressUpdate,
 } from "@/lib/localIngredientOcr";
 import { createCapturedImageThumbnail } from "@/lib/createCapturedImageThumbnail";
-import {
-  meatLookupFallbackIntro,
-  meatLookupFallbackRedFlags,
-  meatLookupFallbackTitle,
-} from "@/lib/meatLookupFallback";
-
 export type CameraScannerMode = "barcode" | "ingredients";
 
 export type CameraScannerBarcodeOutcome =
@@ -2585,21 +2579,6 @@ export default function CameraBarcodeScanner({
           <p className="mt-2 text-[14px] leading-6 text-[#66716B]">
             {barcodeNotFoundMessage}
           </p>
-          {barcodeLookupStatus !== "found_missing_ingredients" ? (
-            <div className="mt-4 rounded-[18px] border border-[#F3D2D4] bg-[#FFF8F7] px-4 py-3">
-              <p className="text-[12px] font-black uppercase tracking-[0.08em] text-[#B42318]">
-                {meatLookupFallbackTitle}
-              </p>
-              <p className="mt-1.5 text-[12.5px] leading-5 text-[#71524D]">
-                {meatLookupFallbackIntro}
-              </p>
-              <ul className="mt-2 space-y-1 text-[12.5px] leading-5 text-[#5E403A]">
-                {meatLookupFallbackRedFlags.map((item) => (
-                  <li key={item}>- {item}</li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
           <div className="mt-4 grid gap-2.5">
             {ingredientModeEnabled ? (
               <button
