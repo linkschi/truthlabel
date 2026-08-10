@@ -12,9 +12,13 @@ export const metadata: Metadata = {
 
 export default async function DemoScanStandaloneRoute({
   params,
+  searchParams,
 }: {
   params: Promise<{
     demoId: string;
+  }>;
+  searchParams: Promise<{
+    mode?: string | string[];
   }>;
 }) {
   const adminEmail = await getAuthorizedTruthlabelAdminEmailFromCookies();
@@ -24,6 +28,14 @@ export default async function DemoScanStandaloneRoute({
   }
 
   const { demoId } = await params;
+  const query = await searchParams;
+  const mode = Array.isArray(query.mode) ? query.mode[0] : query.mode;
 
-  return <DemoScanStandalonePage adminEmail={adminEmail} demoId={demoId} />;
+  return (
+    <DemoScanStandalonePage
+      adminEmail={adminEmail}
+      demoId={demoId}
+      launchMode={mode === "scan" ? "scan" : "preview"}
+    />
+  );
 }

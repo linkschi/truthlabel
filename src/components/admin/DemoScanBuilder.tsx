@@ -67,6 +67,10 @@ function getDemoUrl(demoId: string) {
   return `/app/admin/demo-scan-builder/demo/${demoId}`;
 }
 
+function getDemoScanUrl(demoId: string) {
+  return `${getDemoUrl(demoId)}?mode=scan`;
+}
+
 function FieldLabel({
   children,
   htmlFor,
@@ -603,6 +607,18 @@ export default function DemoScanBuilder({
     });
   }
 
+  function openSavedDemoScan() {
+    setLoadingMessage("Saving and opening demo scan");
+
+    window.setTimeout(() => {
+      const savedRecord = saveDemoScan(activeRecord);
+      setSelectedDemoId(savedRecord.id);
+      setDraftRecord(savedRecord);
+      setStatusMessage("Demo saved locally.");
+      router.push(getDemoScanUrl(savedRecord.id));
+    }, 750);
+  }
+
   return (
     <main className="min-h-screen bg-[#F7F9F7] px-4 py-5 text-[#101613] sm:px-6 lg:px-8">
       {initialPreparing || loadingMessage ? (
@@ -639,6 +655,13 @@ export default function DemoScanBuilder({
             <SmallButton tone="primary" onClick={saveCurrentDemo}>
               Save demo
             </SmallButton>
+            <button
+              type="button"
+              onClick={openSavedDemoScan}
+              className="inline-flex h-9 items-center justify-center rounded-full border border-[#0E5A3F] bg-[#0E5A3F] px-3 text-[13px] font-bold text-white transition active:scale-[0.98]"
+            >
+              Run demo scan
+            </button>
             <SmallButton onClick={createNewDemo}>New demo</SmallButton>
             <SmallButton onClick={duplicateCurrentDemo}>Duplicate demo</SmallButton>
             <SmallButton onClick={copyStandaloneLink}>Copy demo URL</SmallButton>
