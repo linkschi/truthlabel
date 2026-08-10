@@ -1283,7 +1283,7 @@ export default function AccountScreen() {
               role="dialog"
               aria-modal="true"
               aria-labelledby="account-cancel-title"
-              className="mx-auto w-full max-w-[440px] rounded-[24px] border border-[#DCE5DF] bg-white px-5 py-5 shadow-[0_22px_58px_rgba(15,40,28,0.22)]"
+              className="mx-auto w-full max-w-[520px] rounded-[24px] border border-[#DCE5DF] bg-white px-5 py-5 shadow-[0_22px_58px_rgba(15,40,28,0.22)]"
               onClick={(event) => event.stopPropagation()}
             >
               <div className="flex items-start justify-between gap-4">
@@ -1308,6 +1308,23 @@ export default function AccountScreen() {
                 >
                   X
                 </button>
+              </div>
+
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                <figure className="overflow-hidden rounded-[18px] border border-[#DCE5DF] bg-[#F7F9F7]">
+                  <img
+                    src="/cancel-receipt-email.jpeg"
+                    alt="Receipt email showing the subscription settings link"
+                    className="h-full w-full object-contain"
+                  />
+                </figure>
+                <figure className="overflow-hidden rounded-[18px] border border-[#DCE5DF] bg-[#F7F9F7]">
+                  <img
+                    src="/cancel-membership.jpeg"
+                    alt="Manage membership page showing the cancel membership button"
+                    className="h-full w-full object-contain"
+                  />
+                </figure>
               </div>
 
               <div className="mt-4 grid gap-2">
