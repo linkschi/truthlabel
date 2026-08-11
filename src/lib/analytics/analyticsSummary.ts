@@ -9,6 +9,7 @@ export type AnalyticsEventRow = {
   os_name: string | null;
   browser_name: string | null;
   metadata: AnalyticsMetadata | null;
+  occurred_at?: string | null;
   created_at: string;
 };
 
@@ -37,6 +38,23 @@ export type AnalyticsAlert = {
   message: string;
 };
 
+export type AnalyticsCount = {
+  label: string;
+  count: number;
+};
+
+export type AnalyticsRecentEvent = {
+  eventName: string;
+  routePath: string;
+  occurredAt: string;
+  deviceType: string;
+  browserName: string;
+  osName: string;
+  errorType?: string;
+  status?: string;
+  source?: string;
+};
+
 export type AnalyticsSummary = {
   generatedAt: string;
   periodDays: number;
@@ -46,10 +64,15 @@ export type AnalyticsSummary = {
     signedInUsers: number;
     resultPagesLoaded: number;
     metrics: AnalyticsMetric[];
-    topErrorTypes: Array<{ label: string; count: number }>;
-    deviceBreakdown: Array<{ label: string; count: number }>;
-    browserBreakdown: Array<{ label: string; count: number }>;
-    osBreakdown: Array<{ label: string; count: number }>;
+    scanMetrics: AnalyticsMetric[];
+    topEvents: AnalyticsCount[];
+    topRoutes: AnalyticsCount[];
+    topErrorTypes: AnalyticsCount[];
+    deviceBreakdown: AnalyticsCount[];
+    browserBreakdown: AnalyticsCount[];
+    osBreakdown: AnalyticsCount[];
+    recentEvents: AnalyticsRecentEvent[];
+    recentFailures: AnalyticsRecentEvent[];
   };
   business: {
     landingVisitors: number;
@@ -130,6 +153,43 @@ function getEventCount(counts: Map<string, number>, eventName: AnalyticsEventNam
 function getEventErrorType(event: AnalyticsEventRow) {
   const errorType = event.metadata?.error_type;
   return typeof errorType === "string" && errorType ? errorType : null;
+}
+
+function cleanRoutePath(routePath: string | null | undefined) {
+  return routePath?.trim() || "unknown";
+}
+
+function getMetadataString(
+  metadata: AnalyticsMetadata | null | undefined,
+  key: string,
+) {
+  const value = metadata?.[key];
+  return typeof value === "string" && value.trim() ? value.trim() : "";
+}
+
+function toRecentEvent(event: AnalyticsEventRow): AnalyticsRecentEvent {
+  const errorType = getEventErrorType(event);
+  const status =
+    getMetadataString(event.metadata, "status") ||
+    getMetadataString(event.metadata, "lookup_status") ||
+    getMetadataString(event.metadata, "access_state") ||
+    getMetadataString(event.metadata, "install_outcome");
+  const source =
+    getMetadataString(event.metadata, "source") ||
+    getMetadataString(event.metadata, "scan_source") ||
+    getMetadataString(event.metadata, "source_kind");
+
+  return {
+    eventName: event.event_name,
+    routePath: cleanRoutePath(event.route_path),
+    occurredAt: event.occurred_at || event.created_at,
+    deviceType: event.device_type || "unknown",
+    browserName: event.browser_name || "unknown",
+    osName: event.os_name || "unknown",
+    ...(errorType ? { errorType } : {}),
+    ...(status ? { status } : {}),
+    ...(source ? { source } : {}),
+  };
 }
 
 function buildAlerts(args: {
@@ -275,19 +335,40 @@ export function buildAnalyticsSummary({
   const signupSuccess = getEventCount(eventCounts, "signup_success");
   const signupFailed = getEventCount(eventCounts, "signup_failed");
   const checkoutStarted = getEventCount(eventCounts, "checkout_started");
+  const checkoutReturned = getEventCount(eventCounts, "checkout_returned");
+  const checkoutOpenFailed = getEventCount(eventCounts, "checkout_open_failed");
   const activationSuccess = getEventCount(eventCounts, "activation_success");
   const activationFailed = getEventCount(eventCounts, "activation_failed");
+  const manualScanStarted = getEventCount(eventCounts, "manual_scan_started");
+  const manualScanSuccess = getEventCount(eventCounts, "manual_scan_success");
   const barcodeFailures = getEventCount(eventCounts, "barcode_lookup_failed");
+  const barcodeScanStarted = getEventCount(eventCounts, "barcode_scan_started");
+  const barcodeLookupSuccess = getEventCount(eventCounts, "barcode_lookup_success");
+  const barcodeNoProductFound = getEventCount(eventCounts, "barcode_no_product_found");
+  const barcodeMissingIngredients = getEventCount(
+    eventCounts,
+    "barcode_missing_ingredients",
+  );
+  const ocrScanStarted = getEventCount(eventCounts, "ocr_scan_started");
+  const ocrTextExtracted = getEventCount(eventCounts, "ocr_text_extracted");
   const ocrFailures =
     getEventCount(eventCounts, "ocr_scan_failed") +
     getEventCount(eventCounts, "ocr_no_text_detected");
   const manualScanFailures = getEventCount(eventCounts, "manual_scan_failed");
   const resultPagesLoaded = getEventCount(eventCounts, "result_page_loaded");
   const accessCheckFailures = getEventCount(eventCounts, "access_check_failed");
+  const accessCachedFallbacks = getEventCount(eventCounts, "access_cached_fallback_used");
+  const loginSuccess = getEventCount(eventCounts, "login_success");
+  const loginFailed = getEventCount(eventCounts, "login_failed");
   const clientErrors =
     getEventCount(eventCounts, "client_error_captured") +
     getEventCount(eventCounts, "unhandled_rejection");
   const resourceLoadFailures = getEventCount(eventCounts, "resource_load_failed");
+  const recentEvents = events.slice(0, 20).map(toRecentEvent);
+  const recentFailures = events
+    .filter((event) => seriousFailureEvents.has(event.event_name))
+    .slice(0, 12)
+    .map(toRecentEvent);
 
   const activeSubscriptions = subscriptions.filter((subscription) =>
     ["active", "active_until_end"].includes(subscription.status),
@@ -315,6 +396,12 @@ export function buildAnalyticsSummary({
       barcodeFailures,
       "Barcode lookups that failed before a usable result.",
       barcodeFailures >= 5 ? "yellow" : "green",
+    ),
+    metric(
+      "Barcode hidden",
+      barcodeNoProductFound,
+      "Barcodes that were read but had no product data available.",
+      barcodeNoProductFound >= 5 ? "yellow" : "green",
     ),
     metric(
       "OCR failures",
@@ -348,6 +435,63 @@ export function buildAnalyticsSummary({
     ),
   ];
 
+  const scanMetrics = [
+    metric(
+      "Manual started",
+      manualScanStarted,
+      "Manual ingredient scans started.",
+      manualScanStarted > 0 ? "green" : "neutral",
+    ),
+    metric(
+      "Manual success",
+      manualScanSuccess,
+      "Manual ingredient scans that completed.",
+      manualScanSuccess > 0 ? "green" : "neutral",
+    ),
+    metric(
+      "Manual failed",
+      manualScanFailures,
+      "Manual ingredient scans that failed.",
+      manualScanFailures > 0 ? "red" : "green",
+    ),
+    metric(
+      "Barcode started",
+      barcodeScanStarted,
+      "Camera barcode scan sessions started.",
+      barcodeScanStarted > 0 ? "green" : "neutral",
+    ),
+    metric(
+      "Barcode success",
+      barcodeLookupSuccess,
+      "Barcode lookups that loaded product data.",
+      barcodeLookupSuccess > 0 ? "green" : "neutral",
+    ),
+    metric(
+      "Barcode hidden",
+      barcodeNoProductFound,
+      "Barcode lookups where product data was not available.",
+      barcodeNoProductFound > 0 ? "yellow" : "green",
+    ),
+    metric(
+      "Missing ingredients",
+      barcodeMissingIngredients,
+      "Products found without enough ingredient data.",
+      barcodeMissingIngredients > 0 ? "yellow" : "green",
+    ),
+    metric(
+      "OCR started",
+      ocrScanStarted,
+      "Ingredient photo scans started.",
+      ocrScanStarted > 0 ? "green" : "neutral",
+    ),
+    metric(
+      "OCR text found",
+      ocrTextExtracted,
+      "Ingredient photo scans that extracted text.",
+      ocrTextExtracted > 0 ? "green" : "neutral",
+    ),
+  ];
+
   const businessMetrics = [
     metric(
       "Trial clicks",
@@ -360,6 +504,18 @@ export function buildAnalyticsSummary({
       checkoutStarted,
       "Checkout handoffs opened from account or activation pages.",
       checkoutStarted > 0 ? "green" : "neutral",
+    ),
+    metric(
+      "Checkout returns",
+      checkoutReturned,
+      "Visitors who returned to Truthlabel from checkout.",
+      checkoutReturned > 0 ? "green" : "neutral",
+    ),
+    metric(
+      "Checkout open failed",
+      checkoutOpenFailed,
+      "Checkout handoffs that failed to open.",
+      checkoutOpenFailed > 0 ? "red" : "green",
     ),
     metric(
       "Purchase events",
@@ -379,6 +535,24 @@ export function buildAnalyticsSummary({
       "Purchase events that did not match a Truthlabel account.",
       unmatchedPurchases > 0 ? "red" : "green",
     ),
+    metric(
+      "Login success",
+      loginSuccess,
+      "Successful sign-ins during this period.",
+      loginSuccess > 0 ? "green" : "neutral",
+    ),
+    metric(
+      "Login failed",
+      loginFailed,
+      "Failed sign-in attempts during this period.",
+      loginFailed > 0 ? "yellow" : "green",
+    ),
+    metric(
+      "Cached access used",
+      accessCachedFallbacks,
+      "Times the app allowed access from trusted cached account state.",
+      accessCachedFallbacks > 0 ? "yellow" : "neutral",
+    ),
   ];
 
   return {
@@ -390,10 +564,15 @@ export function buildAnalyticsSummary({
       signedInUsers,
       resultPagesLoaded,
       metrics: reliabilityMetrics,
+      scanMetrics,
+      topEvents: topCounts(eventCounts, 12),
+      topRoutes: topCounts(countBy(events.map((event) => event.route_path)), 12),
       topErrorTypes: topCounts(errorCounts),
       deviceBreakdown: topCounts(countBy(events.map((event) => event.device_type))),
       browserBreakdown: topCounts(countBy(events.map((event) => event.browser_name))),
       osBreakdown: topCounts(countBy(events.map((event) => event.os_name))),
+      recentEvents,
+      recentFailures,
     },
     business: {
       landingVisitors,

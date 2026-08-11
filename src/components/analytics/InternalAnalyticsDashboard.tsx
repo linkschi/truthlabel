@@ -95,6 +95,78 @@ function CountList({
   );
 }
 
+function formatEventName(value: string) {
+  return value.replace(/_/g, " ");
+}
+
+function RecentEventList({
+  emptyLabel,
+  events,
+}: {
+  emptyLabel: string;
+  events: AnalyticsSummary["reliability"]["recentEvents"];
+}) {
+  if (events.length === 0) {
+    return (
+      <p className="rounded-[18px] border border-[#E4DED2] bg-white px-4 py-3 text-[13px] font-semibold text-[#6B746D]">
+        {emptyLabel}
+      </p>
+    );
+  }
+
+  return (
+    <div className="grid gap-2">
+      {events.map((event, index) => (
+        <article
+          key={`${event.eventName}-${event.occurredAt}-${index}`}
+          className="rounded-[18px] border border-[#E4DED2] bg-white px-4 py-3"
+        >
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="truncate text-[13px] font-black capitalize text-[#20342B]">
+                {formatEventName(event.eventName)}
+              </p>
+              <p className="mt-1 truncate text-[12px] font-semibold text-[#6B746D]">
+                {event.routePath}
+              </p>
+            </div>
+            <time className="shrink-0 text-right text-[11px] font-bold text-[#7C867F]">
+              {formatDate(event.occurredAt)}
+            </time>
+          </div>
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {[event.deviceType, event.browserName, event.osName]
+              .filter(Boolean)
+              .map((label) => (
+                <span
+                  key={label}
+                  className="rounded-full bg-[#F4F0E6] px-2 py-1 text-[10.5px] font-black uppercase tracking-[0.08em] text-[#526057]"
+                >
+                  {label}
+                </span>
+              ))}
+            {event.errorType ? (
+              <span className="rounded-full bg-[#FFF1EF] px-2 py-1 text-[10.5px] font-black uppercase tracking-[0.08em] text-[#8F1D16]">
+                {event.errorType}
+              </span>
+            ) : null}
+            {event.status ? (
+              <span className="rounded-full bg-[#EFFAF3] px-2 py-1 text-[10.5px] font-black uppercase tracking-[0.08em] text-[#0E5A3F]">
+                {event.status}
+              </span>
+            ) : null}
+            {event.source ? (
+              <span className="rounded-full bg-white px-2 py-1 text-[10.5px] font-black uppercase tracking-[0.08em] text-[#526057] ring-1 ring-[#E4DED2]">
+                {event.source}
+              </span>
+            ) : null}
+          </div>
+        </article>
+      ))}
+    </div>
+  );
+}
+
 function Section({
   children,
   eyebrow,
@@ -244,6 +316,35 @@ function DashboardBody({
         </div>
       </Section>
 
+      <Section eyebrow="Scans" title="Scan diagnostics">
+        <div className="grid gap-3 sm:grid-cols-2">
+          {summary.reliability.scanMetrics.map((metric) => (
+            <MetricCard
+              key={metric.label}
+              label={metric.label}
+              value={metric.value}
+              helper={metric.helper}
+              tone={metric.tone}
+            />
+          ))}
+        </div>
+      </Section>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Section eyebrow="Events" title="Top event names">
+          <CountList
+            emptyLabel="No event names captured yet."
+            items={summary.reliability.topEvents}
+          />
+        </Section>
+        <Section eyebrow="Routes" title="Top pages">
+          <CountList
+            emptyLabel="No route data captured yet."
+            items={summary.reliability.topRoutes}
+          />
+        </Section>
+      </div>
+
       <div className="grid gap-4 lg:grid-cols-3">
         <Section eyebrow="Devices" title="Device mix">
           <CountList
@@ -261,6 +362,21 @@ function DashboardBody({
           <CountList
             emptyLabel="No tracked errors yet."
             items={summary.reliability.topErrorTypes}
+          />
+        </Section>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Section eyebrow="Activity" title="Recent events">
+          <RecentEventList
+            emptyLabel="No recent events captured yet."
+            events={summary.reliability.recentEvents}
+          />
+        </Section>
+        <Section eyebrow="Failures" title="Recent problems">
+          <RecentEventList
+            emptyLabel="No recent failures captured yet."
+            events={summary.reliability.recentFailures}
           />
         </Section>
       </div>

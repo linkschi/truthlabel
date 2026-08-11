@@ -111,3 +111,41 @@ test("analytics summary counts safe error types for reliability review", () => {
   assert.ok(summary.alerts.some((alert) => alert.id === "access_check_failures"));
   assert.ok(summary.alerts.some((alert) => alert.id === "client_errors"));
 });
+
+test("analytics summary exposes recent events, routes, and scan diagnostics", () => {
+  const summary = buildAnalyticsSummary({
+    periodDays: 7,
+    events: [
+      event("barcode_scan_started", {
+        route_path: "/app",
+        occurred_at: "2026-07-28T10:01:00.000Z",
+        metadata: { source: "camera" },
+      }),
+      event("barcode_no_product_found", {
+        route_path: "/app",
+        occurred_at: "2026-07-28T10:02:00.000Z",
+        metadata: { lookup_status: "not_found" },
+      }),
+      event("manual_scan_success", {
+        route_path: "/app/manual",
+        occurred_at: "2026-07-28T10:03:00.000Z",
+      }),
+    ],
+    purchases: [],
+    subscriptions: [],
+  });
+
+  assert.deepEqual(summary.reliability.topEvents.slice(0, 3), [
+    { label: "barcode_no_product_found", count: 1 },
+    { label: "barcode_scan_started", count: 1 },
+    { label: "manual_scan_success", count: 1 },
+  ]);
+  assert.deepEqual(summary.reliability.topRoutes[0], { label: "/app", count: 2 });
+  assert.equal(summary.reliability.recentEvents[0]?.eventName, "barcode_scan_started");
+  assert.equal(summary.reliability.recentEvents[1]?.status, "not_found");
+  assert.ok(
+    summary.reliability.scanMetrics.some(
+      (metric) => metric.label === "Barcode hidden" && metric.value === 1,
+    ),
+  );
+});

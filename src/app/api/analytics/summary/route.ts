@@ -132,7 +132,7 @@ export async function GET(request: Request) {
       serviceClient
         .from("analytics_events")
         .select(
-          "event_name, anonymous_id, user_id, route_path, device_type, os_name, browser_name, metadata, created_at",
+          "event_name, anonymous_id, user_id, route_path, device_type, os_name, browser_name, metadata, occurred_at, created_at",
         )
         .gte("created_at", since)
         .order("created_at", { ascending: false })
@@ -160,6 +160,12 @@ export async function GET(request: Request) {
       warnings,
     ),
   ]);
+
+  if (events.length >= 5000) {
+    warnings.push(
+      "App analytics reached the 5,000-event dashboard limit for this period. Shorten the period for a more complete view.",
+    );
+  }
 
   return Response.json({
     ok: true,
