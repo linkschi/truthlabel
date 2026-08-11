@@ -1,6 +1,7 @@
 import type {
   ScanResult,
   ScanResultDeepExposureCheck,
+  ScanResultIngredientItem,
   ScanResultMatchedItemDetail,
 } from "@/lib/buildScanResult";
 import {
@@ -29,6 +30,51 @@ const severityToVerdictCode: Record<DemoSeverity, TruthlabelFinalVerdictCode> = 
   red: "avoid",
 };
 
+const processedIngredientMarkers = [
+  "acesulfame",
+  "artificial",
+  "blue 1",
+  "bht",
+  "canola oil",
+  "carrageenan",
+  "corn syrup",
+  "disodium",
+  "hydrogenated",
+  "maltodextrin",
+  "modified",
+  "monoglycerides",
+  "palm oil",
+  "phosphate",
+  "polysorbate",
+  "potassium sorbate",
+  "red 40",
+  "sodium benzoate",
+  "soybean oil",
+  "sucralose",
+  "syrup",
+  "tbhq",
+  "yellow 5",
+  "yellow 6",
+];
+
+const seriousProcessedIngredientMarkers = [
+  "acesulfame",
+  "artificial color",
+  "artificial flavor",
+  "bht",
+  "blue 1",
+  "carrageenan",
+  "high fructose corn syrup",
+  "hydrogenated",
+  "potassium sorbate",
+  "red 40",
+  "sodium benzoate",
+  "sucralose",
+  "tbhq",
+  "yellow 5",
+  "yellow 6",
+];
+
 function clampScore(value: number) {
   if (!Number.isFinite(value)) {
     return 0;
@@ -44,6 +90,61 @@ function normalizeDemoId(value: string) {
     .replace(/[^a-z0-9]+/g, "_")
     .replace(/^_+|_+$/g, "")
     .slice(0, 64);
+}
+
+function parseDemoIngredients(value: string | undefined) {
+  return (value ?? "")
+    .split(/[,;\n]/)
+    .map((ingredient) => ingredient.trim())
+    .filter(Boolean);
+}
+
+function buildDemoIngredientItem(
+  ingredient: string,
+  index: number,
+): ScanResultIngredientItem {
+  const normalizedIngredient = ingredient.toLowerCase();
+  const isProcessed = processedIngredientMarkers.some((marker) =>
+    normalizedIngredient.includes(marker),
+  );
+  const isSerious = seriousProcessedIngredientMarkers.some((marker) =>
+    normalizedIngredient.includes(marker),
+  );
+  const canonicalId =
+    normalizeDemoId(ingredient) || `demo_ingredient_${index + 1}`;
+
+  if (isProcessed) {
+    return {
+      originalText: ingredient,
+      displayName: ingredient,
+      group: "processed_artificial",
+      matchedCategories: ["demo_processing_marker"],
+      severity: isSerious ? "red" : "yellow",
+      userFacingReason: isSerious
+        ? "Demo-only processed ingredient marker shown as a stronger warning."
+        : "Demo-only processing marker shown for this example scan.",
+      canonicalIngredientId: canonicalId,
+      duplicateSafe: true,
+    };
+  }
+
+  return {
+    originalText: ingredient,
+    displayName: ingredient,
+    group: "natural_positive",
+    matchedCategories: ["demo_simple_ingredient"],
+    severity: "green",
+    userFacingReason:
+      "Demo-only simple ingredient example used for this manual scan.",
+    canonicalIngredientId: canonicalId,
+    duplicateSafe: true,
+  };
+}
+
+function buildDemoIngredientItems(
+  ingredientsText: string | undefined,
+): ScanResultIngredientItem[] {
+  return parseDemoIngredients(ingredientsText).map(buildDemoIngredientItem);
 }
 
 function getVerdictLabel(severity: DemoSeverity) {
@@ -134,6 +235,13 @@ export function buildDemoScanResult(record: DemoScanRecord): ScanResult {
   const verdictLabel = getVerdictLabel(record.verdictSeverity);
   const riskBand = getRiskBand(record.verdictSeverity);
   const deepExposureChecks = record.categories.map(buildDeepExposureCheck);
+  const demoIngredientItems = buildDemoIngredientItems(record.ingredientsText);
+  const naturalPositive = demoIngredientItems.filter(
+    (item) => item.group === "natural_positive",
+  );
+  const processedArtificial = demoIngredientItems.filter(
+    (item) => item.group === "processed_artificial",
+  );
   const redChecks = deepExposureChecks.filter((check) => check.severity === "red");
   const yellowChecks = deepExposureChecks.filter(
     (check) => check.severity === "yellow",
@@ -142,6 +250,7 @@ export function buildDemoScanResult(record: DemoScanRecord): ScanResult {
     (total, category) => total + category.findings.length,
     0,
   );
+  const totalIngredients = demoIngredientItems.length || totalFindings;
   const mainReasons = [...redChecks, ...yellowChecks].slice(0, 5).map((check) => ({
     categoryId: check.categoryId,
     categoryName: check.label,
@@ -165,7 +274,7 @@ export function buildDemoScanResult(record: DemoScanRecord): ScanResult {
       scanSource: "demo",
       imageUrl: record.productImageDataUrl,
       imageSource: record.productImageDataUrl ? "sample_scan" : undefined,
-      ingredientCount: totalFindings,
+      ingredientCount: totalIngredients,
       ingredientLoadScore: ingredientScore,
       ingredientLoadLevel: qualityToIngredientLoadLevel[record.productQuality],
       ingredientLoadTone: record.verdictSeverity,
@@ -183,11 +292,11 @@ export function buildDemoScanResult(record: DemoScanRecord): ScanResult {
     },
     quickOverview: [],
     ingredientBreakdown: {
-      totalIngredients: totalFindings,
-      naturalPositive: [],
-      processedArtificial: [],
+      totalIngredients,
+      naturalPositive,
+      processedArtificial,
       unknownReview: [],
-      matchedIngredients: [],
+      matchedIngredients: demoIngredientItems,
       unmatchedIngredients: [],
     },
     deepExposureChecks,
@@ -240,7 +349,7 @@ export function buildDemoScanResult(record: DemoScanRecord): ScanResult {
       sourceCount: 0,
       rawMatchCount: 0,
       categoryCount: record.categories.length,
-      matchedIngredientCount: totalFindings,
+      matchedIngredientCount: demoIngredientItems.length || totalFindings,
       quickOverviewCount: 0,
       deepExposureCheckCount: deepExposureChecks.length,
       hiddenDeepExposureCheckCount: 0,

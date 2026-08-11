@@ -56,6 +56,7 @@ export type DemoScanRecord = {
   productName: string;
   brandName: string;
   productImageDataUrl: string;
+  ingredientsText: string;
   ingredientScore: number;
   productQuality: DemoProductQuality;
   verdictSeverity: DemoSeverity;
@@ -118,6 +119,8 @@ export function createStarterDemoScan(): DemoScanRecord {
     productName: "Demo product",
     brandName: "Demo brand",
     productImageDataUrl: "",
+    ingredientsText:
+      "Whole grain oats, almonds, pumpkin seeds, cinnamon, sea salt",
     ingredientScore: 72,
     productQuality: "Moderate",
     verdictSeverity: "yellow",

@@ -21,6 +21,19 @@ import {
   type DemoSeverity,
 } from "@/lib/demoScanBuilder/demoScanTypes";
 import {
+  createDemoCategoryFromTemplate,
+  createDemoIngredientsText,
+  demoCategoryTemplates,
+  demoIngredientProductTypeOptions,
+  demoTemplateStateOptions,
+  getDemoIngredientProductTypeLabel,
+  getDemoTemplateStateLabel,
+  getSuggestedDemoProductSetup,
+  type DemoCategoryTemplateId,
+  type DemoIngredientProductType,
+  type DemoTemplateState,
+} from "@/lib/demoScanBuilder/demoScanTemplates";
+import {
   getDemoScanStoreServerSnapshot,
   deleteDemoScan,
   duplicateDemoScan,
@@ -39,6 +52,17 @@ const severityClasses: Record<DemoSeverity, string> = {
   yellow: "border-[#F4D681] bg-[#FFF5D9] text-[#9A610B]",
   red: "border-[#F3B6B6] bg-[#FDECEC] text-[#A82424]",
 };
+
+const demoCategoryTemplateOptions = demoCategoryTemplates.map(
+  (template) => template.id,
+) as DemoCategoryTemplateId[];
+
+function getDemoCategoryTemplateLabel(templateId: DemoCategoryTemplateId) {
+  return (
+    demoCategoryTemplates.find((template) => template.id === templateId)?.label ??
+    templateId
+  );
+}
 
 function cloneDemoCategory(category: DemoScanCategory): DemoScanCategory {
   return {
@@ -170,6 +194,40 @@ function SelectInput<T extends string>({
         {options.map((option) => (
           <option key={option} value={option}>
             {option}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+function LabeledSelect<T extends string>({
+  label,
+  value,
+  options,
+  getLabel,
+  onChange,
+}: {
+  label: string;
+  value: T;
+  options: readonly T[];
+  getLabel: (value: T) => string;
+  onChange: (value: T) => void;
+}) {
+  const id = useMemo(() => createDemoId("field"), []);
+
+  return (
+    <div className="space-y-1.5">
+      <FieldLabel htmlFor={id}>{label}</FieldLabel>
+      <select
+        id={id}
+        value={value}
+        onChange={(event) => onChange(event.target.value as T)}
+        className="h-11 w-full rounded-[14px] border border-[#DCE5DF] bg-white px-3 text-[15px] font-semibold text-[#101613] outline-none transition focus:border-[#168A43] focus:ring-4 focus:ring-[#20A653]/12"
+      >
+        {options.map((option) => (
+          <option key={option} value={option}>
+            {getLabel(option)}
           </option>
         ))}
       </select>
@@ -466,6 +524,14 @@ export default function DemoScanBuilder({
   const [statusMessage, setStatusMessage] = useState("Demo is not saved yet.");
   const [initialPreparing, setInitialPreparing] = useState(true);
   const [loadingMessage, setLoadingMessage] = useState("");
+  const [selectedTemplateId, setSelectedTemplateId] =
+    useState<DemoCategoryTemplateId>("cancer_linked");
+  const [selectedTemplateState, setSelectedTemplateState] =
+    useState<DemoTemplateState>("bad");
+  const [selectedIngredientProductType, setSelectedIngredientProductType] =
+    useState<DemoIngredientProductType>("breakfast_cereal");
+  const [selectedIngredientState, setSelectedIngredientState] =
+    useState<DemoTemplateState>("bad");
   const selectedRecord =
     records.find((record) => record.id === selectedDemoId) ??
     records.find((record) => record.id === initialDemoId) ??
@@ -577,6 +643,38 @@ export default function DemoScanBuilder({
         categoryIndex + direction,
       ),
     });
+  }
+
+  function addCategoryFromTemplate() {
+    const nextCategory = createDemoCategoryFromTemplate(
+      selectedTemplateId,
+      selectedTemplateState,
+    );
+
+    updateActiveRecord({
+      ...activeRecord,
+      categories: [...activeRecord.categories, nextCategory],
+    });
+    setStatusMessage(
+      `Added ${nextCategory.name} (${getDemoTemplateStateLabel(selectedTemplateState)}).`,
+    );
+  }
+
+  function generateDemoIngredients() {
+    const ingredientsText = createDemoIngredientsText(
+      selectedIngredientProductType,
+      selectedIngredientState,
+    );
+    const suggestedSetup = getSuggestedDemoProductSetup(selectedIngredientState);
+
+    updateActiveRecord({
+      ...activeRecord,
+      ...suggestedSetup,
+      ingredientsText,
+    });
+    setStatusMessage(
+      `Generated ${getDemoTemplateStateLabel(selectedIngredientState)} demo ingredients.`,
+    );
   }
 
   function handleImageUpload(file: File | undefined) {
@@ -812,6 +910,49 @@ export default function DemoScanBuilder({
                     updateActiveRecord({ ...activeRecord, finalSummary })
                   }
                 />
+                <TextArea
+                  label="Demo ingredients"
+                  value={activeRecord.ingredientsText ?? ""}
+                  rows={3}
+                  placeholder="Comma-separated ingredients shown only in this demo scan."
+                  onChange={(ingredientsText) =>
+                    updateActiveRecord({ ...activeRecord, ingredientsText })
+                  }
+                />
+              </div>
+
+              <div className="mt-5 rounded-[20px] border border-[#DCE5DF] bg-[#F7F9F7] p-4">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <h3 className="text-[16px] font-black text-[#101613]">
+                      Ingredient presets
+                    </h3>
+                    <p className="mt-1 text-[13px] leading-5 text-[#56635C]">
+                      Generate realistic-looking demo ingredients by product type.
+                      You can edit the list after it fills in.
+                    </p>
+                  </div>
+                  <SmallButton tone="primary" onClick={generateDemoIngredients}>
+                    Generate ingredients
+                  </SmallButton>
+                </div>
+
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  <LabeledSelect
+                    label="Product type"
+                    value={selectedIngredientProductType}
+                    options={demoIngredientProductTypeOptions}
+                    getLabel={getDemoIngredientProductTypeLabel}
+                    onChange={setSelectedIngredientProductType}
+                  />
+                  <LabeledSelect
+                    label="State"
+                    value={selectedIngredientState}
+                    options={demoTemplateStateOptions}
+                    getLabel={getDemoTemplateStateLabel}
+                    onChange={setSelectedIngredientState}
+                  />
+                </div>
               </div>
 
               <div className="mt-5 rounded-[20px] border border-[#DCE5DF] bg-[#F7F9F7] p-4">
@@ -891,6 +1032,40 @@ export default function DemoScanBuilder({
                 >
                   Add category
                 </SmallButton>
+              </div>
+
+              <div className="mt-5 rounded-[20px] border border-[#DCE5DF] bg-[#F7F9F7] p-4">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <h3 className="text-[16px] font-black text-[#101613]">
+                      Add from template
+                    </h3>
+                    <p className="mt-1 text-[13px] leading-5 text-[#56635C]">
+                      Pick a check category and a demo state. The category is
+                      prefilled, then you can edit or delete anything.
+                    </p>
+                  </div>
+                  <SmallButton tone="primary" onClick={addCategoryFromTemplate}>
+                    Add template
+                  </SmallButton>
+                </div>
+
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  <LabeledSelect
+                    label="Category template"
+                    value={selectedTemplateId}
+                    options={demoCategoryTemplateOptions}
+                    getLabel={getDemoCategoryTemplateLabel}
+                    onChange={setSelectedTemplateId}
+                  />
+                  <LabeledSelect
+                    label="State"
+                    value={selectedTemplateState}
+                    options={demoTemplateStateOptions}
+                    getLabel={getDemoTemplateStateLabel}
+                    onChange={setSelectedTemplateState}
+                  />
+                </div>
               </div>
             </section>
 
