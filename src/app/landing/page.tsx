@@ -36,8 +36,7 @@ const planIncludes: Array<{ id: string; content: ReactNode }> = [
     id: "shop",
     content: (
       <>
-        Shop with Truthlabel and see{" "}
-        <span className="landing-highlight">instant results</span>
+        Shop with Truthlabel
       </>
     ),
   },
@@ -99,7 +98,7 @@ const planIncludes: Array<{ id: string; content: ReactNode }> = [
       <>
         Built by an{" "}
         <span className="landing-yellow-highlight">independent, self-funded</span>{" "}
-        team - <span className="landing-yellow-highlight">not a food company</span>
+        team
       </>
     ),
   },
@@ -262,7 +261,6 @@ function FullPricingSection() {
         </ul>
         <div className="landing-guarantee">
           <strong>Cancel Anytime Guarantee</strong>
-          <p>No long-term commitment. Cancel future renewals whenever you choose.</p>
         </div>
         <PrimaryCta analyticsSource="pricing_section">
           Try Truthlabel free for 7 days
