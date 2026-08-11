@@ -26,8 +26,8 @@ test("analytics summary builds the core business funnel", () => {
     periodDays: 7,
     generatedAt: "2026-07-28T12:00:00.000Z",
     events: [
-      event("page_view", { route_path: "/" }),
-      event("trial_cta_clicked"),
+      event("page_view", { route_path: "/landing" }),
+      event("trial_cta_clicked", { metadata: { source: "hero" } }),
       event("signup_started"),
       event("signup_success"),
       event("checkout_started"),
@@ -52,7 +52,11 @@ test("analytics summary builds the core business funnel", () => {
   });
 
   assert.equal(summary.business.landingVisitors, 1);
+  assert.equal(summary.business.landingUniqueVisitors, 1);
   assert.equal(summary.business.trialClicks, 1);
+  assert.deepEqual(summary.business.trialClickSources, [
+    { label: "hero", count: 1 },
+  ]);
   assert.equal(summary.business.checkoutStarted, 1);
   assert.equal(summary.business.activationSuccess, 1);
   assert.equal(summary.business.purchaseEvents, 1);

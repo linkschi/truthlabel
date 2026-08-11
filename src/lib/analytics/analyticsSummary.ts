@@ -76,6 +76,7 @@ export type AnalyticsSummary = {
   };
   business: {
     landingVisitors: number;
+    landingUniqueVisitors: number;
     trialClicks: number;
     signupStarted: number;
     signupSuccess: number;
@@ -86,6 +87,7 @@ export type AnalyticsSummary = {
     unmatchedPurchases: number;
     conversionRates: Array<{ label: string; value: number; helper: string }>;
     metrics: AnalyticsMetric[];
+    trialClickSources: AnalyticsCount[];
   };
   alerts: AnalyticsAlert[];
 };
@@ -190,6 +192,15 @@ function toRecentEvent(event: AnalyticsEventRow): AnalyticsRecentEvent {
     ...(status ? { status } : {}),
     ...(source ? { source } : {}),
   };
+}
+
+function isLandingPageView(event: AnalyticsEventRow) {
+  if (event.event_name !== "page_view") {
+    return false;
+  }
+
+  const routePath = cleanRoutePath(event.route_path);
+  return routePath === "/landing" || routePath === "/";
 }
 
 function buildAlerts(args: {
@@ -327,10 +338,20 @@ export function buildAnalyticsSummary({
       .map(getEventErrorType),
   );
 
-  const landingVisitors = events.filter(
-    (event) => event.event_name === "page_view" && event.route_path === "/",
-  ).length;
+  const landingPageViews = events.filter(isLandingPageView);
+  const landingVisitors = landingPageViews.length;
+  const landingUniqueVisitors = new Set(
+    landingPageViews.map((event) => event.anonymous_id).filter(Boolean),
+  ).size;
   const trialClicks = getEventCount(eventCounts, "trial_cta_clicked");
+  const trialClickSources = topCounts(
+    countBy(
+      events
+        .filter((event) => event.event_name === "trial_cta_clicked")
+        .map((event) => getMetadataString(event.metadata, "source") || "unknown"),
+    ),
+    8,
+  );
   const signupStarted = getEventCount(eventCounts, "signup_started");
   const signupSuccess = getEventCount(eventCounts, "signup_success");
   const signupFailed = getEventCount(eventCounts, "signup_failed");
@@ -494,7 +515,19 @@ export function buildAnalyticsSummary({
 
   const businessMetrics = [
     metric(
-      "Trial clicks",
+      "Landing page visits",
+      landingVisitors,
+      "Page views on the public landing page.",
+      landingVisitors > 0 ? "green" : "neutral",
+    ),
+    metric(
+      "Unique landing visitors",
+      landingUniqueVisitors,
+      "Distinct browsers that viewed the landing page.",
+      landingUniqueVisitors > 0 ? "green" : "neutral",
+    ),
+    metric(
+      "Trial button clicks",
       trialClicks,
       "People who clicked a trial CTA.",
       trialClicks > 0 ? "green" : "neutral",
@@ -577,6 +610,7 @@ export function buildAnalyticsSummary({
     business: {
       landingVisitors,
       trialClicks,
+      landingUniqueVisitors,
       signupStarted,
       signupSuccess,
       checkoutStarted,
@@ -607,6 +641,7 @@ export function buildAnalyticsSummary({
         },
       ],
       metrics: businessMetrics,
+      trialClickSources,
     },
     alerts: buildAlerts({
       signupFailed,

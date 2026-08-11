@@ -248,6 +248,46 @@ function DashboardBody({
         </section>
       )}
 
+      <Section eyebrow="Landing" title="Landing performance">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <MetricCard
+            label="Landing page visits"
+            value={summary.business.landingVisitors}
+            helper="Visits to the public landing page."
+            tone={summary.business.landingVisitors > 0 ? "green" : "neutral"}
+          />
+          <MetricCard
+            label="Unique landing visitors"
+            value={summary.business.landingUniqueVisitors}
+            helper="Distinct browsers that viewed the landing page."
+            tone={summary.business.landingUniqueVisitors > 0 ? "green" : "neutral"}
+          />
+          <MetricCard
+            label="Trial button clicks"
+            value={summary.business.trialClicks}
+            helper="Clicks on tracked trial buttons."
+            tone={summary.business.trialClicks > 0 ? "green" : "neutral"}
+          />
+          <MetricCard
+            label="Visit to trial click"
+            value={
+              summary.business.conversionRates.find(
+                (rate) => rate.label === "Landing to trial click",
+              )?.value ?? 0
+            }
+            suffix="%"
+            helper="Trial clicks divided by landing page visits."
+            tone={summary.business.trialClicks > 0 ? "green" : "neutral"}
+          />
+        </div>
+        <div className="mt-4">
+          <CountList
+            emptyLabel="No trial button clicks captured yet."
+            items={summary.business.trialClickSources}
+          />
+        </div>
+      </Section>
+
       <Section eyebrow="Business" title="Business health">
         <div className="grid gap-3 sm:grid-cols-2">
           {summary.business.metrics.map((metric) => (
