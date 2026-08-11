@@ -9,7 +9,6 @@ type ConcernTone = "red" | "yellow" | "green";
 type ConcernCard = {
   label: string;
   headline: ReactNode;
-  copy: ReactNode;
   tone: ConcernTone;
   imageSrc?: string;
   imageAlt?: string;
@@ -25,12 +24,6 @@ const concernCards: ConcernCard[] = [
         Restricted ingredients still reach shelves.
       </>
     ),
-    copy: (
-      <>
-        <span className="landing-highlight">Banned or restricted</span>{" "}
-        matches can still appear in ordinary products.
-      </>
-    ),
     tone: "red",
     imageSrc: "/landing-banned-carousel.jpeg",
     imageAlt: "Banned stamp over packaged foods in a supermarket setting",
@@ -44,11 +37,6 @@ const concernCards: ConcernCard[] = [
         Long-term concern signals can hide in ordinary food.
       </>
     ),
-    copy: (
-      <>
-        Cancer-related ingredient and food markers deserve closer review.
-      </>
-    ),
     tone: "red",
     imageSrc: "/landing-cancer-carousel.jpeg",
     imageAlt: "Processed snack foods and packaged products in a supermarket aisle",
@@ -58,12 +46,6 @@ const concernCards: ConcernCard[] = [
   {
     label: "Lab-Made and Bioengineered Food",
     headline: "Lab-made food signals are easy to miss.",
-    copy: (
-      <>
-        Bioengineered, cell-cultured, and lab-made wording can be buried in
-        labels.
-      </>
-    ),
     tone: "yellow",
     imageSrc: "/landing-labmade-carousel.jpeg",
     imageAlt: "Lab-grown meat in a laboratory setting with meat samples",
@@ -75,11 +57,6 @@ const concernCards: ConcernCard[] = [
     headline: (
       <>
         Brand history can change how a label looks.
-      </>
-    ),
-    copy: (
-      <>
-        Verified recall, misbranding, and safety-action records can matter.
       </>
     ),
     tone: "yellow",
@@ -221,7 +198,6 @@ export default function LandingConcernCarousel() {
             <div className="landing-concern-card__body">
               <p>{card.label}</p>
               <h3>{card.headline}</h3>
-              <span>{card.copy}</span>
             </div>
           </article>
         ))}

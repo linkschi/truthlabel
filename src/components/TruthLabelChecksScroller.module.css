@@ -5,15 +5,10 @@
 
 .windowShell {
   overflow: hidden;
-  border: 1px solid rgba(12, 92, 68, 0.11);
+  border: 1px solid rgba(12, 92, 68, 0.12);
   border-radius: 1.75rem;
-  background: rgba(255, 255, 252, 0.9);
-  box-shadow:
-    0 1.65rem 4rem rgba(22, 66, 52, 0.1),
-    0 0.5rem 1.5rem rgba(22, 66, 52, 0.055),
-    inset 0 1px 0 rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  background: #ffffff;
+  box-shadow: 0 0.9rem 2.4rem rgba(22, 66, 52, 0.07);
 }
 
 .windowHeader {
@@ -25,7 +20,7 @@
   justify-content: space-between;
   gap: 1.1rem;
   border-bottom: 1px solid rgba(12, 92, 68, 0.09);
-  background: rgba(251, 252, 248, 0.94);
+  background: #ffffff;
   padding: 1rem 1.1rem;
 }
 
@@ -88,6 +83,7 @@
   position: relative;
   height: 22.5rem;
   overflow: hidden;
+  background: #ffffff;
   pointer-events: none;
 }
 
@@ -127,11 +123,9 @@
   overflow: hidden;
   border: 1px solid rgba(8, 78, 59, 0.09);
   border-radius: 1.1rem;
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow:
-    0 0.45rem 1.25rem rgba(18, 63, 49, 0.045),
-    inset 0 1px 0 rgba(255, 255, 255, 0.98);
-  opacity: 0.78;
+  background: #ffffff;
+  box-shadow: 0 0.35rem 1rem rgba(18, 63, 49, 0.04);
+  opacity: 1;
   padding: 0.7rem 0.9rem 0.7rem 1.05rem;
   transform: scale(0.985);
   transition:
@@ -237,15 +231,8 @@
 
 .active {
   border-color: color-mix(in srgb, currentColor 18%, transparent);
-  background:
-    linear-gradient(
-      110deg,
-      color-mix(in srgb, currentColor 6%, white),
-      rgba(255, 255, 255, 0.97)
-    );
-  box-shadow:
-    0 0.9rem 2rem rgba(18, 63, 49, 0.095),
-    inset 0 1px 0 rgba(255, 255, 255, 1);
+  background: #ffffff;
+  box-shadow: 0 0.6rem 1.35rem rgba(18, 63, 49, 0.07);
   opacity: 1;
   transform: scale(1);
 }
