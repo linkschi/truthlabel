@@ -48,6 +48,18 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 const activeAccessCachePrefix = "truthlabel.accountAccess.active.";
+const localDevelopmentUser = {
+  id: "local-dev-user",
+  aud: "authenticated",
+  role: "authenticated",
+  email: "local-dev@truthlabel.test",
+  email_confirmed_at: "2026-01-01T00:00:00.000Z",
+  app_metadata: { provider: "local-dev", providers: ["local-dev"] },
+  user_metadata: { name: "Local development" },
+  identities: [],
+  created_at: "2026-01-01T00:00:00.000Z",
+  updated_at: "2026-01-01T00:00:00.000Z",
+} as User;
 
 type RefreshAccessOptions = {
   showErrors?: boolean;
@@ -223,21 +235,37 @@ async function loadTrialAccess(userId: string) {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const allowLocalDevBypass =
+    publicAppConfig.flags.enableLocalDevBypass;
+  const [user, setUser] = useState<User | null>(() =>
+    allowLocalDevBypass ? localDevelopmentUser : null,
+  );
   const [subscription, setSubscription] =
     useState<TruthlabelSubscription | null>(null);
   const [trialAccess, setTrialAccess] =
     useState<TruthlabelTrialAccess | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(!allowLocalDevBypass);
   const [errorMessage, setErrorMessage] = useState("");
   const supabase = getSupabaseBrowserClient();
-  const currentUserRef = useRef<User | null>(null);
+  const currentUserRef = useRef<User | null>(
+    allowLocalDevBypass ? localDevelopmentUser : null,
+  );
   // MVP launch rule: a valid signed-in Truthlabel account can enter the app.
   // Gumroad/license checks are still recorded, but they must not block early users.
   const allowSignedInMvpAccess =
     publicAppConfig.flags.enableSignedInMvpAccess;
 
   const refreshAccess = useCallback(async (options: RefreshAccessOptions = {}) => {
+    if (allowLocalDevBypass) {
+      currentUserRef.current = localDevelopmentUser;
+      setUser(localDevelopmentUser);
+      setSubscription(null);
+      setTrialAccess(null);
+      setIsLoading(false);
+      setErrorMessage("");
+      return;
+    }
+
     if (!supabase) {
       setIsLoading(false);
       setErrorMessage("Supabase is not configured for this deployment.");
@@ -344,9 +372,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsLoading(false);
     }
-  }, [allowSignedInMvpAccess, supabase]);
+  }, [allowLocalDevBypass, allowSignedInMvpAccess, supabase]);
 
   useEffect(() => {
+    if (allowLocalDevBypass) {
+      currentUserRef.current = localDevelopmentUser;
+      return;
+    }
+
     const refreshHandle = window.setTimeout(() => {
       void refreshAccess({
         showErrors: false,
@@ -438,10 +471,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       window.clearTimeout(refreshHandle);
       data.subscription.unsubscribe();
     };
-  }, [allowSignedInMvpAccess, refreshAccess, supabase]);
+  }, [allowLocalDevBypass, allowSignedInMvpAccess, refreshAccess, supabase]);
 
   useEffect(() => {
-    if (!supabase || allowSignedInMvpAccess) {
+    if (!supabase || allowSignedInMvpAccess || allowLocalDevBypass) {
       return;
     }
 
@@ -469,32 +502,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.clearInterval(intervalId);
     };
-  }, [allowSignedInMvpAccess, refreshAccess, supabase]);
+  }, [allowLocalDevBypass, allowSignedInMvpAccess, refreshAccess, supabase]);
 
-  const accessState = getAccessState({
-    authLoading: isLoading,
-    userPresent: Boolean(user),
-    subscription,
-    trialAccess,
-    allowSignedInMvpAccess,
-  });
-  const accessKind = getAccessKind({ subscription, trialAccess });
+  const effectiveUser = allowLocalDevBypass ? localDevelopmentUser : user;
+  const accessState = allowLocalDevBypass
+    ? "active"
+    : getAccessState({
+        authLoading: isLoading,
+        userPresent: Boolean(effectiveUser),
+        subscription,
+        trialAccess,
+        allowSignedInMvpAccess,
+      });
+  const accessKind = allowLocalDevBypass
+    ? "paid"
+    : getAccessKind({ subscription, trialAccess });
   const trialDaysRemaining = getTrialDaysRemaining(trialAccess);
 
   const value = useMemo<AuthContextValue>(
     () => ({
       accessState,
       accessKind,
-      user,
+      user: effectiveUser,
       subscription,
       trialAccess,
       trialDaysRemaining,
-      isConfigured: Boolean(supabase),
+      isConfigured: allowLocalDevBypass || Boolean(supabase),
       errorMessage,
       refreshAccess,
       signOut: async () => {
         clearMvpActivationAccess();
-        const signedOutUserId = user?.id;
+        const signedOutUserId = effectiveUser?.id;
+
+        if (allowLocalDevBypass) {
+          currentUserRef.current = localDevelopmentUser;
+          setUser(localDevelopmentUser);
+          setSubscription(null);
+          setTrialAccess(null);
+          setIsLoading(false);
+          setErrorMessage("");
+          return;
+        }
 
         if (!supabase) {
           if (signedOutUserId) {
@@ -516,13 +564,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [
       accessKind,
       accessState,
+      allowLocalDevBypass,
       errorMessage,
+      effectiveUser,
       refreshAccess,
       subscription,
       supabase,
       trialAccess,
       trialDaysRemaining,
-      user,
     ],
   );
 
