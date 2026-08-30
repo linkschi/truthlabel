@@ -504,21 +504,29 @@ export default function InternalAnalyticsDashboard() {
           >
             Back to app
           </Link>
-          <div className="flex items-center gap-2 rounded-full border border-[#E4DED2] bg-white p-1">
-            {[7, 30, 90].map((days) => (
-              <button
-                key={days}
-                type="button"
-                onClick={() => setPeriodDays(days)}
-                className={`rounded-full px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.12em] ${
-                  periodDays === days
-                    ? "bg-[#182B22] text-white"
-                    : "text-[#53635A]"
-                }`}
-              >
-                {days}d
-              </button>
-            ))}
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <Link
+              href="/app/admin/flow-lab"
+              className="rounded-full border border-[#0E5A3F] bg-[#0E5A3F] px-3 py-2 text-[11px] font-black uppercase tracking-[0.14em] text-white"
+            >
+              Flow Lab
+            </Link>
+            <div className="flex items-center gap-2 rounded-full border border-[#E4DED2] bg-white p-1">
+              {[7, 30, 90].map((days) => (
+                <button
+                  key={days}
+                  type="button"
+                  onClick={() => setPeriodDays(days)}
+                  className={`rounded-full px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.12em] ${
+                    periodDays === days
+                      ? "bg-[#182B22] text-white"
+                      : "text-[#53635A]"
+                  }`}
+                >
+                  {days}d
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 

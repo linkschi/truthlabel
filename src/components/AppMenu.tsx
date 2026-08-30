@@ -51,6 +51,11 @@ const baseNavItems = [
 
 const testerNavItems = [
   {
+    href: "/app/admin/flow-lab",
+    label: "Flow Lab",
+    detail: "Preview onboarding, install, social handoff, and cancellation flows.",
+  },
+  {
     href: "/app/admin/demo-scan-builder",
     label: "Demo Scan Builder",
     detail: "Create customizable scan-result examples for screenshots.",

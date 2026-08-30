@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
 import type { User } from "@supabase/supabase-js";
 import { isTruthlabelAdminEmail } from "@/lib/auth/adminAccess";
+import { publicAppConfig } from "@/lib/appConfig";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() ?? "";
 const supabasePublishableKey =
@@ -50,6 +51,10 @@ export async function getServerSupabaseUser(): Promise<User | null> {
 }
 
 export async function getAuthorizedTruthlabelAdminEmailFromCookies() {
+  if (publicAppConfig.flags.enableLocalDevBypass) {
+    return "local-dev@truthlabel.test";
+  }
+
   const user = await getServerSupabaseUser();
 
   if (!isTruthlabelAdminEmail(user?.email)) {

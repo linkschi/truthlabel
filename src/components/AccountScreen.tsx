@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useSyncExternalStore } from "react";
@@ -1039,9 +1040,10 @@ export default function AccountScreen() {
             )}
             {cancelButtonVisible ? (
               <button
+                id="cancel-subscription"
                 type="button"
                 onClick={handleOpenCancelDialog}
-                className="inline-flex min-h-11 items-center justify-center rounded-full border border-[#F4C7C9] bg-[#FFF6F6] px-4 text-[13px] font-extrabold text-[#B42318] transition hover:bg-[#FDECEC] focus-visible:ring-2 focus-visible:ring-[#B42318] focus-visible:ring-offset-2 active:scale-[0.98]"
+                className="scroll-mt-24 inline-flex min-h-11 items-center justify-center rounded-full border border-[#F4C7C9] bg-[#FFF6F6] px-4 text-[13px] font-extrabold text-[#B42318] transition hover:bg-[#FDECEC] focus-visible:ring-2 focus-visible:ring-[#B42318] focus-visible:ring-offset-2 active:scale-[0.98]"
               >
                 Cancel subscription
               </button>
@@ -1115,6 +1117,12 @@ export default function AccountScreen() {
               Visible only on thiislincorn test accounts. These are the private tools
               for custom demo results and internal analytics.
             </p>
+            <RowLink
+              icon="clipboard"
+              title="Flow Lab"
+              detail="Preview onboarding, install, social handoff, and cancellation flows."
+              href="/app/admin/flow-lab"
+            />
             <RowLink
               icon="settings"
               title="Demo Scan Builder"
@@ -1311,16 +1319,20 @@ export default function AccountScreen() {
 
               <div className="mt-4 grid grid-cols-2 gap-2 sm:gap-3">
                 <figure className="overflow-hidden rounded-[18px] border border-[#DCE5DF] bg-[#F7F9F7] p-1">
-                  <img
+                  <Image
                     src="/cancel-receipt-email.jpeg"
                     alt="Receipt email showing the subscription settings link"
+                    width={720}
+                    height={1280}
                     className="h-[190px] w-full object-contain sm:h-[240px]"
                   />
                 </figure>
                 <figure className="overflow-hidden rounded-[18px] border border-[#DCE5DF] bg-[#F7F9F7] p-1">
-                  <img
+                  <Image
                     src="/cancel-membership.jpeg"
                     alt="Manage membership page showing the cancel membership button"
+                    width={720}
+                    height={1280}
                     className="h-[190px] w-full object-contain sm:h-[240px]"
                   />
                 </figure>
